@@ -1,3 +1,4 @@
+![Conduktor logo](https://avatars.githubusercontent.com/u/60062294?s=200&v=4)
 # Conduktor Helm Charts
 
 ## Charts
