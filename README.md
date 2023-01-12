@@ -3,11 +3,12 @@
 
 ## Charts
 
-TODO
+- platform-controller
+- conduktor-proxy
 
 ## Prerequisites
 
-TODO
+- Kubernetes
 
 #### Installing [Helm](https://helm.sh)
 
@@ -37,4 +38,10 @@ helm install platform-controller conduktor/platform-controller
 helm status platform-controller
 ```
 
+## Uninstalling the Chart
 
+To uninstall/delete the `platform-controller` deployment:
+
+```
+$ helm delete platform-controller
+```
