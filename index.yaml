@@ -3,7 +3,7 @@ entries:
   platform:
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2023-01-11T16:41:24.455812-05:00"
+    created: "2023-01-12T16:34:23.108684535Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -15,7 +15,7 @@ entries:
       repository: https://charts.bitnami.com/bitnami
       version: 12.x.x
     description: Conduktor Platform
-    digest: 8bf7a4c14ba4c369562a6ef25058b5ce11f40d668e95218713dbadd660dc8b05
+    digest: 9f79bed5d51770fdc266d9d408400314d362762323031cbcce2dd27aaaad14c2
     maintainers:
     - name: Conduktor Platform
     name: platform
@@ -23,4 +23,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/conduktor/conduktor-public-charts/gh-pages/platform-0.0.1.tgz
     version: 0.0.1
-generated: "2023-01-11T16:41:24.449216-05:00"
+generated: "2023-01-12T16:34:23.101106114Z"
