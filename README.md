@@ -10,12 +10,7 @@
 
 - Kubernetes
 
-#### Installing [Helm](https://helm.sh)
-
-```
-curl -L https://git.io/get_helm.sh | bash
-helm init
-```
+#### Installing [Helm](https://helm.sh/docs/intro/install/)
 
 ## Installing Conduktor Helm Repository
 
