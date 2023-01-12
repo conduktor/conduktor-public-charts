@@ -20,7 +20,7 @@ helm init
 ## Installing Conduktor Helm Repository
 
 ```
-helm repo add conduktor https://conduktor.github.io/conduktor-public-charts/
+helm repo add conduktor https://helm.conduktor.io
 helm repo update
 ```
 
