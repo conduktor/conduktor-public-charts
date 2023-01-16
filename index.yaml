@@ -3,7 +3,7 @@ entries:
   conduktor-proxy:
   - apiVersion: v2
     appVersion: "1.0"
-    created: "2023-01-13T18:29:26.912802151Z"
+    created: "2023-01-16T17:14:29.668433949Z"
     dependencies:
     - condition: kafka.enabled
       name: kafka
@@ -17,10 +17,29 @@ entries:
     urls:
     - https://raw.githubusercontent.com/conduktor/conduktor-public-charts/gh-pages/conduktor-proxy-1.0.40.tgz
     version: 1.0.40
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2023-01-16T17:14:29.659398486Z"
+    dependencies:
+    - condition: kafka.enabled
+      name: kafka
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-kafka
+      version: 18.x.x
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: 2.x.x
+    description: Conduktor Proxy and associated backing Kafka
+    digest: 215dc1305b1ad5c231e2b9a8dc7d25516eabdafe68fd07c55875b9dee810e9b3
+    name: conduktor-proxy
+    urls:
+    - https://raw.githubusercontent.com/conduktor/conduktor-public-charts/gh-pages/conduktor-proxy-1.0.0.tgz
+    version: 1.0.0
   platform:
   - apiVersion: v2
     appVersion: 0.3.3
-    created: "2023-01-13T18:29:26.926736077Z"
+    created: "2023-01-16T17:14:29.678729307Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -42,7 +61,7 @@ entries:
     version: 0.1.5
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2023-01-13T18:29:26.91915745Z"
+    created: "2023-01-16T17:14:29.673295791Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -62,4 +81,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/conduktor/conduktor-public-charts/gh-pages/platform-0.0.1.tgz
     version: 0.0.1
-generated: "2023-01-13T18:29:26.901794483Z"
+generated: "2023-01-16T17:14:29.649801995Z"
