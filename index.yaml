@@ -2,22 +2,6 @@ apiVersion: v1
 entries:
   conduktor-proxy:
   - apiVersion: v2
-    appVersion: "1.0"
-    created: "2023-01-16T17:14:29.668433949Z"
-    dependencies:
-    - condition: kafka.enabled
-      name: kafka
-      repository: https://charts.bitnami.com/bitnami
-      tags:
-      - bitnami-kafka
-      version: 18.1.x
-    description: Conduktor Proxy and associated backing Kafka
-    digest: 60aecc87879b3c7660bafa095e7ca08835c15971222cd2f7b7ee05c7528c6500
-    name: conduktor-proxy
-    urls:
-    - https://raw.githubusercontent.com/conduktor/conduktor-public-charts/gh-pages/conduktor-proxy-1.0.40.tgz
-    version: 1.0.40
-  - apiVersion: v2
     appVersion: 1.0.0
     created: "2023-01-16T17:14:29.659398486Z"
     dependencies:
