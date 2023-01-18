@@ -1,0 +1,179 @@
+# Default values for conduktor-proxy
+
+global:
+  ## @param global.imagePullSecrets [array, nullable] Docker login secrets name for image pull
+  imagePullSecrets:
+  ## @param global.env The environment name
+  env: ""
+
+## @section Conduktor-proxy configurations
+## @descriptionStart
+## This section contains configuration of the proxy
+## @descriptionEnd
+proxy:
+  ## @section Conduktor-proxy image configuration
+  ## @descriptionStart
+  ## This section define the image to be used
+  ## @descriptionEnd
+  image:
+    ## @param proxy.image.registry Docker registry to use
+    registry: docker.io
+    ## @param proxy.image.repository Image in repository format (conduktor/conduktor-proxy)
+    repository: conduktor/conduktor-proxy
+    ## @param proxy.image.tag Image tag
+    tag: 1.0.0-amd64
+    ## @param proxy.image.pullPolicy Kubernetes image pull policy
+    pullPolicy: IfNotPresent
+
+  ## @param proxy.replicas number of proxy instances to be deployed
+  replicas: 2
+  ## @param proxy.secretRef Secret name to load sensitive env var from
+  secretRef: ""
+
+  ## @param proxy.env Environment variables for proxy deployment
+  env: {}
+
+  ## @param proxy.interceptors Json configuration for interceptors to be loaded at startup by proxy
+  interceptors: "[]"
+  ## @param proxy.rocksDbSharedLibDir Folder to load rocksdb shared lib from
+  rocksDbSharedLibDir: /app/resources
+
+  portRange:
+    ## @param proxy.portRange.start Start port of the proxy port range
+    start: 9092
+    ## @param proxy.portRange.end End port (inclusive) of the proxy port range
+    end: 9099
+
+  admin:
+    ## @param proxy.admin.port Admin http server port
+    port: 8888
+
+  jmx:
+    ## @param proxy.jmx.enable Enable jmx jvm options
+    enable: false
+    ## @param proxy.jmx.port jmx port to expose by default jvm args
+    port: 9999
+    ## @param proxy.jmx.jvmArgs arguments to pass to the proxy container jvm
+    jvmArgs: -Dcom.sun.management.jmxremote.port={{ .Values.proxy.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.proxy.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1
+
+  prometheus:
+    ## @param proxy.prometheus.port Prometheus metric port
+    port: 9089
+
+  ## @param proxy.podLabels Specific labels to be added to proxy pod by deployment
+  podLabels: {}
+
+  ## @param proxy.podAnnotations Proxy pod annotations
+  podAnnotations: {}
+
+  ## @param proxy.securityContext Container security context
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+## @section TLS configuration
+## @descriptionStart
+## This section is for configuring proxy to handle certificate to manage SSL endpoint inside proxy deployment
+## @descriptionEnd
+tls:
+  ## @param tls.enable Enable tls injection into proxy
+  enable: false
+  ## @param tls.secretRef Secret name with keystore to load
+  secretRef: ""
+  ## @param tls.keystoreKey Key in the secret to load as keystore
+  keystoreKey: keystore.jks
+  ## @param tls.keystoreFile File name to mount keystore as
+  keystoreFile: keystore.jks
+
+## @section Conduktor-proxy service configurations
+## @descriptionStart
+## This section contains kubernetes services configuration
+## @descriptionEnd
+service:
+  ## @section Conduktor-proxy external service configurations
+  ## @descriptionStart
+  ## This section specify external service configuration
+  ## @descriptionEnd
+  external:
+    ## @param service.external.enable Enable a service for external connection to proxy
+    enable: false
+    ## @param service.external.type Type of load balancer
+    type: ClusterIP
+    ## @param service.external.ip Ip to configure
+    ip: ""
+    ## @param service.external.annotations
+    annotations: {}
+    # LoadBalancer externaldns gke support by annotation https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/gke.md#verify-using-an-external-load-balancer
+    # external-dns.alpha.kubernetes.io/hostname: "{{ required "A valid .Values.proxy.domain is required!" .Values.proxy.domain }}"
+    ## @param service.external.admin Enable admin exposition on external service
+    admin: false
+    ## @param service.external.jmx Enable jmx exposition on external service
+    jmx: false
+    ## @param service.external.prometheus Enable prometheus exposition on external service
+    prometheus: false
+  ## @section Conduktor-proxy internal service configurations
+  ## @descriptionStart
+  ## This section specify internal service configuration
+  ## @descriptionEnd
+  internal:
+    ## @param service.internal.annotations
+    annotations: {}
+
+## @section Conduktor-proxy metrics activation
+## @descriptionStart
+## Proxy embed metrics to be installed within you cluster if your have the correct capabilities (Prometheus and Grafana operators)
+## @descriptionEnd
+metrics:
+  alerts:
+    ## @param metrics.alerts.enable Enable prometheus alerts if prometheus alerts rules is supported on cluster
+    enable: false
+  checklyAlerts:
+    ## @param metrics.checklyAlerts.enable Enable alerts for checky jobs if prometheus rules is supported on cluster
+    enable: false
+  prometheus:
+    ## @param metrics.prometheus.enable Enable ServiceMonitor prometheus operator configuration for metrics scrapping
+    enable: false
+  grafana:
+    ## @param metrics.grafana.enable Enable grafana dashboards to installation
+    enable: false
+    datasources:
+      ## @param metrics.grafana.datasources.prometheus Prometheus datasource to use for metric dashboard
+      prometheus: prometheus
+      ## @param metrics.grafana.datasources.loki Loki datasource to use for log dashboard
+      loki: loki
+
+
+## @section Kubernetes common configuration
+## @descriptionStart
+## Shared kubernetes configuration of the chart
+## @descriptionEnd
+
+serviceAccount:
+  ## @param serviceAccount.create Create Kubernetes service account. Default kube value if false
+  # Specifies whether a service account should be created
+  # If AWS IAM is used, need to have create: false
+  create: false
+
+## @param commonLabels Labels to be applied to all ressources created by this chart
+commonLabels: {}
+
+## @param nodeSelector Container node selector
+nodeSelector: {}
+
+## @param tolerations Container tolerations
+tolerations: []
+
+## @param affinity Container affinity
+affinity: {}
+
+## @section Dependencies
+## @descriptionStart
+## Enable and configure chart dependencies if not available in your deployment
+## @descriptionEnd
+kafka:
+  ## @param kafka.enabled Deploy a kafka along side proxy (This should only used for testing purpose)
+  enabled: false
