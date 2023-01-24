@@ -3,7 +3,7 @@
 
 ## Charts
 
-- platform-controller ([doc](platform/README.md), [values](platform/values.yaml))
+- platform-controller ([doc](platform-controller/README.md), [values](platform-controller/values.yaml))
 - conduktor-proxy ([doc](proxy/README.md), [values](proxy/values.yaml))
 
 ## Prerequisites
