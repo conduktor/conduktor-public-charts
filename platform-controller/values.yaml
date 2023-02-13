@@ -1,1 +1,221 @@
-#Default valies for platform-controller
+# Default values for platform-controller
+
+## @param nameOverride Override the name of resources
+nameOverride: ""
+## @param fullnameOverride Override the full name of resources
+fullnameOverride: ""
+
+## @section Global parameters
+global:
+  ## @param global.imageRegistry Global Docker image registry
+  imageRegistry: ""
+  ## @param global.imagePullSecrets Docker login secrets name for image pull
+  imagePullSecrets: []
+#    - name: ghcr
+
+## @section Controller parameters
+## @descriptionStart
+## Conduktor Controller parameters
+## @descriptionEnd
+controller:
+  ## @param controller.image.registry Platform Controller image registry
+  ## @param controller.image.repository Platform Controller image repository
+  ## @param controller.image.pullPolicy Platform Controller image pull policy
+  ## @param controller.image.tag Platform Controller image tag
+  image:
+    registry: docker.io
+    repository: conduktor/platform-controller
+    pullPolicy: Always
+    tag: 0.4.0
+
+  ## @param controller.commonLabels Common labels to add to all resources
+  commonLabels: {}
+
+  ## @param controller.commonAnnotations Common annotations to add to all resources
+  commonAnnotations: {}
+
+  serviceAccount:
+    ## @param controller.serviceAccount.create Create Kubernetes service account.
+    # Specifies whether a service account should be created
+    # If AWS IAM is used, need to have create: false
+    create: true
+    ## @param controller.serviceAccount.name Service account name override
+    name: "conduktor-controller"
+
+  resources:
+    limits:
+      ## @param controller.resources.limits.cpu CPU limit for the platform controller
+      cpu: 100m
+      ## @param controller.resources.limits.memory Memory limit for the platform controller
+      memory: 128Mi
+    requests:
+      ## @param controller.resources.requests.cpu CPU resource requests for platform controller
+      cpu: 100m
+      ## @param controller.resources.requests.memory Memory resource requests for platform controller
+      memory: 128Mi
+
+  ingress:
+    ## @param controller.ingress.ingressClassName Ingress class name for the controller
+    ingressClassName: ""
+    ## @param controller.ingress.host Platform controller Host
+    host: "controller.private"
+    ## @param controller.ingress.extraHosts An array with additional hostname(s) to be covered with this ingress record.
+    extraHosts: []
+    tls:
+      ## @param controller.ingress.tls.enabled Enable TLS for the controller ingress
+      enabled: false
+      ## @param controller.ingress.tls.host Host
+      host:
+      ## @param controller.ingress.tls.secretRef Secret name with keystore to load
+      secretRef: ""
+    ## @param controller.ingress.annotations Additional annotations for the ingress
+    annotations: {}
+  service:
+    ## @param controller.service.annotations Annotations for controller service
+    annotations: {}
+    http:
+      ## @param controller.service.http.port HTTP port
+      port: 8080
+
+## @section Platform parameters
+## @descriptionStart
+## Conduktor Platform parameters
+## @descriptionEnd
+platform:
+  ## @param platform.commonLabels Common labels to add to all resources
+  commonLabels: {}
+
+  ## @param platform.config.replicas Number of replicas for the platform controller
+  ## @param platform.config.name Name of the platform controller
+  ## @param platform.config.organization Your organizations name
+  ## @param platform.config.adminEmail Email of the admin user
+  ## @param platform.config.adminPassword Password of the admin user
+  config:
+    replicas: 1
+    name: platform
+    organization: conduktor
+    adminEmail: "admin@conduktor.io"
+    adminPassword: "admin"  # pragma: allowlist secret
+
+    ## Module is the list of conduktor platform modules.
+    ## @param platform.config.modules.console Enable or disable the console module
+    ## @param platform.config.modules.data_masking Enable or disable the data masking module
+    ## @param platform.config.modules.monitoring Enable or disable the monitoring module
+    ## @param platform.config.modules.testing Enable or disable the testing module
+    ## @param platform.config.modules.topic_as_a_service Enable or disable the topic as a service module
+    ## @param platform.config.modules.governance Enable or disable the governance module
+    modules:
+      console: true
+      data_masking: true
+      monitoring: true
+      testing: true
+      topic_as_a_service: true
+      governance: true
+    ## @param platform.config.monitoring External monitoring S3 storage
+    monitoring: {}
+    #  storage:
+    #    s3:
+    #      bucket: ""
+
+    ## @param platform.config.sso.enabled Enable or disable the SSO (only on enterprise plan)
+    ## @param platform.config.sso.ignoreUntrustedCertificate Disable SSL checks
+    sso:
+      enabled: false
+      ignoreUntrustedCertificate: false
+
+      ## @param platform.config.sso.ldap[0].name LDAP connection name
+      ## @param platform.config.sso.ldap[0].server LDAP server host and port
+      ## @param platform.config.sso.ldap[0].managerDn Sets the manager DN
+      ## @param platform.config.sso.ldap[0].managerPassword Sets the manager password
+      ## @param platform.config.sso.ldap[0].searchBase  Sets the base DN to search
+      ## @param platform.config.sso.ldap[0].groupsBase Sets the base DN to search from
+      ldap:
+        - name: ""
+          server: ""
+          managerDn: ""
+          managerPassword: ""
+          searchBase: ""
+          groupsBase: ""
+      ## @param platform.config.sso.oauth2[0].name OAuth2 connection name
+      ## @param platform.config.sso.oauth2[0].default Use as default
+      ## @param platform.config.sso.oauth2[0].clientId OAuth2 client id
+      ## @param platform.config.sso.oauth2[0].clientSecret OAuth2 client secret
+      ## @param platform.config.sso.oauth2[0].openid.issuer Issuer to check on token
+      oauth2:
+        - name: ""
+          default: true
+          clientId: ""
+          clientSecret: ""
+          openid:
+            issuer: ""
+    ## @param platform.config.license Enterprise license key. If not provided, fallback to free plan.
+    license: ""
+    database:
+      ## @param platform.config.database.host Database host
+      ##
+      host: "postgresql.postgresql"
+
+      ## @param platform.config.database.port Database port
+      ##
+      port: 5432
+
+      ## @param platform.config.database.username Database user
+      ##
+      username: "postgres"
+
+      ## @param platform.config.database.password Database password, can be a string or can reference a secret.
+      ##
+      password: "conduktor"  # pragma: allowlist secret
+
+      ## @param platform.config.database.name Database name
+      ##
+      name: "postgres"
+  ingress:
+    ## @param platform.ingress.ingressClassName Ingress class name for the platform
+    ingressClassName: ""
+    ## @param platform.ingress.host Plaform host
+    host: "platform.local"
+    tls:
+      ## @param platform.ingress.tls.enabled Enable Platform TLS
+      enabled: false
+      ## @param platform.ingress.tls.host Platform Host
+      host:
+      ## @param platform.ingress.tls.secretRef Secret name with keystore to load
+      secretRef: ""
+      ## @param platform.ingress.annotations Additional annotations for the ingress
+    annotations: {}
+  resources:
+    limits:
+      ## @param platform.resources.limits.cpu CPU limit for the platform container
+      cpu: 4000m
+      ## @param platform.resources.limits.memory Memory limit for the container
+      memory: 8Gi
+    requests:
+      ## @param platform.resources.requests.cpu CPU resource requests
+      cpu: 2000m
+      ## @param platform.resources.requests.memory Memory resource requests
+      memory: 4Gi
+
+## @section Dependencies
+## @descriptionStart
+## Enable and configure chart dependencies if not available in your deployment
+## @descriptionEnd
+## ref: https://github.com/bitnami/charts/blob/main/bitnami/postgresql/values.yaml
+postgresql:
+  ## @param postgresql.enabled Switch to enable or disable the PostgreSQL helm chart
+  enabled: true
+  auth:
+    ## @param postgresql.auth.username Name for a custom user to create
+    username: conduktor
+    ## @param postgresql.auth.password Password for the custom user to create
+    password: conduktorpassword  # pragma: allowlist secret
+    ## @param postgresql.auth.postgresPassword Password for the "postgres" admin user.
+    postgresPassword: ""
+    ## @param postgresql.auth.database Name for a custom database to create
+    database: conduktor_platform
+
+## Kafka chart configuration
+## ref: https://github.com/bitnami/charts/blob/master/bitnami/kafka/values.yaml
+kafka:
+  ## @param kafka.enabled Deploy a kafka along side platform-controller (This should only used for testing purpose)
+  enabled: false

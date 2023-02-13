@@ -3,7 +3,7 @@ entries:
   conduktor-proxy:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2023-02-13T14:01:04.214432117Z"
+    created: "2023-02-13T14:13:20.663080943Z"
     dependencies:
     - condition: kafka.enabled
       name: kafka
@@ -23,7 +23,7 @@ entries:
   platform:
   - apiVersion: v2
     appVersion: 0.3.3
-    created: "2023-02-13T14:01:04.224945258Z"
+    created: "2023-02-13T14:13:20.67363517Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -45,7 +45,7 @@ entries:
     version: 0.1.5
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2023-02-13T14:01:04.219235163Z"
+    created: "2023-02-13T14:13:20.667913535Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -68,7 +68,7 @@ entries:
   platform-controller:
   - apiVersion: v2
     appVersion: 0.4.0
-    created: "2023-02-13T14:01:04.237100639Z"
+    created: "2023-02-13T14:13:20.686412947Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -86,7 +86,7 @@ entries:
       - bitnami-kafka
       version: 18.1.x
     description: Conduktor Controller
-    digest: 3afe040f26eb015c4e0084fcabb8e3903b30ca5a83f63579fec4fefcbb8e0e83
+    digest: ebbe1387b9b8f4e3ca131fe3bf30cfe200506b3fc2ca493d195c9e5f1e7607a0
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -96,4 +96,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/conduktor/conduktor-public-charts/gh-pages/platform-controller-0.2.1.tgz
     version: 0.2.1
-generated: "2023-02-13T14:01:04.205276162Z"
+generated: "2023-02-13T14:13:20.653807875Z"
