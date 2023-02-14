@@ -26,7 +26,7 @@ controller:
     registry: docker.io
     repository: conduktor/platform-controller
     pullPolicy: Always
-    tag: 0.4.0
+    tag: 0.5.0
 
   ## @param controller.commonLabels Common labels to add to all resources
   commonLabels: {}
@@ -213,6 +213,10 @@ postgresql:
     postgresPassword: ""
     ## @param postgresql.auth.database Name for a custom database to create
     database: conduktor_platform
+  primary:
+    ## @param postgresql.primary.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for PostgreSQL Primary nodes
+    ##
+    extraEnvVarsCM: "postgresql-extra-env-vars"
 
 ## Kafka chart configuration
 ## ref: https://github.com/bitnami/charts/blob/master/bitnami/kafka/values.yaml

@@ -52,7 +52,7 @@ Conduktor Controller parameters
 | `controller.image.registry`            | Platform Controller image registry                                           | `docker.io`                     |
 | `controller.image.repository`          | Platform Controller image repository                                         | `conduktor/platform-controller` |
 | `controller.image.pullPolicy`          | Platform Controller image pull policy                                        | `Always`                        |
-| `controller.image.tag`                 | Platform Controller image tag                                                | `0.4.0`                         |
+| `controller.image.tag`                 | Platform Controller image tag                                                | `0.5.0`                         |
 | `controller.commonLabels`              | Common labels to add to all resources                                        | `{}`                            |
 | `controller.commonAnnotations`         | Common annotations to add to all resources                                   | `{}`                            |
 | `controller.serviceAccount.create`     | Create Kubernetes service account.                                           | `true`                          |
@@ -126,14 +126,15 @@ Conduktor Platform parameters
 
 Enable and configure chart dependencies if not available in your deployment
 
-| Name                               | Description                                                                               | Value                |
-| ---------------------------------- | ----------------------------------------------------------------------------------------- | -------------------- |
-| `postgresql.enabled`               | Switch to enable or disable the PostgreSQL helm chart                                     | `true`               |
-| `postgresql.auth.username`         | Name for a custom user to create                                                          | `conduktor`          |
-| `postgresql.auth.password`         | Password for the custom user to create                                                    | `conduktorpassword`  |
-| `postgresql.auth.postgresPassword` | Password for the "postgres" admin user.                                                   | `""`                 |
-| `postgresql.auth.database`         | Name for a custom database to create                                                      | `conduktor_platform` |
-| `kafka.enabled`                    | Deploy a kafka along side platform-controller (This should only used for testing purpose) | `false`              |
+| Name                                | Description                                                                               | Value                       |
+| ----------------------------------- | ----------------------------------------------------------------------------------------- | --------------------------- |
+| `postgresql.enabled`                | Switch to enable or disable the PostgreSQL helm chart                                     | `true`                      |
+| `postgresql.auth.username`          | Name for a custom user to create                                                          | `conduktor`                 |
+| `postgresql.auth.password`          | Password for the custom user to create                                                    | `conduktorpassword`         |
+| `postgresql.auth.postgresPassword`  | Password for the "postgres" admin user.                                                   | `""`                        |
+| `postgresql.auth.database`          | Name for a custom database to create                                                      | `conduktor_platform`        |
+| `postgresql.primary.extraEnvVarsCM` | Name of existing ConfigMap containing extra env vars for PostgreSQL Primary nodes         | `postgresql-extra-env-vars` |
+| `kafka.enabled`                     | Deploy a kafka along side platform-controller (This should only used for testing purpose) | `false`                     |
 
 
 ## Remove
