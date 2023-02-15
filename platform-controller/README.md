@@ -20,13 +20,13 @@ $ helm search repo conduktor
 To install the chart with the release name `platform`:
 
 ```console
-$ helm install -n conduktor --create-namespace platform conduktor/platform
+$ helm install -n conduktor --create-namespace platform conduktor/platform-controller
 ```
 
 ### With enterprise license
 
 ```console
-$ helm install -n conduktor --create-namespace platform conduktor/platform \
+$ helm install -n conduktor --create-namespace platform conduktor/platform-controller \
    --set platform.config.license=YOUR_LICENSE \
    --set platform.config.organization=YOUR_ORGANIZATION \
    --set platform.config.adminEmail=admin@yourdomain.com \
