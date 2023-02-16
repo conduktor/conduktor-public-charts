@@ -1,5 +1,10 @@
 # Platform-controller
 
+> **Warning**  
+> This chart is in **BETA** phase and is subject to change. 
+> The API may change without notice.  
+> If you have any questions or [feedback](https://product.conduktor.help/c/55-helm-chart) contact our [support](https://www.conduktor.io/contact/support/).
+
 ## Introduction
 Controller to deploy the Conduktor Platform on Kubernetes.
 
@@ -33,6 +38,54 @@ $ helm install -n conduktor --create-namespace platform conduktor/platform-contr
    --set platform.config.adminPassword=TOP_SECRET
 ```
 
+## Versions matrix
+
+| Conduktor Platform | Platform-controller | Helm chart |
+|--------------------|---------------------|------------|
+| 1.11.1             | 0.4.0               | 0.2.1      |
+| 1.11.1             | 0.5.0               | 0.2.2      |
+| 1.11.1             | 0.5.0               | 0.2.3      |
+| 1.11.1             | 0.6.0               | 0.2.4      |
+
+## Architecture
+This Helm chart will deploy the Platform-controller that is responsible to deploy the Conduktor Platform on the same namespace.
+
+Optionally it can deploy a Postgresql and/or a Kafka cluster inside the same namespace for demo purpose.
+
+```
+                          conduktor (namespace)
+                        +--------------------------------------------------------------------------------------+
++------------+          |                                                                                      |
+|            |          |          +-----------------------+                          +---------+              |
+| Helm chart |  Deploy  |          |                       | Deploy        +----------> Ingress |              |
+|            +--+-------+---------->  platform-controller  |               |          +----+----+              |
++------------+  |       |          |                       +---------------+               |                   |
+                |       |          +-------+----------+----+               |               |                   |
+                |       |                  |          |                    |         +-----v-----+             |
+                |       |                  |  Watch   |                    +--------->  Service  |             |
+                |       |                  |          |                    |         +-----+-----+             |
+                |       |                  |          |                    |               |                   |
+                |       |            +-----v-----+ +--v------+             |               |                   |
+                |       |            |           | |         |             |     +---------v--------------+    |
+                |       |            | ConfigMap | | Secret  |             |     |                        |    |
+                |       |            |           | |         |             +----->   conduktor-platform   |    |
+                |       |            +------^----+ +---^-----+                   |                        |    |
+                |       |                   |          |                         +--------+---------------+    |
+                |       |                   |          |                                  |                    |
+                +-------+-----------+-------+----------+-+                                |Connect to          |
+                        |           |                    |                                |                    |
+                        |        +--v----------+     +---v----------+                     |                    |
+                        |        |             |     |              |                     |                    |
+                        |        | Postgresql  |     |  Kafka       |                     |                    |
+                        |        |  (optional) |     |   (optional) |                     |                    |
+                        |        |             |     |              |                     |                    |
+                        |        +------^------+     +--------^-----+                     |                    |
+                        |               |                     |                           |                    |
+                        |               +---------------------+---------------------------+                    |
+                        |                                                                                      |
+                        +--------------------------------------------------------------------------------------+
+```
+
 ## Parameters
 
 ### Global parameters
@@ -52,7 +105,7 @@ Conduktor Controller parameters
 | `controller.image.registry`            | Platform Controller image registry                                           | `docker.io`                     |
 | `controller.image.repository`          | Platform Controller image repository                                         | `conduktor/platform-controller` |
 | `controller.image.pullPolicy`          | Platform Controller image pull policy                                        | `Always`                        |
-| `controller.image.tag`                 | Platform Controller image tag                                                | `0.5.0`                         |
+| `controller.image.tag`                 | Platform Controller image tag                                                | `0.6.0`                         |
 | `controller.commonLabels`              | Common labels to add to all resources                                        | `{}`                            |
 | `controller.commonAnnotations`         | Common annotations to add to all resources                                   | `{}`                            |
 | `controller.serviceAccount.create`     | Create Kubernetes service account.                                           | `true`                          |
