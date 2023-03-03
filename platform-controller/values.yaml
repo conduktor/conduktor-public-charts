@@ -11,7 +11,7 @@ global:
   imageRegistry: ""
   ## @param global.imagePullSecrets Docker login secrets name for image pull
   imagePullSecrets: []
-#    - name: ghcr
+  #    - name: ghcr
 
 ## @section Controller parameters
 ## @descriptionStart
@@ -26,7 +26,7 @@ controller:
     registry: docker.io
     repository: conduktor/platform-controller
     pullPolicy: Always
-    tag: 0.6.0
+    tag: 0.7.0
 
   ## @param controller.commonLabels Common labels to add to all resources
   commonLabels: {}
@@ -76,6 +76,17 @@ controller:
     http:
       ## @param controller.service.http.port HTTP port
       port: 8080
+  ## @param controller.extraEnvVars Array with extra environment variables
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param controller.extraEnvVarsCM Name of existing ConfigMap containing extra env vars
+  extraEnvVarsCM: ""
+  ## @param controller.extraEnvVarsSecret Name of existing Secret containing extra env vars
+  extraEnvVarsSecret: ""
 
 ## @section Platform parameters
 ## @descriptionStart
@@ -85,6 +96,14 @@ platform:
   ## @param platform.commonLabels Common labels to add to all resources
   commonLabels: {}
 
+  ## @param platform.existingSecret Existing secret for platform
+  ## The secret must contain the keys:
+  ## `admin-password` (required),
+  ## `database-password` (required),
+  ## `license` (optional),
+  ## `sso-oauth2-client-secret` (optional),
+  ## `sso-ldap-manager-password` (optional),
+  existingSecret: ""
   ## @param platform.config.replicas Number of replicas for the platform controller
   ## @param platform.config.name Name of the platform controller
   ## @param platform.config.organization Your organizations name
@@ -111,11 +130,27 @@ platform:
       testing: true
       topic_as_a_service: true
       governance: true
-    ## @param platform.config.monitoring External monitoring S3 storage
-    monitoring: {}
-    #  storage:
-    #    s3:
-    #      bucket: ""
+    monitoring:
+      storage:
+        s3:
+          ## @param platform.config.monitoring.storage.s3.bucket S3 bucket name
+          # Ignored if minio.enabled is true
+          bucket: ""
+          ## @param platform.config.monitoring.storage.s3.endpoint S3 endpoint
+          # Ignored if minio.enabled is true
+          endpoint: ""
+          ## @param platform.config.monitoring.storage.s3.accessKey S3 access key
+          # Ignored if minio.enabled is true
+          accessKey: ""
+          ## @param platform.config.monitoring.storage.s3.secretKey S3 secret key
+          # Ignored if minio.enabled is true
+          secretKey: ""
+          ## @param platform.config.monitoring.storage.s3.region S3 region
+          # Ignored if minio.enabled is true
+          region: ""
+          ## @param platform.config.monitoring.storage.s3.insecure S3 insecure
+          # Ignored if minio.enabled is true
+          insecure: true
 
     ## @param platform.config.sso.enabled Enable or disable the SSO (only on enterprise plan)
     ## @param platform.config.sso.ignoreUntrustedCertificate Disable SSL checks
@@ -123,31 +158,31 @@ platform:
       enabled: false
       ignoreUntrustedCertificate: false
 
-      ## @param platform.config.sso.ldap[0].name LDAP connection name
-      ## @param platform.config.sso.ldap[0].server LDAP server host and port
-      ## @param platform.config.sso.ldap[0].managerDn Sets the manager DN
-      ## @param platform.config.sso.ldap[0].managerPassword Sets the manager password
-      ## @param platform.config.sso.ldap[0].searchBase  Sets the base DN to search
-      ## @param platform.config.sso.ldap[0].groupsBase Sets the base DN to search from
+      ## @param platform.config.sso.ldap.name LDAP connection name
+      ## @param platform.config.sso.ldap.server LDAP server host and port
+      ## @param platform.config.sso.ldap.managerDn Sets the manager DN
+      ## @param platform.config.sso.ldap.managerPassword Sets the manager password
+      ## @param platform.config.sso.ldap.searchBase  Sets the base DN to search
+      ## @param platform.config.sso.ldap.groupsBase Sets the base DN to search from
       ldap:
-        - name: ""
-          server: ""
-          managerDn: ""
-          managerPassword: ""
-          searchBase: ""
-          groupsBase: ""
-      ## @param platform.config.sso.oauth2[0].name OAuth2 connection name
-      ## @param platform.config.sso.oauth2[0].default Use as default
-      ## @param platform.config.sso.oauth2[0].clientId OAuth2 client id
-      ## @param platform.config.sso.oauth2[0].clientSecret OAuth2 client secret
-      ## @param platform.config.sso.oauth2[0].openid.issuer Issuer to check on token
+        name: ""
+        server: ""
+        managerDn: ""
+        managerPassword: ""
+        searchBase: ""
+        groupsBase: ""
+      ## @param platform.config.sso.oauth2.name OAuth2 connection name
+      ## @param platform.config.sso.oauth2.default Use as default
+      ## @param platform.config.sso.oauth2.clientId OAuth2 client id
+      ## @param platform.config.sso.oauth2.clientSecret OAuth2 client secret
+      ## @param platform.config.sso.oauth2.openid.issuer Issuer to check on token
       oauth2:
-        - name: ""
-          default: true
-          clientId: ""
-          clientSecret: ""
-          openid:
-            issuer: ""
+        name: ""
+        default: true
+        clientId: ""
+        clientSecret: ""
+        openid:
+          issuer: ""
     ## @param platform.config.license Enterprise license key. If not provided, fallback to free plan.
     license: ""
     database:
@@ -170,6 +205,17 @@ platform:
       ## @param platform.config.database.name Database name
       ##
       name: "postgres"
+  ## @param platform.extraEnvVars Array with extra environment variables
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param platform.extraEnvVarsCM Name of existing ConfigMap containing extra env vars
+  extraEnvVarsCM: ""
+  ## @param platform.extraEnvVarsSecret Name of existing Secret containing extra env vars
+  extraEnvVarsSecret: ""
   ingress:
     ## @param platform.ingress.ingressClassName Ingress class name for the platform
     ingressClassName: ""
@@ -217,6 +263,29 @@ postgresql:
     ## @param postgresql.primary.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for PostgreSQL Primary nodes
     ##
     extraEnvVarsCM: "postgresql-extra-env-vars"
+
+## ref: https://github.com/bitnami/charts/tree/main/bitnami/minio
+minio:
+  ## @param minio.enabled Switch to enable or disable the Minio helm chart
+  enabled: true
+  ## @param minio.mode Minio mode (standalone or distributed)
+  mode: standalone
+  ## @param minio.disableWebUI Toggle Minio Console
+  disableWebUI: true
+  ## @param minio.defaultBuckets Default buckets to create
+  defaultBuckets: "conduktor-monitoring"
+  auth:
+    ## @param minio.auth.rootUser Root access key
+    rootUser: ""
+    ## @param minio.auth.rootPassword Root secret key
+    rootPassword: ""
+    ## @param minio.auth.existingSecret Name of existing secret containing minio credentials (must contain root-user and root-password keys)
+    existingSecret: ""
+  persistence:
+    ## @param minio.persistence.enabled Enable Minio persistence
+    enabled: true
+    ## @param minio.persistence.size Size of Minio volume
+    size: 8Gi
 
 ## Kafka chart configuration
 ## ref: https://github.com/bitnami/charts/blob/master/bitnami/kafka/values.yaml
