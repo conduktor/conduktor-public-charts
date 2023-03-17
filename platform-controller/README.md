@@ -6,6 +6,7 @@
 > If you have any questions or [feedback](https://product.conduktor.help/c/55-helm-chart) contact our [support](https://www.conduktor.io/contact/support/).
 
 ## Introduction
+
 Controller to deploy the Conduktor Platform on Kubernetes.
 
 ## Prerequisites
@@ -41,14 +42,16 @@ $ helm install -n conduktor --create-namespace platform conduktor/platform-contr
 ## Versions matrix
 
 | Conduktor Platform | Platform-controller | Helm chart |
-|--------------------|---------------------|------------|
+| ------------------ | ------------------- | ---------- |
 | 1.11.1             | 0.4.0               | 0.2.1      |
 | 1.11.1             | 0.5.0               | 0.2.2      |
 | 1.11.1             | 0.5.0               | 0.2.3      |
 | 1.11.1             | 0.6.0               | 0.2.4      |
 | 1.12.1             | 0.7.0               | 0.2.5      |
+| 1.13.0             | 0.8.0               | 0.2.6      |
 
 ## Architecture
+
 This Helm chart will deploy the Platform-controller that is responsible to deploy the Conduktor Platform on the same namespace.
 
 Optionally it can deploy a Postgresql and/or a Kafka cluster inside the same namespace for demo purpose.
@@ -101,91 +104,103 @@ Optionally it can deploy a Postgresql and/or a Kafka cluster inside the same nam
 
 Conduktor Controller parameters
 
-| Name                                   | Description                                                                  | Value                           |
-| -------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------- |
-| `controller.image.registry`            | Platform Controller image registry                                           | `docker.io`                     |
-| `controller.image.repository`          | Platform Controller image repository                                         | `conduktor/platform-controller` |
-| `controller.image.pullPolicy`          | Platform Controller image pull policy                                        | `Always`                        |
-| `controller.image.tag`                 | Platform Controller image tag                                                | `0.7.0`                         |
-| `controller.commonLabels`              | Common labels to add to all resources                                        | `{}`                            |
-| `controller.commonAnnotations`         | Common annotations to add to all resources                                   | `{}`                            |
-| `controller.serviceAccount.create`     | Create Kubernetes service account.                                           | `true`                          |
-| `controller.serviceAccount.name`       | Service account name override                                                | `conduktor-controller`          |
-| `controller.resources.limits.cpu`      | CPU limit for the platform controller                                        | `100m`                          |
-| `controller.resources.limits.memory`   | Memory limit for the platform controller                                     | `128Mi`                         |
-| `controller.resources.requests.cpu`    | CPU resource requests for platform controller                                | `100m`                          |
-| `controller.resources.requests.memory` | Memory resource requests for platform controller                             | `128Mi`                         |
-| `controller.ingress.ingressClassName`  | Ingress class name for the controller                                        | `""`                            |
-| `controller.ingress.host`              | Platform controller Host                                                     | `controller.private`            |
-| `controller.ingress.extraHosts`        | An array with additional hostname(s) to be covered with this ingress record. | `[]`                            |
-| `controller.ingress.tls.enabled`       | Enable TLS for the controller ingress                                        | `false`                         |
-| `controller.ingress.tls.host`          | Host                                                                         | `nil`                           |
-| `controller.ingress.tls.secretRef`     | Secret name with keystore to load                                            | `""`                            |
-| `controller.ingress.annotations`       | Additional annotations for the ingress                                       | `{}`                            |
-| `controller.service.annotations`       | Annotations for controller service                                           | `{}`                            |
-| `controller.service.http.port`         | HTTP port                                                                    | `8080`                          |
-| `controller.extraEnvVars`              | Array with extra environment variables                                       | `[]`                            |
-| `controller.extraEnvVarsCM`            | Name of existing ConfigMap containing extra env vars                         | `""`                            |
-| `controller.extraEnvVarsSecret`        | Name of existing Secret containing extra env vars                            | `""`                            |
+| Name                                                             | Description                                                                   | Value                           |
+| ---------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------- |
+| `controller.image.registry`                                      | Platform Controller image registry                                            | `docker.io`                     |
+| `controller.image.repository`                                    | Platform Controller image repository                                          | `conduktor/platform-controller` |
+| `controller.image.pullPolicy`                                    | Platform Controller image pull policy                                         | `Always`                        |
+| `controller.image.tag`                                           | Platform Controller image tag                                                 | `0.8.0`                         |
+| `controller.commonLabels`                                        | Common labels to add to all resources                                         | `{}`                            |
+| `controller.securityContext`                                     | Optionally specify some Security Context.                                     | `{}`                            |
+| `controller.commonAnnotations`                                   | Common annotations to add to all resources                                    | `{}`                            |
+| `controller.serviceAccount.create`                               | Create Kubernetes service account.                                            | `true`                          |
+| `controller.serviceAccount.name`                                 | Service account name override                                                 | `conduktor-controller`          |
+| `controller.resources.limits.cpu`                                | CPU limit for the platform controller                                         | `100m`                          |
+| `controller.resources.limits.memory`                             | Memory limit for the platform controller                                      | `128Mi`                         |
+| `controller.resources.requests.cpu`                              | CPU resource requests for platform controller                                 | `100m`                          |
+| `controller.resources.requests.memory`                           | Memory resource requests for platform controller                              | `128Mi`                         |
+| `controller.ingress.enabled`                                     | Enable ingress controller resource                                            | `true`                          |
+| `controller.ingress.ingressClassName`                            | Ingress class name for the controller                                         | `""`                            |
+| `controller.ingress.host`                                        | Platform controller Host                                                      | `controller.private`            |
+| `controller.ingress.extraHosts`                                  | An array with additional hostname(s) to be covered with this ingress record.  | `[]`                            |
+| `controller.ingress.tls.enabled`                                 | Enable TLS for the controller ingress                                         | `false`                         |
+| `controller.ingress.tls.host`                                    | Host                                                                          | `nil`                           |
+| `controller.ingress.tls.secretRef`                               | Secret name with keystore to load                                             | `""`                            |
+| `controller.ingress.annotations`                                 | Additional annotations for the ingress                                        | `{}`                            |
+| `controller.service.annotations`                                 | Annotations for controller service                                            | `{}`                            |
+| `controller.service.http.port`                                   | HTTP port                                                                     | `8080`                          |
+| `controller.extraEnvVars`                                        | Array with extra environment variables                                        | `[]`                            |
+| `controller.extraEnvVarsCM`                                      | Name of existing ConfigMap containing extra env vars                          | `""`                            |
+| `controller.extraEnvVarsSecret`                                  | Name of existing Secret containing extra env vars                             | `""`                            |
+| `controller.metrics.prometheus.serviceMonitor.enabled`           | Enable ServiceMonitor prometheus operator configuration for metrics scrapping | `false`                         |
+| `controller.metrics.prometheus.serviceMonitor.metricRelabelings` | Specify additional relabeling of metrics                                      | `[]`                            |
+| `controller.metrics.prometheus.serviceMonitor.relabelings`       | Specify general relabeling                                                    | `[]`                            |
+| `controller.podAnnotations`                                      | Map of annotations to add to the controller pods                              | `{}`                            |
 
 
 ### Platform parameters
 
 Conduktor Platform parameters
 
-| Name                                              | Description                                                     | Value                   |
-| ------------------------------------------------- | --------------------------------------------------------------- | ----------------------- |
-| `platform.commonLabels`                           | Common labels to add to all resources                           | `{}`                    |
-| `platform.existingSecret`                         | Existing secret for platform                                    | `""`                    |
-| `platform.config.replicas`                        | Number of replicas for the platform controller                  | `1`                     |
-| `platform.config.name`                            | Name of the platform controller                                 | `platform`              |
-| `platform.config.organization`                    | Your organizations name                                         | `conduktor`             |
-| `platform.config.adminEmail`                      | Email of the admin user                                         | `admin@conduktor.io`    |
-| `platform.config.adminPassword`                   | Password of the admin user                                      | `admin`                 |
-| `platform.config.modules.console`                 | Enable or disable the console module                            | `true`                  |
-| `platform.config.modules.data_masking`            | Enable or disable the data masking module                       | `true`                  |
-| `platform.config.modules.monitoring`              | Enable or disable the monitoring module                         | `true`                  |
-| `platform.config.modules.testing`                 | Enable or disable the testing module                            | `true`                  |
-| `platform.config.modules.topic_as_a_service`      | Enable or disable the topic as a service module                 | `true`                  |
-| `platform.config.modules.governance`              | Enable or disable the governance module                         | `true`                  |
-| `platform.config.monitoring.storage.s3.bucket`    | S3 bucket name                                                  | `""`                    |
-| `platform.config.monitoring.storage.s3.endpoint`  | S3 endpoint                                                     | `""`                    |
-| `platform.config.monitoring.storage.s3.accessKey` | S3 access key                                                   | `""`                    |
-| `platform.config.monitoring.storage.s3.secretKey` | S3 secret key                                                   | `""`                    |
-| `platform.config.monitoring.storage.s3.region`    | S3 region                                                       | `""`                    |
-| `platform.config.monitoring.storage.s3.insecure`  | S3 insecure                                                     | `true`                  |
-| `platform.config.sso.enabled`                     | Enable or disable the SSO (only on enterprise plan)             | `false`                 |
-| `platform.config.sso.ignoreUntrustedCertificate`  | Disable SSL checks                                              | `false`                 |
-| `platform.config.sso.ldap.name`                   | LDAP connection name                                            | `""`                    |
-| `platform.config.sso.ldap.server`                 | LDAP server host and port                                       | `""`                    |
-| `platform.config.sso.ldap.managerDn`              | Sets the manager DN                                             | `""`                    |
-| `platform.config.sso.ldap.managerPassword`        | Sets the manager password                                       | `""`                    |
-| `platform.config.sso.ldap.searchBase`             | Sets the base DN to search                                      | `""`                    |
-| `platform.config.sso.ldap.groupsBase`             | Sets the base DN to search from                                 | `""`                    |
-| `platform.config.sso.oauth2.name`                 | OAuth2 connection name                                          | `""`                    |
-| `platform.config.sso.oauth2.default`              | Use as default                                                  | `true`                  |
-| `platform.config.sso.oauth2.clientId`             | OAuth2 client id                                                | `""`                    |
-| `platform.config.sso.oauth2.clientSecret`         | OAuth2 client secret                                            | `""`                    |
-| `platform.config.sso.oauth2.openid.issuer`        | Issuer to check on token                                        | `""`                    |
-| `platform.config.license`                         | Enterprise license key. If not provided, fallback to free plan. | `""`                    |
-| `platform.config.database.host`                   | Database host                                                   | `postgresql.postgresql` |
-| `platform.config.database.port`                   | Database port                                                   | `5432`                  |
-| `platform.config.database.username`               | Database user                                                   | `postgres`              |
-| `platform.config.database.password`               | Database password, can be a string or can reference a secret.   | `conduktor`             |
-| `platform.config.database.name`                   | Database name                                                   | `postgres`              |
-| `platform.extraEnvVars`                           | Array with extra environment variables                          | `[]`                    |
-| `platform.extraEnvVarsCM`                         | Name of existing ConfigMap containing extra env vars            | `""`                    |
-| `platform.extraEnvVarsSecret`                     | Name of existing Secret containing extra env vars               | `""`                    |
-| `platform.ingress.ingressClassName`               | Ingress class name for the platform                             | `""`                    |
-| `platform.ingress.host`                           | Plaform host                                                    | `platform.local`        |
-| `platform.ingress.tls.enabled`                    | Enable Platform TLS                                             | `false`                 |
-| `platform.ingress.tls.host`                       | Platform Host                                                   | `nil`                   |
-| `platform.ingress.tls.secretRef`                  | Secret name with keystore to load                               | `""`                    |
-| `platform.ingress.annotations`                    | Additional annotations for the ingress                          | `{}`                    |
-| `platform.resources.limits.cpu`                   | CPU limit for the platform container                            | `4000m`                 |
-| `platform.resources.limits.memory`                | Memory limit for the container                                  | `8Gi`                   |
-| `platform.resources.requests.cpu`                 | CPU resource requests                                           | `2000m`                 |
-| `platform.resources.requests.memory`              | Memory resource requests                                        | `4Gi`                   |
+| Name                                              | Description                                                                                                                                 | Value                |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| `platform.commonLabels`                           | Common labels to add to all resources                                                                                                       | `{}`                 |
+| `platform.securityContext`                        | Optionally specify some Security Context.                                                                                                   | `{}`                 |
+| `platform.existingSecret`                         | Existing secret for platform                                                                                                                | `""`                 |
+| `platform.config.replicas`                        | Number of replicas for the platform controller                                                                                              | `1`                  |
+| `platform.config.name`                            | Name of the platform controller                                                                                                             | `platform`           |
+| `platform.config.organization`                    | Your organizations name                                                                                                                     | `conduktor`          |
+| `platform.config.adminEmail`                      | Email of the admin user                                                                                                                     | `admin@conduktor.io` |
+| `platform.config.adminPassword`                   | Password of the admin user                                                                                                                  | `admin`              |
+| `platform.config.modules.console`                 | Enable or disable the console module                                                                                                        | `true`               |
+| `platform.config.modules.data_masking`            | Enable or disable the data masking module                                                                                                   | `true`               |
+| `platform.config.modules.monitoring`              | Enable or disable the monitoring module                                                                                                     | `true`               |
+| `platform.config.modules.testing`                 | Enable or disable the testing module                                                                                                        | `true`               |
+| `platform.config.modules.topic_as_a_service`      | Enable or disable the topic as a service module                                                                                             | `true`               |
+| `platform.config.modules.governance`              | Enable or disable the governance module                                                                                                     | `true`               |
+| `platform.config.monitoring.storage.s3.bucket`    | S3 bucket name                                                                                                                              | `""`                 |
+| `platform.config.monitoring.storage.s3.endpoint`  | S3 endpoint                                                                                                                                 | `""`                 |
+| `platform.config.monitoring.storage.s3.accessKey` | S3 access key                                                                                                                               | `""`                 |
+| `platform.config.monitoring.storage.s3.secretKey` | S3 secret key                                                                                                                               | `""`                 |
+| `platform.config.monitoring.storage.s3.region`    | S3 region                                                                                                                                   | `""`                 |
+| `platform.config.monitoring.storage.s3.insecure`  | S3 insecure                                                                                                                                 | `true`               |
+| `platform.config.sso.enabled`                     | Enable or disable the SSO (only on enterprise plan)                                                                                         | `false`              |
+| `platform.config.sso.ignoreUntrustedCertificate`  | Disable SSL checks                                                                                                                          | `false`              |
+| `platform.config.sso.ldap.name`                   | LDAP connection name                                                                                                                        | `""`                 |
+| `platform.config.sso.ldap.server`                 | LDAP server host and port                                                                                                                   | `""`                 |
+| `platform.config.sso.ldap.managerDn`              | Sets the manager DN                                                                                                                         | `""`                 |
+| `platform.config.sso.ldap.managerPassword`        | Sets the manager password                                                                                                                   | `""`                 |
+| `platform.config.sso.ldap.searchBase`             | Sets the base DN to search                                                                                                                  | `""`                 |
+| `platform.config.sso.ldap.groupsBase`             | Sets the base DN to search from                                                                                                             | `""`                 |
+| `platform.config.sso.oauth2.name`                 | OAuth2 connection name                                                                                                                      | `""`                 |
+| `platform.config.sso.oauth2.default`              | Use as default                                                                                                                              | `true`               |
+| `platform.config.sso.oauth2.clientId`             | OAuth2 client id                                                                                                                            | `""`                 |
+| `platform.config.sso.oauth2.clientSecret`         | OAuth2 client secret                                                                                                                        | `""`                 |
+| `platform.config.sso.oauth2.openid.issuer`        | Issuer to check on token                                                                                                                    | `""`                 |
+| `platform.config.license`                         | Enterprise license key. If not provided, fallback to free plan.                                                                             | `""`                 |
+| `platform.config.database`                        | Database configuration. If postgresql.enable is true, it will configure the database with postgresql.auth values                            |                      |
+| `platform.config.database.host`                   | Database host. If postgresql.enable is true, it will configure the database host to the postgresql pod name. e.g: platform-postgresql       | `""`                 |
+| `platform.config.database.port`                   | Database port                                                                                                                               | `5432`               |
+| `platform.config.database.username`               | Database user. If postgresql.enable is true, it will take the postgresql.auth.username value                                                | `""`                 |
+| `platform.config.database.password`               | Database password, can be a string or can reference a secret. If postgresql.enable is true, it will take the postgresql.auth.password value | `""`                 |
+| `platform.config.database.name`                   | Database name. If postgresql.enable is true, it will take the postgresql.auth.database value                                                | `postgres`           |
+| `platform.config.tls.enabled`                     | Enable TLS for the platform (at pod level)                                                                                                  | `false`              |
+| `platform.config.tls.cert`                        | Raw TLS certificate                                                                                                                         | `""`                 |
+| `platform.config.tls.key`                         | Raw TLS certificate                                                                                                                         | `""`                 |
+| `platform.config.tls.existingSecret`              | Secret name with certificate (must have keys: tls.crt, tls.key)                                                                             | `""`                 |
+| `platform.extraEnvVars`                           | Array with extra environment variables                                                                                                      | `[]`                 |
+| `platform.extraEnvVarsCM`                         | Name of existing ConfigMap containing extra env vars                                                                                        | `""`                 |
+| `platform.extraEnvVarsSecret`                     | Name of existing Secret containing extra env vars                                                                                           | `""`                 |
+| `platform.ingress.ingressClassName`               | Ingress class name for the platform                                                                                                         | `""`                 |
+| `platform.ingress.host`                           | Plaform host                                                                                                                                | `platform.local`     |
+| `platform.ingress.tls.enabled`                    | Enable Platform TLS                                                                                                                         | `false`              |
+| `platform.ingress.tls.host`                       | Platform Host                                                                                                                               | `nil`                |
+| `platform.ingress.tls.secretRef`                  | Secret name with keystore to load                                                                                                           | `""`                 |
+| `platform.ingress.annotations`                    | Additional annotations for the ingress                                                                                                      | `{}`                 |
+| `platform.resources.limits.cpu`                   | CPU limit for the platform container                                                                                                        | `4000m`              |
+| `platform.resources.limits.memory`                | Memory limit for the container                                                                                                              | `8Gi`                |
+| `platform.resources.requests.cpu`                 | CPU resource requests                                                                                                                       | `2000m`              |
+| `platform.resources.requests.memory`              | Memory resource requests                                                                                                                    | `4Gi`                |
 
 
 ### Dependencies
@@ -220,14 +235,57 @@ $ helm delete -n conduktor platform
 
 ## Platform configuration
 
-* [Docker image environment vairables](https://docs.conduktor.io/platform/configuration/env-variables#docker-image-environment-variables)
-* [Platform properties reference](https://docs.conduktor.io/platform/configuration/env-variables#platform-properties-reference)
+- [Docker image environment vairables](https://docs.conduktor.io/platform/configuration/env-variables#docker-image-environment-variables)
+- [Platform properties reference](https://docs.conduktor.io/platform/configuration/env-variables#platform-properties-reference)
 
 ## Generate doc
+
 Install [readme-generator-for-helm](https://github.com/bitnami-labs/readme-generator-for-helm)
 
 ```console
 readme-generator --readme README.md -v values.yaml
+```
+
+## Guides
+
+### How to configure TLS for the platform
+
+This guide will help you to deploy Conduktor Platform with TLS enabled, using your own certificates. It can be achieved
+with two methods:
+
+**Give your certificate to the chart**
+
+1. Update `platform.config.tls.enabled` value to `true`
+2. Update `platform.config.tls.cert` value with your raw certificate
+3. Update `platform.config.tls.key` value with your raw certificate key
+
+**Use of a custom TLS secret**:
+
+1. Create a secret with your certificates ([how-to](https://kubernetes.io/docs/concepts/configuration/secret/#tls-secrets))
+2. Update the `platform.config.tls.enabled` value to `true`
+3. Update the `platform.config.tls.existingSecret` value to the name of your secret (must have keys: tls.crt, tls.key)
+4. Deploy the chart
+
+> **Note**: Depending on your ingress controller, you may need to add additional annotations to your ingress
+> (e.g [nginx](https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/tls.md#ssl-passthrough)).
+
+## Metrics
+If you deployed [Prometheus operator](https://github.com/prometheus-operator/prometheus-operator), this chart optionally can create a Prometheus service monitor.
+```yaml
+controller:
+  metrics:
+    prometheus:
+      serviceMonitor:
+        enabled: false
+
+```
+Also, you could use the pod annotation.
+```yaml
+controller:
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+    prometheus.io/path: "/metrics"
 ```
 
 ## Need Help!

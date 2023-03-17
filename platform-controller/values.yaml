@@ -26,10 +26,19 @@ controller:
     registry: docker.io
     repository: conduktor/platform-controller
     pullPolicy: Always
-    tag: 0.7.0
+    tag: 0.8.0
 
   ## @param controller.commonLabels Common labels to add to all resources
   commonLabels: {}
+
+  ## @param controller.securityContext Optionally specify some Security Context.
+  ## ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core
+  ## default:
+  ## securityContext:
+  ##   readOnlyRootFilesystem: true
+  ##   runAsNonRoot: true
+  ##
+  securityContext: {}
 
   ## @param controller.commonAnnotations Common annotations to add to all resources
   commonAnnotations: {}
@@ -55,6 +64,8 @@ controller:
       memory: 128Mi
 
   ingress:
+    ## @param controller.ingress.enabled Enable ingress controller resource
+    enabled: true
     ## @param controller.ingress.ingressClassName Ingress class name for the controller
     ingressClassName: ""
     ## @param controller.ingress.host Platform controller Host
@@ -87,7 +98,25 @@ controller:
   extraEnvVarsCM: ""
   ## @param controller.extraEnvVarsSecret Name of existing Secret containing extra env vars
   extraEnvVarsSecret: ""
-
+  metrics:
+    prometheus:
+      serviceMonitor:
+        ## @param controller.metrics.prometheus.serviceMonitor.enabled Enable ServiceMonitor prometheus operator configuration for metrics scrapping
+        enabled: false
+        ## @param controller.metrics.prometheus.serviceMonitor.metricRelabelings Specify additional relabeling of metrics
+        metricRelabelings: []
+        # - sourceLabels: [__name__]
+        #   regex: '.*ckdt_io.*'
+        #   action: keep
+        ## @param controller.metrics.prometheus.serviceMonitor.relabelings Specify general relabeling
+        relabelings: []
+  ## @param controller.podAnnotations  Map of annotations to add to the controller pods
+  ## e.g:
+  ## podAnnotations:
+  ##   prometheus.io/scrape: "true"
+  ##   prometheus.io/port: "8080"
+  ##   prometheus.io/path: "/metrics"
+  podAnnotations: {}
 ## @section Platform parameters
 ## @descriptionStart
 ## Conduktor Platform parameters
@@ -95,6 +124,15 @@ controller:
 platform:
   ## @param platform.commonLabels Common labels to add to all resources
   commonLabels: {}
+
+  ## @param platform.securityContext Optionally specify some Security Context.
+  ## ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core
+  ## default:
+  ## securityContext:
+  ##   readOnlyRootFilesystem: true
+  ##   runAsNonRoot: true
+  ##
+  securityContext: {}
 
   ## @param platform.existingSecret Existing secret for platform
   ## The secret must contain the keys:
@@ -130,6 +168,19 @@ platform:
       testing: true
       topic_as_a_service: true
       governance: true
+
+    ## External monitoring S3 storage.  Enabling monitoring AWS S3 storage is for the production environment and if not done, the platform will use the local storage volume (not PVC) to store the monitoring data.
+    ## e.g:
+    ## monitoring:
+    ##   storage:
+    ##     s3:
+    ##       bucket: "my-monitoring-bucket" (required)
+    ##       accessKeyId: "my-access-key-id" (required)
+    ##       secretAccessKey: "my-secret-access-key" (required)
+    ##       region: "eu-west-1" (optional)
+    ##       insecure: false (optional)
+    ##       endpoint: "https://s3.eu-west-1.amazonaws.com" (optional)
+    ##
     monitoring:
       storage:
         s3:
@@ -185,26 +236,41 @@ platform:
           issuer: ""
     ## @param platform.config.license Enterprise license key. If not provided, fallback to free plan.
     license: ""
+    ## @extra platform.config.database Database configuration. If postgresql.enable is true, it will configure the database with postgresql.auth values
     database:
-      ## @param platform.config.database.host Database host
-      ##
-      host: "postgresql.postgresql"
+      ## @param platform.config.database.host Database host. If postgresql.enable is true, it will configure the database host to the postgresql pod name. e.g: platform-postgresql
+      host: ""
 
       ## @param platform.config.database.port Database port
       ##
       port: 5432
 
-      ## @param platform.config.database.username Database user
-      ##
-      username: "postgres"
+      ## @param platform.config.database.username Database user. If postgresql.enable is true, it will take the postgresql.auth.username value
+      username: ""
 
-      ## @param platform.config.database.password Database password, can be a string or can reference a secret.
-      ##
-      password: "conduktor"  # pragma: allowlist secret
+      ## @param platform.config.database.password Database password, can be a string or can reference a secret. If postgresql.enable is true, it will take the postgresql.auth.password value
+      password: ""
 
-      ## @param platform.config.database.name Database name
+      ## @param platform.config.database.name Database name. If postgresql.enable is true, it will take the postgresql.auth.database value
       ##
       name: "postgres"
+
+    tls:
+      ## @param platform.config.tls.enabled Enable TLS for the platform (at pod level)
+      enabled: false
+      ## @param platform.config.tls.cert Raw TLS certificate
+      # cert: |
+      #   -----BEGIN CERTIFICATE-----
+      #   ...
+      cert: ""
+      ## @param platform.config.tls.key Raw TLS certificate
+      # key: |
+      #   -----BEGIN PRIVATE KEY-----
+      #   ...
+      key: ""
+      ## @param platform.config.tls.existingSecret Secret name with certificate (must have keys: tls.crt, tls.key)
+      # platform.config.tls.cert and platform.config.tls.key will be ignored if provided
+      existingSecret: ""
   ## @param platform.extraEnvVars Array with extra environment variables
   ## e.g:
   ## extraEnvVars:
@@ -230,6 +296,7 @@ platform:
       secretRef: ""
       ## @param platform.ingress.annotations Additional annotations for the ingress
     annotations: {}
+
   resources:
     limits:
       ## @param platform.resources.limits.cpu CPU limit for the platform container
