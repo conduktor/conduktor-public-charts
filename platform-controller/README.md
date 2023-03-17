@@ -276,7 +276,7 @@ controller:
   metrics:
     prometheus:
       serviceMonitor:
-        enabled: false
+        enabled: true
 
 ```
 Also, you could use the pod annotation.
