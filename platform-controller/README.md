@@ -48,7 +48,7 @@ $ helm install -n conduktor --create-namespace platform conduktor/platform-contr
 | 1.11.1             | 0.5.0               | 0.2.3      |
 | 1.11.1             | 0.6.0               | 0.2.4      |
 | 1.12.1             | 0.7.0               | 0.2.5      |
-| 1.13.0             | 0.8.0               | 0.2.6      |
+| 1.13.0             | 0.8.0               | 0.3.0      |
 
 ## Architecture
 
