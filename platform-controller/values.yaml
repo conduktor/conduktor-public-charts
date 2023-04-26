@@ -26,7 +26,7 @@ controller:
     registry: docker.io
     repository: conduktor/platform-controller
     pullPolicy: Always
-    tag: 0.8.0
+    tag: 0.9.0
 
   ## @param controller.commonLabels Common labels to add to all resources
   commonLabels: {}
@@ -46,7 +46,7 @@ controller:
   serviceAccount:
     ## @param controller.serviceAccount.create Create Kubernetes service account.
     # Specifies whether a service account should be created
-    # If AWS IAM is used, need to have create: false
+    # If AWS IAM is used, need to set `create: false`
     create: true
     ## @param controller.serviceAccount.name Service account name override
     name: "conduktor-controller"
@@ -65,11 +65,11 @@ controller:
 
   ingress:
     ## @param controller.ingress.enabled Enable ingress controller resource
-    enabled: true
+    enabled: false
     ## @param controller.ingress.ingressClassName Ingress class name for the controller
     ingressClassName: ""
     ## @param controller.ingress.host Platform controller Host
-    host: "controller.private"
+    host: "controller.local"
     ## @param controller.ingress.extraHosts An array with additional hostname(s) to be covered with this ingress record.
     extraHosts: []
     tls:
@@ -125,6 +125,22 @@ platform:
   ## @param platform.commonLabels Common labels to add to all resources
   commonLabels: {}
 
+  ## @param platform.image Optionally specify an image to use for the platform.
+  ## @extra platform.image.registry Platform image registry
+  ## @extra platform.image.repository Platform image repository
+  ## @extra platform.image.tag Platform image tag. The major and minor version must be compatible with the platform version that is supported by the current controller version.
+  ## default:
+  ## image:
+  ##   registry: docker.io
+  ##   repository: conduktor/conduktor-platform
+  ##   tag: {latest tag compatible with controller version}
+  ##
+  image: {}
+
+  ## @param platform.ignoreImageConstraints When `true` allows the use of any tag and bypasses the constraint on tag versions.
+  ## CAUTION: Enabling this parameter can lead to unintended effects or problems.
+  ignoreImageConstraints: false
+
   ## @param platform.securityContext Optionally specify some Security Context.
   ## ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core
   ## default:
@@ -142,17 +158,25 @@ platform:
   ## `sso-oauth2-client-secret` (optional),
   ## `sso-ldap-manager-password` (optional),
   existingSecret: ""
-  ## @param platform.config.replicas Number of replicas for the platform controller
-  ## @param platform.config.name Name of the platform controller
-  ## @param platform.config.organization Your organizations name
-  ## @param platform.config.adminEmail Email of the admin user
-  ## @param platform.config.adminPassword Password of the admin user
+
   config:
+    ## @param platform.config.replicas Number of replicas for the platform controller
     replicas: 1
+    ## @param platform.config.name Name of the platform controller
     name: platform
-    organization: conduktor
-    adminEmail: "admin@conduktor.io"
-    adminPassword: "admin"  # pragma: allowlist secret
+    ## @param platform.config.organization Your organizations name (mandatory)
+    organization: ""
+    ## @param platform.config.adminEmail Email of the admin user (mandatory)
+    adminEmail: ""
+    ## @param platform.config.adminPassword Password of the admin user (mandatory)
+    adminPassword: ""  # pragma: allowlist secret
+
+    ## @param platform.config.external_url Force platform external URL, useful for SSO callback URL when using reverse proxy.
+    # When not provided, the platform will try to guess it automatically using X-FORWARDED-* headers coming from
+    # upstream proxy.
+    #
+    # Format: http(s)://<host>[:<port>]
+    external_url: ""
 
     ## Module is the list of conduktor platform modules.
     ## @param platform.config.modules.console Enable or disable the console module
@@ -214,14 +238,19 @@ platform:
       ## @param platform.config.sso.ldap.managerDn Sets the manager DN
       ## @param platform.config.sso.ldap.managerPassword Sets the manager password
       ## @param platform.config.sso.ldap.searchBase  Sets the base DN to search
-      ## @param platform.config.sso.ldap.groupsBase Sets the base DN to search from
+      ## @param platform.config.sso.ldap.groups.enabled Sets if group search is enabled
+      ## @param platform.config.sso.ldap.groups.base Sets the base DN to search from
+      ## @param platform.config.sso.ldap.groups.filter Sets the group search filter
       ldap:
         name: ""
         server: ""
         managerDn: ""
         managerPassword: ""
         searchBase: ""
-        groupsBase: ""
+        groups:
+          enabled: false
+          base: ""
+          filter: ""
       ## @param platform.config.sso.oauth2.name OAuth2 connection name
       ## @param platform.config.sso.oauth2.default Use as default
       ## @param platform.config.sso.oauth2.clientId OAuth2 client id
@@ -283,9 +312,11 @@ platform:
   ## @param platform.extraEnvVarsSecret Name of existing Secret containing extra env vars
   extraEnvVarsSecret: ""
   ingress:
+    ## @param platform.ingress.enabled Enable ingress platform resource
+    enabled: false
     ## @param platform.ingress.ingressClassName Ingress class name for the platform
     ingressClassName: ""
-    ## @param platform.ingress.host Plaform host
+    ## @param platform.ingress.host Platform host
     host: "platform.local"
     tls:
       ## @param platform.ingress.tls.enabled Enable Platform TLS
@@ -357,5 +388,5 @@ minio:
 ## Kafka chart configuration
 ## ref: https://github.com/bitnami/charts/blob/master/bitnami/kafka/values.yaml
 kafka:
-  ## @param kafka.enabled Deploy a kafka along side platform-controller (This should only used for testing purpose)
+  ## @param kafka.enabled Deploy a kafka alongside platform-controller (This should only be used for testing purpose)
   enabled: false
