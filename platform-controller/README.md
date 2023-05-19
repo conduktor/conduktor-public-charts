@@ -46,15 +46,8 @@ $ helm install -n conduktor --create-namespace platform conduktor/platform-contr
 
 ## Versions matrix
 
-| Conduktor Platform | Platform-controller | Helm chart |
-|--------------------|---------------------|------------|
-| 1.11.1             | 0.4.0               | 0.2.1      |
-| 1.11.1             | 0.5.0               | 0.2.2      |
-| 1.11.1             | 0.5.0               | 0.2.3      |
-| 1.11.1             | 0.6.0               | 0.2.4      |
-| 1.12.1             | 0.7.0               | 0.2.5      |
-| 1.13.0             | 0.8.0               | 0.3.0      |
-| 1.14.0             | 0.9.0               | 0.4.0      |
+See [compatibility matrix](https://docs.conduktor.io/platform/installation/get-started/kubernetes/#versions-compatibility-matrix) for more details.
+To know which version of this chart deploy which version of the Conduktor.
 
 ## Architecture
 
@@ -62,39 +55,7 @@ This Helm chart will deploy the Platform-controller that is responsible to deplo
 
 Optionally it can deploy a Postgresql and/or a Kafka cluster inside the same namespace for demo purpose.
 
-```
-                          conduktor (namespace)
-                        +--------------------------------------------------------------------------------------+
-+------------+          |                                                                                      |
-|            | Deploy   |          +-----------------------+                          +---------+              |
-| Helm chart |          |          |                       | Deploy        +----------> Ingress |              |
-|            +--+-------+---------->  platform-controller  |               |          +----+----+              |
-+------------+  |       |          |                       +---------------+               |                   |
-                |       |          +-------+----------+----+               |               |                   |
-                |       |                  |          |                    |         +-----v-----+             |
-                |       |                  |  Watch   |                    +--------->  Service  |             |
-                |       |                  |          |                    |         +-----+-----+             |
-                |       |                  |          |                    |               |                   |
-                |       |            +-----v-----+ +--v------+             |               |                   |
-                |       |            |           | |         |             |     +---------v--------------+    |
-                |       |            | ConfigMap | | Secret  |             |     |                        |    |
-                |       |            |           | |         |             +----->   conduktor-platform   |    |
-                |       |            +------^----+ +---^-----+                   |                        |    |
-                |       |                   |          |                         +--------+---------------+    |
-                |       |                   |          |                                  |                    |
-                +-------+-----------+-------+----------+-------------------+              |Connect to          |
-                        |           |                  |                   |              |                    |
-                        |        +--v----------+  +----v---------+  +------v-------+      |                    |
-                        |        |             |  |              |  |              |      |                    |
-                        |        | Postgresql  |  |  Kafka       |  |  Minio       |      |                    |
-                        |        |  (optional) |  |   (optional) |  |   (optional) |      |                    |
-                        |        |             |  |              |  |              |      |                    |
-                        |        +------^------+  +------^-------+  +------^-------+      |                    |
-                        |               |                |                 |              |                    |
-                        |               +----------------+-----------------+--------------+                    |
-                        |                                                                                      |
-                        +--------------------------------------------------------------------------------------+
-```
+More details on the [documentation](https://docs.conduktor.io/platform/installation/get-started/kubernetes/#architecture).
 
 ## Parameters
 
@@ -115,7 +76,7 @@ Conduktor Controller parameters
 | `controller.image.registry`                                      | Platform Controller image registry                                            | `docker.io`                     |
 | `controller.image.repository`                                    | Platform Controller image repository                                          | `conduktor/platform-controller` |
 | `controller.image.pullPolicy`                                    | Platform Controller image pull policy                                         | `Always`                        |
-| `controller.image.tag`                                           | Platform Controller image tag                                                 | `0.9.0`                         |
+| `controller.image.tag`                                           | Platform Controller image tag                                                 | `0.10.2`                        |
 | `controller.commonLabels`                                        | Common labels to add to all resources                                         | `{}`                            |
 | `controller.securityContext`                                     | Optionally specify some Security Context.                                     | `{}`                            |
 | `controller.commonAnnotations`                                   | Common annotations to add to all resources                                    | `{}`                            |
@@ -142,6 +103,7 @@ Conduktor Controller parameters
 | `controller.metrics.prometheus.serviceMonitor.metricRelabelings` | Specify additional relabeling of metrics                                      | `[]`                            |
 | `controller.metrics.prometheus.serviceMonitor.relabelings`       | Specify general relabeling                                                    | `[]`                            |
 | `controller.podAnnotations`                                      | Map of annotations to add to the controller pods                              | `{}`                            |
+| `controller.affinity`                                            | Affinity for pod assignment of the controller                                 | `{}`                            |
 
 
 ### Platform parameters
@@ -157,6 +119,7 @@ Conduktor Platform parameters
 | `platform.image.tag`                              | Platform image tag. The major and minor version must be compatible with the platform version that is supported by the current controller version. |                  |
 | `platform.ignoreImageConstraints`                 | When `true` allows the use of any tag and bypasses the constraint on tag versions.                                                                | `false`          |
 | `platform.securityContext`                        | Optionally specify some Security Context.                                                                                                         | `{}`             |
+| `platform.affinity`                               | Affinity for pod assignment of the platform                                                                                                       | `{}`             |
 | `platform.existingSecret`                         | Existing secret for platform                                                                                                                      | `""`             |
 | `platform.config.replicas`                        | Number of replicas for the platform controller                                                                                                    | `1`              |
 | `platform.config.name`                            | Name of the platform controller                                                                                                                   | `platform`       |
@@ -167,8 +130,7 @@ Conduktor Platform parameters
 | `platform.config.modules.console`                 | Enable or disable the console module                                                                                                              | `true`           |
 | `platform.config.modules.data_masking`            | Enable or disable the data masking module                                                                                                         | `true`           |
 | `platform.config.modules.monitoring`              | Enable or disable the monitoring module                                                                                                           | `true`           |
-| `platform.config.modules.testing`                 | Enable or disable the testing module                                                                                                              | `true`           |
-| `platform.config.modules.topic_as_a_service`      | Enable or disable the topic as a service module                                                                                                   | `true`           |
+| `platform.config.modules.testing`                 | Enable or disable the testing module                                                                                                              | `false`          |
 | `platform.config.modules.governance`              | Enable or disable the governance module                                                                                                           | `true`           |
 | `platform.config.monitoring.storage.s3.bucket`    | S3 bucket name                                                                                                                                    | `""`             |
 | `platform.config.monitoring.storage.s3.endpoint`  | S3 endpoint                                                                                                                                       | `""`             |

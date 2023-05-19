@@ -26,7 +26,7 @@ controller:
     registry: docker.io
     repository: conduktor/platform-controller
     pullPolicy: Always
-    tag: 0.9.0
+    tag: 0.10.2
 
   ## @param controller.commonLabels Common labels to add to all resources
   commonLabels: {}
@@ -117,6 +117,12 @@ controller:
   ##   prometheus.io/port: "8080"
   ##   prometheus.io/path: "/metrics"
   podAnnotations: {}
+
+  ## @param controller.affinity Affinity for pod assignment of the controller
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ##
+  affinity: {}
+
 ## @section Platform parameters
 ## @descriptionStart
 ## Conduktor Platform parameters
@@ -150,13 +156,21 @@ platform:
   ##
   securityContext: {}
 
+  ## @param platform.affinity Affinity for pod assignment of the platform
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ##
+  affinity: {}
+
   ## @param platform.existingSecret Existing secret for platform
   ## The secret must contain the keys:
   ## `admin-password` (required),
   ## `database-password` (required),
   ## `license` (optional),
+  ## `sso-oauth2-client-id` (optional),
   ## `sso-oauth2-client-secret` (optional),
   ## `sso-ldap-manager-password` (optional),
+  ## `monitoring-s3-access-key` (optional),
+  ## `monitoring-s3-secret-key` (optional),
   existingSecret: ""
 
   config:
@@ -183,14 +197,12 @@ platform:
     ## @param platform.config.modules.data_masking Enable or disable the data masking module
     ## @param platform.config.modules.monitoring Enable or disable the monitoring module
     ## @param platform.config.modules.testing Enable or disable the testing module
-    ## @param platform.config.modules.topic_as_a_service Enable or disable the topic as a service module
     ## @param platform.config.modules.governance Enable or disable the governance module
     modules:
       console: true
       data_masking: true
       monitoring: true
-      testing: true
-      topic_as_a_service: true
+      testing: false
       governance: true
 
     ## External monitoring S3 storage.  Enabling monitoring AWS S3 storage is for the production environment and if not done, the platform will use the local storage volume (not PVC) to store the monitoring data.
