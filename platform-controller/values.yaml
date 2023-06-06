@@ -18,6 +18,11 @@ global:
 ## Conduktor Controller parameters
 ## @descriptionEnd
 controller:
+  ## @param controller.tolerations Tolerations for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+
   ## @param controller.image.registry Platform Controller image registry
   ## @param controller.image.repository Platform Controller image repository
   ## @param controller.image.pullPolicy Platform Controller image pull policy
@@ -26,7 +31,7 @@ controller:
     registry: docker.io
     repository: conduktor/platform-controller
     pullPolicy: Always
-    tag: 0.10.2
+    tag: 0.12.1
 
   ## @param controller.commonLabels Common labels to add to all resources
   commonLabels: {}
@@ -128,6 +133,11 @@ controller:
 ## Conduktor Platform parameters
 ## @descriptionEnd
 platform:
+  ## @param platform.tolerations Tolerations for pod assignment.
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+
   ## @param platform.commonLabels Common labels to add to all resources
   commonLabels: {}
 
@@ -161,6 +171,10 @@ platform:
   ##
   affinity: {}
 
+  serviceAccount:
+    ## @param platform.serviceAccount.name Name of the service account that will be used by the platform
+    name: ""
+
   ## @param platform.existingSecret Existing secret for platform
   ## The secret must contain the keys:
   ## `admin-password` (required),
@@ -172,6 +186,34 @@ platform:
   ## `monitoring-s3-access-key` (optional),
   ## `monitoring-s3-secret-key` (optional),
   existingSecret: ""
+
+  service:
+    ## @param platform.service.type Kubernetes service type. Only support ClusterIP or NodePort
+    ##
+    type: ClusterIP
+    ## @param platform.service.name Name of the platform service
+    ##
+    name: "platform"
+    ## @param platform.service.annotations Annotations for platform service
+    ## e.g.:
+    ## annotations:
+    ##   app.kubernetes.io/managed-by: "conduktor"
+    ##
+    annotations: {}
+    ## @param platform.service.ports.platform Platform service port
+    ##
+    ports:
+      platform: 80
+
+    ## @param platform.service.nodePorts.platform Specify the platform nodePort for the NodePort service type
+    nodePorts:
+      platform: ""
+
+    ## @param platform.service.clusterIP Specify the service IP for the ClusterIP service type
+    ## e.g.:
+    ## clusterIP: None
+    ##
+    clusterIP: ""
 
   config:
     ## @param platform.config.replicas Number of replicas for the platform controller
@@ -191,6 +233,11 @@ platform:
     #
     # Format: http(s)://<host>[:<port>]
     external_url: ""
+
+    ## @param platform.config.containerPorts.platform Platform exposed and listening port
+    ##
+    containerPorts:
+      platform: 8080
 
     ## Module is the list of conduktor platform modules.
     ## @param platform.config.modules.console Enable or disable the console module

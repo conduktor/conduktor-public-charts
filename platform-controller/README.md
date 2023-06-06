@@ -1,8 +1,5 @@
 # Platform-controller
 
-> **Warning**
-> This chart is in **BETA** phase and is subject to change.
-> The API may change without notice.
 > If you have any questions or [feedback](https://product.conduktor.help/c/55-helm-chart) contact our [support](https://www.conduktor.io/contact/support/).
 
 ## Introduction
@@ -73,10 +70,11 @@ Conduktor Controller parameters
 
 | Name                                                             | Description                                                                   | Value                           |
 | ---------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------- |
+| `controller.tolerations`                                         | Tolerations for pod assignment                                                | `[]`                            |
 | `controller.image.registry`                                      | Platform Controller image registry                                            | `docker.io`                     |
 | `controller.image.repository`                                    | Platform Controller image repository                                          | `conduktor/platform-controller` |
 | `controller.image.pullPolicy`                                    | Platform Controller image pull policy                                         | `Always`                        |
-| `controller.image.tag`                                           | Platform Controller image tag                                                 | `0.10.2`                        |
+| `controller.image.tag`                                           | Platform Controller image tag                                                 | `0.12.1`                        |
 | `controller.commonLabels`                                        | Common labels to add to all resources                                         | `{}`                            |
 | `controller.securityContext`                                     | Optionally specify some Security Context.                                     | `{}`                            |
 | `controller.commonAnnotations`                                   | Common annotations to add to all resources                                    | `{}`                            |
@@ -112,6 +110,7 @@ Conduktor Platform parameters
 
 | Name                                              | Description                                                                                                                                       | Value            |
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| `platform.tolerations`                            | Tolerations for pod assignment.                                                                                                                   | `[]`             |
 | `platform.commonLabels`                           | Common labels to add to all resources                                                                                                             | `{}`             |
 | `platform.image`                                  | Optionally specify an image to use for the platform.                                                                                              | `{}`             |
 | `platform.image.registry`                         | Platform image registry                                                                                                                           |                  |
@@ -120,13 +119,21 @@ Conduktor Platform parameters
 | `platform.ignoreImageConstraints`                 | When `true` allows the use of any tag and bypasses the constraint on tag versions.                                                                | `false`          |
 | `platform.securityContext`                        | Optionally specify some Security Context.                                                                                                         | `{}`             |
 | `platform.affinity`                               | Affinity for pod assignment of the platform                                                                                                       | `{}`             |
+| `platform.serviceAccount.name`                    | Name of the service account that will be used by the platform                                                                                     | `""`             |
 | `platform.existingSecret`                         | Existing secret for platform                                                                                                                      | `""`             |
+| `platform.service.type`                           | Kubernetes service type. Only support ClusterIP or NodePort                                                                                       | `ClusterIP`      |
+| `platform.service.name`                           | Name of the platform service                                                                                                                      | `platform`       |
+| `platform.service.annotations`                    | Annotations for platform service                                                                                                                  | `{}`             |
+| `platform.service.ports.platform`                 | Platform service port                                                                                                                             | `80`             |
+| `platform.service.nodePorts.platform`             | Specify the platform nodePort for the NodePort service type                                                                                       | `""`             |
+| `platform.service.clusterIP`                      | Specify the service IP for the ClusterIP service type                                                                                             | `""`             |
 | `platform.config.replicas`                        | Number of replicas for the platform controller                                                                                                    | `1`              |
 | `platform.config.name`                            | Name of the platform controller                                                                                                                   | `platform`       |
 | `platform.config.organization`                    | Your organizations name (mandatory)                                                                                                               | `""`             |
 | `platform.config.adminEmail`                      | Email of the admin user (mandatory)                                                                                                               | `""`             |
 | `platform.config.adminPassword`                   | Password of the admin user (mandatory)                                                                                                            | `""`             |
 | `platform.config.external_url`                    | Force platform external URL, useful for SSO callback URL when using reverse proxy.                                                                | `""`             |
+| `platform.config.containerPorts.platform`         | Platform exposed and listening port                                                                                                               | `8080`           |
 | `platform.config.modules.console`                 | Enable or disable the console module                                                                                                              | `true`           |
 | `platform.config.modules.data_masking`            | Enable or disable the data masking module                                                                                                         | `true`           |
 | `platform.config.modules.monitoring`              | Enable or disable the monitoring module                                                                                                           | `true`           |
