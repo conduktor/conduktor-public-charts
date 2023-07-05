@@ -29,8 +29,10 @@ proxy:
   replicas: 2
   ## @param proxy.secretRef Secret name to load sensitive env var from
   secretRef: ""
+  ## @param proxy.secretSha256sum [nullable] Optional sha256sum of the referenced secret. This could be set to have a automactic restart of proxy deployment if secret change
+  secretSha256sum: ""
 
-  ## @param proxy.env Environment variables for proxy deployment
+  ## @param proxy.env [object] Environment variables for proxy deployment
   env: {}
 
   ## @param proxy.interceptors Json configuration for interceptors to be loaded at startup by proxy
@@ -56,9 +58,8 @@ proxy:
     ## @param proxy.jmx.jvmArgs arguments to pass to the proxy container jvm
     jvmArgs: -Dcom.sun.management.jmxremote.port={{ .Values.proxy.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.proxy.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1
 
-  prometheus:
-    ## @param proxy.prometheus.port Prometheus metric port
-    port: 9089
+  ## @param proxy.startupProbeDelay [nullable] Optional delay in second before startup probe should be running (default 10)
+  startupProbeDelay: ""
 
   ## @param proxy.podLabels Specific labels to be added to proxy pod by deployment
   podLabels: {}
@@ -74,6 +75,12 @@ proxy:
     # readOnlyRootFilesystem: true
     # runAsNonRoot: true
     # runAsUser: 1000
+
+  ## @param proxy.volumes Define user specific volumes for proxy deployment
+  volumes: {}
+
+  ## @param proxy.volumeMounts Define user specific volumeMounts  for proxy container in deployment
+  volumeMounts: {}
 
 ## @section TLS configuration
 ## @descriptionStart
@@ -113,8 +120,6 @@ service:
     admin: false
     ## @param service.external.jmx Enable jmx exposition on external service
     jmx: false
-    ## @param service.external.prometheus Enable prometheus exposition on external service
-    prometheus: false
   ## @section Conduktor-proxy internal service configurations
   ## @descriptionStart
   ## This section specify internal service configuration
@@ -137,6 +142,10 @@ metrics:
   prometheus:
     ## @param metrics.prometheus.enable Enable ServiceMonitor prometheus operator configuration for metrics scrapping
     enable: false
+    ## @param metrics.prometheus.metricRelabelings Configure metric relabeling in ServiceMonitor
+    metricRelabelings: {}
+    ## @param metrics.prometheus.relabelings Configure relabelings in ServiceMonitor
+    relabelings: {}
   grafana:
     ## @param metrics.grafana.enable Enable grafana dashboards to installation
     enable: false
