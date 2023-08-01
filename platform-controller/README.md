@@ -74,7 +74,7 @@ Conduktor Controller parameters
 | `controller.image.registry`                                      | Platform Controller image registry                                            | `docker.io`                     |
 | `controller.image.repository`                                    | Platform Controller image repository                                          | `conduktor/platform-controller` |
 | `controller.image.pullPolicy`                                    | Platform Controller image pull policy                                         | `Always`                        |
-| `controller.image.tag`                                           | Platform Controller image tag                                                 | `0.14.2`                        |
+| `controller.image.tag`                                           | Platform Controller image tag                                                 | `0.15.0`                        |
 | `controller.commonLabels`                                        | Common labels to add to all resources                                         | `{}`                            |
 | `controller.securityContext`                                     | Optionally specify some Security Context.                                     | `{}`                            |
 | `controller.commonAnnotations`                                   | Common annotations to add to all resources                                    | `{}`                            |
