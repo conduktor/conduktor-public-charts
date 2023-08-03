@@ -31,7 +31,7 @@ controller:
     registry: docker.io
     repository: conduktor/platform-controller
     pullPolicy: Always
-    tag: 0.15.0
+    tag: 0.15.1
 
   ## @param controller.commonLabels Common labels to add to all resources
   commonLabels: {}
