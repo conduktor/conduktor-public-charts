@@ -55,6 +55,8 @@ controller:
     create: true
     ## @param controller.serviceAccount.name Service account name override
     name: "conduktor-controller"
+    ## @param controller.serviceAccount.annotations Annotations to add to the service account
+    annotations: {}
 
   resources:
     limits:
