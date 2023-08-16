@@ -32,7 +32,7 @@ jobs:
         run: ct lint --config .github/ct-config.yaml
 
   chart-testing:
-    runs-on: [ cdk-large ]
+    runs-on: [ ubuntu-latest ]
     steps:
       - name: Checkout
         uses: actions/checkout@v3

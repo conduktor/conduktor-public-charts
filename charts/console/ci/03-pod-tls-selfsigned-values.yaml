@@ -76,5 +76,8 @@ ingress:
 platform:
   resources:
     limits:
-      cpu: 2000m
+      cpu: 1500m
+      memory: 4Gi
+    requests:
+      cpu: 1500m
       memory: 4Gi
