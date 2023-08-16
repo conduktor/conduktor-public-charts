@@ -1,0 +1,546 @@
+## @section Global parameters
+## Global Docker image parameters
+## Please, note that this will override the image parameters, including dependencies, configured to use the global value
+## Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
+##
+
+## @param global.imageRegistry Global Docker image registry
+## @param global.imagePullSecrets Global Docker registry secret names as an array
+## @param global.storageClass Global StorageClass for Persistent Volume(s)
+##
+global:
+  imageRegistry: ""
+  ## E.g.
+  ## imagePullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  imagePullSecrets: []
+  storageClass: ""
+
+## @section Common parameters
+##
+
+## @param nameOverride String to partially override common.names.name
+##
+nameOverride: ""
+## @param fullnameOverride String to fully override common.names.fullname
+##
+fullnameOverride: ""
+## @param namespaceOverride String to fully override common.names.namespace
+##
+namespaceOverride: ""
+## @param commonLabels Labels to add to all deployed objects
+##
+commonLabels: {}
+## @param commonAnnotations Annotations to add to all deployed objects
+##
+commonAnnotations: {}
+## @param clusterDomain Kubernetes cluster domain name
+##
+clusterDomain: cluster.local
+## @param extraDeploy Array of extra objects to deploy with the release
+##
+extraDeploy: []
+
+## Enable diagnostic mode in the deployment
+##
+diagnosticMode:
+  ## @param diagnosticMode.enabled Enable diagnostic mode (all probes will be disabled and the command will be overridden)
+  ##
+  enabled: false
+  ## @param diagnosticMode.command Command to override all containers in the deployment
+  ##
+  command:
+    - sleep
+  ## @param diagnosticMode.args Args to override all containers in the deployment
+  ##
+  args:
+    - infinity
+
+## @section Platform product Parameters
+
+## You can paste here your Conduktor Platform Configuration
+##
+## Ref: https://docs.conduktor.io/platform/configuration/env-variables/
+config:
+  ## @param config.organization.name Your Conduktor Platform Organization, you can only set it at install! You will need to change it in the Conduktor Platform UI after the installation
+  organization:
+    name: ""
+
+  admin:
+    ## @param config.admin.email Your Conduktor Platform Admin email, you can only set it at install! You will need to change it in the Conduktor Platform UI after the installation
+    email: ""
+    ## @param config.admin.password Your Conduktor Platform Admin password, you can only set it at install! You will need to change it in the Conduktor Platform UI after the installation
+    password: ""
+
+  ## @param config.database.host Your Conduktor Platform Database host
+  ## @param config.database.port Your Conduktor Platform Database port
+  ## @param config.database.name Your Conduktor Platform Database name
+  ## @param config.database.username Your Conduktor Platform Database username
+  ## @param config.database.password Your Conduktor Platform Database password
+  database:
+    host: ''
+    port: 5432
+    name: 'postgres'
+    username: ''
+    password: ''
+
+  ## @param config.license Conduktor Platform Enterprise license, if none given, the product will run in free tier
+  license: ""
+
+  ## @param config.existingLicenseSecret Name of an existing secret containing the license
+  ##
+  ## Secret should just contain key "license" with the license as value
+  ## NOTE: 'config.license' will be ignored
+  existingLicenseSecret: ""
+
+  platform:
+    ## @param config.platform.external.url Force the platform to redirect and use this URL (useful when behind a proxy to fix SSO issues)
+    external:
+      url: "https://platform.example.com"
+    https:
+      ## @param config.platform.https.selfSigned Enable HTTPS with a self-signed certificate (not recommended for production) based on 'config.platform.external.url' (required).
+      ##
+      ## NOTE: 'config.platform.https.cert.path' and 'config.platform.https.key.path' will be ignored
+      selfSigned: false
+      ## @param config.platform.https.existingSecret Enable HTTPS with an existing secret containing the tls.crt and tls.key (required).
+      ##
+      ## NOTE: 'config.platform.https.cert.path', 'config.platform.https.key.path'
+      ## and 'config.platform.https.selfSigned' will be ignored
+      existingSecret: ""
+
+## @section Platform Deployment Parameters
+##
+
+## Conduktor Platform container configuration
+##
+platform:
+  ## Conduktor Platform image
+  ## ref: https://hub.docker.com/r/conduktor/conduktor-platform/tags/
+  ## @param platform.image.registry Conduktor Platform image registry
+  ## @param platform.image.repository Conduktor Platform image repository
+  ## @param platform.image.tag Conduktor Platform image tag (immutable tags are recommended)
+  ## @param platform.image.digest Conduktor Platform image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param platform.image.pullPolicy Conduktor Platform image pull policy
+  ## @param platform.image.pullSecrets Conduktor Platform image pull secrets
+  ## @param platform.image.debug Enable Conduktor Platform image debug mode
+  ##
+  image:
+    registry: docker.io
+    repository: conduktor/conduktor-platform
+    tag: 1.17.2
+    digest: ""
+    ## Specify a imagePullPolicy
+    ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+    ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+    ##
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ## e.g:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: []
+    ## Enable debug mode
+    ##
+    debug: false
+  ## @param platform.replicaCount Number of Conduktor Platform replicas to deploy
+  ##
+  replicaCount: 1
+  ## @param platform.containerPorts.http Conduktor Platform HTTP (or HTTPS if configured) container port
+  ##
+  containerPorts:
+    http: 8080
+  ## Configure extra options for Conduktor Platform containers' liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param platform.livenessProbe.enabled Enable livenessProbe on Conduktor Platform containers
+  ## @param platform.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param platform.livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param platform.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param platform.livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param platform.livenessProbe.successThreshold Success threshold for livenessProbe
+  ##
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param platform.readinessProbe.enabled Enable readinessProbe on Conduktor Platform containers
+  ## @param platform.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+  ## @param platform.readinessProbe.periodSeconds Period seconds for readinessProbe
+  ## @param platform.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+  ## @param platform.readinessProbe.failureThreshold Failure threshold for readinessProbe
+  ## @param platform.readinessProbe.successThreshold Success threshold for readinessProbe
+  ##
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param platform.startupProbe.enabled Enable startupProbe on Conduktor Platform containers
+  ## @param platform.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
+  ## @param platform.startupProbe.periodSeconds Period seconds for startupProbe
+  ## @param platform.startupProbe.timeoutSeconds Timeout seconds for startupProbe
+  ## @param platform.startupProbe.failureThreshold Failure threshold for startupProbe
+  ## @param platform.startupProbe.successThreshold Success threshold for startupProbe
+  ##
+  startupProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 10
+    successThreshold: 1
+  ## @param platform.customLivenessProbe Custom livenessProbe that overrides the default one
+  ##
+  customLivenessProbe: {}
+  ## @param platform.customReadinessProbe Custom readinessProbe that overrides the default one
+  ##
+  customReadinessProbe: {}
+  ## @param platform.customStartupProbe Custom startupProbe that overrides the default one
+  ##
+  customStartupProbe: {}
+  ## Conduktor Platform resource requests and limits
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
+  resources:
+    limits:
+      ## @param platform.resources.limits.cpu CPU limit for the platform container
+      cpu: 4000m
+      ## @param platform.resources.limits.memory Memory limit for the container
+      memory: 8Gi
+    requests:
+      ## @param platform.resources.requests.cpu CPU resource requests
+      cpu: 2000m
+      ## @param platform.resources.requests.memory Memory resource requests
+      memory: 4Gi
+  ## Configure Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param platform.podSecurityContext.enabled Enabled Conduktor Platform pods' Security Context
+  ## @param platform.podSecurityContext.fsGroup Set Conduktor Platform pod's Security Context fsGroup
+  ##
+  podSecurityContext:
+    enabled: true
+    fsGroup: 1001
+  ## Configure Container Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  ## @param platform.containerSecurityContext.enabled Enabled Conduktor Platform containers' Security Context
+  ## @param platform.containerSecurityContext.runAsUser Set Conduktor Platform containers' Security Context runAsUser
+  ## @param platform.containerSecurityContext.runAsNonRoot Set Conduktor Platform containers' Security Context runAsNonRoot
+  ## @param platform.containerSecurityContext.readOnlyRootFilesystem Set Conduktor Platform containers' Security Context runAsNonRoot
+  ##
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 1001
+    runAsNonRoot: true
+    readOnlyRootFilesystem: false
+
+  ## @param platform.existingConfigmap The name of an existing ConfigMap with your custom configuration for Conduktor Platform
+  ##
+  existingConfigmap: ""
+  ## @param platform.command Override default container command (useful when using custom images)
+  ##
+  command: []
+  ## @param platform.args Override default container args (useful when using custom images)
+  ##
+  args: []
+  ## @param platform.hostAliases Conduktor Platform pods host aliases
+  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+  ##
+  hostAliases: []
+  ## @param platform.podLabels Extra labels for Conduktor Platform pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels: {}
+  ## @param platform.podAnnotations Annotations for Conduktor Platform pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  podAnnotations: {}
+  ## @param platform.podAffinityPreset Pod affinity preset. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAffinityPreset: ""
+  ## @param platform.podAntiAffinityPreset Pod anti-affinity preset. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAntiAffinityPreset: soft
+  ## Node platform.affinity preset
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
+  ##
+  nodeAffinityPreset:
+    ## @param platform.nodeAffinityPreset.type Node affinity preset type. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`
+    ##
+    type: ""
+    ## @param platform.nodeAffinityPreset.key Node label key to match. Ignored if `platform.affinity` is set
+    ##
+    key: ""
+    ## @param platform.nodeAffinityPreset.values Node label values to match. Ignored if `platform.affinity` is set
+    ## E.g.
+    ## values:
+    ##   - e2e-az1
+    ##   - e2e-az2
+    ##
+    values: []
+  ## @param platform.affinity Affinity for Conduktor Platform pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ## NOTE: `platform.podAffinityPreset`, `platform.podAntiAffinityPreset`, and `platform.nodeAffinityPreset` will be ignored when it's set
+  ##
+  affinity: {}
+  ## @param platform.nodeSelector Node labels for Conduktor Platform pods assignment
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+  ## @param platform.tolerations Tolerations for Conduktor Platform pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+  ## @param platform.updateStrategy.type Conduktor Platform statefulset strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ##
+  updateStrategy:
+    ## StrategyType
+    ## Can be set to RollingUpdate, OnDelete or Recreate
+    ##
+    type: Recreate
+
+  ## @param platform.priorityClassName Conduktor Platform pods' priorityClassName
+  ##
+  priorityClassName: ""
+  ## @param platform.topologySpreadConstraints Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/#spread-constraints-for-pods
+  ##
+  topologySpreadConstraints: []
+  ## @param platform.schedulerName Name of the k8s scheduler (other than default) for Conduktor Platform pods
+  ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  ##
+  schedulerName: ""
+  ## @param platform.terminationGracePeriodSeconds Seconds Redmine pod needs to terminate gracefully
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods
+  ##
+  terminationGracePeriodSeconds: ""
+  ## @param platform.lifecycleHooks for the Conduktor Platform container(s) to automate configuration before or after startup
+  ##
+  lifecycleHooks: {}
+  ## @param platform.extraEnvVars Array with extra environment variables to add to Conduktor Platform nodes
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param platform.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for Conduktor Platform nodes
+  ##
+  extraEnvVarsCM: ""
+  ## @param platform.extraEnvVarsSecret Name of existing Secret containing extra env vars for Conduktor Platform nodes
+  ##
+  extraEnvVarsSecret: ""
+  ## @param platform.extraVolumes Optionally specify extra list of additional volumes for the Conduktor Platform pod(s)
+  ##
+  extraVolumes: []
+  ## @param platform.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Conduktor Platform container(s)
+  ##
+  extraVolumeMounts: []
+  ## @param platform.sidecars Add additional sidecar containers to the Conduktor Platform pod(s)
+  ## e.g:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  sidecars: []
+  ## @param platform.initContainers Add additional init containers to the Conduktor Platform pod(s)
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+  ## e.g:
+  ## initContainers:
+  ##  - name: your-image-name
+  ##    image: your-image
+  ##    imagePullPolicy: Always
+  ##    command: ['sh', '-c', 'echo "hello world"']
+  ##
+  initContainers: []
+
+## @section Traffic Exposure Parameters
+##
+
+
+## Conduktor Platform service parameters
+##
+service:
+  ## @param service.type Conduktor Platform service type
+  ##
+  # among ClusterIP, NodePort, LoadBalancer
+  type: ClusterIP
+  ## @param service.ports.http Conduktor Platform service HTTP port
+  ##
+  ports:
+    http: 80
+  ## Node ports to expose
+  ## @param service.nodePorts.http Node port for HTTP
+  ## NOTE: choose port between <30000-32767>
+  ##
+  nodePorts:
+    http: ""
+  ## @param service.clusterIP Conduktor Platform service Cluster IP
+  ## e.g.:
+  ## clusterIP: None
+  ##
+  clusterIP: ""
+  ## @param service.loadBalancerSourceRanges Conduktor Platform service Load Balancer sources
+  ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+  ## e.g:
+  ## loadBalancerSourceRanges:
+  ##   - 10.10.10.0/24
+  ##
+  loadBalancerSourceRanges: []
+  ## @param service.externalTrafficPolicy Conduktor Platform service external traffic policy
+  ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+  ##
+  externalTrafficPolicy: Cluster
+  ## @param service.annotations Additional custom annotations for Conduktor Platform service
+  ##
+  annotations: {}
+  ## @param service.extraPorts Extra ports to expose in Conduktor Platform service (normally used with the `sidecars` value)
+  ##
+  extraPorts: []
+  ## @param service.sessionAffinity Control where client requests go, to the same pod or round-robin
+  ## Values: ClientIP or None
+  ## ref: https://kubernetes.io/docs/user-guide/services/
+  ##
+  sessionAffinity: None
+  ## @param service.sessionAffinityConfig Additional settings for the sessionAffinity
+  ## sessionAffinityConfig:
+  ##   clientIP:
+  ##     timeoutSeconds: 300
+  ##
+  sessionAffinityConfig: {}
+## Conduktor Platform ingress parameters
+## ref: http://kubernetes.io/docs/user-guide/ingress/
+##
+ingress:
+  ## @param ingress.enabled Enable ingress record generation for Conduktor Platform
+  ##
+  enabled: false
+  ## @param ingress.pathType Ingress path type
+  ##
+  pathType: ImplementationSpecific
+  ## @param ingress.apiVersion Force Ingress API version (automatically detected if not set)
+  ##
+  apiVersion: ""
+  ## @param ingress.hostname Default host for the ingress record
+  hostname: platform.local
+  ## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+  ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
+  ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
+  ##
+  ingressClassName: ""
+  ## @param ingress.path Default path for the ingress record
+  ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
+  ##
+  path: /
+  ## @param ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+  ## Use this parameter to set the required annotations for cert-manager, see
+  ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
+  ## e.g:
+  ## annotations:
+  ##   kubernetes.io/ingress.class: nginx
+  ##   cert-manager.io/cluster-issuer: cluster-issuer-name
+  ##
+  annotations: {}
+  ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
+  ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingress.hostname }}`
+  ## You can:
+  ##   - Use the `ingress.secrets` parameter to create this TLS secret
+  ##   - Rely on cert-manager to create it by setting the corresponding annotations
+  ##   - Rely on Helm to create self-signed certificates by setting `ingress.selfSigned=true`
+  ##
+  tls: false
+  ## @param ingress.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
+  ##
+  selfSigned: false
+  ## @param ingress.extraHosts An array with additional hostname(s) to be covered with the ingress record
+  ## e.g:
+  ## extraHosts:
+  ##   - name: platform.local
+  ##     path: /
+  ##
+  extraHosts: []
+  ## @param ingress.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
+  ## e.g:
+  ## extraPaths:
+  ## - path: /*
+  ##   backend:
+  ##     serviceName: ssl-redirect
+  ##     servicePort: use-annotation
+  ##
+  extraPaths: []
+  ## @param ingress.extraTls TLS configuration for additional hostname(s) to be covered with this ingress record
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
+  ## e.g:
+  ## extraTls:
+  ## - hosts:
+  ##     - platform.local
+  ##   secretName: platform.local-tls
+  ##
+  extraTls: []
+  ## @param ingress.secrets Custom TLS certificates as secrets
+  ## NOTE: 'key' and 'certificate' are expected in PEM format
+  ## NOTE: 'name' should line up with a 'secretName' set further up
+  ## If it is not set and you're using cert-manager, this is unneeded, as it will create a secret for you with valid certificates
+  ## If it is not set and you're NOT using cert-manager either, self-signed certificates will be created valid for 365 days
+  ## It is also possible to create and manage the certificates outside of this helm chart
+  ## e.g:
+  ## secrets:
+  ##   - name: platform.local-tls
+  ##     key: |-
+  ##       -----BEGIN RSA PRIVATE KEY-----
+  ##       ...
+  ##       -----END RSA PRIVATE KEY-----
+  ##     certificate: |-
+  ##       -----BEGIN CERTIFICATE-----
+  ##       ...
+  ##       -----END CERTIFICATE-----
+  ##
+  secrets: []
+  ## @param ingress.extraRules Additional rules to be covered with this ingress record
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
+  ## e.g:
+  ## extraRules:
+  ## - host: example.local
+  ##     http:
+  ##       path: /
+  ##       backend:
+  ##         service:
+  ##           name: example-svc
+  ##           port:
+  ##             name: http
+  ##
+  extraRules: []
+
+## @section Other Parameters
+##
+
+## ServiceAccount configuration
+##
+serviceAccount:
+  ## @param serviceAccount.create Specifies whether a ServiceAccount should be created
+  ##
+  create: true
+  ## @param serviceAccount.name The name of the ServiceAccount to use.
+  ## If not set and create is true, a name is generated using the common.names.fullname template
+  ##
+  name: ""
+  ## @param serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
+  ##
+  annotations: {}
+  ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
+  ##
+  automountServiceAccountToken: true

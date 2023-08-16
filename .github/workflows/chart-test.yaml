@@ -1,0 +1,88 @@
+name: Chart testing
+
+on:
+  pull_request:
+    paths: ['charts/**']
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+
+permissions:
+  contents: read
+
+jobs:
+  chart-linting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout Conduktor Charts
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch history
+        run: git fetch --prune --unshallow
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.4.0
+
+      - name: Run chart-testing (lint)
+        run: ct lint --config .github/ct-config.yaml
+
+  chart-testing:
+    runs-on: [ cdk-large ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch history
+        run: git fetch --prune --unshallow
+
+      - name: Install helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'v3.10.1'
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.4.0
+
+      - name: Install K3D
+        shell: bash
+        env:
+          K3D_INSTALL_DIR: ${{ github.workspace }}/.github/.bin
+          K3D_VERSION: "5.4.7"
+        run: |
+          mkdir .github/.bin
+          export PATH="${{ github.workspace }}/.github/.bin:$PATH"
+          echo "PATH=${{ github.workspace }}/.github/.bin:$PATH" >> $GITHUB_ENV
+          
+          echo "Installing k3d"
+          curl -s https://raw.githubusercontent.com/k3d-io/k3d/v${K3D_VERSION}/install.sh | USE_SUDO="false" bash
+
+      - name: Run chart-testing (list-changed)
+        id: list-changed
+        run: |
+          changed=$(ct list-changed --config .github/ct-config.yaml --target-branch main)
+          if [[ -n "$changed" ]]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install helm dependencies
+        if: steps.list-changed.outputs.changed == 'true'
+        run: make helm-deps
+
+      - name: Create k3d cluster
+        if: steps.list-changed.outputs.changed == 'true'
+        run: make k3d-up
+
+      - name: Run chart-testing (install)
+        run: ct install --config .github/ct-config.yaml
+        if: steps.list-changed.outputs.changed == 'true'
+
+      - name: Create k3d cluster
+        if: always()
+        run: make k3d-down
