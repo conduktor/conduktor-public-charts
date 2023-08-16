@@ -1,4 +1,5 @@
 apiVersion: v2
+name: console
 appVersion: 1.17.2
 version: 1.0.0
 description: Helm chart to deploy Conduktor Platform on Kubernetes
@@ -8,9 +9,8 @@ maintainers:
   - name: Conduktor Platform
     email: support@conduktor.io
     url: https://docs.conduktor.io/platform
-name: platform
 sources:
-  - https://github.com/conduktor/conduktor-public-charts/tree/main/charts/platform
+  - https://github.com/conduktor/conduktor-public-charts/tree/main/charts/console
 dependencies:
   - name: common
     repository: https://charts.bitnami.com/bitnami

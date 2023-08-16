@@ -24,7 +24,7 @@
 
 ## Charts
 
-- platform ([doc](charts/platform/README.md), [values](charts/platform/values.yaml))
+- console ([doc](charts/console/README.md), [values](charts/console/values.yaml))
 - platform-controller ([doc](https://helm.conduktor.io/platform-controller/README.md), [values](https://helm.conduktor.io/platform-controller/values.yaml))
 - conduktor-proxy ([doc](https://helm.conduktor.io/proxy/README.md), [values](https://helm.conduktor.io/proxy/values.yaml))
 
