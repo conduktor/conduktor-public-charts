@@ -25,8 +25,8 @@
 ## Charts
 
 - console ([doc](charts/console/README.md), [values](charts/console/values.yaml))
-- platform-controller ([doc](https://helm.conduktor.io/platform-controller/README.md), [values](https://helm.conduktor.io/platform-controller/values.yaml))
 - conduktor-proxy ([doc](https://helm.conduktor.io/proxy/README.md), [values](https://helm.conduktor.io/proxy/values.yaml))
+- platform-controller (deprecated) ([doc](https://helm.conduktor.io/platform-controller/README.md), [values](https://helm.conduktor.io/platform-controller/values.yaml))
 
 ## Usage
 
@@ -42,6 +42,11 @@ or to our charts `README`.
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Development setup
+
+**Requirements**:
+- k3d
+- kubectl
+- helm
 
 You can have a working cluster on your local machine with docker and k3d, 
 use the Makefile target `k3d-up` to start a cluster with nginx and a postgresql

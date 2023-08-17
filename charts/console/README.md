@@ -7,7 +7,7 @@
 
 ```console
 $ helm repo add conduktor https://helm.conduktor.io
-$ helm install my-platform conduktor/platform \
+$ helm install my-platform conduktor/console \
     --create-namespace -n conduktor \
     --set config.organization.name="my-org" \
     --set config.admin.email="admin@conduktor.io" \
