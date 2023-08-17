@@ -39,6 +39,30 @@ entries:
     urls:
     - https://raw.githubusercontent.com/conduktor/conduktor-public-charts/gh-pages/conduktor-proxy-1.0.0.tgz
     version: 1.0.0
+  console:
+  - apiVersion: v2
+    appVersion: 1.17.2
+    created: "2023-08-17T08:55:50.908491522Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-common
+      version: 2.x.x
+    description: Helm chart to deploy Conduktor Platform on Kubernetes
+    digest: 5843c6a6c9e57b84b2b87f67cc50517ff79f6d5a1507e31b16a032c8cb788e07
+    home: https://www.conduktor.io
+    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    maintainers:
+    - email: support@conduktor.io
+      name: Conduktor Platform
+      url: https://docs.conduktor.io/platform
+    name: console
+    sources:
+    - https://github.com/conduktor/conduktor-public-charts/tree/main/charts/console
+    urls:
+    - https://github.com/conduktor/conduktor-public-charts/releases/download/console-1.0.0/console-1.0.0.tgz
+    version: 1.0.0
   platform-controller:
   - annotations:
       platformVersion: 1.17.2
@@ -672,4 +696,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/conduktor/conduktor-public-charts/gh-pages/platform-controller-0.2.1.tgz
     version: 0.2.1
-generated: "2023-08-10T16:02:26.788600892Z"
+generated: "2023-08-17T08:55:50.908535623Z"
