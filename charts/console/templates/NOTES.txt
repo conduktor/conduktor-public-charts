@@ -1,0 +1,50 @@
+CHART NAME: {{ .Chart.Name  }}
+CHART VERSION: {{ .Chart.Version  }}
+APP VERSION: {{ .Chart.AppVersion  }}
+
+** Please be patient while the chart is being deployed **
+
+{{- if .Values.diagnosticMode.enabled }}
+The chart has been deployed in diagnostic mode. All probes have been disabled and the command has been overwritten with:
+
+  command: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.command "context" $) | nindent 4 }}
+  args: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.args "context" $) | nindent 4 }}
+
+Get the list of pods by executing:
+
+  kubectl get pods --namespace {{ include "common.names.namespace" . | quote }} -l app.kubernetes.io/instance={{ .Release.Name }}
+
+Access the pod you want to debug by executing
+
+  kubectl exec --namespace {{ include "common.names.namespace" . | quote }} -ti <NAME OF THE POD> -- bash
+
+In order to replicate the container startup scripts execute this command:
+
+    /opt/conduktor/scripts/run.sh
+
+{{- end }}
+
+{{ if .Values.ingress.enabled }}
+Conduktor Platform will be accessible at :  http://{{ .Values.ingress.hostname }}
+{{- else }}
+Forward Platform service locally with the command (may take a few seconds to be ready):
+kubectl port-forward -n {{ .Release.Namespace }} svc/{{ template "common.names.fullname" . }} 8080:80
+
+Conduktor Platform will be accessible at : http://127.0.0.1:8080
+{{- end }}
+
+To connect use following admin account ADMIN_LOGIN and ADMIN_PASSWORD
+
+ADMIN_LOGIN="{{ .Values.config.admin.email }}"
+ADMIN_PASSWORD="$(kubectl get secret {{ include "conduktor.platform.secretName" .  }} -n {{ .Release.Namespace }} -o jsonpath="{.data.CDK_ADMIN_PASSWORD}" | base64 --decode)"
+
+More details on Platform configuration are available at https://docs.conduktor.io/platform/
+If you have any issue, please contact our support by browsing to https://www.conduktor.io/contact/support/
+
+{{ if and (empty .Values.config.license) (empty .Values.config.existingLicenseSecret) }}
+You are using the free version of Conduktor Platform.
+If you need more, please contact our sales team by browsing to https://www.conduktor.io/contact/sales/
+{{- end }}
+
+{{- include "common.warnings.rollingTag" .Values.platform.image }}
+{{- include "conduktor.validateValues" . }}

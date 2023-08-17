@@ -1,0 +1,22 @@
+nameOverride: cdkt-test-01
+config:
+  organization:
+    name: conduktor
+  admin:
+    email: admin@conduktor.io
+    password: admin
+
+  database:
+    name: platform
+    host: postgresql-hl
+    password: conduktor123
+    port: 5432
+    username: postgres
+platform:
+  resources:
+    limits:
+      cpu: 1500m
+      memory: 4Gi
+    requests:
+      cpu: 1500m
+      memory: 4Gi

@@ -1,0 +1,185 @@
+{{- $tls_enabled := or ((.Values.config.platform.https).existingSecret) ((.Values.config.platform.https).selfSigned) }}
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ template "common.names.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: conduktor-platform
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.platform.replicaCount }}
+  {{- if .Values.platform.updateStrategy }}
+  strategy: {{- toYaml .Values.platform.updateStrategy | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: conduktor-platform
+  template:
+    metadata:
+      annotations:
+        {{- if .Values.platform.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.platform.podAnnotations "context" $) | nindent 8 }}
+        {{- end }}
+        checksum/config: {{ include (print $.Template.BasePath "/platform/configmap.yaml") . | sha256sum }}
+      labels: {{- include "common.labels.standard" . | nindent 8 }}
+        app.kubernetes.io/component: conduktor-platform
+        {{- if .Values.platform.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.platform.podLabels "context" $) | nindent 8 }}
+        {{- end }}
+        {{- if .Values.commonLabels }}
+        {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ template "conduktor.serviceAccountName" . }}
+      {{- include "conduktor.imagePullSecrets" . | nindent 6 }}
+      {{- if .Values.platform.hostAliases }}
+      hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.platform.hostAliases "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.platform.affinity }}
+      affinity: {{- include "common.tplvalues.render" ( dict "value" .Values.platform.affinity "context" $) | nindent 8 }}
+      {{- else }}
+      affinity:
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.platform.podAffinityPreset "component" "conduktor-platform" "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.platform.podAntiAffinityPreset "component" "conduktor-platform" "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.platform.nodeAffinityPreset.type "key" .Values.platform.nodeAffinityPreset.key "values" .Values.platform.nodeAffinityPreset.values) | nindent 10 }}
+      {{- end }}
+      {{- if .Values.platform.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" ( dict "value" .Values.platform.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.platform.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.platform.tolerations "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.platform.priorityClassName }}
+      priorityClassName: {{ .Values.platform.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.platform.schedulerName }}
+      schedulerName: {{ .Values.platform.schedulerName | quote }}
+      {{- end }}
+      {{- if .Values.platform.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.platform.topologySpreadConstraints "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.platform.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.platform.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+      {{- if .Values.platform.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.platform.terminationGracePeriodSeconds }}
+      {{- end }}
+      initContainers:
+        {{- if .Values.platform.initContainers }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.platform.initContainers "context" $) | nindent 8 }}
+        {{- end }}
+      containers:
+        - name: conduktor-platform
+          image: {{ template "conduktor.image" . }}
+          imagePullPolicy: {{ .Values.platform.image.pullPolicy }}
+          {{- if .Values.platform.containerSecurityContext.enabled }}
+          securityContext: {{- omit .Values.platform.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.diagnosticMode.enabled }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.command "context" $) | nindent 12 }}
+          {{- else if .Values.platform.command }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.platform.command "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.diagnosticMode.enabled }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.args "context" $) | nindent 12 }}
+          {{- else if .Values.platform.args }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.platform.args "context" $) | nindent 12 }}
+          {{- end }}
+          env:
+            - name: CDK_DEBUG
+              value: {{ ternary "true" "false" (or .Values.platform.image.debug .Values.diagnosticMode.enabled) | quote }}
+            - name: CDK_IN_CONF_FILE
+              value: /conduktor/config/platform-config.yaml
+            - name: CDK_ONBOARDING_MODE
+              value: never
+            - name: CDK_LISTENING_PORT
+              value: {{ .Values.platform.containerPorts.http | quote }}
+            {{- if $tls_enabled }}
+            - name: CDK_PLATFORM_HTTPS_CERT_PATH
+              value: /conduktor/https/tls.crt
+            - name: CDK_PLATFORM_HTTPS_KEY_PATH
+              value: /conduktor/https/tls.key
+            {{- end }}
+            {{- if .Values.platform.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.platform.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+          envFrom:
+            {{- if .Values.platform.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.platform.extraEnvVarsCM "context" $) }}
+            {{- end }}
+            {{- if .Values.platform.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.platform.extraEnvVarsSecret "context" $) }}
+            {{- end }}
+            - secretRef:
+                name: {{ include "conduktor.platform.secretName" . }}
+            {{- if or .Values.config.license .Values.config.existingLicenseSecret }}
+            - secretRef:
+                name: {{ include "conduktor.license.secretName" . }}
+            {{- end }}
+          {{- if .Values.platform.resources }}
+          resources: {{- toYaml .Values.platform.resources | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.platform.containerPorts.http }}
+          {{- if not .Values.diagnosticMode.enabled }}
+          {{- if .Values.platform.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.platform.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.platform.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.platform.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /platform/api/modules/health/live
+              port: http
+          {{- end }}
+          {{- if .Values.platform.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.platform.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.platform.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.platform.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /platform/api/modules/health/ready
+              port: http
+          {{- end }}
+          {{- if .Values.platform.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.platform.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.platform.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.platform.startupProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /platform/api/modules/health/live
+              port: http
+          {{- end }}
+          {{- end }}
+          {{- if .Values.platform.lifecycleHooks }}
+          lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.platform.lifecycleHooks "context" $) | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /conduktor/config/
+            {{- if $tls_enabled }}
+            - name: platform-https
+              mountPath: /conduktor/https/
+            {{- end }}
+          {{- if .Values.platform.extraVolumeMounts }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.platform.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
+        {{- if .Values.platform.sidecars }}
+        {{- include "common.tplvalues.render" ( dict "value" .Values.platform.sidecars "context" $) | nindent 8 }}
+        {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "conduktor.platform.configMapName" . }}
+        - name: platform-https
+          secret:
+            secretName: {{ include "conduktor.platform.tls.secretName" . }}
+        {{- if .Values.platform.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.platform.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
