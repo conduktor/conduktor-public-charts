@@ -3,6 +3,7 @@
 
 ## Charts
 
+- platform ([doc](https://github.com/conduktor/conduktor-public-charts/blob/main/charts/console/README.md), [values](https://github.com/conduktor/conduktor-public-charts/blob/main/charts/console/values.yaml))
 - platform-controller ([doc](platform-controller/README.md), [values](platform-controller/values.yaml))
 - conduktor-proxy ([doc](proxy/README.md), [values](proxy/values.yaml))
 
@@ -26,17 +27,4 @@ Search all the repositories available
 helm search repo conduktor -l
 ```
 
-Install specific helm chart
-
-```
-helm install platform-controller conduktor/platform-controller
-helm status platform-controller
-```
-
-## Uninstalling the Chart
-
-To uninstall/delete the `platform-controller` deployment:
-
-```
-$ helm delete platform-controller
-```
+Check our [documentation](https://docs.conduktor.io/platform/configuration/env-variables/) for help.
