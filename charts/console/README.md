@@ -15,7 +15,8 @@ $ helm install my-platform conduktor/console \
     --set config.database.password="postgres" \
     --set config.database.username="postgres" \
     --set config.database.host="postgresql" \
-    --set license="${LICENSE}"
+    --set config.database.name="postgres" \
+    --set config.license="${LICENSE}"
 ```
 
 ## Introduction
