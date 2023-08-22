@@ -3,7 +3,7 @@ entries:
   conduktor-proxy:
   - apiVersion: v2
     appVersion: 1.8.2
-    created: "2023-08-21T12:28:46.356587318Z"
+    created: "2023-08-22T10:29:17.491151982+02:00"
     dependencies:
     - condition: kafka.enabled
       name: kafka
@@ -22,7 +22,7 @@ entries:
     version: 1.1.0
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2023-08-21T12:28:46.337222646Z"
+    created: "2023-08-22T10:29:17.483178292+02:00"
     dependencies:
     - condition: kafka.enabled
       name: kafka
@@ -39,12 +39,59 @@ entries:
     urls:
     - https://raw.githubusercontent.com/conduktor/conduktor-public-charts/gh-pages/conduktor-proxy-1.0.0.tgz
     version: 1.0.0
+  console:
+  - apiVersion: v2
+    appVersion: 1.17.3
+    created: "2023-08-22T10:29:17.49478436+02:00"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-common
+      version: 2.x.x
+    description: Helm chart to deploy Conduktor Platform on Kubernetes
+    digest: b5ee0b9fd5b50890748699689dadf45949259a109ee5e6b55292b0d4f61307e8
+    home: https://www.conduktor.io
+    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    maintainers:
+    - email: support@conduktor.io
+      name: Conduktor Platform
+      url: https://docs.conduktor.io/platform
+    name: console
+    sources:
+    - https://github.com/conduktor/conduktor-public-charts/tree/main/charts/console
+    urls:
+    - https://raw.githubusercontent.com/conduktor/conduktor-public-charts/gh-pages/console-1.0.1.tgz
+    version: 1.0.1
+  - apiVersion: v2
+    appVersion: 1.17.2
+    created: "2023-08-22T10:29:17.493180642+02:00"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-common
+      version: 2.x.x
+    description: Helm chart to deploy Conduktor Platform on Kubernetes
+    digest: 5843c6a6c9e57b84b2b87f67cc50517ff79f6d5a1507e31b16a032c8cb788e07
+    home: https://www.conduktor.io
+    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    maintainers:
+    - email: support@conduktor.io
+      name: Conduktor Platform
+      url: https://docs.conduktor.io/platform
+    name: console
+    sources:
+    - https://github.com/conduktor/conduktor-public-charts/tree/main/charts/console
+    urls:
+    - https://raw.githubusercontent.com/conduktor/conduktor-public-charts/gh-pages/console-1.0.0.tgz
+    version: 1.0.0
   platform-controller:
   - annotations:
       platformVersion: 1.17.3
     apiVersion: v2
     appVersion: 0.15.3
-    created: "2023-08-21T12:28:47.050876997Z"
+    created: "2023-08-22T10:29:17.749852613+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -84,7 +131,7 @@ entries:
       platformVersion: 1.17.2
     apiVersion: v2
     appVersion: 0.15.2
-    created: "2023-08-21T12:28:47.007728092Z"
+    created: "2023-08-22T10:29:17.732203089+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -124,7 +171,7 @@ entries:
       platformVersion: 1.17.2
     apiVersion: v2
     appVersion: 0.15.2
-    created: "2023-08-21T12:28:46.945854223Z"
+    created: "2023-08-22T10:29:17.719082566+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -164,7 +211,7 @@ entries:
       platformVersion: 1.17.1
     apiVersion: v2
     appVersion: 0.15.1
-    created: "2023-08-21T12:28:46.905533416Z"
+    created: "2023-08-22T10:29:17.703758412+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -204,7 +251,7 @@ entries:
       platformVersion: 1.17.0
     apiVersion: v2
     appVersion: 0.15.0
-    created: "2023-08-21T12:28:46.852964257Z"
+    created: "2023-08-22T10:29:17.687538835+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -244,7 +291,7 @@ entries:
       platformVersion: 1.16.3
     apiVersion: v2
     appVersion: 0.14.2
-    created: "2023-08-21T12:28:46.8113691Z"
+    created: "2023-08-22T10:29:17.672802308+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -284,7 +331,7 @@ entries:
       platformVersion: 1.16.2
     apiVersion: v2
     appVersion: 1.16.2
-    created: "2023-08-21T12:28:46.768771358Z"
+    created: "2023-08-22T10:29:17.657770709+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -324,7 +371,7 @@ entries:
       platformVersion: 1.16.1
     apiVersion: v2
     appVersion: 0.13.0
-    created: "2023-08-21T12:28:46.724182882Z"
+    created: "2023-08-22T10:29:17.641217392+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -364,7 +411,7 @@ entries:
       platformVersion: 1.15.0
     apiVersion: v2
     appVersion: 0.12.1
-    created: "2023-08-21T12:28:46.681987013Z"
+    created: "2023-08-22T10:29:17.626350828+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -404,7 +451,7 @@ entries:
       platformVersion: 1.15.0
     apiVersion: v2
     appVersion: 0.10.2
-    created: "2023-08-21T12:28:46.642942866Z"
+    created: "2023-08-22T10:29:17.613155901+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -444,7 +491,7 @@ entries:
       platformVersion: 1.15.0
     apiVersion: v2
     appVersion: 0.10.2
-    created: "2023-08-21T12:28:46.599292442Z"
+    created: "2023-08-22T10:29:17.597458079+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -484,7 +531,7 @@ entries:
       platformVersion: 1.14.0
     apiVersion: v2
     appVersion: 0.9.0
-    created: "2023-08-21T12:28:46.56253747Z"
+    created: "2023-08-22T10:29:17.581609699+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -522,7 +569,7 @@ entries:
     version: 0.4.0
   - apiVersion: v2
     appVersion: 0.8.0
-    created: "2023-08-21T12:28:46.525864663Z"
+    created: "2023-08-22T10:29:17.568502018+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -558,7 +605,7 @@ entries:
     version: 0.3.0
   - apiVersion: v2
     appVersion: 0.7.0
-    created: "2023-08-21T12:28:46.487942711Z"
+    created: "2023-08-22T10:29:17.555182356+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -594,7 +641,7 @@ entries:
     version: 0.2.5
   - apiVersion: v2
     appVersion: 0.6.0
-    created: "2023-08-21T12:28:46.443567068Z"
+    created: "2023-08-22T10:29:17.539858044+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -624,7 +671,7 @@ entries:
     version: 0.2.4
   - apiVersion: v2
     appVersion: 0.5.0
-    created: "2023-08-21T12:28:46.419827072Z"
+    created: "2023-08-22T10:29:17.527988944+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -654,7 +701,7 @@ entries:
     version: 0.2.3
   - apiVersion: v2
     appVersion: 0.5.0
-    created: "2023-08-21T12:28:46.395033239Z"
+    created: "2023-08-22T10:29:17.517119011+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -684,7 +731,7 @@ entries:
     version: 0.2.2
   - apiVersion: v2
     appVersion: 0.4.0
-    created: "2023-08-21T12:28:46.376246273Z"
+    created: "2023-08-22T10:29:17.505428355+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -712,4 +759,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/conduktor/conduktor-public-charts/gh-pages/platform-controller-0.2.1.tgz
     version: 0.2.1
-generated: "2023-08-21T12:28:46.319537525Z"
+generated: "2023-08-22T10:29:17.473986808+02:00"
