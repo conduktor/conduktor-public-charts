@@ -185,6 +185,19 @@ Helm Chart to deploy Conduktor Platform on Kubernetes.
 
 ## Snippets
 
+- [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
+- [Install with a registered kafka cluster](#install-with-a-kafka-cluster)
+- [Install with an enterprise license](#install-with-an-enterprise-license)
+- [Install with a PodAffinity](#install-with-a-podaffinity)
+- [Install with a PodAntiAffinity](#install-with-a-podantiaffinity)
+- [Install with a Toleration](#install-with-a-toleration)
+- [Install with a Self-Signed Certificate](#install-with-self-signed-tls-certificate)
+- [Install with a custom service account](#install-with-a-custom-service-account)
+- [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
+
+- [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
+- [Provide the license as a Kubernetes ConfigMap](#provide-the-platform-config-as-a-kubernetes-configmap)
+
 ### Install with an enterprise license
 
 ```yaml
@@ -205,6 +218,88 @@ config:
 
   license: "${ENTERPRISE_LICENSE}"
 ```    
+
+### Install with a basic SSO configuration
+
+```yaml
+config:
+  organization:
+    name: "my-org"
+
+  admin:
+    email: "admin@my-org.com"
+    password: "admin"
+
+  database:
+    host: ''
+    port: 5432
+    name: 'postgres'
+    username: ''
+    password: ''
+  sso:
+    oauth2:
+      - name: 'auth0'
+        default: true
+        client-id: <client_id>
+        client-secret: <client_secret>
+        callback-uri: http://localhost/auth/oauth/callback/auth0
+        openid:
+          issuer: https://conduktor-staging.eu.auth0.com/
+  
+  license: '<license_key>'
+```
+
+### Install with a kafka cluster
+
+```yaml
+config:
+  organization:
+    name: "my-org"
+
+  admin:
+    email: "admin@my-org.com"
+    password: "admin"
+
+  database:
+    host: ''
+    port: 5432
+    name: 'postgres'
+    username: ''
+    password: ''
+  clusters:
+    - id: my-local-kafka-cluster
+      name: My Local Kafka Cluster
+      color: '#0013E7'
+      bootstrapServers: 'my-bootstrap-server:9092'
+      schemaRegistry:
+        id: my-schema-registry
+        url: 'http://my-schema-registry:8081'
+```
+
+### Provide the license as a Kubernetes Secret
+
+We expect the secret to contain a key named `license` which contains your
+license key.
+
+```shell
+# values.yaml
+config:
+  organization:
+    name: "<your_org_name>"
+
+  admin:
+    email: "<your_admin_email>"
+    password: "<your_admin_password>"
+    
+  database:
+    host: '<postgres_host>'
+    port: 5432
+    name: '<postgres_database>'
+    username: '<postgres_username>'
+    password: '<postgres_password>'
+
+  existingLicenseSecret: "<your_secret_name>"
+```
 
 ### Install with a PodAffinity
 
