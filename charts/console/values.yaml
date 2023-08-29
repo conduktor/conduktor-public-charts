@@ -307,7 +307,7 @@ platform:
     ## StrategyType
     ## Can be set to RollingUpdate, OnDelete or Recreate
     ##
-    type: Recreate
+    type: RollingUpdate
 
   ## @param platform.priorityClassName Conduktor Platform pods' priorityClassName
   ##

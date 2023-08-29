@@ -15,7 +15,8 @@ $ helm install my-platform conduktor/console \
     --set config.database.password="postgres" \
     --set config.database.username="postgres" \
     --set config.database.host="postgresql" \
-    --set license="${LICENSE}"
+    --set config.database.name="postgres" \
+    --set config.license="${LICENSE}"
 ```
 
 ## Introduction
@@ -130,7 +131,7 @@ Helm Chart to deploy Conduktor Platform on Kubernetes.
 | `platform.affinity`                                        | Affinity for Conduktor Platform pods assignment                                                                                                               | `{}`                           |
 | `platform.nodeSelector`                                    | Node labels for Conduktor Platform pods assignment                                                                                                            | `{}`                           |
 | `platform.tolerations`                                     | Tolerations for Conduktor Platform pods assignment                                                                                                            | `[]`                           |
-| `platform.updateStrategy.type`                             | Conduktor Platform statefulset strategy type                                                                                                                  | `Recreate`                     |
+| `platform.updateStrategy.type`                             | Conduktor Platform statefulset strategy type                                                                                                                  | `RollingUpdate`                |
 | `platform.priorityClassName`                               | Conduktor Platform pods' priorityClassName                                                                                                                    | `""`                           |
 | `platform.topologySpreadConstraints`                       | Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template                                      | `[]`                           |
 | `platform.schedulerName`                                   | Name of the k8s scheduler (other than default) for Conduktor Platform pods                                                                                    | `""`                           |
