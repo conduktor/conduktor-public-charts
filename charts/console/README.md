@@ -176,12 +176,13 @@ Helm Chart to deploy Conduktor Platform on Kubernetes.
 
 ### Other Parameters
 
-| Name                                          | Description                                                      | Value  |
-| --------------------------------------------- | ---------------------------------------------------------------- | ------ |
-| `serviceAccount.create`                       | Specifies whether a ServiceAccount should be created             | `true` |
-| `serviceAccount.name`                         | The name of the ServiceAccount to use.                           | `""`   |
-| `serviceAccount.annotations`                  | Additional Service Account annotations (evaluated as a template) | `{}`   |
-| `serviceAccount.automountServiceAccountToken` | Automount service account token for the server service account   | `true` |
+| Name                                          | Description                                                      | Value   |
+| --------------------------------------------- | ---------------------------------------------------------------- | ------- |
+| `serviceAccount.create`                       | Specifies whether a ServiceAccount should be created             | `true`  |
+| `serviceAccount.name`                         | The name of the ServiceAccount to use.                           | `""`    |
+| `serviceAccount.annotations`                  | Additional Service Account annotations (evaluated as a template) | `{}`    |
+| `serviceAccount.automountServiceAccountToken` | Automount service account token for the server service account   | `true`  |
+| `test`                                        | Enable additional manifests for testing purposes                 | `false` |
 
 ## Snippets
 
