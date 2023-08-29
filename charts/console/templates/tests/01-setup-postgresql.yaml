@@ -1,7 +1,7 @@
 {{/**
 This is hack so that we install a fresh postgresql (without volume) for each test.
 **/}}
-{{- if regexMatch "^cdkt-test-.*$" .Values.nameOverride }}
+{{- if eq .Values.test true }}
 {{- $postgres_password := "conduktor123" }}
 {{- $postgres_db := "platform" }}
 apiVersion: apps/v1

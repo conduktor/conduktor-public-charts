@@ -544,3 +544,6 @@ serviceAccount:
   ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
   ##
   automountServiceAccountToken: true
+
+## @param test Enable additional manifests for testing purposes
+test: false
