@@ -65,8 +65,12 @@ spec:
       {{- if .Values.platform.topologySpreadConstraints }}
       topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.platform.topologySpreadConstraints "context" .) | nindent 8 }}
       {{- end }}
-      {{- if .Values.platform.podSecurityContext.enabled }}
-      securityContext: {{- omit .Values.platform.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- if .Values.platform.podSecurityContext }}
+      securityContext: {{- include "common.tplvalues.render" (dict "value" .Values.platform.containerSecurityContext "context" $) | nindent 10 }}
+      {{- else }}
+      securityContext:
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
       {{- end }}
       {{- if .Values.platform.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.platform.terminationGracePeriodSeconds }}
@@ -79,8 +83,12 @@ spec:
         - name: conduktor-platform
           image: {{ template "conduktor.image" . }}
           imagePullPolicy: {{ .Values.platform.image.pullPolicy }}
-          {{- if .Values.platform.containerSecurityContext.enabled }}
-          securityContext: {{- omit .Values.platform.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- if .Values.platform.containerSecurityContext }}
+          securityContext: {{- include "common.tplvalues.render" (dict "value" .Values.platform.containerSecurityContext "context" $) | nindent 12 }}
+          {{- else }}
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
           {{- end }}
           {{- if .Values.diagnosticMode.enabled }}
           command: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.command "context" $) | nindent 12 }}
