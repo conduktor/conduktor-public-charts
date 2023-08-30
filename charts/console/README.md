@@ -57,8 +57,6 @@ Helm Chart to deploy Conduktor Platform on Kubernetes.
 
 ### Platform product Parameters
 
-Refer to our [documentation](https://docs.conduktor.io/platform/configuration/env-variables/) for the full list of product configuration properties.
-
 | Name                                   | Description                                                                                                                                            | Value                          |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------ |
 | `config.organization.name`             | Your Conduktor Platform Organization, you can only set it at install! You will need to change it in the Conduktor Platform UI after the installation   | `""`                           |
