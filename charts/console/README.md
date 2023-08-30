@@ -182,9 +182,18 @@ Helm Chart to deploy Conduktor Platform on Kubernetes.
 
 ## Snippets
 
+### Console configuration 
+
+If you are looking for additional snippets related to the configuration of 
+console, we recommend you to look at our 
+[documentation](https://docs.conduktor.io/platform/configuration/configuration-snippets/).
+
 - [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
 - [Install with a registered kafka cluster](#install-with-a-kafka-cluster)
 - [Install with an enterprise license](#install-with-an-enterprise-license)
+
+### Kubernetes configuration 
+
 - [Install with a PodAffinity](#install-with-a-podaffinity)
 - [Install with a PodAntiAffinity](#install-with-a-podantiaffinity)
 - [Install with a Toleration](#install-with-a-toleration)
