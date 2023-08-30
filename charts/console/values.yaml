@@ -220,26 +220,22 @@ platform:
       cpu: 2000m
       ## @param platform.resources.requests.memory Memory resource requests
       memory: 4Gi
-  ## Configure Pods Security Context
+  ## @param platform.podSecurityContext Conduktor Platform Pod Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
-  ## @param platform.podSecurityContext.enabled Enabled Conduktor Platform pods' Security Context
-  ## @param platform.podSecurityContext.fsGroup Set Conduktor Platform pod's Security Context fsGroup
+  ## default:
+  ## securityContext:
+  ##   readOnlyRootFilesystem: true
+  ##   runAsNonRoot: true
   ##
-  podSecurityContext:
-    enabled: true
-    fsGroup: 1001
-  ## Configure Container Security Context
+  podSecurityContext: {}
+  ## @param platform.containerSecurityContext Conduktor Platform containers' Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
-  ## @param platform.containerSecurityContext.enabled Enabled Conduktor Platform containers' Security Context
-  ## @param platform.containerSecurityContext.runAsUser Set Conduktor Platform containers' Security Context runAsUser
-  ## @param platform.containerSecurityContext.runAsNonRoot Set Conduktor Platform containers' Security Context runAsNonRoot
-  ## @param platform.containerSecurityContext.readOnlyRootFilesystem Set Conduktor Platform containers' Security Context runAsNonRoot
+  ## default:
+  ## securityContext:
+  ##   readOnlyRootFilesystem: true
+  ##   runAsNonRoot: true
   ##
-  containerSecurityContext:
-    enabled: true
-    runAsUser: 1001
-    runAsNonRoot: true
-    readOnlyRootFilesystem: false
+  containerSecurityContext: {}
 
   ## @param platform.existingConfigmap The name of an existing ConfigMap with your custom configuration for Conduktor Platform
   ##
@@ -544,3 +540,6 @@ serviceAccount:
   ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
   ##
   automountServiceAccountToken: true
+
+## @param test Enable additional manifests for testing purposes
+test: false

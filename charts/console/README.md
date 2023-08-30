@@ -75,75 +75,71 @@ Helm Chart to deploy Conduktor Platform on Kubernetes.
 
 ### Platform Deployment Parameters
 
-| Name                                                       | Description                                                                                                                                                   | Value                          |
-| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| `platform.image.registry`                                  | Conduktor Platform image registry                                                                                                                             | `docker.io`                    |
-| `platform.image.repository`                                | Conduktor Platform image repository                                                                                                                           | `conduktor/conduktor-platform` |
-| `platform.image.tag`                                       | Conduktor Platform image tag (immutable tags are recommended)                                                                                                 | `1.17.3`                       |
-| `platform.image.digest`                                    | Conduktor Platform image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`                           |
-| `platform.image.pullPolicy`                                | Conduktor Platform image pull policy                                                                                                                          | `IfNotPresent`                 |
-| `platform.image.pullSecrets`                               | Conduktor Platform image pull secrets                                                                                                                         | `[]`                           |
-| `platform.image.debug`                                     | Enable Conduktor Platform image debug mode                                                                                                                    | `false`                        |
-| `platform.replicaCount`                                    | Number of Conduktor Platform replicas to deploy                                                                                                               | `1`                            |
-| `platform.containerPorts.http`                             | Conduktor Platform HTTP (or HTTPS if configured) container port                                                                                               | `8080`                         |
-| `platform.livenessProbe.enabled`                           | Enable livenessProbe on Conduktor Platform containers                                                                                                         | `true`                         |
-| `platform.livenessProbe.initialDelaySeconds`               | Initial delay seconds for livenessProbe                                                                                                                       | `60`                           |
-| `platform.livenessProbe.periodSeconds`                     | Period seconds for livenessProbe                                                                                                                              | `10`                           |
-| `platform.livenessProbe.timeoutSeconds`                    | Timeout seconds for livenessProbe                                                                                                                             | `5`                            |
-| `platform.livenessProbe.failureThreshold`                  | Failure threshold for livenessProbe                                                                                                                           | `3`                            |
-| `platform.livenessProbe.successThreshold`                  | Success threshold for livenessProbe                                                                                                                           | `1`                            |
-| `platform.readinessProbe.enabled`                          | Enable readinessProbe on Conduktor Platform containers                                                                                                        | `true`                         |
-| `platform.readinessProbe.initialDelaySeconds`              | Initial delay seconds for readinessProbe                                                                                                                      | `60`                           |
-| `platform.readinessProbe.periodSeconds`                    | Period seconds for readinessProbe                                                                                                                             | `10`                           |
-| `platform.readinessProbe.timeoutSeconds`                   | Timeout seconds for readinessProbe                                                                                                                            | `5`                            |
-| `platform.readinessProbe.failureThreshold`                 | Failure threshold for readinessProbe                                                                                                                          | `3`                            |
-| `platform.readinessProbe.successThreshold`                 | Success threshold for readinessProbe                                                                                                                          | `1`                            |
-| `platform.startupProbe.enabled`                            | Enable startupProbe on Conduktor Platform containers                                                                                                          | `true`                         |
-| `platform.startupProbe.initialDelaySeconds`                | Initial delay seconds for startupProbe                                                                                                                        | `10`                           |
-| `platform.startupProbe.periodSeconds`                      | Period seconds for startupProbe                                                                                                                               | `10`                           |
-| `platform.startupProbe.timeoutSeconds`                     | Timeout seconds for startupProbe                                                                                                                              | `5`                            |
-| `platform.startupProbe.failureThreshold`                   | Failure threshold for startupProbe                                                                                                                            | `10`                           |
-| `platform.startupProbe.successThreshold`                   | Success threshold for startupProbe                                                                                                                            | `1`                            |
-| `platform.customLivenessProbe`                             | Custom livenessProbe that overrides the default one                                                                                                           | `{}`                           |
-| `platform.customReadinessProbe`                            | Custom readinessProbe that overrides the default one                                                                                                          | `{}`                           |
-| `platform.customStartupProbe`                              | Custom startupProbe that overrides the default one                                                                                                            | `{}`                           |
-| `platform.resources.limits.cpu`                            | CPU limit for the platform container                                                                                                                          | `4000m`                        |
-| `platform.resources.limits.memory`                         | Memory limit for the container                                                                                                                                | `8Gi`                          |
-| `platform.resources.requests.cpu`                          | CPU resource requests                                                                                                                                         | `2000m`                        |
-| `platform.resources.requests.memory`                       | Memory resource requests                                                                                                                                      | `4Gi`                          |
-| `platform.podSecurityContext.enabled`                      | Enabled Conduktor Platform pods' Security Context                                                                                                             | `true`                         |
-| `platform.podSecurityContext.fsGroup`                      | Set Conduktor Platform pod's Security Context fsGroup                                                                                                         | `1001`                         |
-| `platform.containerSecurityContext.enabled`                | Enabled Conduktor Platform containers' Security Context                                                                                                       | `true`                         |
-| `platform.containerSecurityContext.runAsUser`              | Set Conduktor Platform containers' Security Context runAsUser                                                                                                 | `1001`                         |
-| `platform.containerSecurityContext.runAsNonRoot`           | Set Conduktor Platform containers' Security Context runAsNonRoot                                                                                              | `true`                         |
-| `platform.containerSecurityContext.readOnlyRootFilesystem` | Set Conduktor Platform containers' Security Context runAsNonRoot                                                                                              | `false`                        |
-| `platform.existingConfigmap`                               | The name of an existing ConfigMap with your custom configuration for Conduktor Platform                                                                       | `""`                           |
-| `platform.command`                                         | Override default container command (useful when using custom images)                                                                                          | `[]`                           |
-| `platform.args`                                            | Override default container args (useful when using custom images)                                                                                             | `[]`                           |
-| `platform.hostAliases`                                     | Conduktor Platform pods host aliases                                                                                                                          | `[]`                           |
-| `platform.podLabels`                                       | Extra labels for Conduktor Platform pods                                                                                                                      | `{}`                           |
-| `platform.podAnnotations`                                  | Annotations for Conduktor Platform pods                                                                                                                       | `{}`                           |
-| `platform.podAffinityPreset`                               | Pod affinity preset. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`                                                                  | `""`                           |
-| `platform.podAntiAffinityPreset`                           | Pod anti-affinity preset. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`                                                             | `soft`                         |
-| `platform.nodeAffinityPreset.type`                         | Node affinity preset type. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`                                                            | `""`                           |
-| `platform.nodeAffinityPreset.key`                          | Node label key to match. Ignored if `platform.affinity` is set                                                                                                | `""`                           |
-| `platform.nodeAffinityPreset.values`                       | Node label values to match. Ignored if `platform.affinity` is set                                                                                             | `[]`                           |
-| `platform.affinity`                                        | Affinity for Conduktor Platform pods assignment                                                                                                               | `{}`                           |
-| `platform.nodeSelector`                                    | Node labels for Conduktor Platform pods assignment                                                                                                            | `{}`                           |
-| `platform.tolerations`                                     | Tolerations for Conduktor Platform pods assignment                                                                                                            | `[]`                           |
-| `platform.updateStrategy.type`                             | Conduktor Platform statefulset strategy type                                                                                                                  | `RollingUpdate`                |
-| `platform.priorityClassName`                               | Conduktor Platform pods' priorityClassName                                                                                                                    | `""`                           |
-| `platform.topologySpreadConstraints`                       | Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template                                      | `[]`                           |
-| `platform.schedulerName`                                   | Name of the k8s scheduler (other than default) for Conduktor Platform pods                                                                                    | `""`                           |
-| `platform.terminationGracePeriodSeconds`                   | Seconds Redmine pod needs to terminate gracefully                                                                                                             | `""`                           |
-| `platform.lifecycleHooks`                                  | for the Conduktor Platform container(s) to automate configuration before or after startup                                                                     | `{}`                           |
-| `platform.extraEnvVars`                                    | Array with extra environment variables to add to Conduktor Platform nodes                                                                                     | `[]`                           |
-| `platform.extraEnvVarsCM`                                  | Name of existing ConfigMap containing extra env vars for Conduktor Platform nodes                                                                             | `""`                           |
-| `platform.extraEnvVarsSecret`                              | Name of existing Secret containing extra env vars for Conduktor Platform nodes                                                                                | `""`                           |
-| `platform.extraVolumes`                                    | Optionally specify extra list of additional volumes for the Conduktor Platform pod(s)                                                                         | `[]`                           |
-| `platform.extraVolumeMounts`                               | Optionally specify extra list of additional volumeMounts for the Conduktor Platform container(s)                                                              | `[]`                           |
-| `platform.sidecars`                                        | Add additional sidecar containers to the Conduktor Platform pod(s)                                                                                            | `[]`                           |
-| `platform.initContainers`                                  | Add additional init containers to the Conduktor Platform pod(s)                                                                                               | `[]`                           |
+| Name                                          | Description                                                                                                                                                   | Value                          |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| `platform.image.registry`                     | Conduktor Platform image registry                                                                                                                             | `docker.io`                    |
+| `platform.image.repository`                   | Conduktor Platform image repository                                                                                                                           | `conduktor/conduktor-platform` |
+| `platform.image.tag`                          | Conduktor Platform image tag (immutable tags are recommended)                                                                                                 | `1.17.3`                       |
+| `platform.image.digest`                       | Conduktor Platform image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`                           |
+| `platform.image.pullPolicy`                   | Conduktor Platform image pull policy                                                                                                                          | `IfNotPresent`                 |
+| `platform.image.pullSecrets`                  | Conduktor Platform image pull secrets                                                                                                                         | `[]`                           |
+| `platform.image.debug`                        | Enable Conduktor Platform image debug mode                                                                                                                    | `false`                        |
+| `platform.replicaCount`                       | Number of Conduktor Platform replicas to deploy                                                                                                               | `1`                            |
+| `platform.containerPorts.http`                | Conduktor Platform HTTP (or HTTPS if configured) container port                                                                                               | `8080`                         |
+| `platform.livenessProbe.enabled`              | Enable livenessProbe on Conduktor Platform containers                                                                                                         | `true`                         |
+| `platform.livenessProbe.initialDelaySeconds`  | Initial delay seconds for livenessProbe                                                                                                                       | `60`                           |
+| `platform.livenessProbe.periodSeconds`        | Period seconds for livenessProbe                                                                                                                              | `10`                           |
+| `platform.livenessProbe.timeoutSeconds`       | Timeout seconds for livenessProbe                                                                                                                             | `5`                            |
+| `platform.livenessProbe.failureThreshold`     | Failure threshold for livenessProbe                                                                                                                           | `3`                            |
+| `platform.livenessProbe.successThreshold`     | Success threshold for livenessProbe                                                                                                                           | `1`                            |
+| `platform.readinessProbe.enabled`             | Enable readinessProbe on Conduktor Platform containers                                                                                                        | `true`                         |
+| `platform.readinessProbe.initialDelaySeconds` | Initial delay seconds for readinessProbe                                                                                                                      | `60`                           |
+| `platform.readinessProbe.periodSeconds`       | Period seconds for readinessProbe                                                                                                                             | `10`                           |
+| `platform.readinessProbe.timeoutSeconds`      | Timeout seconds for readinessProbe                                                                                                                            | `5`                            |
+| `platform.readinessProbe.failureThreshold`    | Failure threshold for readinessProbe                                                                                                                          | `3`                            |
+| `platform.readinessProbe.successThreshold`    | Success threshold for readinessProbe                                                                                                                          | `1`                            |
+| `platform.startupProbe.enabled`               | Enable startupProbe on Conduktor Platform containers                                                                                                          | `true`                         |
+| `platform.startupProbe.initialDelaySeconds`   | Initial delay seconds for startupProbe                                                                                                                        | `10`                           |
+| `platform.startupProbe.periodSeconds`         | Period seconds for startupProbe                                                                                                                               | `10`                           |
+| `platform.startupProbe.timeoutSeconds`        | Timeout seconds for startupProbe                                                                                                                              | `5`                            |
+| `platform.startupProbe.failureThreshold`      | Failure threshold for startupProbe                                                                                                                            | `10`                           |
+| `platform.startupProbe.successThreshold`      | Success threshold for startupProbe                                                                                                                            | `1`                            |
+| `platform.customLivenessProbe`                | Custom livenessProbe that overrides the default one                                                                                                           | `{}`                           |
+| `platform.customReadinessProbe`               | Custom readinessProbe that overrides the default one                                                                                                          | `{}`                           |
+| `platform.customStartupProbe`                 | Custom startupProbe that overrides the default one                                                                                                            | `{}`                           |
+| `platform.resources.limits.cpu`               | CPU limit for the platform container                                                                                                                          | `4000m`                        |
+| `platform.resources.limits.memory`            | Memory limit for the container                                                                                                                                | `8Gi`                          |
+| `platform.resources.requests.cpu`             | CPU resource requests                                                                                                                                         | `2000m`                        |
+| `platform.resources.requests.memory`          | Memory resource requests                                                                                                                                      | `4Gi`                          |
+| `platform.podSecurityContext`                 | Conduktor Platform Pod Security Context                                                                                                                       | `{}`                           |
+| `platform.containerSecurityContext`           | Conduktor Platform containers' Security Context                                                                                                               | `{}`                           |
+| `platform.existingConfigmap`                  | The name of an existing ConfigMap with your custom configuration for Conduktor Platform                                                                       | `""`                           |
+| `platform.command`                            | Override default container command (useful when using custom images)                                                                                          | `[]`                           |
+| `platform.args`                               | Override default container args (useful when using custom images)                                                                                             | `[]`                           |
+| `platform.hostAliases`                        | Conduktor Platform pods host aliases                                                                                                                          | `[]`                           |
+| `platform.podLabels`                          | Extra labels for Conduktor Platform pods                                                                                                                      | `{}`                           |
+| `platform.podAnnotations`                     | Annotations for Conduktor Platform pods                                                                                                                       | `{}`                           |
+| `platform.podAffinityPreset`                  | Pod affinity preset. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`                                                                  | `""`                           |
+| `platform.podAntiAffinityPreset`              | Pod anti-affinity preset. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`                                                             | `soft`                         |
+| `platform.nodeAffinityPreset.type`            | Node affinity preset type. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`                                                            | `""`                           |
+| `platform.nodeAffinityPreset.key`             | Node label key to match. Ignored if `platform.affinity` is set                                                                                                | `""`                           |
+| `platform.nodeAffinityPreset.values`          | Node label values to match. Ignored if `platform.affinity` is set                                                                                             | `[]`                           |
+| `platform.affinity`                           | Affinity for Conduktor Platform pods assignment                                                                                                               | `{}`                           |
+| `platform.nodeSelector`                       | Node labels for Conduktor Platform pods assignment                                                                                                            | `{}`                           |
+| `platform.tolerations`                        | Tolerations for Conduktor Platform pods assignment                                                                                                            | `[]`                           |
+| `platform.updateStrategy.type`                | Conduktor Platform statefulset strategy type                                                                                                                  | `RollingUpdate`                |
+| `platform.priorityClassName`                  | Conduktor Platform pods' priorityClassName                                                                                                                    | `""`                           |
+| `platform.topologySpreadConstraints`          | Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template                                      | `[]`                           |
+| `platform.schedulerName`                      | Name of the k8s scheduler (other than default) for Conduktor Platform pods                                                                                    | `""`                           |
+| `platform.terminationGracePeriodSeconds`      | Seconds Redmine pod needs to terminate gracefully                                                                                                             | `""`                           |
+| `platform.lifecycleHooks`                     | for the Conduktor Platform container(s) to automate configuration before or after startup                                                                     | `{}`                           |
+| `platform.extraEnvVars`                       | Array with extra environment variables to add to Conduktor Platform nodes                                                                                     | `[]`                           |
+| `platform.extraEnvVarsCM`                     | Name of existing ConfigMap containing extra env vars for Conduktor Platform nodes                                                                             | `""`                           |
+| `platform.extraEnvVarsSecret`                 | Name of existing Secret containing extra env vars for Conduktor Platform nodes                                                                                | `""`                           |
+| `platform.extraVolumes`                       | Optionally specify extra list of additional volumes for the Conduktor Platform pod(s)                                                                         | `[]`                           |
+| `platform.extraVolumeMounts`                  | Optionally specify extra list of additional volumeMounts for the Conduktor Platform container(s)                                                              | `[]`                           |
+| `platform.sidecars`                           | Add additional sidecar containers to the Conduktor Platform pod(s)                                                                                            | `[]`                           |
+| `platform.initContainers`                     | Add additional init containers to the Conduktor Platform pod(s)                                                                                               | `[]`                           |
 
 ### Traffic Exposure Parameters
 
@@ -176,14 +172,37 @@ Helm Chart to deploy Conduktor Platform on Kubernetes.
 
 ### Other Parameters
 
-| Name                                          | Description                                                      | Value  |
-| --------------------------------------------- | ---------------------------------------------------------------- | ------ |
-| `serviceAccount.create`                       | Specifies whether a ServiceAccount should be created             | `true` |
-| `serviceAccount.name`                         | The name of the ServiceAccount to use.                           | `""`   |
-| `serviceAccount.annotations`                  | Additional Service Account annotations (evaluated as a template) | `{}`   |
-| `serviceAccount.automountServiceAccountToken` | Automount service account token for the server service account   | `true` |
+| Name                                          | Description                                                      | Value   |
+| --------------------------------------------- | ---------------------------------------------------------------- | ------- |
+| `serviceAccount.create`                       | Specifies whether a ServiceAccount should be created             | `true`  |
+| `serviceAccount.name`                         | The name of the ServiceAccount to use.                           | `""`    |
+| `serviceAccount.annotations`                  | Additional Service Account annotations (evaluated as a template) | `{}`    |
+| `serviceAccount.automountServiceAccountToken` | Automount service account token for the server service account   | `true`  |
+| `test`                                        | Enable additional manifests for testing purposes                 | `false` |
 
 ## Snippets
+
+### Console configuration 
+
+If you are looking for additional snippets related to the configuration of 
+console, we recommend you to look at our 
+[documentation](https://docs.conduktor.io/platform/configuration/configuration-snippets/).
+
+- [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
+- [Install with a registered kafka cluster](#install-with-a-kafka-cluster)
+- [Install with an enterprise license](#install-with-an-enterprise-license)
+
+### Kubernetes configuration 
+
+- [Install with a PodAffinity](#install-with-a-podaffinity)
+- [Install with a PodAntiAffinity](#install-with-a-podantiaffinity)
+- [Install with a Toleration](#install-with-a-toleration)
+- [Install with a Self-Signed Certificate](#install-with-self-signed-tls-certificate)
+- [Install with a custom service account](#install-with-a-custom-service-account)
+- [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
+
+- [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
+- [Provide the license as a Kubernetes ConfigMap](#provide-the-platform-config-as-a-kubernetes-configmap)
 
 ### Install with an enterprise license
 
@@ -205,6 +224,88 @@ config:
 
   license: "${ENTERPRISE_LICENSE}"
 ```    
+
+### Install with a basic SSO configuration
+
+```yaml
+config:
+  organization:
+    name: "my-org"
+
+  admin:
+    email: "admin@my-org.com"
+    password: "admin"
+
+  database:
+    host: ''
+    port: 5432
+    name: 'postgres'
+    username: ''
+    password: ''
+  sso:
+    oauth2:
+      - name: 'auth0'
+        default: true
+        client-id: <client_id>
+        client-secret: <client_secret>
+        callback-uri: http://localhost/auth/oauth/callback/auth0
+        openid:
+          issuer: https://conduktor-staging.eu.auth0.com/
+  
+  license: '<license_key>'
+```
+
+### Install with a kafka cluster
+
+```yaml
+config:
+  organization:
+    name: "my-org"
+
+  admin:
+    email: "admin@my-org.com"
+    password: "admin"
+
+  database:
+    host: ''
+    port: 5432
+    name: 'postgres'
+    username: ''
+    password: ''
+  clusters:
+    - id: my-local-kafka-cluster
+      name: My Local Kafka Cluster
+      color: '#0013E7'
+      bootstrapServers: 'my-bootstrap-server:9092'
+      schemaRegistry:
+        id: my-schema-registry
+        url: 'http://my-schema-registry:8081'
+```
+
+### Provide the license as a Kubernetes Secret
+
+We expect the secret to contain a key named `license` which contains your
+license key.
+
+```shell
+# values.yaml
+config:
+  organization:
+    name: "<your_org_name>"
+
+  admin:
+    email: "<your_admin_email>"
+    password: "<your_admin_password>"
+    
+  database:
+    host: '<postgres_host>'
+    port: 5432
+    name: '<postgres_database>'
+    username: '<postgres_username>'
+    password: '<postgres_password>'
+
+  existingLicenseSecret: "<your_secret_name>"
+```
 
 ### Install with a PodAffinity
 
