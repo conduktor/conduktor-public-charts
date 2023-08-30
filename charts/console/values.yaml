@@ -94,6 +94,9 @@ config:
   ## NOTE: 'config.license' will be ignored
   existingLicenseSecret: ""
 
+  ## @param config.existingSecret Name of an existing secret containing configs
+  existingSecret: ""
+
   platform:
     ## @param config.platform.external.url Force the platform to redirect and use this URL (useful when behind a proxy to fix SSO issues)
     external:
