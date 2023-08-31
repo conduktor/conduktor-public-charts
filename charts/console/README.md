@@ -34,6 +34,10 @@ Helm Chart to deploy Conduktor Platform on Kubernetes.
 
 ### Global parameters
 
+Global Docker image parameters
+Please, note that this will override the image parameters, including dependencies, configured to use the global value
+Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
+
 | Name                      | Description                                     | Value |
 | ------------------------- | ----------------------------------------------- | ----- |
 | `global.imageRegistry`    | Global Docker image registry                    | `""`  |
@@ -56,6 +60,10 @@ Helm Chart to deploy Conduktor Platform on Kubernetes.
 | `diagnosticMode.args`    | Args to override all containers in the deployment                                       | `["infinity"]`  |
 
 ### Platform product Parameters
+
+You can paste here your Conduktor Platform Configuration
+
+Refer to our [documentation](https://docs.conduktor.io/platform/configuration/env-variables/) for the full list of product configuration properties.
 
 | Name                                   | Description                                                                                                                                            | Value                          |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------ |
