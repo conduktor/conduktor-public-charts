@@ -1,5 +1,21 @@
-![Conduktor logo](https://avatars.githubusercontent.com/u/60062294?s=200&v=4)
-# Conduktor Helm Charts
+<a name="readme-top" id="readme-top"></a>
+
+<p align="center">
+  <img src="https://avatars.githubusercontent.com/u/60062294?s=200&v=4" width="256px" />
+</p>
+<p align="center">
+    <strong>Official repository for Conduktor Helm Charts</strong>
+</p>
+
+<p align="center">
+    <a href="https://docs.conduktor.io/platform/installation/get-started/kubernetes/"><strong>Explore the docs 
+»</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/conduktor/conduktor-public-charts/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/conduktor/conduktor-public-charts/issues">Request Feature</a>
+</p>
 
 ## Charts
 
