@@ -94,7 +94,17 @@ config:
   ## NOTE: 'config.license' will be ignored
   existingLicenseSecret: ""
 
-  ## @param config.existingSecret Name of an existing secret containing configs
+  ## @param config.existingSecret Name of an existing secret containing sensitive configuration
+  ##
+  ## Secret should contain below keys:
+  ## - "CDK_ORGANIZATION_NAME": name of the organization
+  ## - "CDK_ADMIN_EMAIL"      : email of the admin user
+  ## - "CDK_ADMIN_PASSWORD"   : password of the admin user
+  ## - "CDK_DATABASE_PASSWORD": password of the database
+  ## - "CDK_DATABASE_USERNAME": username of the database
+  ##
+  ## NOTE: 'config.organization.name', 'config.admin.email', 'config.admin.password',
+  ## 'config.database.username', 'config.database.password' will be ignored
   existingSecret: ""
 
   platform:
@@ -242,6 +252,7 @@ platform:
 
   ## @param platform.existingConfigmap The name of an existing ConfigMap with your custom configuration for Conduktor Platform
   ##
+  ## ConfigMap must contain a key named `platform-config.yaml` with the configuration as yaml
   existingConfigmap: ""
   ## @param platform.command Override default container command (useful when using custom images)
   ##
