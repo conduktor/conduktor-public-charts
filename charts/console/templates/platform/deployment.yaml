@@ -69,7 +69,6 @@ spec:
       securityContext: {{- include "common.tplvalues.render" (dict "value" .Values.platform.containerSecurityContext "context" $) | nindent 10 }}
       {{- else }}
       securityContext:
-        readOnlyRootFilesystem: true
         runAsNonRoot: true
       {{- end }}
       {{- if .Values.platform.terminationGracePeriodSeconds }}
