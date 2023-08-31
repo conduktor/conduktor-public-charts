@@ -3,7 +3,7 @@
 
 ## Charts
 
-- platform ([doc](https://github.com/conduktor/conduktor-public-charts/blob/main/charts/console/README.md), [values](https://github.com/conduktor/conduktor-public-charts/blob/main/charts/console/values.yaml))
+- console ([doc](https://github.com/conduktor/conduktor-public-charts/blob/main/charts/console/README.md), [values](https://github.com/conduktor/conduktor-public-charts/blob/main/charts/console/values.yaml))
 - platform-controller (deprecated) ([doc](platform-controller/README.md), [values](platform-controller/values.yaml))
 - conduktor-proxy ([doc](proxy/README.md), [values](proxy/values.yaml))
 
