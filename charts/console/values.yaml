@@ -1,8 +1,9 @@
 ## @section Global parameters
+## @descriptionStart 
 ## Global Docker image parameters
 ## Please, note that this will override the image parameters, including dependencies, configured to use the global value
 ## Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
-##
+## @descriptionEnd
 
 ## @param global.imageRegistry Global Docker image registry
 ## @param global.imagePullSecrets Global Docker registry secret names as an array
@@ -58,10 +59,12 @@ diagnosticMode:
     - infinity
 
 ## @section Platform product Parameters
-
+## @descriptionStart 
 ## You can paste here your Conduktor Platform Configuration
 ##
-## Ref: https://docs.conduktor.io/platform/configuration/env-variables/
+## Refer to our [documentation](https://docs.conduktor.io/platform/configuration/env-variables/) for the full list of product configuration properties.
+## @descriptionEnd
+
 config:
   ## @param config.organization.name Your Conduktor Platform Organization, you can only set it at install! You will need to change it in the Conduktor Platform UI after the installation
   organization:
