@@ -9,7 +9,8 @@
 
 ## Prerequisites
 
-- Kubernetes
+- Kubernetes 1.19+
+- Helm 3.1.0+
 
 #### Installing [Helm](https://helm.sh/docs/intro/install/)
 
@@ -27,4 +28,4 @@ Search all the repositories available
 helm search repo conduktor -l
 ```
 
-Check our [documentation](https://docs.conduktor.io/platform/configuration/env-variables/) for help.
+Check our kubernetes [documentation](https://docs.conduktor.io/platform/installation/get-started/kubernetes/) for help.
