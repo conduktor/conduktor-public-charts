@@ -77,6 +77,7 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/en
 | `config.database.password`             | Your Conduktor Platform Database password                                                                                                              | `""`                           |
 | `config.license`                       | Conduktor Platform Enterprise license, if none given, the product will run in free tier                                                                | `""`                           |
 | `config.existingLicenseSecret`         | Name of an existing secret containing the license                                                                                                      | `""`                           |
+| `config.existingSecret`                | Name of an existing secret containing sensitive configuration                                                                                          | `""`                           |
 | `config.platform.external.url`         | Force the platform to redirect and use this URL (useful when behind a proxy to fix SSO issues)                                                         | `https://platform.example.com` |
 | `config.platform.https.selfSigned`     | Enable HTTPS with a self-signed certificate (not recommended for production) based on 'config.platform.external.url' (required).                       | `false`                        |
 | `config.platform.https.existingSecret` | Enable HTTPS with an existing secret containing the tls.crt and tls.key (required).                                                                    | `""`                           |
@@ -209,6 +210,7 @@ console, we recommend you to look at our
 - [Install with a custom service account](#install-with-a-custom-service-account)
 - [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
 
+- [Provide credentials as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
 - [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
 - [Provide the license as a Kubernetes ConfigMap](#provide-the-platform-config-as-a-kubernetes-configmap)
 
@@ -315,6 +317,25 @@ config:
   existingLicenseSecret: "<your_secret_name>"
 ```
 
+### Provide credentials configuration as a Kubernetes Secret
+
+We expect the secret to contain the following keys:
+
+- "CDK_ORGANIZATION_NAME": name of the organization
+- "CDK_ADMIN_EMAIL"      : email of the admin user
+- "CDK_ADMIN_PASSWORD"   : password of the admin user
+- "CDK_DATABASE_PASSWORD": password of the database
+- "CDK_DATABASE_USERNAME": username of the database
+
+```yaml
+config:
+  existingSecret: "<your_secret_name>"
+  database:
+    host: ''
+    port: 5432
+    name: 'postgres'
+```
+
 ### Install with a PodAffinity
 
 ```yaml
@@ -344,6 +365,23 @@ platform:
                 values:
                   - S1
           topologyKey: topology.kubernetes.io/zone
+```
+
+### Provide console configuration as a Kubernetes ConfigMap
+
+**NOTE:** We recommend to be using a secret (see [snippet](#provide-credentials-configuration-as-a-kubernetes-secret))
+in addition to the configmap in order to protect your credentials.
+
+The ConfigMap is expected to contain a key `platform-config.yaml` which got 
+the console configuration in YAML format.
+
+```yaml
+config:
+  # We highly recommend you to be using both the secret and the configmap
+  existingSecret: "<your_secret_name>"
+    
+platform:
+  existingConfigMap: "<your_configmap_name>"
 ```
 
 ### Install with a toleration

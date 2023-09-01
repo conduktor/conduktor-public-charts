@@ -74,7 +74,11 @@ Name of the platform ConfigMap
 Name of the platform secret
 */}}
 {{- define "conduktor.platform.secretName" -}}
+    {{- if .Values.config.existingSecret -}}
+    {{- .Values.config.existingSecret -}}
+    {{- else -}}
     {{- printf "%s-%s" (include "common.names.fullname" .) "platform" | trunc 63 | trimSuffix "-" -}}
+    {{- end -}}
 {{- end -}}
 
 {{/*
