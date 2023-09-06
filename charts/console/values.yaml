@@ -82,7 +82,7 @@ config:
   ## @param config.database.username Your Conduktor Platform Database username
   ## @param config.database.password Your Conduktor Platform Database password
   database:
-    host: 'postgresql.conduktor'
+    host: ''
     port: 5432
     name: 'postgres'
     password: ''
@@ -95,7 +95,7 @@ config:
   ##
   ## Secret should just contain key "CDK_LICENSE" with the license as value
   ## NOTE: 'config.license' will be ignored
-  existingLicenseSecret: "license-secret"
+  existingLicenseSecret: ""
 
   ## @param config.existingSecret Name of an existing secret containing sensitive configuration
   ##
@@ -108,7 +108,7 @@ config:
   ##
   ## NOTE: 'config.organization.name', 'config.admin.email', 'config.admin.password',
   ## 'config.database.username', 'config.database.password' will be ignored
-  existingSecret: "creds-secret"
+  existingSecret: ""
 
   platform:
     ## @param config.platform.external.url Force the platform to redirect and use this URL (useful when behind a proxy to fix SSO issues)
