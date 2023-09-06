@@ -125,6 +125,74 @@ config:
       ## and 'config.platform.https.selfSigned' will be ignored
       existingSecret: ""
 
+## @section Platform Monitoring product Parameters
+## @descriptionStart
+## You can paste here your Conduktor Platform Cortex Configuration
+##
+## Refer to our [documentation](TODO) for the full list of product configuration properties.
+## @descriptionEnd
+
+monitoringConfig:
+  storage:
+    ## S3 storage configuration
+    ## @param monitoringConfig.storage.s3.endpoint S3 endpoint
+    ## @param monitoringConfig.storage.s3.region S3 region
+    ## @param monitoringConfig.storage.s3.bucket S3 bucket name
+    ## @param monitoringConfig.storage.s3.insecure S3 insecure
+    ## @param monitoringConfig.storage.s3.accessKeyId S3 access key id
+    ## @param monitoringConfig.storage.s3.secretAccessKey S3 secret access key
+    s3: {}
+    ##  endpoint: ""
+    ##  region: ""
+    ##  bucket: ""
+    ##  insecure: "false"
+    ##  accessKeyId: ""
+    ##  secretAccessKey: ""
+
+    ## GCS storage configuration
+    ## @param monitoringConfig.storage.gcs.bucketName GCS bucket name
+    ## @param monitoringConfig.storage.gcs.serviceAccount GCS service account
+    gcs: {}
+    ##  bucketName: ""
+    ##  serviceAccount: ""
+
+    ## Azure storage configuration
+    ## @param monitoringConfig.storage.azure.accountName Azure account name
+    ## @param monitoringConfig.storage.azure.accountKey Azure account key
+    ## @param monitoringConfig.storage.azure.containerName Azure container name
+    ## @param monitoringConfig.storage.azure.endpointSuffix Azure endpoint suffix
+    azure: {}
+    ##  accountName: ""
+    ##  accountKey: ""
+    ##  containerName: ""
+    ##  endpointSuffix: "blob.core.windows.net"
+
+    ## Swift storage configuration
+    ## @param monitoringConfig.storage.swift.authUrl Swift auth url
+    ## @param monitoringConfig.storage.swift.password Swift password
+    ## @param monitoringConfig.storage.swift.containerName Swift container name
+    ## @param monitoringConfig.storage.swift.userId Swift user id
+    ## @param monitoringConfig.storage.swift.username Swift username
+    ## @param monitoringConfig.storage.swift.userDomainName Swift user domain name
+    ## @param monitoringConfig.storage.swift.userDomainId Swift user domain id
+    ## @param monitoringConfig.storage.swift.domainId Swift domain id
+    ## @param monitoringConfig.storage.swift.domainName Swift domain name
+    ## @param monitoringConfig.storage.swift.projectId Swift project id
+    ## @param monitoringConfig.storage.swift.regionName Swift region name
+    swift: {}
+    ##  authUrl: ""
+    ##  password: ""
+    ##  containerName: ""
+    ##  userId: ""
+    ##  username: ""
+    ##  userDomainName: ""
+    ##  userDomainId: ""
+    ##  domainId: ""
+    ##  domainName: ""
+    ##  projectId: ""
+    ##  regionName: ""
+
+
 ## @section Platform Deployment Parameters
 ##
 
@@ -395,7 +463,6 @@ platform:
 ## @section Traffic Exposure Parameters
 ##
 
-
 ## Conduktor Platform service parameters
 ##
 service:
@@ -446,6 +513,7 @@ service:
   ##     timeoutSeconds: 300
   ##
   sessionAffinityConfig: {}
+
 ## Conduktor Platform ingress parameters
 ## ref: http://kubernetes.io/docs/user-guide/ingress/
 ##
@@ -461,7 +529,7 @@ ingress:
   apiVersion: ""
   ## @param ingress.hostname Default host for the ingress record
   hostname: platform.local
-  ## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+  ## @param ingress.ingressClassName IngressClass that will be used to implement the Ingress (Kubernetes 1.18+)
   ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
   ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
   ##
@@ -582,3 +650,340 @@ tests:
   #        CDK_DATABASE_PASSWORD: conduktor123
   #        CDK_DATABASE_USERNAME: postgres
   secrets: []
+
+
+## @section Platform Cortex Parameters
+##
+## Conduktor Platform Cortex container configuration
+##
+platformCortex:
+  ## @param platformCortex.enabled Enable Conduktor Platform Cortex
+  ##
+  enabled: true
+  ## Conduktor Platform Cortex image
+  ## ref: https://hub.docker.com/r/conduktor/conduktor-platform/tags/
+  ## @param platformCortex.image.registry Conduktor Platform Cortex image registry
+  ## @param platformCortex.image.repository Conduktor Platform Cortex image repository
+  ## @param platformCortex.image.tag Conduktor Platform Cortex image tag (immutable tags are recommended)
+  ## @param platformCortex.image.digest Conduktor Platform Cortex image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param platformCortex.image.pullPolicy Conduktor Platform Cortex image pull policy
+  ## @param platformCortex.image.pullSecrets Conduktor Platform Cortex image pull secrets
+  ## @param platformCortex.image.debug Enable Conduktor Platform Cortex image debug mode
+  ##
+  image:
+    registry: docker.io
+    repository: conduktor/conduktor-platformCortex
+    tag: nightly # TODO align with conduktor-platform
+    digest: ""
+    ## Specify a imagePullPolicy
+    ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+    ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+    ##
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ## e.g:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: []
+    ## Enable debug mode
+    ##
+    debug: false
+
+  ## @param platformCortex.replicaCount Number of Conduktor Platform replicas to deploy
+  ##
+  replicaCount: 1
+
+  ## @param platformCortex.containerPorts.cortex Conduktor Platform Cortex HTTP (or HTTPS if configured) container port
+  ## @param platformCortex.containerPorts.alertmanager Conduktor Platform AlertManager HTTP (or HTTPS if configured) container port
+  ## @param platformCortex.containerPorts.prometheus Conduktor Platform Prometheus HTTP (or HTTPS if configured) container port
+  ##
+  containerPorts:
+    cortex: 9009
+    alertmanager: 9010
+    prometheus: 9090
+
+  ## Configure extra options for Conduktor Platform Cortex containers' liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param platformCortex.livenessProbe.enabled Enable livenessProbe on Conduktor Platform Cortex containers
+  ## @param platformCortex.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param platformCortex.livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param platformCortex.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param platformCortex.livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param platformCortex.livenessProbe.successThreshold Success threshold for livenessProbe
+  ##
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param platformCortex.readinessProbe.enabled Enable readinessProbe on Conduktor Platform Cortex containers
+  ## @param platformCortex.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+  ## @param platformCortex.readinessProbe.periodSeconds Period seconds for readinessProbe
+  ## @param platformCortex.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+  ## @param platformCortex.readinessProbe.failureThreshold Failure threshold for readinessProbe
+  ## @param platformCortex.readinessProbe.successThreshold Success threshold for readinessProbe
+  ##
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param platformCortex.startupProbe.enabled Enable startupProbe on Conduktor Platform Cortex containers
+  ## @param platformCortex.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
+  ## @param platformCortex.startupProbe.periodSeconds Period seconds for startupProbe
+  ## @param platformCortex.startupProbe.timeoutSeconds Timeout seconds for startupProbe
+  ## @param platformCortex.startupProbe.failureThreshold Failure threshold for startupProbe
+  ## @param platformCortex.startupProbe.successThreshold Success threshold for startupProbe
+  ##
+  startupProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 10
+    successThreshold: 1
+  ## @param platformCortex.customLivenessProbe Custom livenessProbe that overrides the default one
+  ##
+  customLivenessProbe: {}
+  ## @param platformCortex.customReadinessProbe Custom readinessProbe that overrides the default one
+  ##
+  customReadinessProbe: {}
+  ## @param platformCortex.customStartupProbe Custom startupProbe that overrides the default one
+  ##
+  customStartupProbe: {}
+  ## Conduktor Platform Cortex resource requests and limits
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
+  resources:
+    limits:
+      ## @param platformCortex.resources.limits.cpu CPU limit for the platform cortex container
+      cpu: 1000m
+      ## @param platformCortex.resources.limits.memory Memory limit for the container
+      memory: 500Mi
+    requests:
+      ## @param platformCortex.resources.requests.cpu CPU resource requests
+      cpu: 500m
+      ## @param platformCortex.resources.requests.memory Memory resource requests
+      memory: 200Mi
+  ## @param platformCortex.podSecurityContext Conduktor Platform Cortex Pod Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## default:
+  ## securityContext:
+  ##   readOnlyRootFilesystem: true
+  ##   runAsNonRoot: true
+  ##
+  podSecurityContext: {}
+  ## @param platformCortex.containerSecurityContext Conduktor Platform Cortex containers' Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  ## default:
+  ## securityContext:
+  ##   readOnlyRootFilesystem: true
+  ##   runAsNonRoot: true
+  ##
+  containerSecurityContext: {}
+
+  ## @param platformCortex.existingConfigmap The name of an existing ConfigMap with your custom configuration for Conduktor Platform Cortex
+  ##
+  existingConfigmap: ""
+  ## @param platformCortex.existingSecret The name of an existing Secret with your custom configuration for Conduktor Platform Cortex
+  ##
+  ## NOTE: If set, corresponding secrets keys are ignored in monitoringConfig.storage
+  ## The secret must contain the following keys:
+  ## CDK_MONITORING_STORAGE_S3_ACCESSKEYID and CDK_MONITORING_STORAGE_S3_SECRETACCESSKEY
+  ## or
+  ## CDK_MONITORING_STORAGE_GCS_SERVICEACCOUNT
+  ## or
+  ##CDK_MONITORING_STORAGE_AZURE_ACCOUNTNAME and CDK_MONITORING_STORAGE_AZURE_ACCOUNTKEY
+  ## or
+  ## CDK_MONITORING_STORAGE_SWIFT_PASSWORD and CDK_MONITORING_STORAGE_SWIFT_USERID or CDK_MONITORING_STORAGE_SWIFT_USERNAME
+  existingSecret: ""
+
+  ## @param platformCortex.command Override default container command (useful when using custom images)
+  ##
+  command: []
+  ## @param platformCortex.args Override default container args (useful when using custom images)
+  ##
+  args: []
+  ## @param platformCortex.hostAliases Conduktor Platform Cortex pods host aliases
+  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+  ##
+  hostAliases: []
+  ## @param platformCortex.podLabels Extra labels for Conduktor Platform Cortex pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels: {}
+  ## @param platformCortex.podAnnotations Annotations for Conduktor Platform Cortex pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  podAnnotations: {}
+  ## @param platformCortex.podAffinityPreset Pod affinity preset. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAffinityPreset: ""
+  ## @param platformCortex.podAntiAffinityPreset Pod anti-affinity preset. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAntiAffinityPreset: soft
+  ## Node platformCortex.affinity preset
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
+  ##
+  nodeAffinityPreset:
+    ## @param platformCortex.nodeAffinityPreset.type Node affinity preset type. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`
+    ##
+    type: ""
+    ## @param platformCortex.nodeAffinityPreset.key Node label key to match. Ignored if `platform.affinity` is set
+    ##
+    key: ""
+    ## @param platformCortex.nodeAffinityPreset.values Node label values to match. Ignored if `platform.affinity` is set
+    ## E.g.
+    ## values:
+    ##   - e2e-az1
+    ##   - e2e-az2
+    ##
+    values: []
+  ## @param platformCortex.affinity Affinity for Conduktor Platform cortex pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ## NOTE: `platform.podAffinityPreset`, `platform.podAntiAffinityPreset`, and `platform.nodeAffinityPreset` will be ignored when it's set
+  ##
+  affinity: {}
+  ## @param platformCortex.nodeSelector Node labels for Conduktor Platform Cortex pods assignment
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+  ## @param platformCortex.tolerations Tolerations for Conduktor Platform Cortex pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+  ## @param platformCortex.updateStrategy.type Conduktor Platform Cortex statefulset strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ##
+  updateStrategy:
+    ## StrategyType
+    ## Can be set to RollingUpdate, OnDelete or Recreate
+    ##
+    type: RollingUpdate
+
+  ## @param platformCortex.priorityClassName Conduktor Platform Cortex pods' priorityClassName
+  ##
+  priorityClassName: ""
+  ## @param platformCortex.topologySpreadConstraints Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/#spread-constraints-for-pods
+  ##
+  topologySpreadConstraints: []
+  ## @param platformCortex.schedulerName Name of the k8s scheduler (other than default) for Conduktor Platform Cortex pods
+  ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  ##
+  schedulerName: ""
+  ## @param platform.terminationGracePeriodSeconds Seconds Redmine pod needs to terminate gracefully
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods
+  ##
+  terminationGracePeriodSeconds: ""
+  ## @param platformCortex.lifecycleHooks for the Conduktor Platform Cortex container(s) to automate configuration before or after startup
+  ##
+  lifecycleHooks: {}
+  ## @param platformCortex.extraEnvVars Array with extra environment variables to add to Conduktor Platform Cortex nodes
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param platformCortex.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for Conduktor Platform Cortex nodes
+  ##
+  extraEnvVarsCM: ""
+  ## @param platformCortex.extraEnvVarsSecret Name of existing Secret containing extra env vars for Conduktor Platform Cortex nodes
+  ##
+  extraEnvVarsSecret: ""
+  ## @param platformCortex.extraVolumes Optionally specify extra list of additional volumes for the Conduktor Platform Cortex pod(s)
+  ##
+  extraVolumes: []
+  ## @param platformCortex.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Conduktor Platform Cortex container(s)
+  ##
+  extraVolumeMounts: []
+  ## @param platformCortex.sidecars Add additional sidecar containers to the Conduktor Platform Cortex pod(s)
+  ## e.g:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  sidecars: []
+  ## @param platformCortex.initContainers Add additional init containers to the Conduktor Platform Cortex pod(s)
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+  ## e.g:
+  ## initContainers:
+  ##  - name: your-image-name
+  ##    image: your-image
+  ##    imagePullPolicy: Always
+  ##    command: ['sh', '-c', 'echo "hello world"']
+  ##
+  initContainers: []
+
+  ## Conduktor Platform Cortex service parameters
+  ##
+  service:
+    ## @param service.type Conduktor Platform Cortex service type
+    ##
+    # among ClusterIP, NodePort, LoadBalancer
+    type: ClusterIP
+    ## @param platformCortex.service.ports.cortex Conduktor Platform Cortex service HTTP port
+    ## @param platformCortex.service.ports.alertmanager Conduktor Platform Cortex AlertManager service HTTP port
+    ## @param platformCortex.service.ports.prometheus Conduktor Platform Cortex Prometheus service HTTP port
+    ##
+    ports:
+      cortex: 9009
+      alertmanager: 9010
+      prometheus: 9090
+    ## Node ports to expose
+    ## @param platformCortex.service.nodePorts.cortex Node port for Cortex HTTP
+    ## @param platformCortex.service.nodePorts.alertmanager Node port for AlertManager HTTP
+    ## @param platformCortex.service.nodePorts.prometheus Node port for Prometheus HTTP
+    ## NOTE: choose port between <30000-32767>
+    ##
+    nodePorts:
+      cortex: ""
+      alertmanager: ""
+      prometheus: ""
+    ## @param platformCortex.service.clusterIP Conduktor Platform Cortex service Cluster IP
+    ## e.g.:
+    ## clusterIP: None
+    ##
+    clusterIP: ""
+    ## @param platformCortex.service.loadBalancerSourceRanges Conduktor Platform Cortex service Load Balancer sources
+    ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+    ## e.g:
+    ## loadBalancerSourceRanges:
+    ##   - 10.10.10.0/24
+    ##
+    loadBalancerSourceRanges: []
+    ## @param platformCortex.service.externalTrafficPolicy Conduktor Platform Cortex service external traffic policy
+    ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    ##
+    externalTrafficPolicy: Cluster
+    ## @param platformCortex.service.annotations Additional custom annotations for Conduktor Platform Cortex service
+    ##
+    annotations: {}
+    ## @param platformCortex.service.extraPorts Extra ports to expose in Conduktor Platform Cortex service (normally used with the `sidecars` value)
+    ##
+    extraPorts: []
+    ## @param platformCortex.service.sessionAffinity Control where client requests go, to the same pod or round-robin
+    ## Values: ClientIP or None
+    ## ref: https://kubernetes.io/docs/user-guide/services/
+    ##
+    sessionAffinity: None
+    ## @param platformCortex.service.sessionAffinityConfig Additional settings for the sessionAffinity
+    ## sessionAffinityConfig:
+    ##   clientIP:
+    ##     timeoutSeconds: 300
+    ##
+    sessionAffinityConfig: {}

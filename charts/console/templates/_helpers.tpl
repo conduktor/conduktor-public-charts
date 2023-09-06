@@ -6,6 +6,13 @@ Return the proper platform image name
 {{- end -}}
 
 {{/*
+Return the proper platform cortex image name
+*/}}
+{{- define "conduktor.cortex.image" -}}
+{{ include "common.images.image" (dict "imageRoot" .Values.platformCortex.image "global" .Values.global) }}
+{{- end -}}
+
+{{/*
 Return the proper Docker Image Registry Secret Names
 */}}
 {{- define "conduktor.imagePullSecrets" -}}
@@ -49,6 +56,13 @@ Return the proper Condutkor Platform fullname
 {{- end -}}
 
 {{/*
+Return the proper Condutkor Platform Cortex fullname
+*/}}
+{{- define "conduktor.platformCortex.fullname" -}}
+{{- printf "%s-%s" (include "common.names.fullname" .) "cortex" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
 Return the TLS secret name for the platform pod
 */}}
 {{- define "conduktor.platform.tls.secretName" -}}
@@ -71,6 +85,17 @@ Name of the platform ConfigMap
 {{- end -}}
 
 {{/*
+Name of the platform Cortex ConfigMap
+*/}}
+{{- define "conduktor.platformCortex.configMapName" -}}
+{{- if .Values.platform.existingConfigmap -}}
+    {{ include "common.tplvalues.render" (dict "value" .Values.platformCortex.existingConfigmap "context" $) }}
+{{- else -}}
+    {{ include "conduktor.platformCortex.fullname" . }}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Name of the platform secret
 */}}
 {{- define "conduktor.platform.secretName" -}}
@@ -79,6 +104,13 @@ Name of the platform secret
     {{- else -}}
     {{- printf "%s-%s" (include "common.names.fullname" .) "platform" | trunc 63 | trimSuffix "-" -}}
     {{- end -}}
+{{- end -}}
+
+{{/*
+Name of the platform cortex secret
+*/}}
+{{- define "conduktor.platformCortex.secretName" -}}
+    {{- printf "%s-%s" (include "common.names.fullname" .) "cortex" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
