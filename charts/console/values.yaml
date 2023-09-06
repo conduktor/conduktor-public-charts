@@ -1,5 +1,5 @@
 ## @section Global parameters
-## @descriptionStart 
+## @descriptionStart
 ## Global Docker image parameters
 ## Please, note that this will override the image parameters, including dependencies, configured to use the global value
 ## Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
@@ -59,7 +59,7 @@ diagnosticMode:
     - infinity
 
 ## @section Platform product Parameters
-## @descriptionStart 
+## @descriptionStart
 ## You can paste here your Conduktor Platform Configuration
 ##
 ## Refer to our [documentation](https://docs.conduktor.io/platform/configuration/env-variables/) for the full list of product configuration properties.
@@ -85,15 +85,15 @@ config:
     host: ''
     port: 5432
     name: 'postgres'
-    username: ''
     password: ''
+    username: ''
 
   ## @param config.license Conduktor Platform Enterprise license, if none given, the product will run in free tier
   license: ""
 
   ## @param config.existingLicenseSecret Name of an existing secret containing the license
   ##
-  ## Secret should just contain key "license" with the license as value
+  ## Secret should just contain key "CDK_LICENSE" with the license as value
   ## NOTE: 'config.license' will be ignored
   existingLicenseSecret: ""
 
@@ -341,6 +341,7 @@ platform:
   ##
   lifecycleHooks: {}
   ## @param platform.extraEnvVars Array with extra environment variables to add to Conduktor Platform nodes
+  ## ref: https://docs.conduktor.io/platform/configuration/env-variables/
   ## e.g:
   ## extraEnvVars:
   ##   - name: FOO
@@ -348,9 +349,11 @@ platform:
   ##
   extraEnvVars: []
   ## @param platform.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for Conduktor Platform nodes
+  ## ref: https://docs.conduktor.io/platform/configuration/env-variables/
   ##
   extraEnvVarsCM: ""
   ## @param platform.extraEnvVarsSecret Name of existing Secret containing extra env vars for Conduktor Platform nodes
+  ## ref: https://docs.conduktor.io/platform/configuration/env-variables/
   ##
   extraEnvVarsSecret: ""
   ## @param platform.extraVolumes Optionally specify extra list of additional volumes for the Conduktor Platform pod(s)

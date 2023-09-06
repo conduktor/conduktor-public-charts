@@ -35,7 +35,7 @@ Conduktor Platform will be accessible at : http://127.0.0.1:8080
 
 To connect use following admin account ADMIN_LOGIN and ADMIN_PASSWORD
 
-ADMIN_LOGIN="{{ .Values.config.admin.email }}"
+ADMIN_LOGIN="{{ include "common.secrets.lookup" (dict "secret" (include "conduktor.platform.secretName" .) "key" "CDK_ADMIN_EMAIL" "defaultValue" .Values.config.admin.email "context" $) | b64dec }}"
 ADMIN_PASSWORD="$(kubectl get secret {{ include "conduktor.platform.secretName" .  }} -n {{ .Release.Namespace }} -o jsonpath="{.data.CDK_ADMIN_PASSWORD}" | base64 --decode)"
 
 More details on Platform configuration are available at https://docs.conduktor.io/platform/

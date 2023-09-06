@@ -28,6 +28,12 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.platform.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
         checksum/config: {{ include (print $.Template.BasePath "/platform/configmap.yaml") . | sha256sum }}
+        {{- if not .Values.config.existingSecret }}
+        checksum/credentials: {{ include (print $.Template.BasePath "/platform/secret-credentials.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if and .Values.config.license (not .Values.config.existingLicenseSecret) }}
+        checksum/license: {{ include (print $.Template.BasePath "/platform/secret-license.yaml") . | sha256sum }}
+        {{- end }}
       labels: {{- include "common.labels.standard" . | nindent 8 }}
         app.kubernetes.io/component: conduktor-platform
         {{- if .Values.platform.podLabels }}
