@@ -204,7 +204,6 @@ console, we recommend you to look at our
 ### Kubernetes configuration 
 
 - [Install with a PodAffinity](#install-with-a-podaffinity)
-- [Install with a PodAntiAffinity](#install-with-a-podantiaffinity)
 - [Install with a Toleration](#install-with-a-toleration)
 - [Install with a Self-Signed Certificate](#install-with-self-signed-tls-certificate)
 - [Install with a custom service account](#install-with-a-custom-service-account)
@@ -212,7 +211,9 @@ console, we recommend you to look at our
 
 - [Provide credentials as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
 - [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
-- [Provide the license as a Kubernetes ConfigMap](#provide-the-platform-config-as-a-kubernetes-configmap)
+- [Provide the license as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
+
+- [Provide additional credentials as a Kubernetes Secret](#provide-additional-credentials-as-a-kubernetes-secret)
 
 ### Install with an enterprise license
 
@@ -294,10 +295,11 @@ config:
 
 ### Provide the license as a Kubernetes Secret
 
-We expect the secret to contain a key named `license` which contains your
-license key.
+This snippet expects that a *Kubernetes Secret Resource* already exists inside
+your cluster with a key named `license` containing your license key.
 
-```shell
+
+```yaml
 # values.yaml
 config:
   organization:
@@ -382,6 +384,37 @@ config:
     
 platform:
   existingConfigMap: "<your_configmap_name>"
+```
+
+### Provide additional credentials as a Kubernetes Secret
+
+In case our helm chart doesn't protect all the credentials you need, you can
+use this method to provide additional credentials through a Kubernetes 
+Secret Resource you previously created. You can have this case for LDAP 
+credentials, or for SSO credentials for example.
+
+The keys of your secret will be used as environment variables in the
+console pod. Be sure to check available [environment variables](https://docs.conduktor.io/platform/configuration/env-variables/)
+in our documentation.
+
+```yaml
+config:
+  organization:
+    name: "my-org"
+
+  admin:
+    email: "admin@my-org.com"
+    password: "admin"
+
+  database:
+    host: ''
+    port: 5432
+    name: 'postgres'
+    username: ''
+    password: ''
+
+platform:
+  extraEnvVarsSecret: "<your_secret_name>"
 ```
 
 ### Install with a toleration
