@@ -1,5 +1,5 @@
 ## @section Global parameters
-## @descriptionStart 
+## @descriptionStart
 ## Global Docker image parameters
 ## Please, note that this will override the image parameters, including dependencies, configured to use the global value
 ## Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
@@ -59,7 +59,7 @@ diagnosticMode:
     - infinity
 
 ## @section Platform product Parameters
-## @descriptionStart 
+## @descriptionStart
 ## You can paste here your Conduktor Platform Configuration
 ##
 ## Refer to our [documentation](https://docs.conduktor.io/platform/configuration/env-variables/) for the full list of product configuration properties.
@@ -84,7 +84,7 @@ config:
   database:
     host: 'postgresql.conduktor'
     port: 5432
-    name: 'conduktor'
+    name: 'postgres'
     password: ''
     username: ''
 
