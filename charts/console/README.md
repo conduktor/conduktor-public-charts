@@ -296,7 +296,7 @@ config:
 ### Provide the license as a Kubernetes Secret
 
 This snippet expects that a *Kubernetes Secret Resource* already exists inside
-your cluster with a key named `license` containing your license key.
+your cluster with a key named `CDK_LICENSE` containing your license key.
 
 
 ```yaml
