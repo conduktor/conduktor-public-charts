@@ -358,10 +358,18 @@ platform:
   extraEnvVarsSecret: ""
   ## @param platform.extraVolumes Optionally specify extra list of additional volumes for the Conduktor Platform pod(s)
   ##
-  extraVolumes: []
+  extraVolumes:
+    - name: data
+      emptyDir: {}
+    - name: tmp
+      emptyDir: {}
   ## @param platform.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Conduktor Platform container(s)
   ##
-  extraVolumeMounts: []
+  extraVolumeMounts: 
+    - name: data
+      mountPath: /var/conduktor
+    - name: tmp
+      mountPath: /tmp
   ## @param platform.sidecars Add additional sidecar containers to the Conduktor Platform pod(s)
   ## e.g:
   ## sidecars:
