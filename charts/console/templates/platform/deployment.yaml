@@ -191,10 +191,6 @@ spec:
         {{- include "common.tplvalues.render" ( dict "value" .Values.platform.sidecars "context" $) | nindent 8 }}
         {{- end }}
       volumes:
-        - name: data
-          emptyDir: {}
-        - name: tmp
-          emptyDir: {}
         - name: config
           configMap:
             name: {{ include "conduktor.platform.configMapName" . }}
