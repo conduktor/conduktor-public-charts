@@ -372,18 +372,18 @@ platform:
 ### Provide console configuration as a Kubernetes ConfigMap
 
 **NOTE:** We recommend to be using a secret (see [snippet](#provide-credentials-configuration-as-a-kubernetes-secret))
-in addition to the configmap in order to protect your credentials.
+in addition to the ConfigMap in order to protect your credentials.
 
 The ConfigMap is expected to contain a key `platform-config.yaml` which got 
 the console configuration in YAML format.
 
 ```yaml
 config:
-  # We highly recommend you to be using both the secret and the configmap
+  # We highly recommend you to be using both the secret and the ConfigMap
   existingSecret: "<your_secret_name>"
     
 platform:
-  existingConfigMap: "<your_configmap_name>"
+  existingConfigmap: "<your_configmap_name>"
 ```
 
 ### Provide additional credentials as a Kubernetes Secret
