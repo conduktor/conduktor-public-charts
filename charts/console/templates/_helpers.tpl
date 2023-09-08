@@ -122,12 +122,14 @@ Ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
 {{- end -}}
 
 {{- define "conduktor.validateValues.database" -}}
-{{- if not .Values.config.database.host -}}
+{{- if not .Values.config.existingSecret -}}
+    {{- if not .Values.config.database.host -}}
 conduktor: invalid database configuration
            config.database.host MUST be set in values
-{{- else if not .Values.config.database.name -}}
+    {{- else if not .Values.config.database.name -}}
 conduktor: invalid database configuration
            config.database.name MUST be set in values
+    {{- end -}}
 {{- end -}}
 {{- end -}}
 

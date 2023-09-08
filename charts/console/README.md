@@ -181,13 +181,12 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/en
 
 ### Other Parameters
 
-| Name                                          | Description                                                      | Value   |
-| --------------------------------------------- | ---------------------------------------------------------------- | ------- |
-| `serviceAccount.create`                       | Specifies whether a ServiceAccount should be created             | `true`  |
-| `serviceAccount.name`                         | The name of the ServiceAccount to use.                           | `""`    |
-| `serviceAccount.annotations`                  | Additional Service Account annotations (evaluated as a template) | `{}`    |
-| `serviceAccount.automountServiceAccountToken` | Automount service account token for the server service account   | `true`  |
-| `test`                                        | Enable additional manifests for testing purposes                 | `false` |
+| Name                                          | Description                                                      | Value  |
+| --------------------------------------------- | ---------------------------------------------------------------- | ------ |
+| `serviceAccount.create`                       | Specifies whether a ServiceAccount should be created             | `true` |
+| `serviceAccount.name`                         | The name of the ServiceAccount to use.                           | `""`   |
+| `serviceAccount.annotations`                  | Additional Service Account annotations (evaluated as a template) | `{}`   |
+| `serviceAccount.automountServiceAccountToken` | Automount service account token for the server service account   | `true` |
 
 ## Snippets
 
@@ -330,12 +329,28 @@ We expect the secret to contain the following keys:
 - "CDK_DATABASE_USERNAME": username of the database
 
 ```yaml
+# values.yaml
 config:
   existingSecret: "<your_secret_name>"
   database:
     host: ''
     port: 5432
     name: 'postgres'
+```
+
+```yaml 
+# secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "<your_secret_name>"
+type: Opaque
+data:
+    CDK_ORGANIZATION_NAME: <your_organization_name>
+    CDK_ADMIN_EMAIL: <your_admin_email>
+    CDK_ADMIN_PASSWORD: <your_admin_password>
+    CDK_DATABASE_PASSWORD: <your_database_password>
+    CDK_DATABASE_USERNAME: <your_database_username>
 ```
 
 ### Install with a PodAffinity
@@ -378,12 +393,28 @@ The ConfigMap is expected to contain a key `platform-config.yaml` which got
 the console configuration in YAML format.
 
 ```yaml
+# values.yaml
 config:
   # We highly recommend you to be using both the secret and the ConfigMap
+  # check our snippet 'Provide credentials configuration as a Kubernetes Secret'
   existingSecret: "<your_secret_name>"
     
 platform:
   existingConfigmap: "<your_configmap_name>"
+```
+
+```yaml
+# platform-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "<your_configmap_name>"
+data:
+  platform-config.yaml: |
+    database:
+      host: '<postgres_host>'
+      port: 5432
+      name: '<postgres_database>'
 ```
 
 ### Provide additional credentials as a Kubernetes Secret
