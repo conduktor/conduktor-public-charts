@@ -572,5 +572,18 @@ serviceAccount:
   ##
   automountServiceAccountToken: true
 
-## @param test Enable additional manifests for testing purposes
-test: false
+## @skip tests
+## @skip tests.enabled Enable additional manifests for test purposes
+## @skip tests.secrets additional secrets to inject
+tests:
+  enabled: false
+  # secrets:
+  #    - name: cdkt-test-04
+  #      type: Opaque
+  #      stringData:
+  #        CDK_ORGANIZATION_NAME: conduktor
+  #        CDK_ADMIN_EMAIL: admin@conduktor.io
+  #        CDK_ADMIN_PASSWORD: admin
+  #        CDK_DATABASE_PASSWORD: conduktor123
+  #        CDK_DATABASE_USERNAME: postgres
+  secrets: []

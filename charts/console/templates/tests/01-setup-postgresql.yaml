@@ -1,7 +1,7 @@
 {{/**
 This is hack so that we install a fresh postgresql (without volume) for each test.
 **/}}
-{{- if eq .Values.test true }}
+{{- if .Values.tests.enabled }}
 {{- $postgres_password := "conduktor123" }}
 {{- $postgres_db := "platform" }}
 apiVersion: apps/v1
