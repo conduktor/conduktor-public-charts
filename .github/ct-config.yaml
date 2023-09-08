@@ -14,3 +14,5 @@ helm-extra-args: "--timeout 300s"
 # We need to explicitly login to external repos for external dependencies
 chart-repos:
   - bitnami=https://charts.bitnami.com/bitnami
+namespace: ct
+release-label: console
