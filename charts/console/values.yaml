@@ -368,11 +368,11 @@ platform:
   ## By default, we create two EmptyDir volumes "data" and "tmp". If you want to make them PersistentVolume, please see
   ## the relevant snippet.
   ##
-  extraVolumes: {}
+  extraVolumes: []
   ## @param platform.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Conduktor Platform container(s).
   ## By default, the volumes mounted are "data" and "tmp".
   ##
-  extraVolumeMounts: {}
+  extraVolumeMounts: []
   ## @param platform.sidecars Add additional sidecar containers to the Conduktor Platform pod(s)
   ## e.g:
   ## sidecars:
