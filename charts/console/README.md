@@ -181,13 +181,12 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/en
 
 ### Other Parameters
 
-| Name                                          | Description                                                      | Value   |
-| --------------------------------------------- | ---------------------------------------------------------------- | ------- |
-| `serviceAccount.create`                       | Specifies whether a ServiceAccount should be created             | `true`  |
-| `serviceAccount.name`                         | The name of the ServiceAccount to use.                           | `""`    |
-| `serviceAccount.annotations`                  | Additional Service Account annotations (evaluated as a template) | `{}`    |
-| `serviceAccount.automountServiceAccountToken` | Automount service account token for the server service account   | `true`  |
-| `test`                                        | Enable additional manifests for testing purposes                 | `false` |
+| Name                                          | Description                                                      | Value  |
+| --------------------------------------------- | ---------------------------------------------------------------- | ------ |
+| `serviceAccount.create`                       | Specifies whether a ServiceAccount should be created             | `true` |
+| `serviceAccount.name`                         | The name of the ServiceAccount to use.                           | `""`   |
+| `serviceAccount.annotations`                  | Additional Service Account annotations (evaluated as a template) | `{}`   |
+| `serviceAccount.automountServiceAccountToken` | Automount service account token for the server service account   | `true` |
 
 ## Snippets
 
