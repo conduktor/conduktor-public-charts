@@ -356,12 +356,23 @@ platform:
   ## ref: https://docs.conduktor.io/platform/configuration/env-variables/
   ##
   extraEnvVarsSecret: ""
-  ## @param platform.extraVolumes Optionally specify extra list of additional volumes for the Conduktor Platform pod(s)
+  ## @param platform.extraVolumes Optionally specify extra list of additional volumes for the Conduktor Platform pod(s). 
+  ## By default, we create two EmptyDir volumes "data" and "tmp". If you want to make them PersistentVolume, please see
+  ## the relevant snippet.
   ##
-  extraVolumes: []
-  ## @param platform.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Conduktor Platform container(s)
+  extraVolumes:
+    - name: data
+      emptyDir: {}
+    - name: tmp
+      emptyDir: {}
+  ## @param platform.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Conduktor Platform container(s).
+  ## By default, the volumes mounted are "data" and "tmp".
   ##
-  extraVolumeMounts: []
+  extraVolumeMounts: 
+    - name: data
+      mountPath: /var/conduktor
+    - name: tmp
+      mountPath: /tmp
   ## @param platform.sidecars Add additional sidecar containers to the Conduktor Platform pod(s)
   ## e.g:
   ## sidecars:

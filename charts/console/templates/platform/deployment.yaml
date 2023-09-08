@@ -174,10 +174,6 @@ spec:
           lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.platform.lifecycleHooks "context" $) | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - name: data
-              mountPath: /var/conduktor
-            - name: tmp
-              mountPath: /tmp
             - name: config
               mountPath: /conduktor/config/
             {{- if $tls_enabled }}
@@ -191,10 +187,6 @@ spec:
         {{- include "common.tplvalues.render" ( dict "value" .Values.platform.sidecars "context" $) | nindent 8 }}
         {{- end }}
       volumes:
-        - name: data
-          emptyDir: {}
-        - name: tmp
-          emptyDir: {}
         - name: config
           configMap:
             name: {{ include "conduktor.platform.configMapName" . }}
