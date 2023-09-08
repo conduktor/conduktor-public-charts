@@ -340,6 +340,14 @@ platform:
   ## @param platform.lifecycleHooks for the Conduktor Platform container(s) to automate configuration before or after startup
   ##
   lifecycleHooks: {}
+  ## @extra platform.dataVolume Persistent Volume to store Conduktor Platform data
+  ## @skip platform.dataVolume.emptyDir
+  dataVolume:
+    emptyDir: {}
+  ## @extra platform.tmpVolume Persistent Volume to store Conduktor Platform tmp data
+  ## @skip platform.tmpVolume.emptyDir
+  tmpVolume:
+    emptyDir: {}
   ## @param platform.extraEnvVars Array with extra environment variables to add to Conduktor Platform nodes
   ## ref: https://docs.conduktor.io/platform/configuration/env-variables/
   ## e.g:
@@ -356,23 +364,12 @@ platform:
   ## ref: https://docs.conduktor.io/platform/configuration/env-variables/
   ##
   extraEnvVarsSecret: ""
-  ## @param platform.extraVolumes Optionally specify extra list of additional volumes for the Conduktor Platform pod(s). 
-  ## By default, we create two EmptyDir volumes "data" and "tmp". If you want to make them PersistentVolume, please see
-  ## the relevant snippet.
+  ## @param platform.extraVolumes Optionally specify extra list of additional volumes for the Conduktor Platform pod(s).
   ##
-  extraVolumes:
-    - name: data
-      emptyDir: {}
-    - name: tmp
-      emptyDir: {}
+  extraVolumes: []
   ## @param platform.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Conduktor Platform container(s).
-  ## By default, the volumes mounted are "data" and "tmp".
   ##
-  extraVolumeMounts: 
-    - name: data
-      mountPath: /var/conduktor
-    - name: tmp
-      mountPath: /tmp
+  extraVolumeMounts: []
   ## @param platform.sidecars Add additional sidecar containers to the Conduktor Platform pod(s)
   ## e.g:
   ## sidecars:
@@ -573,8 +570,6 @@ serviceAccount:
   automountServiceAccountToken: true
 
 ## @skip tests
-## @skip tests.enabled Enable additional manifests for test purposes
-## @skip tests.secrets additional secrets to inject
 tests:
   enabled: false
   # secrets:
