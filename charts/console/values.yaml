@@ -340,14 +340,14 @@ platform:
   ## @param platform.lifecycleHooks for the Conduktor Platform container(s) to automate configuration before or after startup
   ##
   lifecycleHooks: {}
-  ## @extra platform.dataVolume Persistent Volume to store Conduktor Platform data
-  ## @skip platform.dataVolume.emptyDir
-  dataVolume:
-    emptyDir: {}
-  ## @extra platform.tmpVolume Persistent Volume to store Conduktor Platform tmp data
-  ## @skip platform.tmpVolume.emptyDir
-  tmpVolume:
-    emptyDir: {}
+  ## @param platform.dataVolume Configure the data volume to store Conduktor Platform data
+  ## default:
+  ##  emptyDir: {}
+  dataVolume: {}
+  ## @param platform.tmpVolume Configure the /tmp volume which store various data related to running services
+  ## default:
+  ##  emptyDir: {}
+  tmpVolume: {}
   ## @param platform.extraEnvVars Array with extra environment variables to add to Conduktor Platform nodes
   ## ref: https://docs.conduktor.io/platform/configuration/env-variables/
   ## e.g:

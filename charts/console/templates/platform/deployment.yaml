@@ -192,9 +192,17 @@ spec:
         {{- end }}
       volumes:
         - name: data
+          {{- if .Values.platform.dataVolume }}
           {{- include "common.tplvalues.render" ( dict "value" .Values.platform.dataVolume "context" $) | nindent 10 }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
         - name: tmp
+          {{- if .Values.platform.tmpVolume }}
           {{- include "common.tplvalues.render" ( dict "value" .Values.platform.tmpVolume "context" $) | nindent 10 }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
         - name: config
           configMap:
             name: {{ include "conduktor.platform.configMapName" . }}
