@@ -377,13 +377,11 @@ config:
 
 platform:
     dataVolume:
-      accessModes: [ "ReadWriteOnce" ]
-      size: 10Gi
-      storageClass: "standard"
+      persistentVolumeClaim:
+        claimName: data-pv-claim
     tmpVolume:
-      accessModes: [ "ReadWriteOnce" ]
-      size: 10Gi
-      storageClass: "standard"
+      persistentVolumeClaim:
+        claimName: tmp-pv-claim
 ```
 
 ### Install with a PodAffinity
