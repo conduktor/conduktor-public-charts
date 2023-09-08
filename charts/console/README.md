@@ -209,6 +209,7 @@ console, we recommend you to look at our
 - [Install with a Self-Signed Certificate](#install-with-self-signed-tls-certificate)
 - [Install with a custom service account](#install-with-a-custom-service-account)
 - [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
+- [Store console data into a PersistentVolume](#store-platform-data-into-a-persistent-volume)
 
 - [Provide credentials as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
 - [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
@@ -353,6 +354,36 @@ data:
     CDK_ADMIN_PASSWORD: <your_admin_password>
     CDK_DATABASE_PASSWORD: <your_database_password>
     CDK_DATABASE_USERNAME: <your_database_username>
+```
+
+### Store platform data into a Persistent Volume
+
+```yaml
+# values.yaml
+config:
+  organization:
+    name: "<your_org_name>"
+
+  admin:
+    email: "<your_admin_email>"
+    password: "<your_admin_password>"
+
+  database:
+    host: '<postgres_host>'
+    port: 5432
+    name: '<postgres_database>'
+    username: '<postgres_username>'
+    password: '<postgres_password>'
+
+platform:
+    dataVolume:
+      accessModes: [ "ReadWriteOnce" ]
+      size: 10Gi
+      storageClass: "standard"
+    tmpVolume:
+      accessModes: [ "ReadWriteOnce" ]
+      size: 10Gi
+      storageClass: "standard"
 ```
 
 ### Install with a PodAffinity
