@@ -120,7 +120,6 @@ Default name for the conduktor license secret
 {{- printf "%s-%s" (include "common.names.fullname" .) "license" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-
 {{/*
 Name of the conduktor license
 */}}
@@ -130,6 +129,36 @@ Name of the conduktor license
 {{- else -}}
     {{ include "conduktor.license.secretNameDefault" . }}
 {{- end -}}
+{{- end -}}
+
+
+{{/*
+Name of the platform Service
+*/}}
+{{- define "conduktor.platform.serviceName" -}}
+    {{ include "common.names.fullname" . }}
+{{- end -}}
+
+{{/*
+Platform service internal domain name
+*/}}
+{{- define "conduktor.platform.serviceDomain" -}}
+{{- printf "%s.%s.svc.cluster.local" (include "conduktor.platform.serviceName" .) .Release.Namespace -}}
+{{- end -}}
+
+
+{{/*
+Name of the platform cortex Service
+*/}}
+{{- define "conduktor.platformCortex.serviceName" -}}
+    {{ include "conduktor.platformCortex.fullname" . }}
+{{- end -}}
+
+{{/*
+Platform Cortex service internal domain name
+*/}}
+{{- define "conduktor.platformCortex.serviceDomain" -}}
+{{- printf "%s.%s.svc.cluster.local" (include "conduktor.platformCortex.serviceName" .) .Release.Namespace -}}
 {{- end -}}
 
 {{/*
@@ -181,3 +210,43 @@ Those are warnings and not errors, they are only output in NOTES.txt
 {{- end -}}
 {{- end -}}
 
+
+{{/*
+Return platform monitoring api poll rate for clusters. Default to 60s
+*/}}
+{{- define "conduktor.monitoring.clustersRefreshInterval" -}}
+{{- $refreshInterval := index .Values "config" "monitoring" "clusters-refresh-interval" -}}
+{{- default "60" $refreshInterval }}
+{{- end -}}
+
+{{- define "conduktor.monitoring.cortexUrl" -}}
+{{- $defaultUrl := printf "http://%s:%d/" (include "conduktor.platformCortex.serviceDomain" .) (.Values.platformCortex.service.ports.cortex | int) -}}
+{{- $overrideUrl := index .Values "config" "monitoring" "cortex-url" -}}
+{{- default $defaultUrl $overrideUrl }}
+{{- end -}}
+
+{{- define "conduktor.monitoring.alertManagerUrl" -}}
+{{- $defaultUrl := printf "http://%s:%d/" (include "conduktor.platformCortex.serviceDomain" .) (.Values.platformCortex.service.ports.alertmanager | int)  -}}
+{{- $overrideUrl := index .Values "config" "monitoring" "alert-manager-url" -}}
+{{- default $defaultUrl $overrideUrl }}
+{{- end -}}
+
+{{- define "conduktor.monitoring.callbackUrl" -}}
+{{- $defaultUrl := printf "http://%s:%d/monitoring/api/" (include "conduktor.platform.serviceDomain" .) (.Values.service.ports.http | int) -}}
+{{- $overrideUrl := index .Values "config" "monitoring" "callback-url" -}}
+{{- default $defaultUrl $overrideUrl }}
+{{- end -}}
+
+{{- define "conduktor.monitoring.notificationsCallbackUrl" -}}
+{{- $ingressUrl := printf "http://%s" .Values.ingress.hostname -}}
+{{- $serviceUrl := printf "http://%s:%d" (include "conduktor.platform.serviceDomain" .) (.Values.service.ports.http | int) -}}
+{{- $defaultUrl := ternary $ingressUrl $serviceUrl .Values.ingress.enabled }}
+{{- $overrideUrl := index .Values "config" "monitoring" "notifications-callback-url" -}}
+{{- default $defaultUrl $overrideUrl }}
+{{- end -}}
+
+{{- define "conduktor.monitoring.consoleUrl" -}}
+{{- $defaultUrl := printf "%s:%d" (include "conduktor.platform.serviceDomain" .) (.Values.service.ports.http | int) }}
+{{- $overrideUrl := index .Values "config" "monitoring" "console-url" -}}
+{{- default $defaultUrl $overrideUrl }}
+{{- end -}}

@@ -1,7 +1,7 @@
 apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
 kind: Deployment
 metadata:
-  name: {{ template "common.names.fullname" . }}
+  name: {{ include "conduktor.platformCortex.fullname" . }}
   namespace: {{ include "common.names.namespace" . | quote }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
     app.kubernetes.io/component: conduktor-platform-cortex
@@ -19,7 +19,7 @@ spec:
   {{- end }}
   selector:
     matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
-      app.kubernetes.io/component: conduktor-platform
+      app.kubernetes.io/component: conduktor-platform-cortex
   template:
     metadata:
       annotations:
@@ -28,7 +28,7 @@ spec:
         {{- end }}
         checksum/config: {{ include (print $.Template.BasePath "/platform/configmap.yaml") . | sha256sum }}
       labels: {{- include "common.labels.standard" . | nindent 8 }}
-        app.kubernetes.io/component: conduktor-platform
+        app.kubernetes.io/component: conduktor-platform-cortex
         {{- if .Values.platformCortex.podLabels }}
         {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.podLabels "context" $) | nindent 8 }}
         {{- end }}

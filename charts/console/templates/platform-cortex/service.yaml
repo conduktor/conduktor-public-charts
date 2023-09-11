@@ -1,51 +1,71 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "common.names.fullname" . }}
+  name: {{ include "conduktor.platformCortex.fullname" . }}
   namespace: {{ include "common.names.namespace" . | quote }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
     app.kubernetes.io/component: conduktor-platform-cortex
     {{- if .Values.commonLabels }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
-  {{- if or .Values.service.annotations .Values.commonAnnotations }}
+  {{- if or .Values.platformCortex.service.annotations .Values.commonAnnotations }}
   annotations:
-    {{- if .Values.service.annotations }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.service.annotations "context" $) | nindent 4 }}
+    {{- if .Values.platformCortex.service.annotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.platformCortex.service.annotations "context" $) | nindent 4 }}
     {{- end }}
     {{- if .Values.commonAnnotations }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
     {{- end }}
   {{- end }}
 spec:
-  type: {{ .Values.service.type }}
-  {{- if and .Values.service.clusterIP (eq .Values.service.type "ClusterIP") }}
-  clusterIP: {{ .Values.service.clusterIP }}
+  type: {{ .Values.platformCortex.service.type }}
+  {{- if and .Values.platformCortex.service.clusterIP (eq .Values.platformCortex.service.type "ClusterIP") }}
+  clusterIP: {{ .Values.platformCortex.service.clusterIP }}
   {{- end }}
-  {{- if .Values.service.sessionAffinity }}
-  sessionAffinity: {{ .Values.service.sessionAffinity }}
+  {{- if .Values.platformCortex.service.sessionAffinity }}
+  sessionAffinity: {{ .Values.platformCortex.service.sessionAffinity }}
   {{- end }}
-  {{- if .Values.service.sessionAffinityConfig }}
-  sessionAffinityConfig: {{- include "common.tplvalues.render" (dict "value" .Values.service.sessionAffinityConfig "context" $) | nindent 4 }}
+  {{- if .Values.platformCortex.service.sessionAffinityConfig }}
+  sessionAffinityConfig: {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.service.sessionAffinityConfig "context" $) | nindent 4 }}
   {{- end }}
-  {{- if or (eq .Values.service.type "LoadBalancer") (eq .Values.service.type "NodePort") }}
-  externalTrafficPolicy: {{ .Values.service.externalTrafficPolicy | quote }}
+  {{- if or (eq .Values.platformCortex.service.type "LoadBalancer") (eq .Values.platformCortex.service.type "NodePort") }}
+  externalTrafficPolicy: {{ .Values.platformCortex.service.externalTrafficPolicy | quote }}
   {{- end }}
-  {{- if and (eq .Values.service.type "LoadBalancer") (not (empty .Values.service.loadBalancerSourceRanges)) }}
-  loadBalancerSourceRanges: {{ .Values.service.loadBalancerSourceRanges }}
+  {{- if and (eq .Values.platformCortex.service.type "LoadBalancer") (not (empty .Values.platformCortex.service.loadBalancerSourceRanges)) }}
+  loadBalancerSourceRanges: {{ .Values.platformCortex.service.loadBalancerSourceRanges }}
   {{- end }}
   ports:
-    - name: http
-      port: {{ .Values.service.ports.http }}
+    - name: cortex
+      port: {{ .Values.platformCortex.service.ports.cortex }}
       protocol: TCP
-      targetPort: http
-      {{- if and (or (eq .Values.service.type "NodePort") (eq .Values.service.type "LoadBalancer")) (not (empty .Values.service.nodePorts.http)) }}
-      nodePort: {{ .Values.service.nodePorts.http }}
-      {{- else if eq .Values.service.type "ClusterIP" }}
+      targetPort: cortex
+      {{- if and (or (eq .Values.platformCortex.service.type "NodePort") (eq .Values.platformCortex.service.type "LoadBalancer")) (not (empty .Values.platformCortex.service.nodePorts.cortex)) }}
+      nodePort: {{ .Values.platformCortex.service.nodePorts.cortex }}
+      {{- else if eq .Values.platformCortex.service.type "ClusterIP" }}
       nodePort: null
       {{- end }}
-    {{- if .Values.service.extraPorts }}
-    {{- include "common.tplvalues.render" (dict "value" .Values.service.extraPorts "context" $) | nindent 4 }}
+
+    - name: alertmanager
+      port: {{ .Values.platformCortex.service.ports.alertmanager }}
+      protocol: TCP
+      targetPort: alertmanager
+      {{- if and (or (eq .Values.platformCortex.service.type "NodePort") (eq .Values.platformCortex.service.type "LoadBalancer")) (not (empty .Values.platformCortex.service.nodePorts.alertmanager)) }}
+      nodePort: {{ .Values.platformCortex.service.nodePorts.alertmanager }}
+      {{- else if eq .Values.platformCortex.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+
+    - name: prometheus
+      port: {{ .Values.platformCortex.service.ports.prometheus }}
+      protocol: TCP
+      targetPort: prometheus
+      {{- if and (or (eq .Values.platformCortex.service.type "NodePort") (eq .Values.platformCortex.service.type "LoadBalancer")) (not (empty .Values.platformCortex.service.nodePorts.prometheus)) }}
+      nodePort: {{ .Values.platformCortex.service.nodePorts.prometheus }}
+      {{- else if eq .Values.platformCortex.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+    {{- if .Values.platformCortex.service.extraPorts }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.service.extraPorts "context" $) | nindent 4 }}
     {{- end }}
   selector: {{- include "common.labels.matchLabels" . | nindent 4 }}
-    app.kubernetes.io/component: conduktor-platform
+    app.kubernetes.io/component: conduktor-platform-cortex

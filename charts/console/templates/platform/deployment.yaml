@@ -123,6 +123,18 @@ spec:
             {{- if .Values.platform.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.platform.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}
+            {{- if .Values.platformCortex.enabled }}
+            - name: CDK_MONITORING_CLUSTERS-REFRESH-INTERVAL
+              value: {{ include "conduktor.monitoring.clustersRefreshInterval" . | quote }}
+            - name: CDK_MONITORING_CORTEX-URL
+              value: {{ include "conduktor.monitoring.cortexUrl" . | quote }}
+            - name: CDK_MONITORING_ALERT-MANAGER-URL
+              value: {{ include "conduktor.monitoring.alertManagerUrl" . | quote }}
+            - name: CDK_MONITORING_CALLBACK-URL
+              value: {{ include "conduktor.monitoring.callbackUrl" . | quote }}
+            - name: CDK_MONITORING_NOTIFICATIONS-CALLBACK-URL
+              value: {{ include "conduktor.monitoring.notificationsCallbackUrl" . | quote }}
+            {{- end }}
           envFrom:
             {{- if .Values.platform.extraEnvVarsCM }}
             - configMapRef:

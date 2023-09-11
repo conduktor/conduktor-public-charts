@@ -13,6 +13,7 @@ metadata:
   annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
   {{- end }}
 data:
+  CDK_CONSOLE-URL: {{ include "conduktor.monitoring.consoleUrl" . | quote }}
   {{- if .Values.monitoringConfig.storage.s3 }}
   CDK_MONITORING_STORAGE_S3_ENDPOINT: {{ .Values.monitoringConfig.storage.s3.endpoint | quote }}
   CDK_MONITORING_STORAGE_S3_REGION: {{ .Values.monitoringConfig.storage.s3.region | quote }}
