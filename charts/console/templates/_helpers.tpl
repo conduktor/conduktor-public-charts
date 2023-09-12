@@ -25,25 +25,25 @@ Return the full configuration for the platform ConfigMap
 "$_" is needed as it prevent the output of the function to be printed in the template
 */}}
 {{- define "conduktor.platform.config" -}}
-{{ $config := .Values.config | deepCopy }}
+{{- $config := .Values.config | deepCopy -}}
 {{/* Delete sensitive data from ConfigMap */}}
-{{ $_ := unset $config "organization" }}
-{{ $_ := unset $config "admin" }}
-{{ $_ := unset $config "license" }}
-{{ $_ := unset $config "existingLicenseSecret" }}
+{{- $_ := unset $config "organization" -}}
+{{- $_ := unset $config "admin" -}}
+{{- $_ := unset $config "license" -}}
+{{- $_ := unset $config "existingLicenseSecret" -}}
 
-{{ $platform := .Values.config.platform | deepCopy }}
-{{ if empty .Values.config.platform.external.url }}
-    {{ $_ := unset $platform "external" }}
-{{ end }}
-{{ $_ := unset $platform "https" }}
-{{ $_ := set $config "platform" $platform }}
+{{- $platform := .Values.config.platform | deepCopy -}}
+  {{- if empty .Values.config.platform.external.url -}}
+        {{- $_ := unset $platform "external" -}}
+  {{- end -}}
+{{- $_ := unset $platform "https" -}}
+{{- $_ := set $config "platform" $platform -}}
 
 {{/* Delete database password/username from ConfigMap */}}
-{{ $database := .Values.config.database | deepCopy }}
-{{ $_ := unset $database "password" }}
-{{ $_ := unset $database "username" }}
-{{ $_ := set $config "database" $database }}
+{{- $database := .Values.config.database | deepCopy -}}
+{{- $_ := unset $database "password" -}}
+{{- $_ := unset $database "username" -}}
+{{- $_ := set $config "database" $database -}}
 
 {{ include "common.tplvalues.render" (dict "value" $config "context" $) }}
 {{- end -}}
@@ -194,6 +194,17 @@ conduktor: invalid database configuration
 {{- end -}}
 {{- end -}}
 
+{{- define "conduktor.validateValues.monitoring" -}}
+{{- if (.Values.config.monitoring).storage -}}
+{{- with .Values.config.monitoring.storage }}
+{{- if or (or .s3 .gcs) (or .azure .swift) -}}
+conduktor: invalid monitoring storage configuration
+           config.monitoring.storage is deprecated, move to monitoringConfig.storage instead
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
 {{/*
 Compile all warnings into a single message.
 
@@ -202,11 +213,12 @@ Those are warnings and not errors, they are only output in NOTES.txt
 {{- define "conduktor.validateValues" -}}
 {{- $messages := list -}}
 {{- $messages := append $messages (include "conduktor.validateValues.database" .) -}}
+{{- $messages := append $messages (include "conduktor.validateValues.monitoring" .) -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
 
 {{- if $message -}}
-{{-   printf "\n\nYOUR DEPLOYMENT MIGHT NOT WORK:\n\n%s" $message -}}
+{{- required (printf "\n\nYOUR DEPLOYMENT WILL NOT WORK:\n\n%s" $message) .Values.unknown -}}
 {{- end -}}
 {{- end -}}
 
@@ -247,6 +259,6 @@ Return platform monitoring api poll rate for clusters. Default to 60s
 
 {{- define "conduktor.monitoring.consoleUrl" -}}
 {{- $defaultUrl := printf "%s:%d" (include "conduktor.platform.serviceDomain" .) (.Values.service.ports.http | int) }}
-{{- $overrideUrl := index .Values "config" "monitoring" "console-url" -}}
+{{- $overrideUrl := index .Values "monitoringConfig" "console-url" -}}
 {{- default $defaultUrl $overrideUrl }}
 {{- end -}}

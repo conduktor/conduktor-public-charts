@@ -113,7 +113,7 @@ config:
   platform:
     ## @param config.platform.external.url Force the platform to redirect and use this URL (useful when behind a proxy to fix SSO issues)
     external:
-      url: "https://platform.example.com"
+      url: ""
     https:
       ## @param config.platform.https.selfSigned Enable HTTPS with a self-signed certificate (not recommended for production) based on 'config.platform.external.url' (required).
       ##
@@ -124,66 +124,6 @@ config:
       ## NOTE: 'config.platform.https.cert.path', 'config.platform.https.key.path'
       ## and 'config.platform.https.selfSigned' will be ignored
       existingSecret: ""
-
-  monitoring:
-    storage:
-      ## S3 storage configuration
-      ## @param config.platform.storage.s3.endpoint S3 endpoint
-      ## @param config.platform.storage.s3.region S3 region
-      ## @param config.platform.storage.s3.bucket S3 bucket name
-      ## @param config.platform.storage.s3.insecure S3 insecure
-      ## @param config.platform.storage.s3.accessKeyId S3 access key id
-      ## @param config.platform.storage.s3.secretAccessKey S3 secret access key
-      s3: { }
-      ##  endpoint: ""
-      ##  region: ""
-      ##  bucket: ""
-      ##  insecure: "false"
-      ##  accessKeyId: ""
-      ##  secretAccessKey: ""
-
-      ## GCS storage configuration
-      ## @param config.platform.storage.gcs.bucketName GCS bucket name
-      ## @param config.platform.storage.gcs.serviceAccount GCS service account
-      gcs: { }
-      ##  bucketName: ""
-      ##  serviceAccount: ""
-
-      ## Azure storage configuration
-      ## @param config.platform.storage.azure.accountName Azure account name
-      ## @param config.platform.storage.azure.accountKey Azure account key
-      ## @param config.platform.storage.azure.containerName Azure container name
-      ## @param config.platform.storage.azure.endpointSuffix Azure endpoint suffix
-      azure: { }
-      ##  accountName: ""
-      ##  accountKey: ""
-      ##  containerName: ""
-      ##  endpointSuffix: "blob.core.windows.net"
-
-      ## Swift storage configuration
-      ## @param config.platform.storage.swift.authUrl Swift auth url
-      ## @param config.platform.storage.swift.password Swift password
-      ## @param config.platform.storage.swift.containerName Swift container name
-      ## @param config.platform.storage.swift.userId Swift user id
-      ## @param config.platform.storage.swift.username Swift username
-      ## @param config.platform.storage.swift.userDomainName Swift user domain name
-      ## @param config.platform.storage.swift.userDomainId Swift user domain id
-      ## @param config.platform.storage.swift.domainId Swift domain id
-      ## @param config.platform.storage.swift.domainName Swift domain name
-      ## @param config.platform.storage.swift.projectId Swift project id
-      ## @param config.platform.storage.swift.regionName Swift region name
-      swift: { }
-      ##  authUrl: ""
-      ##  password: ""
-      ##  containerName: ""
-      ##  userId: ""
-      ##  username: ""
-      ##  userDomainName: ""
-      ##  userDomainId: ""
-      ##  domainId: ""
-      ##  domainName: ""
-      ##  projectId: ""
-      ##  regionName: ""
 
 
 ## @section Platform Monitoring product Parameters
