@@ -14,31 +14,44 @@ metadata:
   {{- end }}
 data:
   CDK_CONSOLE-URL: {{ include "conduktor.monitoring.consoleUrl" . | quote }}
+
+  {{- /* S3 configuration */ -}}
   {{- if .Values.monitoringConfig.storage.s3 }}
-  CDK_MONITORING_STORAGE_S3_ENDPOINT: {{ .Values.monitoringConfig.storage.s3.endpoint | quote }}
-  CDK_MONITORING_STORAGE_S3_REGION: {{ .Values.monitoringConfig.storage.s3.region | quote }}
-  CDK_MONITORING_STORAGE_S3_BUCKET: {{ .Values.monitoringConfig.storage.s3.bucket | quote }}
-  CDK_MONITORING_STORAGE_S3_INSECURE: {{ .Values.monitoringConfig.storage.s3.insecure | quote }}
+  {{- with .Values.monitoringConfig.storage.s3 }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_S3_BUCKET" "value" .bucket) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_S3_ENDPOINT" "value" .endpoint) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_S3_REGION" "value" .region) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_S3_INSECURE" "value" .insecure) }}
+  {{- end }}
   {{- end }}
 
+  {{- /* GCS configuration */ -}}
   {{- if .Values.monitoringConfig.storage.gcs }}
-  CDK_MONITORING_STORAGE_GCS_BUCKETNAME: {{ .Values.monitoringConfig.storage.gcs.bucketName | quote }}
+  {{- with .Values.monitoringConfig.storage.gcs }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_GCS_BUCKETNAME" "value" .bucketName) }}
+  {{- end }}
   {{- end }}
 
+  {{- /* AZURE configuration */ -}}
   {{- if .Values.monitoringConfig.storage.azure }}
-  CDK_MONITORING_STORAGE_AZURE_CONTAINERNAME: {{ .Values.monitoringConfig.storage.azure.containerName | quote }}
-  CDK_MONITORING_STORAGE_AZURE_ENDPOINTSUFFIX: {{ .Values.monitoringConfig.storage.azure.endpointSuffix | quote }}
+  {{- with .Values.monitoringConfig.storage.azure }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_AZURE_ENDPOINTSUFFIX" "value" .endpointSuffix) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_AZURE_CONTAINERNAME" "value" .containerName) }}
+  {{- end }}
   {{- end }}
 
+  {{- /* SWIFT configuration */ -}}
   {{- if .Values.monitoringConfig.storage.swift }}
-  CDK_MONITORING_STORAGE_SWIFT_AUTHURL: {{ .Values.monitoringConfig.storage.swift.authUrl | quote }}
-  CDK_MONITORING_STORAGE_SWIFT_CONTAINERNAME: {{ .Values.monitoringConfig.storage.swift.containerName | quote }}
-  CDK_MONITORING_STORAGE_SWIFT_USERDOMAINNAME: {{ .Values.monitoringConfig.storage.swift.userDomainName | quote }}
-  CDK_MONITORING_STORAGE_SWIFT_USERDOMAINID: {{ .Values.monitoringConfig.storage.swift.userDomainId | quote }}
-  CDK_MONITORING_STORAGE_SWIFT_DOMAINID: {{ .Values.monitoringConfig.storage.swift.domainId | quote }}
-  CDK_MONITORING_STORAGE_SWIFT_DOMAINNAME: {{ .Values.monitoringConfig.storage.swift.domainName | quote }}
-  CDK_MONITORING_STORAGE_SWIFT_PROJECTID: {{ .Values.monitoringConfig.storage.swift.projectId | quote }}
-  CDK_MONITORING_STORAGE_SWIFT_REGIONNAME: {{ .Values.monitoringConfig.storage.swift.regionName | quote }}
-  {{- end }}
+  {{- with .Values.monitoringConfig.storage.swift }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_SWIFT_AUTHURL" "value" .authUrl) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_SWIFT_CONTAINERNAME" "value" .containerName) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_SWIFT_USERDOMAINNAME" "value" .userDomainName) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_SWIFT_USERDOMAINID" "value" .userDomainId) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_SWIFT_DOMAINID" "value" .domainId) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_SWIFT_DOMAINNAME" "value" .domainName) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_SWIFT_PROJECTID" "value" .projectId) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_SWIFT_REGIONNAME" "value" .regionName) }}
+  {{ end }}
+  {{ end }}
 
 {{- end }}

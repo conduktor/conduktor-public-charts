@@ -301,3 +301,25 @@ Return platform internal url. Like http://platform.nsp.svc.cluster.local:8080
 {{- end -}}
 {{- printf "%s" $url -}}
 {{- end -}}
+
+{{/*
+Return platform monitoring env value
+Usage :
+{{ include "conduktor.monitoring.envValue" (dict "name" "MY_ENV_NAME" "value" .Values.path.to.value) }}
+*/}}
+{{- define "conduktor.monitoring.envValue" -}}
+  {{- if .value -}}
+  {{ printf "%s: %s" .name (.value | quote) }}
+  {{- end -}}
+{{- end -}}
+
+{{/*
+Return platform monitoring env secret
+Usage :
+{{ include "conduktor.monitoring.envSecret" (dict "name" "MY_ENV_NAME" "value" .Values.path.to.value) }}
+*/}}
+{{- define "conduktor.monitoring.envSecret" -}}
+  {{- if .value -}}
+  {{ printf "%s: %s" .name (.value | b64enc) }}
+  {{- end -}}
+{{- end -}}
