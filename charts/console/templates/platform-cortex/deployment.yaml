@@ -66,10 +66,9 @@ spec:
       topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.topologySpreadConstraints "context" .) | nindent 8 }}
       {{- end }}
       {{- if .Values.platformCortex.podSecurityContext }}
-      securityContext: {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.containerSecurityContext "context" $) | nindent 10 }}
+      securityContext: {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.podSecurityContext "context" $) | nindent 10 }}
       {{- else }}
       securityContext:
-        readOnlyRootFilesystem: true
         runAsNonRoot: true
       {{- end }}
       {{- if .Values.platformCortex.terminationGracePeriodSeconds }}

@@ -72,7 +72,7 @@ spec:
       topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.platform.topologySpreadConstraints "context" .) | nindent 8 }}
       {{- end }}
       {{- if .Values.platform.podSecurityContext }}
-      securityContext: {{- include "common.tplvalues.render" (dict "value" .Values.platform.containerSecurityContext "context" $) | nindent 10 }}
+      securityContext: {{- include "common.tplvalues.render" (dict "value" .Values.platform.podSecurityContext "context" $) | nindent 10 }}
       {{- else }}
       securityContext:
         runAsNonRoot: true
