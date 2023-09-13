@@ -16,7 +16,7 @@ Return the proper platform cortex image name
 Return the proper Docker Image Registry Secret Names
 */}}
 {{- define "conduktor.imagePullSecrets" -}}
-{{- include "common.images.renderPullSecrets" (dict "images" (list .Values.platform.image) "global" .Values.global) -}}
+{{- include "common.images.renderPullSecrets" (dict "images" (list .Values.platform.image .Values.platformCortex.image) "global" .Values.global "context" $) -}}
 {{- end -}}
 
 {{/*
