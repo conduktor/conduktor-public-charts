@@ -1,0 +1,17 @@
+{{- if .Values.platformCortex.enabled }}
+{{- $serviceName := include "conduktor.platformCortex.fullname" . -}}
+{{- $servicePort := .Values.platformCortex.service.ports.cortex -}}
+{{- $url := printf "http://%v:%v/ready" $serviceName $servicePort }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "common.names.fullname" . }}-test-platform-cortex"
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: curlimages/curl:8.1.2
+      args: [ '--insecure', "--verbose" ,'{{ $url }}']
+  restartPolicy: Never
+{{- end }}
