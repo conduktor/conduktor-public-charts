@@ -213,7 +213,7 @@ platform:
   image:
     registry: docker.io
     repository: conduktor/conduktor-platform
-    tag: 1.17.3
+    tag: nightly
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -674,7 +674,7 @@ platformCortex:
   image:
     registry: docker.io
     repository: conduktor/conduktor-platform-cortex
-    tag: nightly # TODO align with conduktor-platform
+    tag: nightly
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
