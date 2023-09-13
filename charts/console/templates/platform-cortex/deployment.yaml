@@ -1,3 +1,4 @@
+{{- if .Values.platformCortex.enabled }}
 apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
 kind: Deployment
 metadata:
@@ -108,6 +109,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "conduktor.platformCortex.configMapName" . }}
+            - secretRef:
+                name: {{ include "conduktor.platformCortex.secretName" . }}
             {{- if .Values.platformCortex.extraEnvVarsCM }}
             - configMapRef:
                 name: {{ include "common.tplvalues.render" (dict "value" .Values.platformCortex.extraEnvVarsCM "context" $) }}
@@ -116,8 +119,6 @@ spec:
             - secretRef:
                 name: {{ include "common.tplvalues.render" (dict "value" .Values.platformCortex.extraEnvVarsSecret "context" $) }}
             {{- end }}
-            - secretRef:
-                name: {{ include "conduktor.platformCortex.secretName" . }}
           {{- if .Values.platformCortex.resources }}
           resources: {{- toYaml .Values.platformCortex.resources | nindent 12 }}
           {{- end }}
@@ -176,3 +177,4 @@ spec:
         {{- if .Values.platformCortex.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.extraVolumes "context" $) | nindent 8 }}
         {{- end }}
+{{- end }}

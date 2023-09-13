@@ -16,7 +16,7 @@ Return the proper platform cortex image name
 Return the proper Docker Image Registry Secret Names
 */}}
 {{- define "conduktor.imagePullSecrets" -}}
-{{- include "common.images.pullSecrets" (dict "images" (list .Values.platform.image) "global" .Values.global) -}}
+{{- include "common.images.renderPullSecrets" (dict "images" (list .Values.platform.image) "global" .Values.global) -}}
 {{- end -}}
 
 {{/*
@@ -143,9 +143,16 @@ Name of the platform Service
 Platform service internal domain name
 */}}
 {{- define "conduktor.platform.serviceDomain" -}}
-{{- printf "%s.%s.svc.cluster.local" (include "conduktor.platform.serviceName" .) .Release.Namespace -}}
+{{- printf "%s.%s.svc.%s" (include "conduktor.platform.serviceName" .) .Release.Namespace .Values.clusterDomain -}}
 {{- end -}}
 
+{{/*
+Platform external url
+*/}}
+{{- define "conduktor.platform.externalUrl" -}}
+{{- $proto := ternary "https" "http" .Values.ingress.tls -}}
+{{- printf "%s://%s" $proto .Values.ingress.hostname -}}
+{{- end -}}
 
 {{/*
 Name of the platform cortex Service
@@ -158,7 +165,7 @@ Name of the platform cortex Service
 Platform Cortex service internal domain name
 */}}
 {{- define "conduktor.platformCortex.serviceDomain" -}}
-{{- printf "%s.%s.svc.cluster.local" (include "conduktor.platformCortex.serviceName" .) .Release.Namespace -}}
+{{- printf "%s.%s.svc.%s" (include "conduktor.platformCortex.serviceName" .) .Release.Namespace .Values.clusterDomain -}}
 {{- end -}}
 
 {{/*
@@ -227,38 +234,70 @@ Those are warnings and not errors, they are only output in NOTES.txt
 Return platform monitoring api poll rate for clusters. Default to 60s
 */}}
 {{- define "conduktor.monitoring.clustersRefreshInterval" -}}
-{{- $refreshInterval := index .Values "config" "monitoring" "clusters-refresh-interval" -}}
-{{- default "60" $refreshInterval }}
+{{- $refresh := "60" -}}
+{{- if .Values.config.monitoring -}}
+{{- $refresh := (default $refresh (index .Values "config" "monitoring" "clusters-refresh-interval")) }}
+{{- end -}}
+{{- printf "%s" $refresh -}}
 {{- end -}}
 
+{{/*
+Return platform monitoring cortex url. Like http://cortex.nsp.svc.cluster.local:9009/
+*/}}
 {{- define "conduktor.monitoring.cortexUrl" -}}
-{{- $defaultUrl := printf "http://%s:%d/" (include "conduktor.platformCortex.serviceDomain" .) (.Values.platformCortex.service.ports.cortex | int) -}}
-{{- $overrideUrl := index .Values "config" "monitoring" "cortex-url" -}}
-{{- default $defaultUrl $overrideUrl }}
+{{- $url := printf "http://%s:%d/" (include "conduktor.platformCortex.serviceDomain" .) (.Values.platformCortex.service.ports.cortex | int) -}}
+{{- if .Values.config.monitoring -}}
+{{- $url := (default $url (index .Values "config" "monitoring" "cortex-url")) }}
+{{- end -}}
+{{- printf "%s" $url -}}
 {{- end -}}
 
+{{/*
+Return platform monitoring alertmanager url. Like http://cortex.nsp.svc.cluster.local:9010/
+*/}}
 {{- define "conduktor.monitoring.alertManagerUrl" -}}
-{{- $defaultUrl := printf "http://%s:%d/" (include "conduktor.platformCortex.serviceDomain" .) (.Values.platformCortex.service.ports.alertmanager | int)  -}}
-{{- $overrideUrl := index .Values "config" "monitoring" "alert-manager-url" -}}
-{{- default $defaultUrl $overrideUrl }}
+{{- $url := printf "http://%s:%d/" (include "conduktor.platformCortex.serviceDomain" .) (.Values.platformCortex.service.ports.alertmanager | int) -}}
+{{- if .Values.config.monitoring -}}
+{{- $url := (default $url (index .Values "config" "monitoring" "alert-manager-url")) }}
+{{- end -}}
+{{- printf "%s" $url -}}
 {{- end -}}
 
+{{/*
+Return platform monitoring callback url. Like http://platform.nsp.svc.cluster.local:8080/monitoring/api/
+This is used by alertmanager as a webhook to send alerts to the platform
+*/}}
 {{- define "conduktor.monitoring.callbackUrl" -}}
-{{- $defaultUrl := printf "http://%s:%d/monitoring/api/" (include "conduktor.platform.serviceDomain" .) (.Values.service.ports.http | int) -}}
-{{- $overrideUrl := index .Values "config" "monitoring" "callback-url" -}}
-{{- default $defaultUrl $overrideUrl }}
+{{- $url := printf "http://%s:%d/monitoring/api/" (include "conduktor.platform.serviceDomain" .) (.Values.service.ports.http | int) -}}
+{{- if .Values.config.monitoring -}}
+{{- $url := (default $url (index .Values "config" "monitoring" "callback-url")) }}
+{{- end -}}
+{{- printf "%s" $url -}}
 {{- end -}}
 
+{{/*
+Return platform monitoring notification callback url. Like http://conduktor.mydomain.com
+This is used to return on the platform when a user click on a notification.
+If ingress is not enabled, this will return the service internal url instead but notification link will not work.
+*/}}
 {{- define "conduktor.monitoring.notificationsCallbackUrl" -}}
-{{- $ingressUrl := printf "http://%s" .Values.ingress.hostname -}}
+{{- $ingressUrl := (include "conduktor.platform.externalUrl" .) -}}
 {{- $serviceUrl := printf "http://%s:%d" (include "conduktor.platform.serviceDomain" .) (.Values.service.ports.http | int) -}}
-{{- $defaultUrl := ternary $ingressUrl $serviceUrl .Values.ingress.enabled }}
-{{- $overrideUrl := index .Values "config" "monitoring" "notifications-callback-url" -}}
-{{- default $defaultUrl $overrideUrl }}
+{{- $url := ternary $ingressUrl $serviceUrl .Values.ingress.enabled  -}}
+{{- if .Values.config.monitoring -}}
+{{- $url := (default $url (index .Values "config" "monitoring" "notifications-callback-url")) }}
+{{- end -}}
+{{- printf "%s" $url -}}
 {{- end -}}
 
+
+{{/*
+Return platform internal url. Like http://platform.nsp.svc.cluster.local:8080
+*/}}
 {{- define "conduktor.monitoring.consoleUrl" -}}
-{{- $defaultUrl := printf "%s:%d" (include "conduktor.platform.serviceDomain" .) (.Values.service.ports.http | int) }}
-{{- $overrideUrl := index .Values "monitoringConfig" "console-url" -}}
-{{- default $defaultUrl $overrideUrl }}
+{{- $url := printf "%s:%d" (include "conduktor.platform.serviceDomain" .) (.Values.service.ports.http | int) -}}
+{{- if .Values.monitoringConfig -}}
+{{- $url := (default $url (index .Values "monitoringConfig" "console-url")) }}
+{{- end -}}
+{{- printf "%s" $url -}}
 {{- end -}}
