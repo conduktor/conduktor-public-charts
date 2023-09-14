@@ -44,6 +44,7 @@ Current available global Docker image parameters: imageRegistry, imagePullSecret
 | `global.imagePullSecrets` | Global Docker registry secret names as an array | `[]`  |
 | `global.storageClass`     | Global StorageClass for Persistent Volume(s)    | `""`  |
 
+
 ### Common parameters
 
 | Name                     | Description                                                                             | Value           |
@@ -59,28 +60,67 @@ Current available global Docker image parameters: imageRegistry, imagePullSecret
 | `diagnosticMode.command` | Command to override all containers in the deployment                                    | `["sleep"]`     |
 | `diagnosticMode.args`    | Args to override all containers in the deployment                                       | `["infinity"]`  |
 
+
 ### Platform product Parameters
 
 You can paste here your Conduktor Platform Configuration
 
 Refer to our [documentation](https://docs.conduktor.io/platform/configuration/env-variables/) for the full list of product configuration properties.
 
-| Name                                   | Description                                                                                                                                            | Value                          |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------ |
-| `config.organization.name`             | Your Conduktor Platform Organization, you can only set it at install! You will need to change it in the Conduktor Platform UI after the installation   | `""`                           |
-| `config.admin.email`                   | Your Conduktor Platform Admin email, you can only set it at install! You will need to change it in the Conduktor Platform UI after the installation    | `""`                           |
-| `config.admin.password`                | Your Conduktor Platform Admin password, you can only set it at install! You will need to change it in the Conduktor Platform UI after the installation | `""`                           |
-| `config.database.host`                 | Your Conduktor Platform Database host                                                                                                                  | `""`                           |
-| `config.database.port`                 | Your Conduktor Platform Database port                                                                                                                  | `5432`                         |
-| `config.database.name`                 | Your Conduktor Platform Database name                                                                                                                  | `postgres`                     |
-| `config.database.username`             | Your Conduktor Platform Database username                                                                                                              | `""`                           |
-| `config.database.password`             | Your Conduktor Platform Database password                                                                                                              | `""`                           |
-| `config.license`                       | Conduktor Platform Enterprise license, if none given, the product will run in free tier                                                                | `""`                           |
-| `config.existingLicenseSecret`         | Name of an existing secret containing the license                                                                                                      | `""`                           |
-| `config.existingSecret`                | Name of an existing secret containing sensitive configuration                                                                                          | `""`                           |
-| `config.platform.external.url`         | Force the platform to redirect and use this URL (useful when behind a proxy to fix SSO issues)                                                         | `https://platform.example.com` |
-| `config.platform.https.selfSigned`     | Enable HTTPS with a self-signed certificate (not recommended for production) based on 'config.platform.external.url' (required).                       | `false`                        |
-| `config.platform.https.existingSecret` | Enable HTTPS with an existing secret containing the tls.crt and tls.key (required).                                                                    | `""`                           |
+| Name                                   | Description                                                                                                                                            | Value      |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
+| `config.organization.name`             | Your Conduktor Platform Organization, you can only set it at install! You will need to change it in the Conduktor Platform UI after the installation   | `""`       |
+| `config.admin.email`                   | Your Conduktor Platform Admin email, you can only set it at install! You will need to change it in the Conduktor Platform UI after the installation    | `""`       |
+| `config.admin.password`                | Your Conduktor Platform Admin password, you can only set it at install! You will need to change it in the Conduktor Platform UI after the installation | `""`       |
+| `config.database.host`                 | Your Conduktor Platform Database host                                                                                                                  | `""`       |
+| `config.database.port`                 | Your Conduktor Platform Database port                                                                                                                  | `5432`     |
+| `config.database.name`                 | Your Conduktor Platform Database name                                                                                                                  | `postgres` |
+| `config.database.username`             | Your Conduktor Platform Database username                                                                                                              | `""`       |
+| `config.database.password`             | Your Conduktor Platform Database password                                                                                                              | `""`       |
+| `config.license`                       | Conduktor Platform Enterprise license, if none given, the product will run in free tier                                                                | `""`       |
+| `config.existingLicenseSecret`         | Name of an existing secret containing the license                                                                                                      | `""`       |
+| `config.existingSecret`                | Name of an existing secret containing sensitive configuration                                                                                          | `""`       |
+| `config.platform.external.url`         | Force the platform to redirect and use this URL (useful when behind a proxy to fix SSO issues)                                                         | `""`       |
+| `config.platform.https.selfSigned`     | Enable HTTPS with a self-signed certificate (not recommended for production) based on 'config.platform.external.url' (required).                       | `false`    |
+| `config.platform.https.existingSecret` | Enable HTTPS with an existing secret containing the tls.crt and tls.key (required).                                                                    | `""`       |
+
+
+### Platform Monitoring product Parameters
+
+You can paste here your Conduktor Platform Cortex Configuration
+
+Refer to our [documentation](TODO) for the full list of product configuration properties.
+
+| Name                                            | Description                 | Value |
+| ----------------------------------------------- | --------------------------- | ----- |
+| `monitoringConfig.storage.s3`                   | S3 storage configuration    | `{}`  |
+| `monitoringConfig.storage.s3.endpoint`          | S3 endpoint                 |       |
+| `monitoringConfig.storage.s3.region`            | S3 region                   |       |
+| `monitoringConfig.storage.s3.bucket`            | S3 bucket name              |       |
+| `monitoringConfig.storage.s3.insecure`          | S3 insecure                 |       |
+| `monitoringConfig.storage.s3.accessKeyId`       | S3 access key id            |       |
+| `monitoringConfig.storage.s3.secretAccessKey`   | S3 secret access key        |       |
+| `monitoringConfig.storage.gcs`                  | GCS storage configuration   | `{}`  |
+| `monitoringConfig.storage.gcs.bucketName`       | GCS bucket name             |       |
+| `monitoringConfig.storage.gcs.serviceAccount`   | GCS service account         |       |
+| `monitoringConfig.storage.azure`                | Azure storage configuration | `{}`  |
+| `monitoringConfig.storage.azure.accountName`    | Azure account name          |       |
+| `monitoringConfig.storage.azure.accountKey`     | Azure account key           |       |
+| `monitoringConfig.storage.azure.containerName`  | Azure container name        |       |
+| `monitoringConfig.storage.azure.endpointSuffix` | Azure endpoint suffix       |       |
+| `monitoringConfig.storage.swift`                | Swift storage configuration | `{}`  |
+| `monitoringConfig.storage.swift.authUrl`        | Swift auth url              |       |
+| `monitoringConfig.storage.swift.password`       | Swift password              |       |
+| `monitoringConfig.storage.swift.containerName`  | Swift container name        |       |
+| `monitoringConfig.storage.swift.userId`         | Swift user id               |       |
+| `monitoringConfig.storage.swift.username`       | Swift username              |       |
+| `monitoringConfig.storage.swift.userDomainName` | Swift user domain name      |       |
+| `monitoringConfig.storage.swift.userDomainId`   | Swift user domain id        |       |
+| `monitoringConfig.storage.swift.domainId`       | Swift domain id             |       |
+| `monitoringConfig.storage.swift.domainName`     | Swift domain name           |       |
+| `monitoringConfig.storage.swift.projectId`      | Swift project id            |       |
+| `monitoringConfig.storage.swift.regionName`     | Swift region name           |       |
+
 
 ### Platform Deployment Parameters
 
@@ -88,7 +128,7 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/en
 | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
 | `platform.image.registry`                     | Conduktor Platform image registry                                                                                                                             | `docker.io`                    |
 | `platform.image.repository`                   | Conduktor Platform image repository                                                                                                                           | `conduktor/conduktor-platform` |
-| `platform.image.tag`                          | Conduktor Platform image tag (immutable tags are recommended)                                                                                                 | `1.17.3`                       |
+| `platform.image.tag`                          | Conduktor Platform image tag (immutable tags are recommended)                                                                                                 | `1.18.0`                       |
 | `platform.image.digest`                       | Conduktor Platform image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`                           |
 | `platform.image.pullPolicy`                   | Conduktor Platform image pull policy                                                                                                                          | `IfNotPresent`                 |
 | `platform.image.pullSecrets`                  | Conduktor Platform image pull secrets                                                                                                                         | `[]`                           |
@@ -152,6 +192,7 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/en
 | `platform.sidecars`                           | Add additional sidecar containers to the Conduktor Platform pod(s)                                                                                            | `[]`                           |
 | `platform.initContainers`                     | Add additional init containers to the Conduktor Platform pod(s)                                                                                               | `[]`                           |
 
+
 ### Traffic Exposure Parameters
 
 | Name                               | Description                                                                                                                      | Value                    |
@@ -170,7 +211,7 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/en
 | `ingress.pathType`                 | Ingress path type                                                                                                                | `ImplementationSpecific` |
 | `ingress.apiVersion`               | Force Ingress API version (automatically detected if not set)                                                                    | `""`                     |
 | `ingress.hostname`                 | Default host for the ingress record                                                                                              | `platform.local`         |
-| `ingress.ingressClassName`         | IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)                                                    | `""`                     |
+| `ingress.ingressClassName`         | IngressClass that will be used to implement the Ingress (Kubernetes 1.18+)                                                       | `""`                     |
 | `ingress.path`                     | Default path for the ingress record                                                                                              | `/`                      |
 | `ingress.annotations`              | Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations. | `{}`                     |
 | `ingress.tls`                      | Enable TLS configuration for the host defined at `ingress.hostname` parameter                                                    | `false`                  |
@@ -181,6 +222,7 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/en
 | `ingress.secrets`                  | Custom TLS certificates as secrets                                                                                               | `[]`                     |
 | `ingress.extraRules`               | Additional rules to be covered with this ingress record                                                                          | `[]`                     |
 
+
 ### Other Parameters
 
 | Name                                          | Description                                                      | Value  |
@@ -189,6 +231,96 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/en
 | `serviceAccount.name`                         | The name of the ServiceAccount to use.                           | `""`   |
 | `serviceAccount.annotations`                  | Additional Service Account annotations (evaluated as a template) | `{}`   |
 | `serviceAccount.automountServiceAccountToken` | Automount service account token for the server service account   | `true` |
+
+
+### Platform Cortex Parameters
+
+| Name                                                | Description                                                                                                                                                          | Value                                 |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| `platformCortex.enabled`                            | Enable Conduktor Platform Cortex                                                                                                                                     | `true`                                |
+| `platformCortex.image.registry`                     | Conduktor Platform Cortex image registry                                                                                                                             | `docker.io`                           |
+| `platformCortex.image.repository`                   | Conduktor Platform Cortex image repository                                                                                                                           | `conduktor/conduktor-platform-cortex` |
+| `platformCortex.image.tag`                          | Conduktor Platform Cortex image tag (immutable tags are recommended)                                                                                                 | `1.18.0`                              |
+| `platformCortex.image.digest`                       | Conduktor Platform Cortex image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`                                  |
+| `platformCortex.image.pullPolicy`                   | Conduktor Platform Cortex image pull policy                                                                                                                          | `IfNotPresent`                        |
+| `platformCortex.image.pullSecrets`                  | Conduktor Platform Cortex image pull secrets                                                                                                                         | `[]`                                  |
+| `platformCortex.image.debug`                        | Enable Conduktor Platform Cortex image debug mode                                                                                                                    | `false`                               |
+| `platformCortex.replicaCount`                       | Number of Conduktor Platform replicas to deploy                                                                                                                      | `1`                                   |
+| `platformCortex.containerPorts.cortex`              | Conduktor Platform Cortex HTTP (or HTTPS if configured) container port                                                                                               | `9009`                                |
+| `platformCortex.containerPorts.alertmanager`        | Conduktor Platform AlertManager HTTP (or HTTPS if configured) container port                                                                                         | `9010`                                |
+| `platformCortex.containerPorts.prometheus`          | Conduktor Platform Prometheus HTTP (or HTTPS if configured) container port                                                                                           | `9090`                                |
+| `platformCortex.livenessProbe.enabled`              | Enable livenessProbe on Conduktor Platform Cortex containers                                                                                                         | `true`                                |
+| `platformCortex.livenessProbe.initialDelaySeconds`  | Initial delay seconds for livenessProbe                                                                                                                              | `30`                                  |
+| `platformCortex.livenessProbe.periodSeconds`        | Period seconds for livenessProbe                                                                                                                                     | `10`                                  |
+| `platformCortex.livenessProbe.timeoutSeconds`       | Timeout seconds for livenessProbe                                                                                                                                    | `5`                                   |
+| `platformCortex.livenessProbe.failureThreshold`     | Failure threshold for livenessProbe                                                                                                                                  | `3`                                   |
+| `platformCortex.livenessProbe.successThreshold`     | Success threshold for livenessProbe                                                                                                                                  | `1`                                   |
+| `platformCortex.readinessProbe.enabled`             | Enable readinessProbe on Conduktor Platform Cortex containers                                                                                                        | `true`                                |
+| `platformCortex.readinessProbe.initialDelaySeconds` | Initial delay seconds for readinessProbe                                                                                                                             | `30`                                  |
+| `platformCortex.readinessProbe.periodSeconds`       | Period seconds for readinessProbe                                                                                                                                    | `10`                                  |
+| `platformCortex.readinessProbe.timeoutSeconds`      | Timeout seconds for readinessProbe                                                                                                                                   | `5`                                   |
+| `platformCortex.readinessProbe.failureThreshold`    | Failure threshold for readinessProbe                                                                                                                                 | `3`                                   |
+| `platformCortex.readinessProbe.successThreshold`    | Success threshold for readinessProbe                                                                                                                                 | `1`                                   |
+| `platformCortex.startupProbe.enabled`               | Enable startupProbe on Conduktor Platform Cortex containers                                                                                                          | `false`                               |
+| `platformCortex.startupProbe.initialDelaySeconds`   | Initial delay seconds for startupProbe                                                                                                                               | `10`                                  |
+| `platformCortex.startupProbe.periodSeconds`         | Period seconds for startupProbe                                                                                                                                      | `10`                                  |
+| `platformCortex.startupProbe.timeoutSeconds`        | Timeout seconds for startupProbe                                                                                                                                     | `5`                                   |
+| `platformCortex.startupProbe.failureThreshold`      | Failure threshold for startupProbe                                                                                                                                   | `10`                                  |
+| `platformCortex.startupProbe.successThreshold`      | Success threshold for startupProbe                                                                                                                                   | `1`                                   |
+| `platformCortex.customLivenessProbe`                | Custom livenessProbe that overrides the default one                                                                                                                  | `{}`                                  |
+| `platformCortex.customReadinessProbe`               | Custom readinessProbe that overrides the default one                                                                                                                 | `{}`                                  |
+| `platformCortex.customStartupProbe`                 | Custom startupProbe that overrides the default one                                                                                                                   | `{}`                                  |
+| `platformCortex.resources.limits.cpu`               | CPU limit for the platform cortex container                                                                                                                          | `1000m`                               |
+| `platformCortex.resources.limits.memory`            | Memory limit for the container                                                                                                                                       | `500Mi`                               |
+| `platformCortex.resources.requests.cpu`             | CPU resource requests                                                                                                                                                | `500m`                                |
+| `platformCortex.resources.requests.memory`          | Memory resource requests                                                                                                                                             | `200Mi`                               |
+| `platformCortex.podSecurityContext`                 | Conduktor Platform Cortex Pod Security Context                                                                                                                       | `{}`                                  |
+| `platformCortex.containerSecurityContext`           | Conduktor Platform Cortex containers' Security Context                                                                                                               | `{}`                                  |
+| `platformCortex.existingConfigmap`                  | The name of an existing ConfigMap with your custom configuration for Conduktor Platform Cortex                                                                       | `""`                                  |
+| `platformCortex.existingSecret`                     | The name of an existing Secret with your custom configuration for Conduktor Platform Cortex                                                                          | `""`                                  |
+| `platformCortex.command`                            | Override default container command (useful when using custom images)                                                                                                 | `[]`                                  |
+| `platformCortex.args`                               | Override default container args (useful when using custom images)                                                                                                    | `[]`                                  |
+| `platformCortex.hostAliases`                        | Conduktor Platform Cortex pods host aliases                                                                                                                          | `[]`                                  |
+| `platformCortex.podLabels`                          | Extra labels for Conduktor Platform Cortex pods                                                                                                                      | `{}`                                  |
+| `platformCortex.podAnnotations`                     | Annotations for Conduktor Platform Cortex pods                                                                                                                       | `{}`                                  |
+| `platformCortex.podAffinityPreset`                  | Pod affinity preset. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`                                                                         | `""`                                  |
+| `platformCortex.podAntiAffinityPreset`              | Pod anti-affinity preset. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`                                                                    | `soft`                                |
+| `platformCortex.nodeAffinityPreset.type`            | Node affinity preset type. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`                                                                   | `""`                                  |
+| `platformCortex.nodeAffinityPreset.key`             | Node label key to match. Ignored if `platform.affinity` is set                                                                                                       | `""`                                  |
+| `platformCortex.nodeAffinityPreset.values`          | Node label values to match. Ignored if `platform.affinity` is set                                                                                                    | `[]`                                  |
+| `platformCortex.affinity`                           | Affinity for Conduktor Platform cortex pods assignment                                                                                                               | `{}`                                  |
+| `platformCortex.nodeSelector`                       | Node labels for Conduktor Platform Cortex pods assignment                                                                                                            | `{}`                                  |
+| `platformCortex.tolerations`                        | Tolerations for Conduktor Platform Cortex pods assignment                                                                                                            | `[]`                                  |
+| `platformCortex.updateStrategy.type`                | Conduktor Platform Cortex statefulset strategy type                                                                                                                  | `RollingUpdate`                       |
+| `platformCortex.priorityClassName`                  | Conduktor Platform Cortex pods' priorityClassName                                                                                                                    | `""`                                  |
+| `platformCortex.topologySpreadConstraints`          | Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template                                             | `[]`                                  |
+| `platformCortex.schedulerName`                      | Name of the k8s scheduler (other than default) for Conduktor Platform Cortex pods                                                                                    | `""`                                  |
+| `platformCortex.terminationGracePeriodSeconds`      | Seconds Redmine pod needs to terminate gracefully                                                                                                                    | `""`                                  |
+| `platformCortex.lifecycleHooks`                     | for the Conduktor Platform Cortex container(s) to automate configuration before or after startup                                                                     | `{}`                                  |
+| `platformCortex.extraEnvVars`                       | Array with extra environment variables to add to Conduktor Platform Cortex nodes                                                                                     | `[]`                                  |
+| `platformCortex.extraEnvVarsCM`                     | Name of existing ConfigMap containing extra env vars for Conduktor Platform Cortex nodes                                                                             | `""`                                  |
+| `platformCortex.extraEnvVarsSecret`                 | Name of existing Secret containing extra env vars for Conduktor Platform Cortex nodes                                                                                | `""`                                  |
+| `platformCortex.dataVolume`                         | Configure the data volume to store Conduktor Platform Cortex data                                                                                                    | `{}`                                  |
+| `platformCortex.tmpVolume`                          | Configure the /tmp volume which store various data related to running services                                                                                       | `{}`                                  |
+| `platformCortex.extraVolumes`                       | Optionally specify extra list of additional volumes for the Conduktor Platform Cortex pod(s)                                                                         | `[]`                                  |
+| `platformCortex.extraVolumeMounts`                  | Optionally specify extra list of additional volumeMounts for the Conduktor Platform Cortex container(s)                                                              | `[]`                                  |
+| `platformCortex.sidecars`                           | Add additional sidecar containers to the Conduktor Platform Cortex pod(s)                                                                                            | `[]`                                  |
+| `platformCortex.initContainers`                     | Add additional init containers to the Conduktor Platform Cortex pod(s)                                                                                               | `[]`                                  |
+| `platformCortex.service.type`                       | Conduktor Platform Cortex service type                                                                                                                               | `ClusterIP`                           |
+| `platformCortex.service.ports.cortex`               | Conduktor Platform Cortex service HTTP port                                                                                                                          | `9009`                                |
+| `platformCortex.service.ports.alertmanager`         | Conduktor Platform Cortex AlertManager service HTTP port                                                                                                             | `9010`                                |
+| `platformCortex.service.ports.prometheus`           | Conduktor Platform Cortex Prometheus service HTTP port                                                                                                               | `9090`                                |
+| `platformCortex.service.nodePorts.cortex`           | Node port for Cortex HTTP                                                                                                                                            | `""`                                  |
+| `platformCortex.service.nodePorts.alertmanager`     | Node port for AlertManager HTTP                                                                                                                                      | `""`                                  |
+| `platformCortex.service.nodePorts.prometheus`       | Node port for Prometheus HTTP                                                                                                                                        | `""`                                  |
+| `platformCortex.service.clusterIP`                  | Conduktor Platform Cortex service Cluster IP                                                                                                                         | `""`                                  |
+| `platformCortex.service.loadBalancerSourceRanges`   | Conduktor Platform Cortex service Load Balancer sources                                                                                                              | `[]`                                  |
+| `platformCortex.service.externalTrafficPolicy`      | Conduktor Platform Cortex service external traffic policy                                                                                                            | `Cluster`                             |
+| `platformCortex.service.annotations`                | Additional custom annotations for Conduktor Platform Cortex service                                                                                                  | `{}`                                  |
+| `platformCortex.service.extraPorts`                 | Extra ports to expose in Conduktor Platform Cortex service (normally used with the `sidecars` value)                                                                 | `[]`                                  |
+| `platformCortex.service.sessionAffinity`            | Control where client requests go, to the same pod or round-robin                                                                                                     | `None`                                |
+| `platformCortex.service.sessionAffinityConfig`      | Additional settings for the sessionAffinity                                                                                                                          | `{}`                                  |
+
 
 ## Snippets
 

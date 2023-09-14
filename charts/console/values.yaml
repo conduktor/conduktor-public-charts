@@ -136,12 +136,13 @@ config:
 monitoringConfig:
   storage:
     ## S3 storage configuration
-    ## @param monitoringConfig.storage.s3.endpoint S3 endpoint
-    ## @param monitoringConfig.storage.s3.region S3 region
-    ## @param monitoringConfig.storage.s3.bucket S3 bucket name
-    ## @param monitoringConfig.storage.s3.insecure S3 insecure
-    ## @param monitoringConfig.storage.s3.accessKeyId S3 access key id
-    ## @param monitoringConfig.storage.s3.secretAccessKey S3 secret access key
+    ## @param monitoringConfig.storage.s3 S3 storage configuration
+    ## @extra monitoringConfig.storage.s3.endpoint S3 endpoint
+    ## @extra monitoringConfig.storage.s3.region S3 region
+    ## @extra monitoringConfig.storage.s3.bucket S3 bucket name
+    ## @extra monitoringConfig.storage.s3.insecure S3 insecure
+    ## @extra monitoringConfig.storage.s3.accessKeyId S3 access key id
+    ## @extra monitoringConfig.storage.s3.secretAccessKey S3 secret access key
     s3: {}
     ##  endpoint: ""
     ##  region: ""
@@ -151,17 +152,19 @@ monitoringConfig:
     ##  secretAccessKey: ""
 
     ## GCS storage configuration
-    ## @param monitoringConfig.storage.gcs.bucketName GCS bucket name
-    ## @param monitoringConfig.storage.gcs.serviceAccount GCS service account
+    ## @param monitoringConfig.storage.gcs GCS storage configuration
+    ## @extra monitoringConfig.storage.gcs.bucketName GCS bucket name
+    ## @extra monitoringConfig.storage.gcs.serviceAccount GCS service account
     gcs: {}
     ##  bucketName: ""
     ##  serviceAccount: ""
 
     ## Azure storage configuration
-    ## @param monitoringConfig.storage.azure.accountName Azure account name
-    ## @param monitoringConfig.storage.azure.accountKey Azure account key
-    ## @param monitoringConfig.storage.azure.containerName Azure container name
-    ## @param monitoringConfig.storage.azure.endpointSuffix Azure endpoint suffix
+    ## @param monitoringConfig.storage.azure Azure storage configuration
+    ## @extra monitoringConfig.storage.azure.accountName Azure account name
+    ## @extra monitoringConfig.storage.azure.accountKey Azure account key
+    ## @extra monitoringConfig.storage.azure.containerName Azure container name
+    ## @extra monitoringConfig.storage.azure.endpointSuffix Azure endpoint suffix
     azure: {}
     ##  accountName: ""
     ##  accountKey: ""
@@ -169,17 +172,18 @@ monitoringConfig:
     ##  endpointSuffix: "blob.core.windows.net"
 
     ## Swift storage configuration
-    ## @param monitoringConfig.storage.swift.authUrl Swift auth url
-    ## @param monitoringConfig.storage.swift.password Swift password
-    ## @param monitoringConfig.storage.swift.containerName Swift container name
-    ## @param monitoringConfig.storage.swift.userId Swift user id
-    ## @param monitoringConfig.storage.swift.username Swift username
-    ## @param monitoringConfig.storage.swift.userDomainName Swift user domain name
-    ## @param monitoringConfig.storage.swift.userDomainId Swift user domain id
-    ## @param monitoringConfig.storage.swift.domainId Swift domain id
-    ## @param monitoringConfig.storage.swift.domainName Swift domain name
-    ## @param monitoringConfig.storage.swift.projectId Swift project id
-    ## @param monitoringConfig.storage.swift.regionName Swift region name
+    ## @param monitoringConfig.storage.swift Swift storage configuration
+    ## @extra monitoringConfig.storage.swift.authUrl Swift auth url
+    ## @extra monitoringConfig.storage.swift.password Swift password
+    ## @extra monitoringConfig.storage.swift.containerName Swift container name
+    ## @extra monitoringConfig.storage.swift.userId Swift user id
+    ## @extra monitoringConfig.storage.swift.username Swift username
+    ## @extra monitoringConfig.storage.swift.userDomainName Swift user domain name
+    ## @extra monitoringConfig.storage.swift.userDomainId Swift user domain id
+    ## @extra monitoringConfig.storage.swift.domainId Swift domain id
+    ## @extra monitoringConfig.storage.swift.domainName Swift domain name
+    ## @extra monitoringConfig.storage.swift.projectId Swift project id
+    ## @extra monitoringConfig.storage.swift.regionName Swift region name
     swift: {}
     ##  authUrl: ""
     ##  password: ""
@@ -882,7 +886,7 @@ platformCortex:
   ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
   ##
   schedulerName: ""
-  ## @param platform.terminationGracePeriodSeconds Seconds Redmine pod needs to terminate gracefully
+  ## @param platformCortex.terminationGracePeriodSeconds Seconds Redmine pod needs to terminate gracefully
   ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods
   ##
   terminationGracePeriodSeconds: ""
@@ -941,7 +945,7 @@ platformCortex:
   ## Conduktor Platform Cortex service parameters
   ##
   service:
-    ## @param service.type Conduktor Platform Cortex service type
+    ## @param platformCortex.service.type Conduktor Platform Cortex service type
     ##
     # among ClusterIP, NodePort, LoadBalancer
     type: ClusterIP
