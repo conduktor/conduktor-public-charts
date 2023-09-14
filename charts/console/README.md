@@ -44,7 +44,6 @@ Current available global Docker image parameters: imageRegistry, imagePullSecret
 | `global.imagePullSecrets` | Global Docker registry secret names as an array | `[]`  |
 | `global.storageClass`     | Global StorageClass for Persistent Volume(s)    | `""`  |
 
-
 ### Common parameters
 
 | Name                     | Description                                                                             | Value           |
@@ -59,7 +58,6 @@ Current available global Docker image parameters: imageRegistry, imagePullSecret
 | `diagnosticMode.enabled` | Enable diagnostic mode (all probes will be disabled and the command will be overridden) | `false`         |
 | `diagnosticMode.command` | Command to override all containers in the deployment                                    | `["sleep"]`     |
 | `diagnosticMode.args`    | Args to override all containers in the deployment                                       | `["infinity"]`  |
-
 
 ### Platform product Parameters
 
@@ -83,7 +81,6 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/en
 | `config.platform.external.url`         | Force the platform to redirect and use this URL (useful when behind a proxy to fix SSO issues)                                                         | `""`       |
 | `config.platform.https.selfSigned`     | Enable HTTPS with a self-signed certificate (not recommended for production) based on 'config.platform.external.url' (required).                       | `false`    |
 | `config.platform.https.existingSecret` | Enable HTTPS with an existing secret containing the tls.crt and tls.key (required).                                                                    | `""`       |
-
 
 ### Platform Monitoring product Parameters
 
@@ -120,7 +117,6 @@ Refer to our [documentation](TODO) for the full list of product configuration pr
 | `monitoringConfig.storage.swift.domainName`     | Swift domain name           |       |
 | `monitoringConfig.storage.swift.projectId`      | Swift project id            |       |
 | `monitoringConfig.storage.swift.regionName`     | Swift region name           |       |
-
 
 ### Platform Deployment Parameters
 
@@ -192,7 +188,6 @@ Refer to our [documentation](TODO) for the full list of product configuration pr
 | `platform.sidecars`                           | Add additional sidecar containers to the Conduktor Platform pod(s)                                                                                            | `[]`                           |
 | `platform.initContainers`                     | Add additional init containers to the Conduktor Platform pod(s)                                                                                               | `[]`                           |
 
-
 ### Traffic Exposure Parameters
 
 | Name                               | Description                                                                                                                      | Value                    |
@@ -222,7 +217,6 @@ Refer to our [documentation](TODO) for the full list of product configuration pr
 | `ingress.secrets`                  | Custom TLS certificates as secrets                                                                                               | `[]`                     |
 | `ingress.extraRules`               | Additional rules to be covered with this ingress record                                                                          | `[]`                     |
 
-
 ### Other Parameters
 
 | Name                                          | Description                                                      | Value  |
@@ -231,7 +225,6 @@ Refer to our [documentation](TODO) for the full list of product configuration pr
 | `serviceAccount.name`                         | The name of the ServiceAccount to use.                           | `""`   |
 | `serviceAccount.annotations`                  | Additional Service Account annotations (evaluated as a template) | `{}`   |
 | `serviceAccount.automountServiceAccountToken` | Automount service account token for the server service account   | `true` |
-
 
 ### Platform Cortex Parameters
 
