@@ -902,6 +902,14 @@ platformCortex:
   ## @param platformCortex.extraEnvVarsSecret Name of existing Secret containing extra env vars for Conduktor Platform Cortex nodes
   ##
   extraEnvVarsSecret: ""
+  ## @param platformCortex.dataVolume Configure the data volume to store Conduktor Platform Cortex data
+  ## default:
+  ##  emptyDir: {}
+  dataVolume: {}
+  ## @param platformCortex.tmpVolume Configure the /tmp volume which store various data related to running services
+  ## default:
+  ##  emptyDir: {}
+  tmpVolume: {}
   ## @param platformCortex.extraVolumes Optionally specify extra list of additional volumes for the Conduktor Platform Cortex pod(s)
   ##
   extraVolumes: []

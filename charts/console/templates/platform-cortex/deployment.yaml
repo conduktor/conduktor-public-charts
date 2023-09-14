@@ -173,9 +173,17 @@ spec:
         {{- end }}
       volumes:
         - name: data
+          {{- if .Values.platformCortex.dataVolume }}
+          {{- include "common.tplvalues.render" ( dict "value" .Values.platformCortex.dataVolume "context" $) | nindent 10 }}
+          {{- else }}
           emptyDir: {}
+          {{- end }}
         - name: tmp
+          {{- if .Values.platformCortex.tmpVolume }}
+          {{- include "common.tplvalues.render" ( dict "value" .Values.platformCortex.tmpVolume "context" $) | nindent 10 }}
+          {{- else }}
           emptyDir: {}
+          {{- end }}
         {{- if .Values.platformCortex.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.extraVolumes "context" $) | nindent 8 }}
         {{- end }}
