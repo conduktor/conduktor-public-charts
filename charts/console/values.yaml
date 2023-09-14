@@ -303,12 +303,12 @@ platform:
       ## @param platform.resources.limits.cpu CPU limit for the platform container
       cpu: 4000m
       ## @param platform.resources.limits.memory Memory limit for the container
-      memory: 8Gi
+      memory: 4Gi
     requests:
       ## @param platform.resources.requests.cpu CPU resource requests
       cpu: 2000m
       ## @param platform.resources.requests.memory Memory resource requests
-      memory: 4Gi
+      memory: 2Gi
   ## @param platform.podSecurityContext Conduktor Platform Pod Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## default:
