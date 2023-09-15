@@ -75,8 +75,8 @@ ingress:
 
 platform:
   startupProbe:
-    initialDelaySeconds: 60 # extra delay because of limited cpu resources
-  terminationGracePeriodSeconds: 0 # quick kill between tests
+    initialDelaySeconds: 60  # extra delay because of limited cpu resources
+  terminationGracePeriodSeconds: 0  # quick kill between tests
   resources:
     limits:
       cpu: 1500m
