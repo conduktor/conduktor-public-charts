@@ -74,12 +74,25 @@ ingress:
         -----END PRIVATE KEY-----
 
 platform:
+  startupProbe:
+    initialDelaySeconds: 60 # extra delay because of limited cpu resources
+  terminationGracePeriodSeconds: 0 # quick kill between tests
   resources:
     limits:
       cpu: 1500m
       memory: 3Gi
     requests:
-      cpu: 1000m
+      cpu: 500m
       memory: 2Gi
+
+platformCortex:
+  resources:
+    limits:
+      cpu: 500m
+      memory: 400Mi
+    requests:
+      cpu: 200m
+      memory: 200Mi
+
 tests:
   enabled: true

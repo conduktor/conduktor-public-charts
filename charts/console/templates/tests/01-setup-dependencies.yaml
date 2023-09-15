@@ -97,8 +97,8 @@ spec:
             timeoutSeconds: 5
           resources:
             requests:
-              cpu: 250m
-              memory: 256Mi
+              cpu: 100m
+              memory: 128Mi
           securityContext:
             runAsUser: 1001
           terminationMessagePath: /dev/termination-log
@@ -109,7 +109,7 @@ spec:
       restartPolicy: Always
       securityContext:
         fsGroup: 1001
-      terminationGracePeriodSeconds: 30
+      terminationGracePeriodSeconds: 0
       volumes:
         - emptyDir:
             medium: Memory
@@ -220,8 +220,8 @@ spec:
             failureThreshold: 5
           resources:
             requests:
-              cpu: 250m
-              memory: 256Mi
+              cpu: 150m
+              memory: 200Mi
           securityContext:
             runAsUser: 1001
             runAsNonRoot: true
@@ -233,7 +233,7 @@ spec:
       restartPolicy: Always
       securityContext:
         fsGroup: 1001
-      terminationGracePeriodSeconds: 30
+      terminationGracePeriodSeconds: 0
       volumes:
         - emptyDir:
             medium: Memory
