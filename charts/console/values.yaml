@@ -642,21 +642,6 @@ serviceAccount:
   ##
   automountServiceAccountToken: true
 
-## @skip tests
-tests:
-  enabled: false
-  # secrets:
-  #    - name: cdkt-test-04
-  #      type: Opaque
-  #      stringData:
-  #        CDK_ORGANIZATION_NAME: conduktor
-  #        CDK_ADMIN_EMAIL: admin@conduktor.io
-  #        CDK_ADMIN_PASSWORD: admin
-  #        CDK_DATABASE_PASSWORD: conduktor123
-  #        CDK_DATABASE_USERNAME: postgres
-  secrets: []
-
-
 ## @section Platform Cortex Parameters
 ##
 ## Conduktor Platform Cortex container configuration
@@ -1000,3 +985,18 @@ platformCortex:
     ##     timeoutSeconds: 300
     ##
     sessionAffinityConfig: {}
+
+## @skip tests
+tests:
+  enabled: false
+  minio: false
+  # secrets:
+  #    - name: cdkt-test-04
+  #      type: Opaque
+  #      stringData:
+  #        CDK_ORGANIZATION_NAME: conduktor
+  #        CDK_ADMIN_EMAIL: admin@conduktor.io
+  #        CDK_ADMIN_PASSWORD: admin
+  #        CDK_DATABASE_PASSWORD: conduktor123
+  #        CDK_DATABASE_USERNAME: postgres
+  secrets: []

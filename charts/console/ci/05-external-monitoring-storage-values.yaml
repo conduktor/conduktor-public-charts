@@ -1,0 +1,41 @@
+# Test is checking:
+# - basic usage of the chart is working with external monitoring storage
+nameOverride: cdkt-test-05
+config:
+  organization:
+    name: conduktor
+  admin:
+    email: admin@conduktor.io
+    password: admin
+
+  database:
+    name: platform
+    host: postgresql-hl
+    password: conduktor123
+    port: 5432
+    username: postgres
+
+monitoringConfig:
+  storage:
+    s3:
+      endpoint: "minio:9000"
+      bucket: "conduktor"
+      accessKeyId: "admin"
+      secretAccessKey: "conduktor123"
+      insecure: true
+
+platform:
+  resources:
+    limits:
+      cpu: 1500m
+      memory: 3Gi
+    requests:
+      cpu: 1000m
+      memory: 2Gi
+
+platformCortex:
+  enabled: true
+
+tests:
+  enabled: true
+  minio: true

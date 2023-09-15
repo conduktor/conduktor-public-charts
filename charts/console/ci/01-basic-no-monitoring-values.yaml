@@ -1,5 +1,5 @@
 # Test is checking:
-# - basic usage of the chart is working
+# - basic usage of the chart is working without monitoring pod
 # - usage of a persistent volume instead of emptyDir volume for dataVolume
 nameOverride: cdkt-test-01
 config:
@@ -26,6 +26,10 @@ platform:
   dataVolume:
     persistentVolumeClaim:
       claimName: pv-claim
+
+platformCortex:
+  enabled: false
+
 tests:
   enabled: true
 

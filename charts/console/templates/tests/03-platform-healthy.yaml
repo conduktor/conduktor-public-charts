@@ -14,7 +14,7 @@ metadata:
     "helm.sh/hook": test
 spec:
   containers:
-    - name: wget
+    - name: curl-platform
       image: curlimages/curl:8.1.2
       args: [ '--insecure', "--verbose" ,'{{ $url }}']
   restartPolicy: Never

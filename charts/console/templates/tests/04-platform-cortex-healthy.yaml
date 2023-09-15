@@ -1,7 +1,11 @@
 {{- if .Values.platformCortex.enabled }}
 {{- $serviceName := include "conduktor.platformCortex.fullname" . -}}
-{{- $servicePort := .Values.platformCortex.service.ports.cortex -}}
-{{- $url := printf "http://%v:%v/ready" $serviceName $servicePort }}
+{{- $cortexPort := .Values.platformCortex.service.ports.cortex -}}
+{{- $alertManagerPort := .Values.platformCortex.service.ports.alertmanager -}}
+{{- $prometheusPort := .Values.platformCortex.service.ports.prometheus -}}
+{{- $cortexUrl := printf "http://%v:%v/ready" $serviceName $cortexPort }}
+{{- $alertManagerUrl := printf "http://%v:%v/ready" $serviceName $alertManagerPort }}
+{{- $prometheusUrl := printf "http://%v:%v/-/healthy" $serviceName $prometheusPort }}
 apiVersion: v1
 kind: Pod
 metadata:
@@ -10,8 +14,14 @@ metadata:
     "helm.sh/hook": test
 spec:
   containers:
-    - name: wget
+    - name: curl-cortex
       image: curlimages/curl:8.1.2
-      args: [ '--insecure', "--verbose" ,'{{ $url }}']
+      args: [ '--insecure', "--verbose" ,'{{ $cortexUrl }}']
+    - name: curl-alertmanager
+      image: curlimages/curl:8.1.2
+      args: [ '--insecure', "--verbose" ,'{{ $alertManagerUrl }}']
+    - name: curl-prometheus
+      image: curlimages/curl:8.1.2
+      args: [ '--insecure', "--verbose" ,'{{ $prometheusUrl }}']
   restartPolicy: Never
 {{- end }}
