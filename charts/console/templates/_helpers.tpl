@@ -110,7 +110,11 @@ Name of the platform secret
 Name of the platform cortex secret
 */}}
 {{- define "conduktor.platformCortex.secretName" -}}
+    {{- if .Values.monitoringConfig.existingSecret -}}
+    {{- .Values.monitoringConfig.existingSecret -}}
+    {{- else -}}
     {{- printf "%s-%s" (include "common.names.fullname" .) "cortex" | trunc 63 | trimSuffix "-" -}}
+    {{- end -}}
 {{- end -}}
 
 {{/*

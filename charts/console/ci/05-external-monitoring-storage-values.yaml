@@ -16,6 +16,7 @@ config:
     username: postgres
 
 monitoringConfig:
+  existingSecret: cdkt-test-05
   storage:
     s3:
       endpoint: "minio:9000"
@@ -43,13 +44,12 @@ platformCortex:
     requests:
       cpu: 200m
       memory: 200Mi
-  extraEnvVarsSecret: cdkt-test-05-extra
 
 tests:
   enabled: true
   minio: true
   secrets:
-    - name: cdkt-test-05-extra
+    - name: cdkt-test-05
       type: Opaque
       stringData:
         CDK_MONITORING_STORAGE_S3_ACCESSKEYID: "admin"

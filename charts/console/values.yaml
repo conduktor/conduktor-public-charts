@@ -134,6 +134,18 @@ config:
 ## @descriptionEnd
 
 monitoringConfig:
+  ## @param monitoringConfig.existingSecret The name of an existing Secret with your custom configuration for Conduktor Platform Cortex
+  ##
+  ## NOTE: If set, corresponding secrets keys are ignored in monitoringConfig.storage
+  ## The secret must contain the following keys:
+  ## CDK_MONITORING_STORAGE_S3_ACCESSKEYID and CDK_MONITORING_STORAGE_S3_SECRETACCESSKEY
+  ## or
+  ## CDK_MONITORING_STORAGE_GCS_SERVICEACCOUNT
+  ## or
+  ## CDK_MONITORING_STORAGE_AZURE_ACCOUNTNAME and CDK_MONITORING_STORAGE_AZURE_ACCOUNTKEY
+  ## or
+  ## CDK_MONITORING_STORAGE_SWIFT_PASSWORD and CDK_MONITORING_STORAGE_SWIFT_USERID or CDK_MONITORING_STORAGE_SWIFT_USERNAME
+  existingSecret: ""
   storage:
     ## S3 storage configuration
     ## @param monitoringConfig.storage.s3 S3 storage configuration
@@ -625,7 +637,7 @@ ingress:
 ## @section Other Parameters
 ##
 
-## ServiceAccount configuration
+## ServiceAccount configuration for the Conduktor Platform pods
 ##
 serviceAccount:
   ## @param serviceAccount.create Specifies whether a ServiceAccount should be created
@@ -782,18 +794,6 @@ platformCortex:
   ## @param platformCortex.existingConfigmap The name of an existing ConfigMap with your custom configuration for Conduktor Platform Cortex
   ##
   existingConfigmap: ""
-  ## @param platformCortex.existingSecret The name of an existing Secret with your custom configuration for Conduktor Platform Cortex
-  ##
-  ## NOTE: If set, corresponding secrets keys are ignored in monitoringConfig.storage
-  ## The secret must contain the following keys:
-  ## CDK_MONITORING_STORAGE_S3_ACCESSKEYID and CDK_MONITORING_STORAGE_S3_SECRETACCESSKEY
-  ## or
-  ## CDK_MONITORING_STORAGE_GCS_SERVICEACCOUNT
-  ## or
-  ## CDK_MONITORING_STORAGE_AZURE_ACCOUNTNAME and CDK_MONITORING_STORAGE_AZURE_ACCOUNTKEY
-  ## or
-  ## CDK_MONITORING_STORAGE_SWIFT_PASSWORD and CDK_MONITORING_STORAGE_SWIFT_USERID or CDK_MONITORING_STORAGE_SWIFT_USERNAME
-  existingSecret: ""
 
   ## @param platformCortex.command Override default container command (useful when using custom images)
   ##

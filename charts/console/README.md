@@ -326,6 +326,7 @@ console, we recommend you to look at our
 - [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
 - [Install with a registered kafka cluster](#install-with-a-kafka-cluster)
 - [Install with an enterprise license](#install-with-an-enterprise-license)
+- [Install without Conduktor monitoring](#install-without-conduktor-monitoring)
 
 ### Kubernetes configuration 
 
@@ -337,6 +338,7 @@ console, we recommend you to look at our
 - [Store console data into a PersistentVolume](#store-platform-data-into-a-persistent-volume)
 
 - [Provide credentials as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
+- [Provide monitoring configuration as a Kubernetes Secret](#provide-monitoring-configuration-as-a-kubernetes-secret)
 - [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
 - [Provide the license as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
 
@@ -420,6 +422,28 @@ config:
         url: 'http://my-schema-registry:8081'
 ```
 
+### Install without Conduktor monitoring
+
+```yaml
+config:
+  organization:
+    name: "my-org"
+
+  admin:
+    email: "admin@my-org.com"
+    password: "admin"
+
+  database:
+    host: ''
+    port: 5432
+    name: 'postgres'
+    username: ''
+    password: ''
+
+platformCortex:
+  enabled: false
+```
+
 ### Provide the license as a Kubernetes Secret
 
 This snippet expects that a *Kubernetes Secret Resource* already exists inside
@@ -481,6 +505,43 @@ data:
     CDK_DATABASE_USERNAME: <your_database_username>
 ```
 
+### Provide monitoring configuration as a Kubernetes Secret
+
+We expect the secret to contain the following keys:
+- For S3 like storage:
+  - "CDK_MONITORING_STORAGE_S3_ACCESSKEYID" : S3 access key
+  - "CDK_MONITORING_STORAGE_S3_SECRETACCESSKEY" : S3 secret access key
+- For GCS like storage:
+  - "CDK_MONITORING_STORAGE_GCS_SERVICEACCOUNT" : GCS service account JSON representing either client_credentials.json file or a service account key file.
+- For Azure like storage:
+  - "CDK_MONITORING_STORAGE_AZURE_ACCOUNTNAME" : Azure account name
+  - "CDK_MONITORING_STORAGE_AZURE_ACCOUNTKEY" : Azure account key
+- For Swift like storage:
+  - "CDK_MONITORING_STORAGE_SWIFT_PASSWORD" : Swift user password
+  - "CDK_MONITORING_STORAGE_SWIFT_USERID" OR "CDK_MONITORING_STORAGE_SWIFT_USERNAME": Swift user id or name
+
+```yaml
+# values.yaml
+monitoringConfig:
+  existingSecret: "<your_secret_name>"
+  storage:
+    s3:
+      endpoint: "s3.eu-west-1.amazonaws.com"
+      bucket: "conduktor"
+```
+
+```yaml
+# secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "<your_secret_name>"
+type: Opaque
+data:
+  CDK_MONITORING_STORAGE_S3_ACCESSKEYID: <your_s3_access_key>
+  CDK_MONITORING_STORAGE_S3_SECRETACCESSKEY: <your_s3_secret_access_key>
+```
+
 ### Store platform data into a Persistent Volume
 
 ```yaml
@@ -507,6 +568,15 @@ platform:
     tmpVolume:
       persistentVolumeClaim:
         claimName: tmp-pv-claim
+
+platformCortex:
+  enabled: true
+  dataVolume:
+    persistentVolumeClaim:
+      claimName: monitoring-data-pv-claim
+  tmpVolume:
+    persistentVolumeClaim:
+      claimName: monitoring-tmp-pv-claim
 ```
 
 ### Install with a PodAffinity
@@ -528,6 +598,19 @@ config:
     password: ''
 
 platform:
+  affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: security
+                operator: In
+                values:
+                  - S1
+          topologyKey: topology.kubernetes.io/zone
+
+platformCortex:
+  enabled: true
   affinity:
     podAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -602,6 +685,8 @@ config:
 
 platform:
   extraEnvVarsSecret: "<your_secret_name>"
+platformCortex:
+  extraEnvVarsSecret: "<your_secret_name>"
 ```
 
 ### Install with a toleration
@@ -628,6 +713,13 @@ config:
     https:
       selfSigned: true
 platform:
+  tolerations:
+    - key: "donotschedule"
+      operator: "Exists"
+      effect: "NoSchedule"
+
+platformCortex:
+  enabled: true
   tolerations:
     - key: "donotschedule"
       operator: "Exists"
@@ -720,6 +812,8 @@ serviceAccount:
 ```
 
 ### Install with a AWS EKS IAM Role
+
+**NOTE:** Service account are shared between Conduktor Console and Cortex pods.
 
 ```yaml
 config:

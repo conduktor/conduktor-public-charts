@@ -28,7 +28,7 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
         checksum/config: {{ include (print $.Template.BasePath "/platform-cortex/configmap.yaml") . | sha256sum }}
-        {{- if not .Values.platformCortex.existingSecret }}
+        {{- if not .Values.monitoringConfig.existingSecret }}
         checksum/credentials: {{ include (print $.Template.BasePath "/platform-cortex/secrets.yaml") . | sha256sum }}
         {{- end }}
       labels: {{- include "common.labels.standard" . | nindent 8 }}
