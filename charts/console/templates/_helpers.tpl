@@ -151,12 +151,48 @@ Platform service internal domain name
 {{- end -}}
 
 {{/*
-Platform external url
+Return true if platform TLS is enabled
+*/}}
+{{- define "conduktor.platform.tlsEnabled" -}}
+{{- $enabled := "" -}}
+{{- if (.Values.config.platform.https).selfSigned -}}
+  {{/* Auto signed TLS */}}
+  {{- $enabled := "1" -}}
+{{- else if (.Values.config.platform.https).existingSecret -}}
+  {{/* TLS from secrets */}}
+  {{- $enabled := "1" -}}
+{{- else if and ((.Values.config.platform.https).cert).path ((.Values.config.platform.https).key).path -}}
+  {{/* TLS from plain text values */}}
+  {{- $enabled := "1" -}}
+{{- end -}}
+{{ $enabled }}
+{{- end -}}
+
+{{/*
+Platform internal url from service in format http(s)://platform.nsp.svc.cluster.local:8080
+*/}}
+{{- define "conduktor.platform.internalUrl" -}}
+{{- $isSSLEnabled := empty (include "conduktor.platform.tlsEnabled" .) }}
+{{- $proto := ternary "https" "http" $isSSLEnabled -}}
+{{- printf "%s://%s:%d" $proto (include "conduktor.platform.serviceDomain" .) (.Values.service.ports.http | int) -}}
+{{- end -}}
+
+
+{{/*
+Platform external url. Fallback to internal one if no external url configured or ingress is not enabled
 */}}
 {{- define "conduktor.platform.externalUrl" -}}
-{{- $proto := ternary "https" "http" .Values.ingress.tls -}}
+{{- if .Values.config.platform.external.url -}}
+{{- .Values.config.platform.external.url -}}
+{{- else if .Values.ingress.enabled -}}
+{{- $isSSLEnabled := empty (include "conduktor.platform.tlsEnabled" .) }}
+{{- $proto := ternary "https" "http" (or .Values.ingress.tls $isSSLEnabled) -}}
 {{- printf "%s://%s" $proto .Values.ingress.hostname -}}
+{{- else -}}
+{{- include "conduktor.platform.internalUrl" . -}}
 {{- end -}}
+{{- end -}}
+
 
 {{/*
 Name of the platform cortex Service
@@ -207,12 +243,8 @@ conduktor: invalid database configuration
 
 {{- define "conduktor.validateValues.monitoring" -}}
 {{- if (.Values.config.monitoring).storage -}}
-{{- with .Values.config.monitoring.storage }}
-{{- if or (or .s3 .gcs) (or .azure .swift) -}}
 conduktor: invalid monitoring storage configuration
            config.monitoring.storage is deprecated, move to monitoringConfig.storage instead
-{{- end -}}
-{{- end -}}
 {{- end -}}
 {{- end -}}
 
@@ -229,7 +261,7 @@ Those are warnings and not errors, they are only output in NOTES.txt
 {{- $message := join "\n" $messages -}}
 
 {{- if $message -}}
-{{- required (printf "\n\nYOUR DEPLOYMENT WILL NOT WORK:\n\n%s" $message) .Values.unknown -}}
+{{- fail (printf "\n\nYOUR DEPLOYMENT WILL NOT WORK:\n\n%s" $message) -}}
 {{- end -}}
 {{- end -}}
 
@@ -272,7 +304,7 @@ Return platform monitoring callback url. Like http://platform.nsp.svc.cluster.lo
 This is used by alertmanager as a webhook to send alerts to the platform
 */}}
 {{- define "conduktor.monitoring.callbackUrl" -}}
-{{- $url := printf "http://%s:%d/monitoring/api/" (include "conduktor.platform.serviceDomain" .) (.Values.service.ports.http | int) -}}
+{{- $url := printf "%v/monitoring/api/" (include "conduktor.platform.internalUrl" .)  -}}
 {{- if .Values.config.monitoring -}}
 {{- $url := (default $url (index .Values "config" "monitoring" "callback-url")) }}
 {{- end -}}
@@ -285,9 +317,7 @@ This is used to return on the platform when a user click on a notification.
 If ingress is not enabled, this will return the service internal url instead but notification link will not work.
 */}}
 {{- define "conduktor.monitoring.notificationsCallbackUrl" -}}
-{{- $ingressUrl := (include "conduktor.platform.externalUrl" .) -}}
-{{- $serviceUrl := printf "http://%s:%d" (include "conduktor.platform.serviceDomain" .) (.Values.service.ports.http | int) -}}
-{{- $url := ternary $ingressUrl $serviceUrl .Values.ingress.enabled  -}}
+{{- $url := include "conduktor.platform.externalUrl" .  -}}
 {{- if .Values.config.monitoring -}}
 {{- $url := (default $url (index .Values "config" "monitoring" "notifications-callback-url")) }}
 {{- end -}}
@@ -296,7 +326,7 @@ If ingress is not enabled, this will return the service internal url instead but
 
 
 {{/*
-Return platform internal url. Like http://platform.nsp.svc.cluster.local:8080
+Return platform internal url. Like platform.nsp.svc.cluster.local:8080
 */}}
 {{- define "conduktor.monitoring.consoleUrl" -}}
 {{- $url := printf "%s:%d" (include "conduktor.platform.serviceDomain" .) (.Values.service.ports.http | int) -}}
@@ -304,6 +334,19 @@ Return platform internal url. Like http://platform.nsp.svc.cluster.local:8080
 {{- $url := (default $url (index .Values "monitoringConfig" "console-url")) }}
 {{- end -}}
 {{- printf "%s" $url -}}
+{{- end -}}
+
+{{/*
+Return platform monitoring storage type configured. Default to filesystem.
+*/}}
+{{- define "conduktor.monitoring.storageType" -}}
+{{- $storageType := "filesystem" -}}
+{{- range $key, $val := .Values.monitoringConfig.storage -}}
+  {{- if $key -}}
+    {{- $storageType = $key -}}
+  {{- end -}}
+{{- end -}}
+{{- printf "%s" $storageType -}}
 {{- end -}}
 
 {{/*
