@@ -86,7 +86,7 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/en
 
 You can paste here your Conduktor Platform Cortex Configuration
 
-Refer to our [documentation](TODO) for the full list of product configuration properties.
+Refer to our [documentation](https://docs.conduktor.io/platform/configuration/cortex/) for the full list of product configuration properties.
 
 | Name                                            | Description                                                                                 | Value |
 | ----------------------------------------------- | ------------------------------------------------------------------------------------------- | ----- |
