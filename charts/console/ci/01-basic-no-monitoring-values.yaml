@@ -1,5 +1,5 @@
 # Test is checking:
-# - basic usage of the chart is working
+# - basic usage of the chart is working without monitoring pod
 # - usage of a persistent volume instead of emptyDir volume for dataVolume
 nameOverride: cdkt-test-01
 config:
@@ -16,16 +16,30 @@ config:
     port: 5432
     username: postgres
 platform:
+  startupProbe:
+    initialDelaySeconds: 60  # extra delay because of limited cpu resources
+  terminationGracePeriodSeconds: 0  # quick kill between tests
   resources:
     limits:
       cpu: 1500m
-      memory: 4Gi
+      memory: 3Gi
     requests:
-      cpu: 1000m
-      memory: 4Gi
+      cpu: 500m
+      memory: 2Gi
   dataVolume:
     persistentVolumeClaim:
       claimName: pv-claim
+
+platformCortex:
+  enabled: false
+  resources:
+    limits:
+      cpu: 500m
+      memory: 400Mi
+    requests:
+      cpu: 200m
+      memory: 200Mi
+
 tests:
   enabled: true
 

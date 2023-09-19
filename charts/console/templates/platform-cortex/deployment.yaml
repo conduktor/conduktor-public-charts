@@ -1,0 +1,193 @@
+{{- if .Values.platformCortex.enabled }}
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ include "conduktor.platformCortex.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: conduktor-platform-cortex
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.platformCortex.replicaCount }}
+  {{- if .Values.platformCortex.updateStrategy }}
+  strategy: {{- toYaml .Values.platformCortex.updateStrategy | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: conduktor-platform-cortex
+  template:
+    metadata:
+      annotations:
+        {{- if .Values.commonAnnotations }}
+        {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 8 }}
+        {{- end }}
+        {{- if .Values.platformCortex.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.podAnnotations "context" $) | nindent 8 }}
+        {{- end }}
+        checksum/config: {{ include (print $.Template.BasePath "/platform-cortex/configmap.yaml") . | sha256sum }}
+        {{- if not .Values.monitoringConfig.existingSecret }}
+        checksum/credentials: {{ include (print $.Template.BasePath "/platform-cortex/secrets.yaml") . | sha256sum }}
+        {{- end }}
+      labels: {{- include "common.labels.standard" . | nindent 8 }}
+        app.kubernetes.io/component: conduktor-platform-cortex
+        {{- if .Values.platformCortex.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.podLabels "context" $) | nindent 8 }}
+        {{- end }}
+        {{- if .Values.commonLabels }}
+        {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ template "conduktor.serviceAccountName" . }}
+      {{- include "conduktor.imagePullSecrets" . | nindent 6 }}
+      {{- if .Values.platformCortex.hostAliases }}
+      hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.hostAliases "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.platformCortex.affinity }}
+      affinity: {{- include "common.tplvalues.render" ( dict "value" .Values.platformCortex.affinity "context" $) | nindent 8 }}
+      {{- else }}
+      affinity:
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.platformCortex.podAffinityPreset "component" "conduktor-platform" "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.platformCortex.podAntiAffinityPreset "component" "conduktor-platform" "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.platformCortex.nodeAffinityPreset.type "key" .Values.platformCortex.nodeAffinityPreset.key "values" .Values.platformCortex.nodeAffinityPreset.values) | nindent 10 }}
+      {{- end }}
+      {{- if .Values.platformCortex.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" ( dict "value" .Values.platformCortex.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.platformCortex.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.tolerations "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.platformCortex.priorityClassName }}
+      priorityClassName: {{ .Values.platformCortex.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.platformCortex.schedulerName }}
+      schedulerName: {{ .Values.platformCortex.schedulerName | quote }}
+      {{- end }}
+      {{- if .Values.platformCortex.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.topologySpreadConstraints "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.platformCortex.podSecurityContext }}
+      securityContext: {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.podSecurityContext "context" $) | nindent 10 }}
+      {{- else }}
+      securityContext:
+        runAsNonRoot: true
+      {{- end }}
+      {{- if .Values.platformCortex.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.platformCortex.terminationGracePeriodSeconds }}
+      {{- end }}
+      initContainers:
+        {{- if .Values.platformCortex.initContainers }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.initContainers "context" $) | nindent 8 }}
+        {{- end }}
+      containers:
+        - name: conduktor-platform-cortex
+          image: {{ template "conduktor.cortex.image" . }}
+          imagePullPolicy: {{ .Values.platformCortex.image.pullPolicy }}
+          {{- if .Values.platformCortex.containerSecurityContext }}
+          securityContext: {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.containerSecurityContext "context" $) | nindent 12 }}
+          {{- else }}
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          {{- end }}
+          {{- if .Values.diagnosticMode.enabled }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.command "context" $) | nindent 12 }}
+          {{- else if .Values.platformCortex.command }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.command "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.diagnosticMode.enabled }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.args "context" $) | nindent 12 }}
+          {{- else if .Values.platformCortex.args }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.args "context" $) | nindent 12 }}
+          {{- end }}
+          env:
+            - name: CDK_DEBUG
+              value: {{ ternary "true" "false" (or .Values.platformCortex.image.debug .Values.diagnosticMode.enabled) | quote }}
+            {{- if .Values.platformCortex.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "conduktor.platformCortex.configMapName" . }}
+            - secretRef:
+                name: {{ include "conduktor.platformCortex.secretName" . }}
+            {{- if .Values.platformCortex.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.platformCortex.extraEnvVarsCM "context" $) }}
+            {{- end }}
+            {{- if .Values.platformCortex.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.platformCortex.extraEnvVarsSecret "context" $) }}
+            {{- end }}
+          {{- if .Values.platformCortex.resources }}
+          resources: {{- toYaml .Values.platformCortex.resources | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: cortex
+              containerPort: {{ .Values.platformCortex.containerPorts.cortex }}
+            - name: alertmanager
+              containerPort: {{ .Values.platformCortex.containerPorts.alertmanager }}
+            - name: prometheus
+              containerPort: {{ .Values.platformCortex.containerPorts.prometheus }}
+          {{- if not .Values.diagnosticMode.enabled }}
+          {{- if .Values.platformCortex.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.platformCortex.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.platformCortex.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /ready
+              port: cortex
+          {{- end }}
+          {{- if .Values.platformCortex.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.platformCortex.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.platformCortex.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /ready
+              port: cortex
+          {{- end }}
+          {{- if .Values.platformCortex.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.platformCortex.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.platformCortex.startupProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /ready
+              port: cortex
+          {{- end }}
+          {{- end }}
+          {{- if .Values.platformCortex.lifecycleHooks }}
+          lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.lifecycleHooks "context" $) | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /var/conduktor
+            - name: tmp
+              mountPath: /tmp
+          {{- if .Values.platformCortex.extraVolumeMounts }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
+        {{- if .Values.platformCortex.sidecars }}
+        {{- include "common.tplvalues.render" ( dict "value" .Values.platformCortex.sidecars "context" $) | nindent 8 }}
+        {{- end }}
+      volumes:
+        - name: data
+          {{- if .Values.platformCortex.dataVolume }}
+          {{- include "common.tplvalues.render" ( dict "value" .Values.platformCortex.dataVolume "context" $) | nindent 10 }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: tmp
+          {{- if .Values.platformCortex.tmpVolume }}
+          {{- include "common.tplvalues.render" ( dict "value" .Values.platformCortex.tmpVolume "context" $) | nindent 10 }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        {{- if .Values.platformCortex.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
+{{- end }}

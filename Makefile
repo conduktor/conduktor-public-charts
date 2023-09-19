@@ -2,14 +2,17 @@
 #############
 
 WORKING_DIR 	= $(shell pwd)
-OS 						= $(shell uname -s)
-ARCH 					= $(shell uname -m)
+OS 				= $(shell uname -s)
+ARCH 			= $(shell uname -m)
+NAMESPACE 		= conduktor
 
 # Helm dependencies specific default variables
 ##############################################
 
 postgresql_password := conduktor
 postgresql_default_database := conduktor
+minio_password := conduktor
+minio_default_bucket := conduktor
 
 # Main targets you should run
 #############################
@@ -35,6 +38,8 @@ k3d-up: ## Setup k3d cluster
 	make helm-nginx
 	@echo "Installing postgresql"
 	make helm-postgresql
+	@echo "Installing Minio"
+	make helm-minio
 
 .PHONY: k3d-down
 k3d-down: ## Teardown k3d cluster
@@ -86,14 +91,28 @@ helm-nginx: ## Install nginx-ingress helm chart from ingress-nginx
 
 .PHONY: helm-postgresql
 helm-postgresql: ## Install postgresql helm chart from bitnami
-	kubectl create namespace conduktor || true
+	kubectl create namespace ${NAMESPACE} || true
 	@echo "Installing postgresql"
 	helm upgrade --install postgresql bitnami/postgresql \
-		--namespace conduktor --create-namespace \
+		--namespace ${NAMESPACE} --create-namespace \
 		--version 12.5.8 \
 		--set global.postgresql.auth.database=${postgresql_default_database} \
 		--set global.postgresql.auth.postgresPassword=${postgresql_password} \
 		--set auth.postgresPassword=${postgresql_password} \
 		--set primary.service.type=LoadBalancer
 	@echo "Waiting for postgresql to be ready..."
-	kubectl rollout status --watch --timeout=300s statefulset/postgresql -n conduktor
+	kubectl rollout status --watch --timeout=300s statefulset/postgresql -n ${NAMESPACE}
+
+
+.PHONY: helm-minio
+helm-minio: ## Install minio helm chart from bitnami
+	kubectl create namespace ${NAMESPACE} || true
+	@echo "Installing Minio"
+	helm upgrade --install minio bitnami/minio \
+		--namespace ${NAMESPACE} --create-namespace \
+		--version 12.8.0 \
+	    --set auth.rootPassword=${minio_password} \
+	    --set defaultBuckets=${minio_default_bucket} \
+	    --set disableWebUI=false
+	@echo "Waiting for minio to be ready..."
+	kubectl rollout status --watch --timeout=300s deployment/minio -n ${NAMESPACE}

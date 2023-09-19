@@ -1,0 +1,57 @@
+{{- if and .Values.platformCortex.enabled (not .Values.platformCortex.existingConfigmap) -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "conduktor.platformCortex.configMapName" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: conduktor-platform-cortex
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+data:
+  CDK_CONSOLE-URL: {{ include "conduktor.monitoring.consoleUrl" . | quote }}
+
+  {{- /* S3 configuration */ -}}
+  {{- if .Values.monitoringConfig.storage.s3 }}
+  {{- with .Values.monitoringConfig.storage.s3 }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_S3_BUCKET" "value" .bucket) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_S3_ENDPOINT" "value" .endpoint) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_S3_REGION" "value" .region) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_S3_INSECURE" "value" .insecure) }}
+  {{- end }}
+  {{- end }}
+
+  {{- /* GCS configuration */ -}}
+  {{- if .Values.monitoringConfig.storage.gcs }}
+  {{- with .Values.monitoringConfig.storage.gcs }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_GCS_BUCKETNAME" "value" .bucketName) }}
+  {{- end }}
+  {{- end }}
+
+  {{- /* AZURE configuration */ -}}
+  {{- if .Values.monitoringConfig.storage.azure }}
+  {{- with .Values.monitoringConfig.storage.azure }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_AZURE_ENDPOINTSUFFIX" "value" .endpointSuffix) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_AZURE_CONTAINERNAME" "value" .containerName) }}
+  {{- end }}
+  {{- end }}
+
+  {{- /* SWIFT configuration */ -}}
+  {{- if .Values.monitoringConfig.storage.swift }}
+  {{- with .Values.monitoringConfig.storage.swift }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_SWIFT_AUTHURL" "value" .authUrl) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_SWIFT_CONTAINERNAME" "value" .containerName) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_SWIFT_USERDOMAINNAME" "value" .userDomainName) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_SWIFT_USERDOMAINID" "value" .userDomainId) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_SWIFT_DOMAINID" "value" .domainId) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_SWIFT_DOMAINNAME" "value" .domainName) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_SWIFT_PROJECTID" "value" .projectId) }}
+  {{ include "conduktor.monitoring.envValue" (dict "name" "CDK_MONITORING_STORAGE_SWIFT_REGIONNAME" "value" .regionName) }}
+  {{ end }}
+  {{ end }}
+
+{{- end }}

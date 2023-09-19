@@ -46,5 +46,10 @@ You are using the free version of Conduktor Platform.
 If you need more, please contact our sales team by browsing to https://www.conduktor.io/contact/sales/
 {{- end }}
 
+{{- if and .Values.platformCortex.enabled (eq (include "conduktor.monitoring.storageType" .) "filesystem") }}
+You are using the filesystem storage type for Cortex. This is not recommended for production usage.
+See https://docs.conduktor.io/platform/configuration/cortex/ for configuration details.
+{{- end }}
+
 {{- include "common.warnings.rollingTag" .Values.platform.image }}
 {{- include "conduktor.validateValues" . }}

@@ -1,4 +1,6 @@
-nameOverride: cdkt-test-02
+# Test is checking:
+# - basic usage of the chart is working with external monitoring storage
+nameOverride: cdkt-test-05
 config:
   organization:
     name: conduktor
@@ -13,11 +15,14 @@ config:
     port: 5432
     username: postgres
 
-  platform:
-    external:
-      url: "https://platform.cluster.local"
-    https:
-      selfSigned: true
+monitoringConfig:
+  existingSecret: cdkt-test-05
+  storage:
+    s3:
+      endpoint: "minio:9000"
+      bucket: "conduktor"
+      insecure: true
+
 platform:
   startupProbe:
     initialDelaySeconds: 60  # extra delay because of limited cpu resources
@@ -31,6 +36,7 @@ platform:
       memory: 2Gi
 
 platformCortex:
+  enabled: true
   resources:
     limits:
       cpu: 500m
@@ -41,3 +47,10 @@ platformCortex:
 
 tests:
   enabled: true
+  minio: true
+  secrets:
+    - name: cdkt-test-05
+      type: Opaque
+      stringData:
+        CDK_MONITORING_STORAGE_S3_ACCESSKEYID: "admin"
+        CDK_MONITORING_STORAGE_S3_SECRETACCESSKEY: "conduktor123"

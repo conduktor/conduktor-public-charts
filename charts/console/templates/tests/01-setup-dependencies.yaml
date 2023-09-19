@@ -97,8 +97,8 @@ spec:
             timeoutSeconds: 5
           resources:
             requests:
-              cpu: 250m
-              memory: 256Mi
+              cpu: 100m
+              memory: 128Mi
           securityContext:
             runAsUser: 1001
           terminationMessagePath: /dev/termination-log
@@ -109,7 +109,7 @@ spec:
       restartPolicy: Always
       securityContext:
         fsGroup: 1001
-      terminationGracePeriodSeconds: 30
+      terminationGracePeriodSeconds: 0
       volumes:
         - emptyDir:
             medium: Memory
@@ -142,5 +142,128 @@ spec:
     app.kubernetes.io/component: primary
     app.kubernetes.io/instance: postgresql
     app.kubernetes.io/name: postgresql
+  type: ClusterIP
+{{- end }}
+---
+{{- if and .Values.tests.enabled .Values.tests.minio }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-99"
+  labels:
+    app.kubernetes.io/instance: minio
+    app.kubernetes.io/name: minio
+  name: minio
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: minio
+      app.kubernetes.io/name: minio
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: minio
+        app.kubernetes.io/name: minio
+      name: minio
+    spec:
+      containers:
+        - env:
+          - name: BITNAMI_DEBUG
+            value: 'false'
+          - name: MINIO_SCHEME
+            value: 'http'
+          - name: MINIO_FORCE_NEW_KEYS
+            value: 'no'
+          - name: MINIO_ROOT_USER
+            value: 'admin'
+          - name: MINIO_ROOT_PASSWORD
+            value: 'conduktor123'
+          - name: MINIO_DEFAULT_BUCKETS
+            value: 'conduktor'
+          - name: MINIO_BROWSER
+            value: 'off'
+          - name: MINIO_PROMETHEUS_AUTH_TYPE
+            value: public
+          - name: MINIO_CONSOLE_PORT_NUMBER
+            value: '9001'
+          image: docker.io/bitnami/minio:2023.7.18-debian-11-r0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: minio-api
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 5
+          name: postgresql
+          ports:
+            - name: minio-api
+              containerPort: 9000
+              protocol: TCP
+            - name: minio-console
+              containerPort: 9001
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: minio-api
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 5
+          resources:
+            requests:
+              cpu: 150m
+              memory: 200Mi
+          securityContext:
+            runAsUser: 1001
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      restartPolicy: Always
+      securityContext:
+        fsGroup: 1001
+      terminationGracePeriodSeconds: 0
+      volumes:
+        - emptyDir:
+            medium: Memory
+          name: data
+  strategy:
+    type: Recreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-99"
+  labels:
+    app.kubernetes.io/instance: minio
+    app.kubernetes.io/name: minio
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+  name: minio
+spec:
+  ports:
+    - name: minio-api
+      protocol: TCP
+      port: 9000
+      targetPort: minio-api
+    - name: minio-console
+      protocol: TCP
+      port: 9001
+  publishNotReadyAddresses: true
+  selector:
+    app.kubernetes.io/instance: minio
+    app.kubernetes.io/name: minio
   type: ClusterIP
 {{- end }}
