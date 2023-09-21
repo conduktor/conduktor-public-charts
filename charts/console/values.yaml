@@ -146,6 +146,11 @@ monitoringConfig:
   ## or
   ## CDK_MONITORING_STORAGE_SWIFT_PASSWORD and CDK_MONITORING_STORAGE_SWIFT_USERID or CDK_MONITORING_STORAGE_SWIFT_USERNAME
   existingSecret: ""
+  scraper:
+    ## @param monitoringConfig.scraper.skipSSLCheck Skip TLS verification when scraping Platform metrics
+    skipSSLCheck: false
+    ## @param monitoringConfig.scraper.caFile Skip TLS verification when scraping Platform metrics
+    caFile: ""
   storage:
     ## S3 storage configuration
     ## @param monitoringConfig.storage.s3 S3 storage configuration
