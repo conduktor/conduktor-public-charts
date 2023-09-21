@@ -44,9 +44,9 @@ or to our charts `README`.
 ## Development setup
 
 **Requirements**:
-- k3d
-- kubectl
-- helm
+- [k3d](https://k3d.io/v5.6.0/#installation)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+- [helm](https://helm.sh/docs/intro/install/)
 
 You can have a working cluster on your local machine with docker and k3d, 
 use the Makefile target `k3d-up` to start a cluster with nginx and a postgresql
@@ -65,6 +65,17 @@ port: 5432
 username: postgres
 password: conduktor
 database: conduktor
+```
+
+### Run chart tests
+You need to have [chart-testing](https://github.com/helm/chart-testing) installed and a running kubernetes cluster.
+
+```shell
+# Create tests namespace if not exists
+kubectl create namespace ct || true
+
+# Run tests
+ct install --config .github/ct-config.yaml
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
