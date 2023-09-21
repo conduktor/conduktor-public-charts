@@ -1,3 +1,6 @@
+# Test is checking:
+# - generate a self-signed certificate for the platform
+# - connectivity between the platform and the monitoring pod using self-signed certificate
 nameOverride: cdkt-test-02
 config:
   organization:
@@ -18,6 +21,7 @@ config:
       url: "https://platform.cluster.local"
     https:
       selfSigned: true
+
 platform:
   startupProbe:
     initialDelaySeconds: 60  # extra delay because of limited cpu resources

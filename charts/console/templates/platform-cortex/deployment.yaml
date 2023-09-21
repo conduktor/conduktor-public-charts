@@ -1,4 +1,7 @@
 {{- if .Values.platformCortex.enabled }}
+{{- $skipCertVerify := ((.Values.monitoringConfig).scraper).skipSSLCheck -}}
+{{- $isPlatformSSLEnabled := not (empty (include "conduktor.platform.tls.enabled" .)) }}
+{{- $verifyCA := and $isPlatformSSLEnabled (not $skipCertVerify) }}
 apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
 kind: Deployment
 metadata:
@@ -108,6 +111,12 @@ spec:
           env:
             - name: CDK_DEBUG
               value: {{ ternary "true" "false" (or .Values.platformCortex.image.debug .Values.diagnosticMode.enabled) | quote }}
+            - name: CDK_SCRAPER_SKIPSSLCHECK
+              value: {{ ((.Values.monitoringConfig).scraper).skipSSLCheck | quote }}
+            {{- if $verifyCA }}
+            - name: CDK_SCRAPER_CAFILE
+              value: {{ include "conduktor.monitoring.caFile" . | quote }}
+            {{- end }}
             {{- if .Values.platformCortex.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}
@@ -168,6 +177,12 @@ spec:
               mountPath: /var/conduktor
             - name: tmp
               mountPath: /tmp
+          {{- if $verifyCA }}
+            - name: platform-https
+              mountPath: {{ include "conduktor.monitoring.caFile" . | quote }}
+              subPath: ca.crt
+              readOnly: true
+          {{- end }}
           {{- if .Values.platformCortex.extraVolumeMounts }}
           {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.extraVolumeMounts "context" $) | nindent 12 }}
           {{- end }}
@@ -187,6 +202,14 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        {{- if $verifyCA }}
+        - name: platform-https
+          secret:
+            secretName: {{ include "conduktor.platform.tls.secretName" . }}
+            items:
+              - key: ca.crt
+                path: ca.crt
+        {{- end }}
         {{- if .Values.platformCortex.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.extraVolumes "context" $) | nindent 8 }}
         {{- end }}

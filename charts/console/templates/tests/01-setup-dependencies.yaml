@@ -143,9 +143,8 @@ spec:
     app.kubernetes.io/instance: postgresql
     app.kubernetes.io/name: postgresql
   type: ClusterIP
-{{- end }}
 ---
-{{- if and .Values.tests.enabled .Values.tests.minio }}
+{{- if .Values.tests.minio }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -266,4 +265,5 @@ spec:
     app.kubernetes.io/instance: minio
     app.kubernetes.io/name: minio
   type: ClusterIP
+{{- end }}
 {{- end }}
