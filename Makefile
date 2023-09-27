@@ -44,6 +44,15 @@ k3d-up: ## Setup k3d cluster
 	@echo "Create Test namespace"
 	make create-test-ns
 
+.PHONY: k3d-ci-up
+k3d-ci-up: ## Setup CI k3d cluster
+	@echo "Creating k3d cluster"
+	make create-k3d-cluster
+	@echo "Installing nginx-ingress"
+	make helm-nginx
+	@echo "Create Test namespace"
+	make create-test-ns
+
 .PHONY: k3d-down
 k3d-down: ## Teardown k3d cluster
 	make delete-k3d-cluster
