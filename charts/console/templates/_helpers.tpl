@@ -88,7 +88,7 @@ Name of the platform ConfigMap
 Name of the platform Cortex ConfigMap
 */}}
 {{- define "conduktor.platformCortex.configMapName" -}}
-{{- if .Values.platform.existingConfigmap -}}
+{{- if .Values.platformCortex.existingConfigmap -}}
     {{ include "common.tplvalues.render" (dict "value" .Values.platformCortex.existingConfigmap "context" $) }}
 {{- else -}}
     {{ include "conduktor.platformCortex.fullname" . }}
