@@ -355,7 +355,7 @@ Usage :
 {{ include "conduktor.monitoring.envValue" (dict "name" "MY_ENV_NAME" "value" .Values.path.to.value) }}
 */}}
 {{- define "conduktor.monitoring.envValue" -}}
-  {{- if .value -}}
+  {{- if or .value (eq (.value | toString) "false") -}}
   {{ printf "%s: %s" .name (.value | quote) }}
   {{- end -}}
 {{- end -}}
