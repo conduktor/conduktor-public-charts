@@ -5,6 +5,7 @@ WORKING_DIR 	= $(shell pwd)
 OS 				= $(shell uname -s)
 ARCH 			= $(shell uname -m)
 NAMESPACE 		= conduktor
+TEST_NAMESPACE 	= ct
 
 # Helm dependencies specific default variables
 ##############################################
@@ -40,6 +41,17 @@ k3d-up: ## Setup k3d cluster
 	make helm-postgresql
 	@echo "Installing Minio"
 	make helm-minio
+	@echo "Create Test namespace"
+	make create-test-ns
+
+.PHONY: k3d-ci-up
+k3d-ci-up: ## Setup CI k3d cluster
+	@echo "Creating k3d cluster"
+	make create-k3d-cluster
+	@echo "Installing nginx-ingress"
+	make helm-nginx
+	@echo "Create Test namespace"
+	make create-test-ns
 
 .PHONY: k3d-down
 k3d-down: ## Teardown k3d cluster
@@ -116,3 +128,7 @@ helm-minio: ## Install minio helm chart from bitnami
 	    --set disableWebUI=false
 	@echo "Waiting for minio to be ready..."
 	kubectl rollout status --watch --timeout=300s deployment/minio -n ${NAMESPACE}
+
+.PHONY: create-test-ns
+create-test-ns: ## Create test namespace
+	kubectl create namespace ${TEST_NAMESPACE} || true

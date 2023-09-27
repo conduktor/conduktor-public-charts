@@ -74,6 +74,24 @@ Return the TLS secret name for the platform pod
 {{- end -}}
 
 {{/*
+Return true if platform TLS is enabled
+*/}}
+{{- define "conduktor.platform.tls.enabled" -}}
+{{- if (.Values.config.platform.https).selfSigned -}}
+  {{/* Auto signed TLS */}}
+  {{- "1" -}}
+{{- else if not (empty (.Values.config.platform.https).existingSecret) -}}
+  {{/* TLS from secrets */}}
+  {{- "1" -}}
+{{- else if and ((.Values.config.platform.https).cert).path ((.Values.config.platform.https).key).path -}}
+  {{/* TLS from plain text values */}}
+  {{- "1" -}}
+{{- else -}}
+{{- "" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Name of the platform ConfigMap
 */}}
 {{- define "conduktor.platform.configMapName" -}}
@@ -150,29 +168,12 @@ Platform service internal domain name
 {{- printf "%s.%s.svc.%s" (include "conduktor.platform.serviceName" .) .Release.Namespace .Values.clusterDomain -}}
 {{- end -}}
 
-{{/*
-Return true if platform TLS is enabled
-*/}}
-{{- define "conduktor.platform.tlsEnabled" -}}
-{{- $enabled := "" -}}
-{{- if (.Values.config.platform.https).selfSigned -}}
-  {{/* Auto signed TLS */}}
-  {{- $enabled := "1" -}}
-{{- else if (.Values.config.platform.https).existingSecret -}}
-  {{/* TLS from secrets */}}
-  {{- $enabled := "1" -}}
-{{- else if and ((.Values.config.platform.https).cert).path ((.Values.config.platform.https).key).path -}}
-  {{/* TLS from plain text values */}}
-  {{- $enabled := "1" -}}
-{{- end -}}
-{{ $enabled }}
-{{- end -}}
 
 {{/*
 Platform internal url from service in format http(s)://platform.nsp.svc.cluster.local:8080
 */}}
 {{- define "conduktor.platform.internalUrl" -}}
-{{- $isSSLEnabled := empty (include "conduktor.platform.tlsEnabled" .) }}
+{{- $isSSLEnabled := not (empty (include "conduktor.platform.tls.enabled" .)) }}
 {{- $proto := ternary "https" "http" $isSSLEnabled -}}
 {{- printf "%s://%s:%d" $proto (include "conduktor.platform.serviceDomain" .) (.Values.service.ports.http | int) -}}
 {{- end -}}
@@ -185,7 +186,7 @@ Platform external url. Fallback to internal one if no external url configured or
 {{- if .Values.config.platform.external.url -}}
 {{- .Values.config.platform.external.url -}}
 {{- else if .Values.ingress.enabled -}}
-{{- $isSSLEnabled := empty (include "conduktor.platform.tlsEnabled" .) }}
+{{- $isSSLEnabled := not (empty (include "conduktor.platform.tls.enabled" .)) }}
 {{- $proto := ternary "https" "http" (or .Values.ingress.tls $isSSLEnabled) -}}
 {{- printf "%s://%s" $proto .Values.ingress.hostname -}}
 {{- else -}}
@@ -278,7 +279,7 @@ Return platform monitoring api poll rate for clusters. Default to 60s
 {{- end -}}
 
 {{/*
-Return platform monitoring cortex url. Like http://cortex.nsp.svc.cluster.local:9009/
+Return platform monitoring cortex url. Like http(s)://cortex.nsp.svc.cluster.local:9009/
 */}}
 {{- define "conduktor.monitoring.cortexUrl" -}}
 {{- $url := printf "http://%s:%d/" (include "conduktor.platformCortex.serviceDomain" .) (.Values.platformCortex.service.ports.cortex | int) -}}
@@ -289,7 +290,7 @@ Return platform monitoring cortex url. Like http://cortex.nsp.svc.cluster.local:
 {{- end -}}
 
 {{/*
-Return platform monitoring alertmanager url. Like http://cortex.nsp.svc.cluster.local:9010/
+Return platform monitoring alertmanager url. Like http(s)://cortex.nsp.svc.cluster.local:9010/
 */}}
 {{- define "conduktor.monitoring.alertManagerUrl" -}}
 {{- $url := printf "http://%s:%d/" (include "conduktor.platformCortex.serviceDomain" .) (.Values.platformCortex.service.ports.alertmanager | int) -}}
@@ -300,7 +301,7 @@ Return platform monitoring alertmanager url. Like http://cortex.nsp.svc.cluster.
 {{- end -}}
 
 {{/*
-Return platform monitoring callback url. Like http://platform.nsp.svc.cluster.local:8080/monitoring/api/
+Return platform monitoring callback url. Like http(s)://platform.nsp.svc.cluster.local:8080/monitoring/api/
 This is used by alertmanager as a webhook to send alerts to the platform
 */}}
 {{- define "conduktor.monitoring.callbackUrl" -}}
@@ -312,7 +313,7 @@ This is used by alertmanager as a webhook to send alerts to the platform
 {{- end -}}
 
 {{/*
-Return platform monitoring notification callback url. Like http://conduktor.mydomain.com
+Return platform monitoring notification callback url. Like http(s)://conduktor.mydomain.com
 This is used to return on the platform when a user click on a notification.
 If ingress is not enabled, this will return the service internal url instead but notification link will not work.
 */}}
@@ -324,16 +325,19 @@ If ingress is not enabled, this will return the service internal url instead but
 {{- printf "%s" $url -}}
 {{- end -}}
 
-
 {{/*
-Return platform internal url. Like platform.nsp.svc.cluster.local:8080
+Return platform internal url. Like http(s)://platform.nsp.svc.cluster.local:8080
 */}}
 {{- define "conduktor.monitoring.consoleUrl" -}}
-{{- $url := printf "%s:%d" (include "conduktor.platform.serviceDomain" .) (.Values.service.ports.http | int) -}}
-{{- if .Values.monitoringConfig -}}
-{{- $url := (default $url (index .Values "monitoringConfig" "console-url")) }}
+{{- default (include "conduktor.platform.internalUrl" .) (index .Values "monitoringConfig" "console-url") }}
 {{- end -}}
-{{- printf "%s" $url -}}
+
+{{/*
+  Path where platform CA cert file is mounted in the Cortex pod.
+  Default to /etc/conduktor/platform-tls/ca.crt
+*/}}
+{{- define "conduktor.monitoring.caFile" -}}
+{{- default "/etc/conduktor/platform-tls/ca.crt" ((.Values.monitoringConfig).scraper).caFile }}
 {{- end -}}
 
 {{/*

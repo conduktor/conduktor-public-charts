@@ -5,13 +5,14 @@
 {{- $prometheusPort := .Values.platformCortex.service.ports.prometheus -}}
 {{- $cortexUrl := printf "http://%v:%v/ready" $serviceName $cortexPort }}
 {{- $alertManagerUrl := printf "http://%v:%v/ready" $serviceName $alertManagerPort }}
-{{- $prometheusUrl := printf "http://%v:%v/-/healthy" $serviceName $prometheusPort }}
+{{- $prometheusUrl := printf "http://%v:%v" $serviceName $prometheusPort }}
 apiVersion: v1
 kind: Pod
 metadata:
   name: "{{ include "common.names.fullname" . }}-test-platform-cortex"
   annotations:
     "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   containers:
     - name: curl-cortex
@@ -22,6 +23,28 @@ spec:
       args: [ '--insecure', "--verbose" ,'{{ $alertManagerUrl }}']
     - name: curl-prometheus
       image: curlimages/curl:8.1.2
-      args: [ '--insecure', "--verbose" ,'{{ $prometheusUrl }}']
+      args: [ '--insecure', "--verbose" ,'{{ $prometheusUrl }}/-/healthy']
+    - name: curl-prometheus-targets
+      image: nicolaka/netshoot
+      command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          retries=0
+          max_retries=10
+          retry_interval=3
+
+          while [ $retries -lt $max_retries ]; do
+            if curl -s URL | jq -e '.data.activeTargets[0].health == "up" | if . then true else false end'; then
+              exit 0
+            else
+              echo "Retry $((retries+1)) of $max_retries. Retrying in $retry_interval seconds..."
+              sleep $retry_interval
+              retries=$((retries+1))
+            fi
+          done
+
+          echo "Exceeded maximum retry attempts. Exiting with failure status."
+          exit 1
   restartPolicy: Never
 {{- end }}

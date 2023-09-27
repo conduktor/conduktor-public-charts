@@ -88,36 +88,38 @@ You can paste here your Conduktor Platform Cortex Configuration
 
 Refer to our [documentation](https://docs.conduktor.io/platform/configuration/cortex/) for the full list of product configuration properties.
 
-| Name                                            | Description                                                                                 | Value |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------- | ----- |
-| `monitoringConfig.existingSecret`               | The name of an existing Secret with your custom configuration for Conduktor Platform Cortex | `""`  |
-| `monitoringConfig.storage.s3`                   | S3 storage configuration                                                                    | `{}`  |
-| `monitoringConfig.storage.s3.endpoint`          | S3 endpoint                                                                                 |       |
-| `monitoringConfig.storage.s3.region`            | S3 region                                                                                   |       |
-| `monitoringConfig.storage.s3.bucket`            | S3 bucket name                                                                              |       |
-| `monitoringConfig.storage.s3.insecure`          | S3 insecure                                                                                 |       |
-| `monitoringConfig.storage.s3.accessKeyId`       | S3 access key id                                                                            |       |
-| `monitoringConfig.storage.s3.secretAccessKey`   | S3 secret access key                                                                        |       |
-| `monitoringConfig.storage.gcs`                  | GCS storage configuration                                                                   | `{}`  |
-| `monitoringConfig.storage.gcs.bucketName`       | GCS bucket name                                                                             |       |
-| `monitoringConfig.storage.gcs.serviceAccount`   | GCS service account                                                                         |       |
-| `monitoringConfig.storage.azure`                | Azure storage configuration                                                                 | `{}`  |
-| `monitoringConfig.storage.azure.accountName`    | Azure account name                                                                          |       |
-| `monitoringConfig.storage.azure.accountKey`     | Azure account key                                                                           |       |
-| `monitoringConfig.storage.azure.containerName`  | Azure container name                                                                        |       |
-| `monitoringConfig.storage.azure.endpointSuffix` | Azure endpoint suffix                                                                       |       |
-| `monitoringConfig.storage.swift`                | Swift storage configuration                                                                 | `{}`  |
-| `monitoringConfig.storage.swift.authUrl`        | Swift auth url                                                                              |       |
-| `monitoringConfig.storage.swift.password`       | Swift password                                                                              |       |
-| `monitoringConfig.storage.swift.containerName`  | Swift container name                                                                        |       |
-| `monitoringConfig.storage.swift.userId`         | Swift user id                                                                               |       |
-| `monitoringConfig.storage.swift.username`       | Swift username                                                                              |       |
-| `monitoringConfig.storage.swift.userDomainName` | Swift user domain name                                                                      |       |
-| `monitoringConfig.storage.swift.userDomainId`   | Swift user domain id                                                                        |       |
-| `monitoringConfig.storage.swift.domainId`       | Swift domain id                                                                             |       |
-| `monitoringConfig.storage.swift.domainName`     | Swift domain name                                                                           |       |
-| `monitoringConfig.storage.swift.projectId`      | Swift project id                                                                            |       |
-| `monitoringConfig.storage.swift.regionName`     | Swift region name                                                                           |       |
+| Name                                            | Description                                                                                 | Value   |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------- | ------- |
+| `monitoringConfig.existingSecret`               | The name of an existing Secret with your custom configuration for Conduktor Platform Cortex | `""`    |
+| `monitoringConfig.scraper.skipSSLCheck`         | Skip TLS verification when scraping Platform metrics                                        | `false` |
+| `monitoringConfig.scraper.caFile`               | Skip TLS verification when scraping Platform metrics                                        | `""`    |
+| `monitoringConfig.storage.s3`                   | S3 storage configuration                                                                    | `{}`    |
+| `monitoringConfig.storage.s3.endpoint`          | S3 endpoint                                                                                 |         |
+| `monitoringConfig.storage.s3.region`            | S3 region                                                                                   |         |
+| `monitoringConfig.storage.s3.bucket`            | S3 bucket name                                                                              |         |
+| `monitoringConfig.storage.s3.insecure`          | S3 insecure                                                                                 |         |
+| `monitoringConfig.storage.s3.accessKeyId`       | S3 access key id                                                                            |         |
+| `monitoringConfig.storage.s3.secretAccessKey`   | S3 secret access key                                                                        |         |
+| `monitoringConfig.storage.gcs`                  | GCS storage configuration                                                                   | `{}`    |
+| `monitoringConfig.storage.gcs.bucketName`       | GCS bucket name                                                                             |         |
+| `monitoringConfig.storage.gcs.serviceAccount`   | GCS service account                                                                         |         |
+| `monitoringConfig.storage.azure`                | Azure storage configuration                                                                 | `{}`    |
+| `monitoringConfig.storage.azure.accountName`    | Azure account name                                                                          |         |
+| `monitoringConfig.storage.azure.accountKey`     | Azure account key                                                                           |         |
+| `monitoringConfig.storage.azure.containerName`  | Azure container name                                                                        |         |
+| `monitoringConfig.storage.azure.endpointSuffix` | Azure endpoint suffix                                                                       |         |
+| `monitoringConfig.storage.swift`                | Swift storage configuration                                                                 | `{}`    |
+| `monitoringConfig.storage.swift.authUrl`        | Swift auth url                                                                              |         |
+| `monitoringConfig.storage.swift.password`       | Swift password                                                                              |         |
+| `monitoringConfig.storage.swift.containerName`  | Swift container name                                                                        |         |
+| `monitoringConfig.storage.swift.userId`         | Swift user id                                                                               |         |
+| `monitoringConfig.storage.swift.username`       | Swift username                                                                              |         |
+| `monitoringConfig.storage.swift.userDomainName` | Swift user domain name                                                                      |         |
+| `monitoringConfig.storage.swift.userDomainId`   | Swift user domain id                                                                        |         |
+| `monitoringConfig.storage.swift.domainId`       | Swift domain id                                                                             |         |
+| `monitoringConfig.storage.swift.domainName`     | Swift domain name                                                                           |         |
+| `monitoringConfig.storage.swift.projectId`      | Swift project id                                                                            |         |
+| `monitoringConfig.storage.swift.regionName`     | Swift region name                                                                           |         |
 
 ### Platform Deployment Parameters
 
@@ -125,7 +127,7 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/co
 | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
 | `platform.image.registry`                     | Conduktor Platform image registry                                                                                                                             | `docker.io`                    |
 | `platform.image.repository`                   | Conduktor Platform image repository                                                                                                                           | `conduktor/conduktor-platform` |
-| `platform.image.tag`                          | Conduktor Platform image tag (immutable tags are recommended)                                                                                                 | `1.18.0`                       |
+| `platform.image.tag`                          | Conduktor Platform image tag (immutable tags are recommended)                                                                                                 | `1.18.1`                       |
 | `platform.image.digest`                       | Conduktor Platform image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`                           |
 | `platform.image.pullPolicy`                   | Conduktor Platform image pull policy                                                                                                                          | `IfNotPresent`                 |
 | `platform.image.pullSecrets`                  | Conduktor Platform image pull secrets                                                                                                                         | `[]`                           |
@@ -234,7 +236,7 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/co
 | `platformCortex.enabled`                            | Enable Conduktor Platform Cortex                                                                                                                                     | `true`                                |
 | `platformCortex.image.registry`                     | Conduktor Platform Cortex image registry                                                                                                                             | `docker.io`                           |
 | `platformCortex.image.repository`                   | Conduktor Platform Cortex image repository                                                                                                                           | `conduktor/conduktor-platform-cortex` |
-| `platformCortex.image.tag`                          | Conduktor Platform Cortex image tag (immutable tags are recommended)                                                                                                 | `1.18.0`                              |
+| `platformCortex.image.tag`                          | Conduktor Platform Cortex image tag (immutable tags are recommended)                                                                                                 | `1.18.1`                              |
 | `platformCortex.image.digest`                       | Conduktor Platform Cortex image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`                                  |
 | `platformCortex.image.pullPolicy`                   | Conduktor Platform Cortex image pull policy                                                                                                                          | `IfNotPresent`                        |
 | `platformCortex.image.pullSecrets`                  | Conduktor Platform Cortex image pull secrets                                                                                                                         | `[]`                                  |

@@ -78,8 +78,8 @@ jobs:
       - name: Create k3d cluster
         if: steps.list-changed.outputs.changed == 'true'
         run: |
-          make k3d-up
-          kubectl create ns ct
+          make k3d-ci-up
+          kubectl create ns ct || true
 
       - name: Run chart-testing (install)
         run: ct install --config .github/ct-config.yaml
