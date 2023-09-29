@@ -518,6 +518,9 @@ service:
   ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
   ##
   externalTrafficPolicy: Cluster
+  ## @param service.labels Additional custom labels for Conduktor Platform service
+  ##
+  labels: {}
   ## @param service.annotations Additional custom annotations for Conduktor Platform service
   ##
   annotations: {}
@@ -973,6 +976,9 @@ platformCortex:
     ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
     ##
     externalTrafficPolicy: Cluster
+    ## @param platformCortex.service.labels Additional custom labels for Conduktor Platform Cortex service
+    ##
+    labels: {}
     ## @param platformCortex.service.annotations Additional custom annotations for Conduktor Platform Cortex service
     ##
     annotations: {}
