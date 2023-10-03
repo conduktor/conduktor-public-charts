@@ -318,12 +318,12 @@ platform:
   resources:
     limits:
       ## @param platform.resources.limits.cpu CPU limit for the platform container
-      cpu: 4000m
+      cpu: 3000m
       ## @param platform.resources.limits.memory Memory limit for the container
       memory: 4Gi
     requests:
       ## @param platform.resources.requests.cpu CPU resource requests
-      cpu: 2000m
+      cpu: 1000m
       ## @param platform.resources.requests.memory Memory resource requests
       memory: 2Gi
   ## @param platform.podSecurityContext Conduktor Platform Pod Security Context
