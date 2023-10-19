@@ -129,6 +129,22 @@ helm-minio: ## Install minio helm chart from bitnami
 	@echo "Waiting for minio to be ready..."
 	kubectl rollout status --watch --timeout=300s deployment/minio -n ${NAMESPACE}
 
+.PHONY: helm-monitoring-stack
+helm-monitoring-stack: ## Install monitoring stack prometheus and grafana
+	@echo "Add prometheus helm repo"
+	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts || true
+	helm repo update
+	@echo "Install prometheus stack"
+	helm upgrade --install prometheus-stack prometheus-community/kube-prometheus-stack \
+		--namespace prometheus-stack --create-namespace \
+		--set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false \
+		--set alertmanager.enabled=false \
+		--set grafana.enabled=true \
+		--set kubelet.enabled=false \
+		--set coreDns.enabled=false \
+		--set nodeExporter.enabled=false
+
+
 .PHONY: create-test-ns
 create-test-ns: ## Create test namespace
 	kubectl create namespace ${TEST_NAMESPACE} || true
