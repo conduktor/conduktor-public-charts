@@ -64,7 +64,7 @@ host: postgresql.conduktor
 port: 5432
 username: postgres
 password: conduktor
-database: conduktor
+name: conduktor
 ```
 
 ### Run chart tests
