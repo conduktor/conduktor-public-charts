@@ -502,11 +502,11 @@ metadata:
   name: "<your_secret_name>"
 type: Opaque
 data:
-    CDK_ORGANIZATION_NAME: <your_organization_name>
-    CDK_ADMIN_EMAIL: <your_admin_email>
-    CDK_ADMIN_PASSWORD: <your_admin_password>
-    CDK_DATABASE_PASSWORD: <your_database_password>
-    CDK_DATABASE_USERNAME: <your_database_username>
+  CDK_ORGANIZATION_NAME: <your_organization_name>
+  CDK_ADMIN_EMAIL: <your_admin_email>
+  CDK_ADMIN_PASSWORD: <your_admin_password>
+  CDK_DATABASE_PASSWORD: <your_database_password>
+  CDK_DATABASE_USERNAME: <your_database_username>
 ```
 
 ### Provide monitoring configuration as a Kubernetes Secret
@@ -566,12 +566,12 @@ config:
     password: '<postgres_password>'
 
 platform:
-    dataVolume:
-      persistentVolumeClaim:
-        claimName: data-pv-claim
-    tmpVolume:
-      persistentVolumeClaim:
-        claimName: tmp-pv-claim
+  dataVolume:
+    persistentVolumeClaim:
+      claimName: data-pv-claim
+  tmpVolume:
+    persistentVolumeClaim:
+      claimName: tmp-pv-claim
 
 platformCortex:
   enabled: true
@@ -836,8 +836,8 @@ config:
     password: ''
 
 serviceAccount:
-    annotations:
-        eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/my-role"
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/my-role"
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
