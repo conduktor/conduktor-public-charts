@@ -137,12 +137,10 @@ helm-monitoring-stack: ## Install monitoring stack prometheus and grafana
 	@echo "Install prometheus stack"
 	helm upgrade --install prometheus-stack prometheus-community/kube-prometheus-stack \
 		--namespace prometheus-stack --create-namespace \
+		--set prometheus.prometheusSpec.podMonitorSelectorNilUsesHelmValues=false \
 		--set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false \
 		--set alertmanager.enabled=false \
-		--set grafana.enabled=true \
-		--set kubelet.enabled=false \
-		--set coreDns.enabled=false \
-		--set nodeExporter.enabled=false
+		--set grafana.enabled=true
 
 
 .PHONY: create-test-ns
