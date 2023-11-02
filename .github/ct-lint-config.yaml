@@ -1,0 +1,16 @@
+# helm/chart-testing config
+#
+# See https://github.com/helm/chart-testing/tree/main/doc for documentation
+
+target-branch: main
+chart-dirs:
+  - charts
+debug: false
+remote: origin
+validate-maintainers: false
+validate-yaml: true
+# We need to explicitly login to external repos for external dependencies
+chart-repos:
+  - bitnami=https://charts.bitnami.com/bitnami
+namespace: ct
+release-label: console
