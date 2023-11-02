@@ -26,10 +26,10 @@ jobs:
         run: git fetch --prune --unshallow
 
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.4.0
+        uses: helm/chart-testing-action@v2.6.0
 
       - name: Run chart-testing (lint)
-        run: ct lint --config .github/ct-config.yaml
+        run: ct lint --config .github/ct-lint-config.yaml
 
   chart-testing:
     runs-on: [ ubuntu-latest ]
@@ -48,7 +48,7 @@ jobs:
           version: 'v3.10.1'
 
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.4.0
+        uses: helm/chart-testing-action@v2.6.0
 
       - name: Install K3D
         shell: bash
