@@ -1,0 +1,16 @@
+apiVersion: v2
+appVersion: "1.0"
+description: Conduktor Gateway and associated backing Kafka
+name: conduktor-gateway
+version: 2.1.1
+
+dependencies:
+  - name: kafka
+    repository: https://charts.bitnami.com/bitnami
+    tags:
+      - bitnami-kafka
+    version: 18.x.x
+    condition: kafka.enabled
+  - name: common
+    version: 2.x.x
+    repository: https://charts.bitnami.com/bitnami

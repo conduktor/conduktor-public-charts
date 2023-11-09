@@ -1,0 +1,46 @@
+{{- if .Capabilities.APIVersions.Has "integreatly.org/v1alpha1/GrafanaDashboard" }}
+{{- if .Values.metrics.grafana.enable }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "conduktor-gateway.fullname" . | trunc 52 }}-dashboards
+  labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
+data:
+  gateway.json: |
+{{ .Files.Get "grafana-dashboards/gateway.json" | indent 4 }}
+  gateway-logs.json: |
+{{ .Files.Get "grafana-dashboards/gateway-logs.json" | indent 4 }}
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "conduktor-gateway.fullname" . | trunc 47 }}-gateway-dashboard
+  labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
+    conduktor.io/dashboard: "true"
+spec:
+  customFolderName: Product
+  configMapRef:
+    name: {{ include "conduktor-gateway.fullname" . | trunc 52 }}-dashboards
+    key: gateway.json
+  datasources:
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: {{ .Values.metrics.grafana.datasources.prometheus | quote }}
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "conduktor-gateway.fullname" . | trunc 49 }}-log-dashboard
+  labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
+    conduktor.io/dashboard: "true"
+spec:
+  customFolderName: Product
+  configMapRef:
+    name: {{ include "conduktor-gateway.fullname" . | trunc 52 }}-dashboards
+    key: gateway-logs.json
+  datasources:
+    - inputName: "DS_LOKI"
+      datasourceName: {{ .Values.metrics.grafana.datasources.loki | quote }}
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: {{ .Values.metrics.grafana.datasources.prometheus | quote }}
+{{- end }}
+{{- end }}

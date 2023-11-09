@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "conduktor-gateway.fullname" . | trunc 54 }}-internal
+  labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
+    metrics.conduktor.io/prometheus: {{ .Values.metrics.prometheus.enable | quote }}
+  {{- with .Values.service.internal.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: ClusterIP
+  ports:
+    {{- range untilStep (int .Values.gateway.portRange.start) (int (add .Values.gateway.portRange.start .Values.gateway.portRange.count)) 1 }}
+    - name: broker-gateway-{{ . }}
+      port: {{ . }}
+      targetPort: {{ . }}
+      protocol: TCP
+    {{- end }}
+    - name: admin-http
+      port: {{ .Values.gateway.admin.port }}
+      targetPort: {{ .Values.gateway.admin.port }}
+      protocol: TCP
+    {{- if .Values.gateway.jmx.enable }}
+    - name: jmx
+      port: {{ .Values.gateway.jmx.port }}
+      targetPort: {{ .Values.gateway.jmx.port }}
+      protocol: TCP
+    {{- end }}
+  selector: {{ include "conduktor-gateway.podSelectorLabels" . | nindent 4 }}

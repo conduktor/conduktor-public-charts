@@ -1,0 +1,21 @@
+groups:
+  - name: Playground
+    rules:
+      - alert: PlaygroundChecklyError
+        expr: (checkly_check_status{job="checkly", conduktor_team="gateway"} == 0)
+        # Change to (checkly_check_status{job="checkly", conduktor_team="gateway"} == 0) * on (conduktor_env, conduktor_team) group_right(job, check_name, check_type) kube_deployment_labels
+        # when conduktor.io/env will be automatically added to be able to deploy alert on all env an correlate alert by deployment
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "External playground connectivity test is failing"
+          description: "Checkly test {{ $labels.check_name }} failed for more than 1m"
+      - alert: Checkly Playground is slow
+        expr: checkly_check_result{job="checkly", conduktor_team="gateway"} > 6000
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Checkly playground connectivity is slow"
+          description: "Test {{ $labels.check_name }} is taking more than 6s for more than 10m"

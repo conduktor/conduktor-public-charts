@@ -1,0 +1,186 @@
+# Default values for conduktor-gateway
+
+global:
+  ## @param global.imagePullSecrets [array, nullable] Docker login secrets name for image pull
+  imagePullSecrets:
+  ## @param global.env The environment name
+  env: ""
+
+## @section Conduktor-gateway configurations
+## @descriptionStart
+## This section contains configuration of the gateway
+## @descriptionEnd
+gateway:
+  ## @section Conduktor-gateway image configuration
+  ## @descriptionStart
+  ## This section define the image to be used
+  ## @descriptionEnd
+  image:
+    ## @param gateway.image.registry Docker registry to use
+    registry: docker.io
+    ## @param gateway.image.repository Image in repository format (conduktor/conduktor-gateway)
+    repository: conduktor/conduktor-gateway
+    ## @param gateway.image.tag Image tag
+    tag: 2.1.0
+    ## @param gateway.image.pullPolicy Kubernetes image pull policy
+    pullPolicy: IfNotPresent
+
+  ## @param gateway.replicas number of gateway instances to be deployed
+  replicas: 2
+  ## @param gateway.secretRef Secret name to load sensitive env var from
+  secretRef: ""
+  ## @param gateway.secretSha256sum [nullable] Optional sha256sum of the referenced secret. This could be set to have a automactic restart of gateway deployment if secret change
+  secretSha256sum: ""
+
+  ## @param gateway.env [object] Environment variables for gateway deployment
+  env: {}
+
+  ## @param gateway.interceptors Json configuration for interceptors to be loaded at startup by gateway
+  interceptors: "[]"
+
+  portRange:
+    ## @param gateway.portRange.start Start port of the gateway port range
+    start: 9092
+    ## @param gateway.portRange.count Max number of broker to expose
+    count: 7
+
+  admin:
+    ## @param gateway.admin.port Admin http server port
+    port: 8888
+
+  jmx:
+    ## @param gateway.jmx.enable Enable jmx jvm options
+    enable: false
+    ## @param gateway.jmx.port jmx port to expose by default jvm args
+    port: 9999
+    ## @param gateway.jmx.jvmArgs arguments to pass to the gateway container jvm
+    jvmArgs: -Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1
+
+  ## @param gateway.startupProbeDelay [nullable] Optional delay in second before startup probe should be running (default 10)
+  startupProbeDelay: ""
+
+  ## @param gateway.podLabels Specific labels to be added to gateway pod by deployment
+  podLabels: {}
+
+  ## @param gateway.podAnnotations gateway pod annotations
+  podAnnotations: {}
+
+  ## @param gateway.securityContext Container security context
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  ## @param gateway.volumes Define user specific volumes for gateway deployment
+  volumes: {}
+
+  ## @param gateway.volumeMounts Define user specific volumeMounts  for gateway container in deployment
+  volumeMounts: {}
+
+## @section TLS configuration
+## @descriptionStart
+## This section is for configuring gateway to handle certificate to manage SSL endpoint inside gateway deployment
+## @descriptionEnd
+tls:
+  ## @param tls.enable Enable tls injection into gateway
+  enable: false
+  ## @param tls.secretRef Secret name with keystore to load
+  secretRef: ""
+  ## @param tls.keystoreKey Key in the secret to load as keystore
+  keystoreKey: keystore.jks
+  ## @param tls.keystoreFile File name to mount keystore as
+  keystoreFile: keystore.jks
+
+## @section Conduktor-gateway service configurations
+## @descriptionStart
+## This section contains kubernetes services configuration
+## @descriptionEnd
+service:
+  ## @section Conduktor-gateway external service configurations
+  ## @descriptionStart
+  ## This section specify external service configuration
+  ## @descriptionEnd
+  external:
+    ## @param service.external.enable Enable a service for external connection to gateway
+    enable: false
+    ## @param service.external.type Type of load balancer
+    type: ClusterIP
+    ## @param service.external.ip Ip to configure
+    ip: ""
+    ## @param service.external.annotations
+    annotations: {}
+    # LoadBalancer externaldns gke support by annotation https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/gke.md#verify-using-an-external-load-balancer
+    # external-dns.alpha.kubernetes.io/hostname: "{{ required "A valid .Values.gateway.domain is required!" .Values.gateway.domain }}"
+    ## @param service.external.admin Enable admin exposition on external service
+    admin: false
+    ## @param service.external.jmx Enable jmx exposition on external service
+    jmx: false
+  ## @section Conduktor-gateway internal service configurations
+  ## @descriptionStart
+  ## This section specify internal service configuration
+  ## @descriptionEnd
+  internal:
+    ## @param service.internal.annotations
+    annotations: {}
+
+## @section Conduktor-gateway metrics activation
+## @descriptionStart
+## Gateway embed metrics to be installed within you cluster if your have the correct capabilities (Prometheus and Grafana operators)
+## @descriptionEnd
+metrics:
+  alerts:
+    ## @param metrics.alerts.enable Enable prometheus alerts if prometheus alerts rules is supported on cluster
+    enable: false
+  checklyAlerts:
+    ## @param metrics.checklyAlerts.enable Enable alerts for checky jobs if prometheus rules is supported on cluster
+    enable: false
+  prometheus:
+    ## @param metrics.prometheus.enable Enable ServiceMonitor prometheus operator configuration for metrics scrapping
+    enable: false
+    ## @param metrics.prometheus.metricRelabelings Configure metric relabeling in ServiceMonitor
+    metricRelabelings: {}
+    ## @param metrics.prometheus.relabelings Configure relabelings in ServiceMonitor
+    relabelings: {}
+  grafana:
+    ## @param metrics.grafana.enable Enable grafana dashboards to installation
+    enable: false
+    datasources:
+      ## @param metrics.grafana.datasources.prometheus Prometheus datasource to use for metric dashboard
+      prometheus: prometheus
+      ## @param metrics.grafana.datasources.loki Loki datasource to use for log dashboard
+      loki: loki
+
+
+## @section Kubernetes common configuration
+## @descriptionStart
+## Shared kubernetes configuration of the chart
+## @descriptionEnd
+
+serviceAccount:
+  ## @param serviceAccount.create Create Kubernetes service account. Default kube value if false
+  # Specifies whether a service account should be created
+  # If AWS IAM is used, need to have create: false
+  create: false
+
+## @param commonLabels Labels to be applied to all ressources created by this chart
+commonLabels: {}
+
+## @param nodeSelector Container node selector
+nodeSelector: {}
+
+## @param tolerations Container tolerations
+tolerations: []
+
+## @param affinity Container affinity
+affinity: {}
+
+## @section Dependencies
+## @descriptionStart
+## Enable and configure chart dependencies if not available in your deployment
+## @descriptionEnd
+kafka:
+  ## @param kafka.enabled Deploy a kafka along side gateway (This should only used for testing purpose)
+  enabled: false
