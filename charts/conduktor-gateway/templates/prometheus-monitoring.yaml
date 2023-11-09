@@ -1,0 +1,23 @@
+{{- if .Capabilities.APIVersions.Has "monitoring.coreos.com/v1/ServiceMonitor" }}
+{{- if .Values.metrics.prometheus.enable }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "conduktor-gateway.fullname" . | trunc 52 }}-monitoring
+spec:
+  jobLabel: app.kubernetes.io/name
+  selector:
+    matchLabels: {{ include "conduktor-gateway.labels" . | nindent 6 }}
+      metrics.conduktor.io/prometheus: "true"
+  endpoints:
+    - port: admin-http
+      path: /metrics
+      scheme: http
+      {{- if .Values.metrics.prometheus.metricRelabelings }}
+      metricRelabelings: {{- include "common.tplvalues.render" ( dict "value" .Values.metrics.prometheus.metricRelabelings "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.metrics.prometheus.relabelings }}
+      relabelings: {{- include "common.tplvalues.render" ( dict "value" .Values.metrics.prometheus.relabelings "context" $) | nindent 8 }}
+      {{- end }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,139 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "conduktor-gateway.fullname" . }}
+  labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels: {{ include "conduktor-gateway.podSelectorLabels" . | nindent 6 }}
+  replicas: {{ .Values.gateway.replicas }}
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- if .Values.gateway.secretSha256sum }}
+        checksum/secret: {{ .Values.gateway.secretSha256sum }}
+        {{- end }}
+        {{- with .Values.gateway.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels: {{ include "conduktor-gateway.labels" . | nindent 8 }}
+      {{- if .Values.gateway.podLabels }}
+      {{- toYaml .Values.gateway.podLabels | nindent 8 }}
+      {{- end }}
+    spec:
+      containers:
+        - name: gateway
+          image: {{ .Values.gateway.image.registry }}/{{ .Values.gateway.image.repository }}:{{ .Values.gateway.image.tag }}
+          imagePullPolicy: {{ .Values.gateway.image.pullPolicy }}
+          env:
+            # Static env var to be reconsidered if we offer env way to configure them
+            - name: GATEWAY_INTERCEPTOR_CONFIG_LOCATION
+              value: /etc/gateway/config/interceptors.json
+            {{- if .Values.kafka.enabled }}
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: {{ include "conduktor-gateway.kafka-bootstrap-server" . }}
+            {{- end}}
+            {{- if not (hasKey .Values.gateway.env "GATEWAY_ADVERTISED_HOST") }}
+            - name: GATEWAY_ADVERTISED_HOST
+              value: {{ include "conduktor-gateway.fullname" . | trunc 54 }}-internal
+            {{- end }}
+            - name: GATEWAY_PORT_START
+              value: {{ .Values.gateway.portRange.start | quote }}
+            - name: GATEWAY_PORT_COUNT
+              value: {{ .Values.gateway.portRange.count | quote }}
+            - name: GATEWAY_HTTP_PORT
+              value: {{ .Values.gateway.admin.port | quote }}
+            {{- if .Values.gateway.jmx.enable }}
+            - name: JAVA_TOOL_OPTIONS
+              value: {{ tpl .Values.gateway.jmx.jvmArgs . | quote }}
+            {{- end}}
+            {{- if .Values.tls.secretRef}}
+            - name: GATEWAY_SSL_KEY_STORE_PATH
+              value: /etc/gateway/tls/{{ .Values.tls.keystoreFile }}
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "conduktor-gateway.fullname" . }}
+            {{- if .Values.gateway.secretRef }}
+            - secretRef:
+                name: {{ .Values.gateway.secretRef }}
+            {{- end }}
+          ports:
+            {{- range untilStep (int .Values.gateway.portRange.start) (int (add .Values.gateway.portRange.end 1)) 1 }}
+            - containerPort: {{ . }}
+              protocol: TCP
+            {{- end }}
+            - name: admin-http
+              containerPort: {{ .Values.gateway.admin.port }}
+              protocol: TCP
+            {{- if .Values.gateway.jmx.enable }}
+            - name: jmx
+              containerPort: {{ .Values.gateway.jmx.port }}
+              protocol: TCP
+            {{- end }}
+          volumeMounts:
+            {{- with .Values.gateway.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- if .Values.tls.secretRef }}
+            - name: keystore
+              mountPath: /etc/gateway/tls/
+              readOnly: true
+            {{- end }}
+            - name: config
+              mountPath: /etc/gateway/config
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.gateway.admin.port }}
+            periodSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.gateway.admin.port }}
+            initialDelaySeconds: {{ .Values.gateway.startupProbeDelay | default 10 }}
+          {{- with .Values.resources }}
+          resources: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.gateway.podSecurityContext }}
+          securityContext: {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        {{- with .Values.gateway.volumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- if .Values.tls.secretRef }}
+        - name: keystore
+          secret:
+            secretName: {{ .Values.tls.secretRef }}
+            items:
+            - key: {{ .Values.tls.keystoreKey }}
+              path: {{ .Values.tls.keystoreFile }}
+        {{- end }}
+        - name: config
+          configMap:
+            name: {{ include "conduktor-gateway.fullname" . }}
+            items:
+            - key: interceptors.json
+              path: interceptors.json
+      {{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ template "conduktor-gateway.serviceAccountName" . }}
+      {{- end }}
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.securityContext }}
+      securityContext: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}

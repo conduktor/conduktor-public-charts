@@ -1,0 +1,37 @@
+groups:
+  - name: Proxy
+    rules:
+      - alert: ProxyHA
+        expr: (kube_deployment_status_replicas_ready{namespace="proxy", deployment="conduktor-proxy"}  < 2 ) * on (deployment) group_left(conduktor_team,conduktor_app_name) kube_deployment_labels
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.namespace }}/{{ $labels.deployment }} ready replicas is lower than 2"
+
+      - alert: ProxyReadyReplicas
+        expr: ( kube_deployment_status_replicas_ready{namespace="proxy", deployment="conduktor-proxy"} < kube_deployment_spec_replicas{namespace="proxy", deployment="conduktor-proxy"} ) * on (deployment) group_left(conduktor_team,conduktor_app_name) kube_deployment_labels
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.namespace }}/{{ $labels.deployment }} replicas count drift"
+          description: "{{ $labels.namespace }}/{{ $labels.deployment }} ready replicas count is {{ $value }}, lower than replicas count defined"
+
+      - alert: ProxyPodRestart
+        expr: (increase(kube_pod_container_status_restarts_total{namespace="proxy"}[1m]) > 1) * on (pod) group_left(conduktor_team,conduktor_app_name) kube_pod_labels{conduktor_app_name="conduktor-proxy"}
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is crash looping"
+          description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is crash looping {{ $value }}x times in the last minute"
+
+      - alert: ProxyInstanceNotHealthy
+        expr: min_over_time(sum by (namespace, pod) (kube_pod_status_phase {phase=~"Pending|Unknown|Failed", namespace="proxy" })[5m:1m]) * on (pod) group_left(conduktor_team,conduktor_app_name) kube_pod_labels{conduktor_app_name="conduktor-proxy"} > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} not healthy"
+          description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in a non-ready state for longer than 5 minutes."

@@ -1,0 +1,5 @@
+kafka:
+  enabled: true
+  startupProbe:
+    enabled: true
+    failureThreshold: 30

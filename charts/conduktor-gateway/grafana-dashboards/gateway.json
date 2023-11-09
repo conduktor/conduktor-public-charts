@@ -1,0 +1,3994 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "prometheus",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "panel",
+      "id": "bargauge",
+      "name": "Bar gauge",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "gauge",
+      "name": "Gauge",
+      "version": ""
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "9.3.2"
+    },
+    {
+      "type": "panel",
+      "id": "graph",
+      "name": "Graph (old)",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "histogram",
+      "name": "Histogram",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "piechart",
+      "name": "Pie chart",
+      "version": ""
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "limit": 100,
+        "name": "Annotations & Alerts",
+        "showIn": 0,
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "enable": true,
+        "expr": "resets(process_uptime_seconds{application=\"$application\", instance=\"$instance\"}[1m]) > 0",
+        "iconColor": "rgba(255, 96, 96, 1)",
+        "name": "Restart Detection",
+        "showIn": 0,
+        "step": "1m",
+        "tagKeys": "restart-tag",
+        "textFormat": "uptime reset",
+        "titleFormat": "Restart"
+      }
+    ]
+  },
+  "description": "Dashboard for Kafka Proxy",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "gnetId": 4701,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 191,
+      "panels": [],
+      "title": "Summary",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 0,
+        "y": 1
+      },
+      "id": 209,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.3.2",
+      "repeat": "proxy_kcache_size_type",
+      "repeatDirection": "h",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "proxy_kcache_size{job=\"$job\", pod=~\"$pod\", type=\"$proxy_kcache_size_type\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "$proxy_kcache_size_type",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 7
+      },
+      "id": 154,
+      "panels": [],
+      "title": "Kafka Proxy",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "[95p]"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "[99p]"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "[med]"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "[30p]"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "[avg]"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 173,
+      "interval": "1h",
+      "options": {
+        "displayMode": "gradient",
+        "minVizHeight": 10,
+        "minVizWidth": 0,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true
+      },
+      "pluginVersion": "9.3.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(irate(proxy_latency_request_response_seconds_sum{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) / sum(irate(proxy_latency_request_response_seconds_count{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) > 0",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "[avg]",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.3, sum(rate(proxy_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) by (le)) > 0",
+          "hide": false,
+          "interval": "1m",
+          "legendFormat": "[30p]",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.5, sum(rate(proxy_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) by (le)) > 0",
+          "hide": false,
+          "interval": "1m",
+          "legendFormat": "[med]",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum(rate(proxy_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) by (le)) > 0",
+          "hide": false,
+          "interval": "1m",
+          "legendFormat": "[95p]",
+          "range": true,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.99, sum(rate(proxy_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) by (le)) > 0",
+          "hide": false,
+          "interval": "1m",
+          "legendFormat": "[99p]",
+          "range": true,
+          "refId": "E"
+        }
+      ],
+      "title": "Global latency request response",
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "unit": "deckbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 5,
+        "x": 12,
+        "y": 8
+      },
+      "id": 254,
+      "options": {
+        "displayLabels": [
+          "value"
+        ],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(direction) (increase(proxy_bytes_exchanged_total{job=\"$job\", pod=~\"$pod\"}[$__range]))",
+          "legendFormat": "{{direction}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Bytes  Exchanged Total",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 17,
+        "y": 8
+      },
+      "id": 298,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "proxy_brokered_active_connections{job=\"$job\", pod=~\"$pod\"}",
+          "legendFormat": "proxy_brokered - {{ pod }}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Active Connection",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "id": 419,
+      "interval": "1m",
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(proxy_thread_request_received_total{job=\"$job\", pod=~\"$pod\"}[1m]))",
+          "legendFormat": "Requests",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(proxy_thread_request_rebuild_total{job=\"$job\", pod=~\"$pod\"}[1m]))",
+          "hide": false,
+          "legendFormat": "Rebuild",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Request rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "id": 402,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "9.3.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum (proxy_thread_tasks{job=\"$job\", pod=~\"$pod\"})",
+          "hide": false,
+          "legendFormat": "Total",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(name) (proxy_thread_tasks{job=\"$job\", pod=~\"$pod\"})",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Tasks",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "id": 436,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(tenant) (rate(proxy_thread_request_rebuild_total{job=\"$job\", pod=~\"$pod\"}[1m])) > 0",
+          "interval": "1m",
+          "legendFormat": "{{tenant}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Rebuild rate / tenant",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "id": 468,
+      "options": {
+        "displayMode": "gradient",
+        "minVizHeight": 10,
+        "minVizWidth": 0,
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true
+      },
+      "pluginVersion": "9.3.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "round(sum by (api_key) (increase(proxy_thread_request_rebuild_total{tenant=~\"$tenant\", job=\"$job\", pod=~\"$pod\"}[$__range])) > 0)",
+          "legendFormat": "{{api_key}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Api keys",
+      "type": "bargauge"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 32
+      },
+      "id": 385,
+      "panels": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "fixed"
+              },
+              "custom": {
+                "fillOpacity": 80,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "ms"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "[95p]"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "orange",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "[99p]"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "red",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "[med]"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "green",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "[30p]"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "blue",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "[avg]"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "purple",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 6,
+            "x": 0,
+            "y": 33
+          },
+          "id": 231,
+          "options": {
+            "bucketOffset": 0,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "right",
+              "showLegend": true
+            }
+          },
+          "pluginVersion": "9.1.7",
+          "repeat": "tenant",
+          "repeatDirection": "h",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "editorMode": "code",
+              "expr": "sum(irate(proxy_latency_request_response_seconds_sum{job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"} [1m])) / sum(irate(proxy_latency_request_response_seconds_count{job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m]))",
+              "hide": false,
+              "legendFormat": "[avg]",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "editorMode": "code",
+              "expr": "histogram_quantile(0.3, sum(rate(proxy_latency_request_response_seconds_bucket{ job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m])) by (le))",
+              "hide": false,
+              "legendFormat": "[30p]",
+              "range": true,
+              "refId": "B"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "editorMode": "code",
+              "expr": "histogram_quantile(0.5, sum(rate(proxy_latency_request_response_seconds_bucket{ job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m])) by (le))",
+              "hide": false,
+              "legendFormat": "[med]",
+              "range": true,
+              "refId": "C"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "editorMode": "code",
+              "expr": "histogram_quantile(0.95, sum(rate(proxy_latency_request_response_seconds_bucket{ job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m])) by (le))",
+              "hide": false,
+              "legendFormat": "[95p]",
+              "range": true,
+              "refId": "D"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "editorMode": "code",
+              "expr": "histogram_quantile(0.99, sum(rate(proxy_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m])) by (le))",
+              "hide": false,
+              "legendFormat": "[99p]",
+              "range": true,
+              "refId": "E"
+            }
+          ],
+          "title": "Latency request response by tenant  $tenant",
+          "transformations": [
+            {
+              "id": "filterByValue",
+              "options": {
+                "filters": [
+                  {
+                    "config": {
+                      "id": "greater",
+                      "options": {
+                        "value": 0
+                      }
+                    },
+                    "fieldName": "[avg]"
+                  }
+                ],
+                "match": "any",
+                "type": "include"
+              }
+            }
+          ],
+          "type": "histogram"
+        }
+      ],
+      "title": "Tenant latency",
+      "type": "row"
+    },
+    {
+      "collapsed": false,
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 33
+      },
+      "id": 107,
+      "panels": [],
+      "targets": [
+        {
+          "datasource": "prometheus",
+          "refId": "A"
+        }
+      ],
+      "title": "Thread State",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 0,
+        "y": 34
+      },
+      "id": 63,
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "value"
+      },
+      "pluginVersion": "9.3.2",
+      "repeat": "jvm_threads_states_threads",
+      "repeatDirection": "h",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "jvm_threads_states_threads{job=\"$job\", pod=~\"$pod\", state=\"$jvm_threads_states_threads\"}",
+          "format": "time_series",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "metric": "",
+          "range": false,
+          "refId": "A",
+          "step": 14400
+        }
+      ],
+      "title": "$jvm_threads_states_threads state",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 40
+      },
+      "id": 108,
+      "panels": [],
+      "targets": [
+        {
+          "datasource": "prometheus",
+          "refId": "A"
+        }
+      ],
+      "title": "JVM Memory",
+      "type": "row"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {
+        "leftLogBase": 1,
+        "rightLogBase": 1
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 41
+      },
+      "hiddenSeries": false,
+      "id": 24,
+      "legend": {
+        "avg": false,
+        "current": true,
+        "max": true,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.3.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(jvm_memory_used_bytes{job=\"$job\", pod=~\"$pod\", area=\"heap\"})",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "used",
+          "metric": "",
+          "range": true,
+          "refId": "A",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(jvm_memory_committed_bytes{job=\"$job\", pod=~\"$pod\", area=\"heap\"})",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "committed",
+          "range": true,
+          "refId": "B",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(jvm_memory_max_bytes{job=\"$job\", pod=~\"$pod\", area=\"heap\"})",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "max",
+          "range": true,
+          "refId": "C",
+          "step": 2400
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "JVM Heap",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "x-axis": true,
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "y-axis": true,
+      "y_formats": [
+        "mbytes",
+        "short"
+      ],
+      "yaxes": [
+        {
+          "format": "bytes",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {
+        "leftLogBase": 1,
+        "rightLogBase": 1
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 41
+      },
+      "hiddenSeries": false,
+      "id": 25,
+      "legend": {
+        "avg": false,
+        "current": true,
+        "max": true,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.3.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(jvm_memory_used_bytes{job=\"$job\", pod=~\"$pod\", area=\"nonheap\"})",
+          "format": "time_series",
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "used",
+          "metric": "",
+          "range": true,
+          "refId": "A",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(jvm_memory_committed_bytes{job=\"$job\", pod=~\"$pod\", area=\"nonheap\"})",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "committed",
+          "range": true,
+          "refId": "B",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(jvm_memory_max_bytes{job=\"$job\", pod=~\"$pod\", area=\"nonheap\"})",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "max",
+          "range": true,
+          "refId": "C",
+          "step": 2400
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "JVM Non-Heap",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "x-axis": true,
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "y-axis": true,
+      "y_formats": [
+        "mbytes",
+        "short"
+      ],
+      "yaxes": [
+        {
+          "format": "bytes",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {
+        "leftLogBase": 1,
+        "rightLogBase": 1
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 41
+      },
+      "hiddenSeries": false,
+      "id": 26,
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": true,
+        "max": true,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.3.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(jvm_memory_used_bytes{job=\"$job\", pod=~\"$pod\"})",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "used",
+          "metric": "",
+          "range": true,
+          "refId": "A",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(jvm_memory_committed_bytes{job=\"$job\", pod=~\"$pod\"})",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "committed",
+          "range": true,
+          "refId": "B",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(jvm_memory_max_bytes{job=\"$job\", pod=~\"$pod\"})",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "max",
+          "range": true,
+          "refId": "C",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "process_memory_vss_bytes{job=\"$job\", pod=~\"$pod\"}",
+          "format": "time_series",
+          "hide": true,
+          "intervalFactor": 2,
+          "legendFormat": "vss",
+          "metric": "",
+          "range": true,
+          "refId": "D",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "process_memory_rss_bytes{job=\"$job\", pod=~\"$pod\"}",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "rss",
+          "range": true,
+          "refId": "E",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "process_memory_pss_bytes{job=\"$job\", pod=~\"$pod\"}",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "pss",
+          "range": true,
+          "refId": "F",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "process_memory_swap_bytes{job=\"$job\", pod=~\"$pod\"}",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "swap",
+          "range": true,
+          "refId": "G",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "process_memory_swappss_bytes{job=\"$job\", pod=~\"$pod\"}",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "swappss",
+          "range": true,
+          "refId": "H",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "process_memory_pss_bytes{job=\"$job\", pod=~\"$pod\"} + process_memory_swap_bytes{job=\"$job\", pod=~\"$pod\"}",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "phys (pss+swap)",
+          "range": true,
+          "refId": "I",
+          "step": 2400
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "JVM Total",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "x-axis": true,
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "y-axis": true,
+      "y_formats": [
+        "mbytes",
+        "short"
+      ],
+      "yaxes": [
+        {
+          "format": "bytes",
+          "label": "",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "collapsed": false,
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 48
+      },
+      "id": 109,
+      "panels": [],
+      "targets": [
+        {
+          "datasource": "prometheus",
+          "refId": "A"
+        }
+      ],
+      "title": "JVM Misc",
+      "type": "row"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {
+        "leftLogBase": 1,
+        "rightLogBase": 1
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 0,
+        "y": 49
+      },
+      "hiddenSeries": false,
+      "id": 106,
+      "legend": {
+        "avg": false,
+        "current": true,
+        "max": true,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.3.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "system_cpu_usage{job=\"$job\", pod=~\"$pod\"}",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 1,
+          "legendFormat": "system - {{ pod }}",
+          "metric": "",
+          "range": true,
+          "refId": "A",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "process_cpu_usage{job=\"$job\", pod=~\"$pod\"}",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 1,
+          "legendFormat": "process - {{ pod }}",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "avg_over_time(process_cpu_usage{job=\"$job\", pod=~\"$pod\"}[1h])",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 1,
+          "legendFormat": "process-1h - {{ pod }}",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "CPU",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "x-axis": true,
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "y-axis": true,
+      "y_formats": [
+        "short",
+        "short"
+      ],
+      "yaxes": [
+        {
+          "$$hashKey": "object:738",
+          "decimals": 1,
+          "format": "percentunit",
+          "label": "",
+          "logBase": 1,
+          "max": "1",
+          "min": 0,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:739",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {
+        "leftLogBase": 1,
+        "rightLogBase": 1
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 6,
+        "y": 49
+      },
+      "hiddenSeries": false,
+      "id": 93,
+      "legend": {
+        "avg": false,
+        "current": true,
+        "max": true,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.3.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(system_load_average_1m{job=\"$job\", pod=~\"$pod\"})",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "system-1m",
+          "metric": "",
+          "range": true,
+          "refId": "A",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(system_cpu_count{job=\"$job\", pod=~\"$pod\"})",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "cpu",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Load",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "x-axis": true,
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "y-axis": true,
+      "y_formats": [
+        "short",
+        "short"
+      ],
+      "yaxes": [
+        {
+          "$$hashKey": "object:156",
+          "decimals": 1,
+          "format": "short",
+          "label": "",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:157",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {
+        "leftLogBase": 1,
+        "rightLogBase": 1
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 12,
+        "y": 49
+      },
+      "hiddenSeries": false,
+      "id": 32,
+      "legend": {
+        "avg": false,
+        "current": true,
+        "max": true,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.3.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(jvm_threads_live_threads{job=\"$job\", pod=~\"$pod\"})",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "live",
+          "metric": "",
+          "range": true,
+          "refId": "A",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(jvm_threads_daemon_threads{job=\"$job\", pod=~\"$pod\"})",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "daemon",
+          "metric": "",
+          "range": true,
+          "refId": "B",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(jvm_threads_peak_threads{job=\"$job\", pod=~\"$pod\"})",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "peak",
+          "range": true,
+          "refId": "C",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(process_threads{job=\"$job\", pod=~\"$pod\"})",
+          "format": "time_series",
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "process",
+          "range": true,
+          "refId": "D",
+          "step": 2400
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Threads",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "x-axis": true,
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "y-axis": true,
+      "y_formats": [
+        "short",
+        "short"
+      ],
+      "yaxes": [
+        {
+          "$$hashKey": "object:669",
+          "decimals": 0,
+          "format": "short",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:670",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "editable": true,
+      "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {
+        "leftLogBase": 1,
+        "rightLogBase": 1
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 18,
+        "y": 49
+      },
+      "hiddenSeries": false,
+      "id": 61,
+      "legend": {
+        "avg": false,
+        "current": true,
+        "max": true,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.3.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(process_files_open_files{job=\"$job\", pod=~\"$pod\"})",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "open",
+          "metric": "",
+          "range": true,
+          "refId": "A",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(process_files_max_files{job=\"$job\", pod=~\"$pod\"})",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "max",
+          "metric": "",
+          "range": true,
+          "refId": "B",
+          "step": 2400
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "File Descriptors",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "x-axis": true,
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "y-axis": true,
+      "y_formats": [
+        "short",
+        "short"
+      ],
+      "yaxes": [
+        {
+          "$$hashKey": "object:522",
+          "decimals": 0,
+          "format": "none",
+          "logBase": 10,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:523",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "collapsed": false,
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 56
+      },
+      "id": 110,
+      "panels": [],
+      "repeat": "persistence_counts",
+      "targets": [
+        {
+          "datasource": "prometheus",
+          "refId": "A"
+        }
+      ],
+      "title": "JVM Memory Pools (Heap)",
+      "type": "row"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {
+        "leftLogBase": 1,
+        "rightLogBase": 1
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 57
+      },
+      "hiddenSeries": false,
+      "id": 3,
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": true,
+        "max": true,
+        "min": false,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "maxPerRow": 3,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.3.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "repeat": "jvm_memory_pool_heap",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(jvm_memory_used_bytes{job=\"$job\", pod=~\"$pod\", id=\"$jvm_memory_pool_heap\"})",
+          "format": "time_series",
+          "hide": false,
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "used",
+          "metric": "",
+          "range": true,
+          "refId": "A",
+          "step": 1800
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(jvm_memory_committed_bytes{job=\"$job\", pod=~\"$pod\", id=\"$jvm_memory_pool_heap\"})",
+          "format": "time_series",
+          "hide": false,
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "commited",
+          "metric": "",
+          "range": true,
+          "refId": "B",
+          "step": 1800
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(jvm_memory_max_bytes{job=\"$job\", pod=~\"$pod\", id=\"$jvm_memory_pool_heap\"})",
+          "format": "time_series",
+          "hide": false,
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "max",
+          "metric": "",
+          "range": true,
+          "refId": "C",
+          "step": 1800
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "$jvm_memory_pool_heap",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "x-axis": true,
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "y-axis": true,
+      "y_formats": [
+        "mbytes",
+        "short"
+      ],
+      "yaxes": [
+        {
+          "$$hashKey": "object:875",
+          "format": "bytes",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:876",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "collapsed": false,
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 64
+      },
+      "id": 111,
+      "panels": [],
+      "targets": [
+        {
+          "datasource": "prometheus",
+          "refId": "A"
+        }
+      ],
+      "title": "JVM Memory Pools (Non-Heap)",
+      "type": "row"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {
+        "leftLogBase": 1,
+        "rightLogBase": 1
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 65
+      },
+      "hiddenSeries": false,
+      "id": 78,
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": true,
+        "max": true,
+        "min": false,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "maxPerRow": 3,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.3.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "repeat": "jvm_memory_pool_nonheap",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(jvm_memory_used_bytes{job=\"$job\", pod=~\"$pod\", id=\"$jvm_memory_pool_nonheap\"})",
+          "format": "time_series",
+          "hide": false,
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "used",
+          "metric": "",
+          "range": true,
+          "refId": "A",
+          "step": 1800
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(jvm_memory_committed_bytes{job=\"$job\", pod=~\"$pod\", id=\"$jvm_memory_pool_nonheap\"})",
+          "format": "time_series",
+          "hide": false,
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "commited",
+          "metric": "",
+          "range": true,
+          "refId": "B",
+          "step": 1800
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(jvm_memory_max_bytes{job=\"$job\", pod=~\"$pod\", id=\"$jvm_memory_pool_nonheap\"})",
+          "format": "time_series",
+          "hide": false,
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "max",
+          "metric": "",
+          "range": true,
+          "refId": "C",
+          "step": 1800
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "$jvm_memory_pool_nonheap",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "x-axis": true,
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "y-axis": true,
+      "y_formats": [
+        "mbytes",
+        "short"
+      ],
+      "yaxes": [
+        {
+          "$$hashKey": "object:1023",
+          "format": "bytes",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:1024",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "collapsed": false,
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 79
+      },
+      "id": 112,
+      "panels": [],
+      "targets": [
+        {
+          "datasource": "prometheus",
+          "refId": "A"
+        }
+      ],
+      "title": "Garbage Collection",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 80
+      },
+      "id": 98,
+      "links": [],
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.3.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(jvm_gc_pause_duration_seconds_count{job=\"$job\", pod=~\"$pod\"}[1m])",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 2,
+          "legendFormat": "{{action}} ({{cause}}) - {{ pod }}",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(jvm_gc_pause_seconds_count{job=\"$job\", pod=~\"$pod\"}[1m])",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 2,
+          "legendFormat": "{{action}} ({{cause}})  - {{ pod }}",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Collections",
+      "type": "timeseries"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 80
+      },
+      "hiddenSeries": false,
+      "id": 101,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.3.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "increase(jvm_gc_pause_duration_seconds_sum{job=\"$job\", pod=~\"$pod\"}[1m])/increase(jvm_gc_pause_duration_seconds_count{job=\"$job\", pod=~\"$pod\"}[1m])",
+          "format": "time_series",
+          "instant": false,
+          "intervalFactor": 2,
+          "legendFormat": "avg {{action}} ({{cause}}) - {{ pod }}",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "jvm_gc_pause_duration_seconds_max{job=\"$job\", pod=~\"$pod\"}",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 2,
+          "legendFormat": "max {{action}} ({{cause}}) - {{ pod }}",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "increase(jvm_gc_pause_seconds_sum{job=\"$job\", pod=~\"$pod\"}[1m])/increase(jvm_gc_pause_seconds_count{job=\"$job\", pod=~\"$pod\"}[1m])",
+          "format": "time_series",
+          "instant": false,
+          "intervalFactor": 2,
+          "legendFormat": "avg {{action}} ({{cause}}) - {{ pod }}",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "jvm_gc_pause_seconds_max{job=\"$job\", pod=~\"$pod\"}",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 2,
+          "legendFormat": "max {{action}} ({{cause}}) - {{ pod }}",
+          "range": true,
+          "refId": "D"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Pause Durations",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:1193",
+          "format": "s",
+          "logBase": 1,
+          "min": "0",
+          "show": true
+        },
+        {
+          "$$hashKey": "object:1194",
+          "format": "short",
+          "label": "",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 80
+      },
+      "hiddenSeries": false,
+      "id": 99,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.3.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(jvm_gc_memory_allocated_bytes_total{job=\"$job\", pod=~\"$pod\"}[1m])",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "allocated",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(jvm_gc_memory_promoted_bytes_total{job=\"$job\", pod=~\"$pod\"}[1m])",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "promoted",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Allocated/Promoted",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:1262",
+          "format": "bytes",
+          "logBase": 1,
+          "min": "0",
+          "show": true
+        },
+        {
+          "$$hashKey": "object:1263",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "collapsed": false,
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 87
+      },
+      "id": 113,
+      "panels": [],
+      "targets": [
+        {
+          "datasource": "prometheus",
+          "refId": "A"
+        }
+      ],
+      "title": "Classloading",
+      "type": "row"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {
+        "leftLogBase": 1,
+        "rightLogBase": 1
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 88
+      },
+      "hiddenSeries": false,
+      "id": 37,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.3.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "jvm_classes_loaded_classes{job=\"$job\", pod=~\"$pod\"}",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "loaded",
+          "metric": "",
+          "range": true,
+          "refId": "A",
+          "step": 1200
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Classes loaded",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "x-axis": true,
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "y-axis": true,
+      "y_formats": [
+        "short",
+        "short"
+      ],
+      "yaxes": [
+        {
+          "$$hashKey": "object:1331",
+          "format": "short",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:1332",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {
+        "leftLogBase": 1,
+        "rightLogBase": 1
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 88
+      },
+      "hiddenSeries": false,
+      "id": 38,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.3.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "delta(jvm_classes_loaded_classes{job=\"$job\", pod=~\"$pod\"}[5m])",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 2,
+          "legendFormat": "class load rate",
+          "metric": "",
+          "range": true,
+          "refId": "A",
+          "step": 1200
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "delta(jvm_classes_unloaded_total{job=\"$job\", pod=~\"$pod\"}[5m])",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 2,
+          "legendFormat": "class unload rate",
+          "range": true,
+          "refId": "B",
+          "step": 1800
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "jvm_classes_loaded_total{job=\"$job\", pod=~\"$pod\"}-jvm_classes_unloaded_total{job=\"$job\", pod=~\"$pod\"}",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 2,
+          "legendFormat": "class unload rate",
+          "range": true,
+          "refId": "C",
+          "step": 1800
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Class load/unload rate (5m)",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "x-axis": true,
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "y-axis": true,
+      "y_formats": [
+        "ops",
+        "short"
+      ],
+      "yaxes": [
+        {
+          "$$hashKey": "object:1384",
+          "format": "ops",
+          "label": "",
+          "logBase": 2,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:1385",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "collapsed": false,
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 95
+      },
+      "id": 114,
+      "panels": [],
+      "targets": [
+        {
+          "datasource": "prometheus",
+          "refId": "A"
+        }
+      ],
+      "title": "Buffer Pools",
+      "type": "row"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {
+        "leftLogBase": 1,
+        "rightLogBase": 1
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 0,
+        "y": 96
+      },
+      "hiddenSeries": false,
+      "id": 33,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.3.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "jvm_buffer_memory_used_bytes{job=\"$job\", pod=~\"$pod\", id=\"direct\"}",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "used - {{ pod }}",
+          "metric": "",
+          "range": true,
+          "refId": "A",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "jvm_buffer_total_capacity_bytes{job=\"$job\", pod=~\"$pod\", id=\"direct\"}",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "capacity - {{ pod }}",
+          "metric": "",
+          "range": true,
+          "refId": "B",
+          "step": 2400
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Direct Buffers",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "x-axis": true,
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "y-axis": true,
+      "y_formats": [
+        "short",
+        "short"
+      ],
+      "yaxes": [
+        {
+          "$$hashKey": "object:1540",
+          "format": "bytes",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:1541",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {
+        "leftLogBase": 1,
+        "rightLogBase": 1
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 6,
+        "y": 96
+      },
+      "hiddenSeries": false,
+      "id": 83,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.3.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "jvm_buffer_count_buffers{job=\"$job\", pod=~\"$pod\", id=\"direct\"}",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "count - {{ pod }}",
+          "metric": "",
+          "range": true,
+          "refId": "A",
+          "step": 2400
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Direct Buffers",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "x-axis": true,
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "y-axis": true,
+      "y_formats": [
+        "short",
+        "short"
+      ],
+      "yaxes": [
+        {
+          "$$hashKey": "object:1593",
+          "decimals": 0,
+          "format": "short",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:1594",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {
+        "leftLogBase": 1,
+        "rightLogBase": 1
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 12,
+        "y": 96
+      },
+      "hiddenSeries": false,
+      "id": 85,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.3.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "jvm_buffer_memory_used_bytes{job=\"$job\", pod=~\"$pod\", id=\"mapped\"}",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "used - {{ pod }}",
+          "metric": "",
+          "range": true,
+          "refId": "A",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "jvm_buffer_total_capacity_bytes{job=\"$job\", pod=~\"$pod\", id=\"mapped\"}",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "capacity - {{ pod }}",
+          "metric": "",
+          "range": true,
+          "refId": "B",
+          "step": 2400
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Mapped Buffers",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "x-axis": true,
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "y-axis": true,
+      "y_formats": [
+        "short",
+        "short"
+      ],
+      "yaxes": [
+        {
+          "$$hashKey": "object:1749",
+          "format": "bytes",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:1750",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {
+        "leftLogBase": 1,
+        "rightLogBase": 1
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 18,
+        "y": 96
+      },
+      "hiddenSeries": false,
+      "id": 84,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "9.3.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "jvm_buffer_count_buffers{job=\"$job\", pod=~\"$pod\", id=\"mapped\"}",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "count - {{ pod }}",
+          "metric": "",
+          "range": true,
+          "refId": "A",
+          "step": 2400
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Mapped Buffers",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "x-axis": true,
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "y-axis": true,
+      "y_formats": [
+        "short",
+        "short"
+      ],
+      "yaxes": [
+        {
+          "$$hashKey": "object:1826",
+          "decimals": 0,
+          "format": "short",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:1827",
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 37,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": "conduktor-proxy",
+          "value": "conduktor-proxy"
+        },
+        "hide": 2,
+        "includeAll": false,
+        "label": "Job",
+        "multi": false,
+        "name": "job",
+        "options": [
+          {
+            "selected": true,
+            "text": "conduktor-proxy",
+            "value": "conduktor-proxy"
+          }
+        ],
+        "query": "conduktor-proxy",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "type": "custom"
+      },
+      {
+        "allFormat": "glob",
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(up{job=\"$job\"}, pod)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "pod",
+        "multi": true,
+        "multiFormat": "glob",
+        "name": "pod",
+        "options": [],
+        "query": {
+          "query": "label_values(up{job=\"$job\"}, pod)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allFormat": "glob",
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(jvm_memory_used_bytes{job=\"$job\", pod=~\"$pod\", area=\"heap\"},id)",
+        "hide": 2,
+        "includeAll": true,
+        "label": "JVM Memory Pools Heap",
+        "multi": false,
+        "multiFormat": "glob",
+        "name": "jvm_memory_pool_heap",
+        "options": [],
+        "query": {
+          "query": "label_values(jvm_memory_used_bytes{job=\"$job\", pod=~\"$pod\", area=\"heap\"},id)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allFormat": "glob",
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(jvm_memory_used_bytes{job=\"$job\", pod=~\"$pod\", area=\"nonheap\"},id)",
+        "hide": 2,
+        "includeAll": true,
+        "label": "JVM Memory Pools Non-Heap",
+        "multi": false,
+        "multiFormat": "glob",
+        "name": "jvm_memory_pool_nonheap",
+        "options": [],
+        "query": {
+          "query": "label_values(jvm_memory_used_bytes{job=\"$job\", pod=~\"$pod\", area=\"nonheap\"},id)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 2,
+        "tagValuesQuery": "",
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allFormat": "glob",
+        "allValue": ".*",
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(proxy_latency_request_response_seconds{job=\"$job\", pod=~\"$pod\"},tenant)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Tenant",
+        "multi": true,
+        "multiFormat": "glob",
+        "name": "tenant",
+        "options": [],
+        "query": {
+          "query": "label_values(proxy_latency_request_response_seconds{job=\"$job\", pod=~\"$pod\"},tenant)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 2,
+        "tagValuesQuery": "",
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allFormat": "glob",
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(jvm_threads_states_threads{job=\"$job\",  pod=~\"$pod\"},state)",
+        "hide": 2,
+        "includeAll": true,
+        "label": "JVM Thread State",
+        "multi": false,
+        "multiFormat": "glob",
+        "name": "jvm_threads_states_threads",
+        "options": [],
+        "query": {
+          "query": "label_values(jvm_threads_states_threads{job=\"$job\",  pod=~\"$pod\"},state)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 2,
+        "tagValuesQuery": "",
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allFormat": "glob",
+        "allValue": "",
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(proxy_kcache_size{job=\"$job\", pod=~\"$pod\"},type)",
+        "hide": 2,
+        "includeAll": true,
+        "label": "kcache_key",
+        "multi": false,
+        "multiFormat": "glob",
+        "name": "proxy_kcache_size_type",
+        "options": [],
+        "query": {
+          "query": "label_values(proxy_kcache_size{job=\"$job\", pod=~\"$pod\"},type)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 2,
+        "tagValuesQuery": "",
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {
+    "now": true,
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Conduktor Proxy",
+  "uid": "",
+  "version": 1,
+  "weekStart": ""
+}

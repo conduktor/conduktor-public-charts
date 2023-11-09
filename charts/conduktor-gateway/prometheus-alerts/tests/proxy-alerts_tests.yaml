@@ -1,0 +1,101 @@
+rule_files:
+- ../gateway-alerts.yaml
+
+tests:
+- interval: 15s # 5m [15s] -> 20 metrics to fill
+  input_series:
+  - series: 'kube_deployment_status_replicas_ready{deployment="conduktor-proxy", namespace="proxy", test="1"}'
+    values: '2x20'
+  - series: 'kube_deployment_status_replicas_ready{deployment="conduktor-proxy", namespace="proxy", test="2"}'
+    values: '2x15 1x5'
+  - series: 'kube_deployment_labels{deployment="conduktor-proxy", conduktor_team="proxy", conduktor_app_name="conduktor-proxy"}'
+    values: '1x20'
+  alert_rule_test:
+  - eval_time: 5m
+    alertname: ProxyHA
+    exp_alerts:
+    - exp_labels:
+        severity: warning
+        namespace: proxy
+        deployment: conduktor-proxy
+        conduktor_team: proxy
+        conduktor_app_name: conduktor-proxy
+        test: 2
+      exp_annotations:
+        summary: "proxy/conduktor-proxy ready replicas is lower than 2"
+- interval: 15s # 5m [15s] -> 20 metrics to fill
+  input_series:
+  - series: 'kube_deployment_spec_replicas{namespace="proxy", deployment="conduktor-proxy", test="1"}'
+    values: '3x20'
+  - series: 'kube_deployment_status_replicas_ready{namespace="proxy", deployment="conduktor-proxy", test="1"}'
+    values: '3x20'
+  - series: 'kube_deployment_spec_replicas{namespace="proxy", deployment="conduktor-proxy", test="2"}'
+    values: '3x20'
+  - series: 'kube_deployment_status_replicas_ready{namespace="proxy", deployment="conduktor-proxy", test="2"}'
+    values: '3x15 2x15'
+  - series: 'kube_deployment_labels{deployment="conduktor-proxy", conduktor_team="proxy", conduktor_app_name="conduktor-proxy"}'
+    values: '1x20'
+  alert_rule_test:
+  - eval_time: 5m
+    alertname: ProxyReadyReplicas
+    exp_alerts:
+    - exp_labels:
+        severity: warning
+        namespace: proxy
+        deployment: conduktor-proxy
+        conduktor_team: proxy
+        conduktor_app_name: conduktor-proxy
+        test: 2
+      exp_annotations:
+        summary: "proxy/conduktor-proxy replicas count drift"
+        description: "proxy/conduktor-proxy ready replicas count is 2, lower than replicas count defined"
+- interval: 15s # 5m [15s] -> 20 metrics to fill
+  input_series:
+  - series: 'kube_pod_container_status_restarts_total{namespace="proxy", pod="conduktor-proxy-579d7d6b7c-2kncg"}'
+    values: '0x12 1 1 2 2 3 3 4 4'
+  - series: 'kube_pod_labels{pod="conduktor-proxy-579d7d6b7c-2kncg", conduktor_team="proxy", conduktor_app_name="conduktor-proxy"}'
+    values: '1x20'
+  - series: 'kube_pod_container_status_restarts_total{namespace="proxy", pod="conduktor-proxy-579d7d6b7c-8t6zk"}'
+    values: '0x20'
+  - series: 'kube_pod_labels{pod="conduktor-proxy-579d7d6b7c-8t6zk", conduktor_team="proxy", conduktor_app_name="conduktor-proxy"}'
+    values: '1x20'
+  alert_rule_test:
+  - eval_time: 5m
+    alertname: ProxyPodRestart
+    exp_alerts:
+    - exp_labels:
+        severity: critical
+        namespace: proxy
+        pod: conduktor-proxy-579d7d6b7c-2kncg
+        conduktor_team: proxy
+        conduktor_app_name: conduktor-proxy
+      exp_annotations:
+        summary: "Pod proxy/conduktor-proxy-579d7d6b7c-2kncg is crash looping"
+        description: "Pod proxy/conduktor-proxy-579d7d6b7c-2kncg is crash looping 2x times in the last minute"
+- interval: 15s # 6m [15s] -> 24 metrics to fill
+  input_series:
+  - series: 'kube_pod_status_phase{namespace="proxy", phase="Pending", pod="conduktor-proxy-579d7d6b7c-2kncg"}'
+    values: '1x8 0x16'
+  - series: 'kube_pod_status_phase{namespace="proxy", phase="Running", pod="conduktor-proxy-579d7d6b7c-2kncg"}'
+    values: '0x8 1x16'
+  - series: 'kube_pod_labels{pod="conduktor-proxy-579d7d6b7c-2kncg", conduktor_team="proxy", conduktor_app_name="conduktor-proxy"}'
+    values: '1x20'
+  - series: 'kube_pod_status_phase{namespace="proxy", phase="Pending", pod="conduktor-proxy-579d7d6b7c-8t6zk"}'
+    values: '1x4 0x16'
+  - series: 'kube_pod_status_phase{namespace="proxy", phase="Failed", pod="conduktor-proxy-579d7d6b7c-8t6zk"}'
+    values: '0x4 1x20'
+  - series: 'kube_pod_labels{pod="conduktor-proxy-579d7d6b7c-8t6zk", conduktor_team="proxy", conduktor_app_name="conduktor-proxy"}'
+    values: '1x20'
+  alert_rule_test:
+  - eval_time: 6m
+    alertname: ProxyInstanceNotHealthy
+    exp_alerts:
+    - exp_labels:
+        severity: critical
+        namespace: proxy
+        pod: conduktor-proxy-579d7d6b7c-8t6zk
+        conduktor_team: proxy
+        conduktor_app_name: conduktor-proxy
+      exp_annotations:
+        summary: "Pod proxy/conduktor-proxy-579d7d6b7c-8t6zk not healthy"
+        description: "Pod proxy/conduktor-proxy-579d7d6b7c-8t6zk has been in a non-ready state for longer than 5 minutes."
