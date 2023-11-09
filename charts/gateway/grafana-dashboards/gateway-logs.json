@@ -137,7 +137,7 @@
             "uid": "${DS_LOKI}"
           },
           "editorMode": "builder",
-          "expr": "sum by(pod) (count_over_time({app=\"conduktor-proxy\"} | pod =~ `$pod` [$__range]))",
+          "expr": "sum by(pod) (count_over_time({app=\"conduktor-gateway\"} | pod =~ `$pod` [$__range]))",
           "legendFormat": "{{pod}}",
           "queryType": "range",
           "refId": "A"
@@ -259,7 +259,7 @@
             "uid": "${DS_LOKI}"
           },
           "editorMode": "builder",
-          "expr": "sum by(pod, level) (count_over_time({app=\"conduktor-proxy\"} | pod =~ `$pod` | json level=\"level\" | __error__=`` | level =~ `ERROR|WARN` [$__range]))",
+          "expr": "sum by(pod, level) (count_over_time({app=\"conduktor-gateway\"} | pod =~ `$pod` | json level=\"level\" | __error__=`` | level =~ `ERROR|WARN` [$__range]))",
           "legendFormat": "{{level}}",
           "queryType": "range",
           "refId": "A"
@@ -298,7 +298,7 @@
             "uid": "${DS_LOKI}"
           },
           "editorMode": "builder",
-          "expr": "{app=\"conduktor-proxy\"} | pod =~ `$pod` | json level=\"level\", message=\"message\", thread=\"thread\", logger=\"loggerName\", pod=\"pod\" | __error__=`` | line_format `{{.message}}`",
+          "expr": "{app=\"conduktor-gateway\"} | pod =~ `$pod` | json level=\"level\", message=\"message\", thread=\"thread\", logger=\"loggerName\", pod=\"pod\" | __error__=`` | line_format `{{.message}}`",
           "legendFormat": "{{level}}",
           "queryType": "range",
           "refId": "A"
@@ -321,14 +321,14 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(kube_pod_labels{conduktor_app_name=\"conduktor-proxy\"}, pod)",
+        "definition": "label_values(kube_pod_labels{conduktor_app_name=\"conduktor-gateway\"}, pod)",
         "hide": 0,
         "includeAll": true,
         "multi": true,
         "name": "pod",
         "options": [],
         "query": {
-          "query": "label_values(kube_pod_labels{conduktor_app_name=\"conduktor-proxy\"}, pod)",
+          "query": "label_values(kube_pod_labels{conduktor_app_name=\"conduktor-gateway\"}, pod)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 2,
@@ -345,7 +345,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Proxy logs",
+  "title": "Conduktor Gateway logs",
   "uid": "",
   "version": 2,
   "weekStart": ""

@@ -105,7 +105,7 @@
       }
     ]
   },
-  "description": "Dashboard for Kafka Proxy",
+  "description": "Dashboard for Conduktor Gateway",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "gnetId": 4701,
@@ -3764,8 +3764,8 @@
       {
         "current": {
           "selected": true,
-          "text": "conduktor-proxy",
-          "value": "conduktor-proxy"
+          "text": "conduktor-gateway",
+          "value": "conduktor-gateway"
         },
         "hide": 2,
         "includeAll": false,
@@ -3775,11 +3775,11 @@
         "options": [
           {
             "selected": true,
-            "text": "conduktor-proxy",
-            "value": "conduktor-proxy"
+            "text": "conduktor-gateway",
+            "value": "conduktor-gateway"
           }
         ],
-        "query": "conduktor-proxy",
+        "query": "conduktor-gateway",
         "queryValue": "",
         "skipUrlSync": false,
         "type": "custom"
@@ -3987,7 +3987,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "Conduktor Proxy",
+  "title": "Conduktor Gateway",
   "uid": "",
   "version": 1,
   "weekStart": ""

@@ -4,13 +4,13 @@ rule_files:
 tests:
 - interval: 15s # 5m [15s] -> 20 metrics to fill
   input_series:
-  - series: 'checkly_check_status{job="checkly", check_name="Another Test", check_type="api", conduktor_team="proxy"}'
+  - series: 'checkly_check_status{job="checkly", check_name="Another Test", check_type="api", conduktor_team="gateway"}'
     values: '1x20'
-  - series: 'checkly_check_status{job="checkly", check_name="Test Prod Kafka Playground Connectivity", check_type="api", conduktor_team="proxy", conduktor_env="production"}'
+  - series: 'checkly_check_status{job="checkly", check_name="Test Prod Kafka Playground Connectivity", check_type="api", conduktor_team="gateway", conduktor_env="production"}'
     values: '1x15 0x5'
-  - series: 'checkly_check_status{job="checkly", check_name="Test Staging Kafka Playground Connectivity", check_type="api", conduktor_team="proxy", conduktor_env="staging"}'
+  - series: 'checkly_check_status{job="checkly", check_name="Test Staging Kafka Playground Connectivity", check_type="api", conduktor_team="gateway", conduktor_env="staging"}'
     values: '1x15 0x5'
-  - series: 'kube_deployment_labels{conduktor_team="proxy", conduktor_env="production"}'
+  - series: 'kube_deployment_labels{conduktor_team="gateway", conduktor_env="production"}'
     values: '1x20'
   alert_rule_test:
   - eval_time: 5m
@@ -21,7 +21,7 @@ tests:
         job: checkly
         check_name: Test Prod Kafka Playground Connectivity
         check_type: api
-        conduktor_team: proxy
+        conduktor_team: gateway
         conduktor_env: production
       exp_annotations:
         summary: "External playground connectivity test is failing"
@@ -32,18 +32,18 @@ tests:
         job: checkly
         check_name: Test Staging Kafka Playground Connectivity
         check_type: api
-        conduktor_team: proxy
+        conduktor_team: gateway
         conduktor_env: staging
       exp_annotations:
         summary: "External playground connectivity test is failing"
         description: "Checkly test Test Staging Kafka Playground Connectivity failed for more than 1m"
 - interval: 30s # 15m [30s] -> 30 metrics to fill
   input_series:
-  - series: 'checkly_check_result{job="checkly", check_name="Test A", check_type="api", conduktor_team="proxy"}'
+  - series: 'checkly_check_result{job="checkly", check_name="Test A", check_type="api", conduktor_team="gateway"}'
     values: '1000x30'
-  - series: 'checkly_check_result{job="checkly", check_name="Test B", check_type="api", conduktor_team="proxy"}'
+  - series: 'checkly_check_result{job="checkly", check_name="Test B", check_type="api", conduktor_team="gateway"}'
     values: '1000x9 7000x21'
-  - series: 'checkly_check_result{job="checkly", check_name="Test C", check_type="api", conduktor_team="proxy"}'
+  - series: 'checkly_check_result{job="checkly", check_name="Test C", check_type="api", conduktor_team="gateway"}'
     values: '7000x21 1000x9'
   alert_rule_test:
   - eval_time: 15m
@@ -54,7 +54,7 @@ tests:
         job: checkly
         check_name: Test B
         check_type: api
-        conduktor_team: proxy
+        conduktor_team: gateway
       exp_annotations:
         summary: "Checkly playground connectivity is slow"
         description: "Test Test B is taking more than 6s for more than 10m"
@@ -66,7 +66,7 @@ tests:
         job: checkly
         check_name: Test C
         check_type: api
-        conduktor_team: proxy
+        conduktor_team: gateway
       exp_annotations:
         summary: "Checkly playground connectivity is slow"
         description: "Test Test C is taking more than 6s for more than 10m"
