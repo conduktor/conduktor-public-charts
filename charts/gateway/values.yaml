@@ -184,3 +184,7 @@ affinity: {}
 kafka:
   ## @param kafka.enabled Deploy a kafka along side gateway (This should only used for testing purpose)
   enabled: false
+
+## @param priorityClassName Conduktor Platform pods' priorityClassName
+##
+priorityClassName: ""

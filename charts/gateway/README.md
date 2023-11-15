@@ -108,6 +108,7 @@ Shared kubernetes configuration of the chart
 | `nodeSelector`          | Container node selector                                        | `{}`    |
 | `tolerations`           | Container tolerations                                          | `[]`    |
 | `affinity`              | Container affinity                                             | `{}`    |
+| `priorityClassName`     | Container priorityClassName                                    | `{}`    |
 
 ### Dependencies
 
