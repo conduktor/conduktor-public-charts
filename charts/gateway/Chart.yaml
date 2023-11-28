@@ -2,7 +2,7 @@ apiVersion: v2
 appVersion: "2.2.1"
 description: Conduktor Gateway and associated backing Kafka
 name: conduktor-gateway
-version: 2.2.2
+version: 2.2.3
 
 dependencies:
   - name: kafka
