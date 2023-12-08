@@ -54,6 +54,9 @@ spec:
             - name: GATEWAY_SSL_KEY_STORE_PATH
               value: /etc/gateway/tls/{{ .Values.tls.keystoreFile }}
             {{- end }}
+            {{- if .Values.gateway.extraSecretEnvVars }}
+            {{- toYaml .Values.gateway.extraSecretEnvVars | nindent 12 }}
+            {{- end }}
           envFrom:
             - configMapRef:
                 name: {{ include "conduktor-gateway.fullname" . }}
