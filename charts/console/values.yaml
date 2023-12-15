@@ -482,8 +482,10 @@ platform:
   ##
   initContainers: []
 
-  ## Prometheus metrics
-  ##
+  ## @section Conduktor-gateway metrics activation
+  ## @descriptionStart
+  ## Console expose metrics that could be collected and presented if your environment have the necessary components (Prometheus and Grafana operators)
+  ## @descriptionEnd
   metrics:
     ## @param platform.metrics.enabled Enable the export of Prometheus metrics
     ##
@@ -533,6 +535,33 @@ platform:
       ##   prometheus: my-prometheus
       ##
       selector: {}
+
+    ## Grafana dashboard (need grafana operator or sidecar to be enabled on namespace)
+    ## refs:
+    ##  - Grafana sidecar : https://github.com/grafana/helm-charts/tree/main/charts/grafana#sidecar-for-dashboards
+    ##  - Grafana operator : https://grafana.github.io/grafana-operator/docs/dashboards/
+    ##
+    grafana:
+      ## @param platform.metrics.grafana.enable Enable grafana dashboards to installation
+      ##
+      enable: false
+      ## @param platform.metrics.grafana.namespace Namespace used to deploy Grafana dashboards by default use the same namespace as Conduktor Csonsole
+      ##
+      namespace: ""
+      ## @param platform.metrics.grafana.matchLabels Label selector for Grafana instance
+      ##
+      matchLabels:
+        dashboards: "grafana"
+      ## @param platform.metrics.grafana.labels Additional custom labels for Grafana dashboard ConfigMap
+      ##
+      labels: {}
+      ## @param platform.metrics.grafana.folder Grafana dashboard folder name
+      ##
+      folder: ""
+      datasources:
+        ## @param platform.metrics.grafana.datasources.prometheus Prometheus datasource to use for metric dashboard
+        ##
+        prometheus: prometheus
 
 ## @section Traffic Exposure Parameters
 ##

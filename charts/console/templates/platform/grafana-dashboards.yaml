@@ -1,0 +1,73 @@
+{{- if .Values.platform.metrics.grafana.enable }}
+{{- $consoleDashboard :=  .Files.Get "grafana-dashboards/console.json" | fromJson }}
+{{- $_ := set $consoleDashboard "title" (printf "Conduktor Console [%s]" (include "common.names.namespace" .)) -}}
+{{- if .Values.platform.metrics.grafana.folder }}
+{{- if .Capabilities.APIVersions.Has "grafana.integreatly.org/v1beta1/GrafanaFolder" }}
+{{- $consoleFolderName := printf "%s-%s" (include "common.names.fullname" .) "folder" | trunc 63 | trimSuffix "-" -}}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: {{ $consoleFolderName | quote }}
+  namespace: {{ include "conduktor.platform.dashboard.namespace" . | quote }}
+spec:
+  instanceSelector:
+    matchLabels:
+    {{- include "common.tplvalues.render" ( dict "value" .Values.platform.metrics.grafana.matchLabels "context" $ ) | nindent 6 }}
+  title: {{ .Values.platform.metrics.grafana.folder | quote }}
+{{- end }}
+{{- end }}
+---
+{{- if .Capabilities.APIVersions.Has "grafana.integreatly.org/v1beta1/GrafanaDashboard" }}
+{{- $consoleDashboardName := printf "%s-%s" (include "common.names.fullname" .) "dashboards" | trunc 63 | trimSuffix "-" -}}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ $consoleDashboardName | quote }}
+  namespace: {{ include "conduktor.platform.dashboard.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    "conduktor.io/dashboard": "true"
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+spec:
+  instanceSelector:
+    matchLabels:
+    {{- include "common.tplvalues.render" ( dict "value" .Values.platform.metrics.grafana.matchLabels "context" $ ) | nindent 6 }}
+  {{- if .Values.platform.metrics.grafana.folder }}
+  folder: {{ .Values.platform.metrics.grafana.folder | quote }}
+  {{- end }}
+  datasources:
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: {{ .Values.platform.metrics.grafana.datasources.prometheus | quote }}
+    - inputName: "VAR_NAMESPACE"
+      datasourceName: {{ include "common.names.namespace" . | quote }}
+  json: |
+{{ toPrettyJson $consoleDashboard | indent 4 }}
+{{- end }}
+---
+{{- /* Support for v4 of Grafana operator */ -}}
+{{- if .Capabilities.APIVersions.Has "integreatly.org/v1alpha1/GrafanaDashboard" }}
+{{- $consoleDashboardName := printf "%s-%s" (include "common.names.fullname" .) "dashboards" | trunc 63 | trimSuffix "-" -}}
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: {{ $consoleDashboardName | quote }}
+  namespace: {{ include "conduktor.platform.dashboard.namespace" . | quote }}
+  labels:  {{- include "common.labels.standard" . | nindent 4 }}
+    conduktor.io/dashboard: "true"
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.platform.metrics.grafana.folder }}
+  customFolderName: {{ .Values.platform.metrics.grafana.folder | quote }}
+  {{- end }}
+  datasou2rces:
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: {{ .Values.platform.metrics.grafana.datasources.prometheus | quote }}
+    - inputName: "VAR_NAMESPACE"
+      datasourceName: {{ include "common.names.namespace" . | quote }}
+  json: |
+{{ toPrettyJson $consoleDashboard | indent 4 }}
+{{- end }}
+{{- end }}

@@ -130,6 +130,7 @@ helm-minio: ## Install minio helm chart from bitnami
 	kubectl rollout status --watch --timeout=300s deployment/minio -n ${NAMESPACE}
 
 .PHONY: helm-monitoring-stack
+.ONESHELL:
 helm-monitoring-stack: ## Install monitoring stack prometheus and grafana
 	@echo "Add prometheus helm repo"
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts || true
@@ -140,8 +141,15 @@ helm-monitoring-stack: ## Install monitoring stack prometheus and grafana
 		--set prometheus.prometheusSpec.podMonitorSelectorNilUsesHelmValues=false \
 		--set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false \
 		--set alertmanager.enabled=false \
-		--set grafana.enabled=true
-
+		--set grafana.enabled=false
+	@echo "Install grafana operator"
+	helm upgrade --install grafana-operator oci://ghcr.io/grafana/helm-charts/grafana-operator \
+		--namespace prometheus-stack --create-namespace \
+		--set namespaceScope=false \
+		--set watchNamespaces="" \
+		--version v5.6.0
+	@echo "Install grafana"
+	kubectl apply -f resources/monitoring-stack-grafana-crd.yaml
 
 .PHONY: create-test-ns
 create-test-ns: ## Create test namespace

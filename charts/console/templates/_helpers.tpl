@@ -114,6 +114,24 @@ Name of the platform Cortex ConfigMap
 {{- end -}}
 
 {{/*
+Name of the platform grafana dashboard ConfigMap
+*/}}
+{{- define "conduktor.platform.dashboard.name" -}}
+    {{- printf "%s-%s" (include "common.names.fullname" .) "dashboards" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Name of the platform grafana dashboard ConfigMap
+*/}}
+{{- define "conduktor.platform.dashboard.namespace" -}}
+  {{- if not (empty .Values.platform.metrics.grafana.namespace) -}}
+    {{- .Values.platform.metrics.grafana.namespace -}}
+  {{- else -}}
+    {{- include "common.names.namespace" . -}}
+  {{- end -}}
+{{- end -}}
+
+{{/*
 Name of the platform secret
 */}}
 {{- define "conduktor.platform.secretName" -}}
