@@ -347,6 +347,7 @@ console, we recommend you to look at our
 - [Provide the license as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
 
 - [Provide additional credentials as a Kubernetes Secret](#provide-additional-credentials-as-a-kubernetes-secret)
+- [Install with Console technical monitoring](#install-with-console-technical-monitoring)
 
 ### Install with an enterprise license
 
@@ -838,6 +839,58 @@ config:
 serviceAccount:
   annotations:
     eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/my-role"
+```
+
+### Install with Console technical monitoring
+
+If you want to enable the technical monitoring of Conduktor Console, you can enable built-in Prometheus metrics collector and Grafana dashboard.   
+But to work you need to have [prometheus-operator](https://github.com/prometheus-operator/prometheus-operator) and [grafana-operator](https://grafana.github.io/grafana-operator/docs/installation/helm/) installed in your cluster.
+We use following CRDs from these operators:
+- **ServiceMonitor** : `monitoring.coreos.com/v1/ServiceMonitor`
+- **GrafanaDashboard** : `grafana.integreatly.org/v1beta1/GrafanaDashboard` (v5) or `integreatly.org/v1alpha1/GrafanaDashboard` (v4)
+- **GrafanaFolder** : `grafana.integreatly.org/v1beta1/GrafanaFolder` (v5 only)
+
+You can also manually install Grafana dashboard from Json export located here [console.json](./grafana-dashboards/console.json). 
+It takes two inputs variables:
+- `DS_PROMETHEUS` : Prometheus Datasource name
+- `VAR_NAMESPACE` : Namespace where Conduktor Console is installed
+
+```yaml
+config:
+  organization:
+    name: "my-org"
+
+  admin:
+    email: "admin@my-org.com"
+    password: "admin"
+
+  database:
+    host: ''
+    port: 5432
+    name: 'postgres'
+    username: ''
+    password: ''
+
+platform:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: "monitoring-namespace"
+      labels:
+        monitor: "1"
+      interval: "30s"
+      scrapeTimeout: "10s"
+    grafana:
+      enabled: true
+      namespace: "monitoring-namespace"
+      folder: "tools"
+      matchLabels:
+        grafana: "tooling"
+      labels:
+        grafana_dashboard: "1"
+      datasources:
+        prometheus: my-prometheus-ds
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
