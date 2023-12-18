@@ -542,9 +542,9 @@ platform:
     ##  - Grafana operator : https://grafana.github.io/grafana-operator/docs/dashboards/
     ##
     grafana:
-      ## @param platform.metrics.grafana.enable Enable grafana dashboards to installation
+      ## @param platform.metrics.grafana.enabled Enable grafana dashboards to installation
       ##
-      enable: false
+      enabled: false
       ## @param platform.metrics.grafana.namespace Namespace used to deploy Grafana dashboards by default use the same namespace as Conduktor Csonsole
       ##
       namespace: ""

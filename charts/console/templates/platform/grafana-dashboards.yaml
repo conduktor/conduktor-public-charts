@@ -1,4 +1,4 @@
-{{- if .Values.platform.metrics.grafana.enable }}
+{{- if and .Values.platform.metrics.enabled .Values.platform.metrics.grafana.enabled }}
 {{- $consoleDashboard :=  .Files.Get "grafana-dashboards/console.json" | fromJson }}
 {{- $_ := set $consoleDashboard "title" (printf "Conduktor Console [%s]" (include "common.names.namespace" .)) -}}
 {{- if .Values.platform.metrics.grafana.folder }}
