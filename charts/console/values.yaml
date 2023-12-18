@@ -482,6 +482,58 @@ platform:
   ##
   initContainers: []
 
+  ## Prometheus metrics
+  ##
+  metrics:
+    ## @param platform.metrics.enabled Enable the export of Prometheus metrics
+    ##
+    enabled: false
+    ## Prometheus Operator ServiceMonitor configuration
+    ##
+    serviceMonitor:
+      ## @param platform.metrics.serviceMonitor.enabled if `true`, creates a Prometheus Operator ServiceMonitor (also requires `metrics.enabled` to be `true`)
+      ##
+      enabled: false
+      ## @param platform.metrics.serviceMonitor.namespace Namespace in which Prometheus is running
+      ##
+      namespace: ""
+      ## @param platform.metrics.serviceMonitor.annotations Additional custom annotations for the ServiceMonitor
+      ##
+      annotations: {}
+      ## @param platform.metrics.serviceMonitor.labels Extra labels for the ServiceMonitor
+      ##
+      labels: {}
+      ## @param platform.metrics.serviceMonitor.jobLabel The name of the label on the target service to use as the job name in Prometheus
+      ##
+      jobLabel: "app.kubernetes.io/name"
+      ## @param platform.metrics.serviceMonitor.honorLabels honorLabels chooses the metric's labels on collisions with target labels
+      ##
+      honorLabels: false
+      ## @param platform.metrics.serviceMonitor.interval Interval at which metrics should be scraped.
+      ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+      ## e.g:
+      ## interval: 10s
+      ##
+      interval: ""
+      ## @param platform.metrics.serviceMonitor.scrapeTimeout Timeout after which the scrape is ended
+      ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+      ## e.g:
+      ## scrapeTimeout: 10s
+      ##
+      scrapeTimeout: ""
+      ## @param platform.metrics.serviceMonitor.metricRelabelings Specify additional relabeling of metrics
+      ##
+      metricRelabelings: []
+      ## @param platform.metrics.serviceMonitor.relabelings Specify general relabeling
+      ##
+      relabelings: []
+      ## @param platform.metrics.serviceMonitor.selector Prometheus instance selector labels
+      ## ref: https://github.com/bitnami/charts/tree/main/bitnami/prometheus-operator#prometheus-configuration
+      ## selector:
+      ##   prometheus: my-prometheus
+      ##
+      selector: {}
+
 ## @section Traffic Exposure Parameters
 ##
 

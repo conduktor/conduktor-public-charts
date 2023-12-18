@@ -153,6 +153,12 @@ Name of the conduktor license
 {{- end -}}
 {{- end -}}
 
+{{/*
+Name of the platform Prometheus ServiceMonitor
+*/}}
+{{- define "conduktor.platform.serviceMonitorName" -}}
+{{- printf "%s-%s" (include "common.names.fullname" .) "monitor" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
 
 {{/*
 Name of the platform Service
