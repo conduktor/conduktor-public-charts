@@ -550,8 +550,7 @@ platform:
       namespace: ""
       ## @param platform.metrics.grafana.matchLabels Label selector for Grafana instance
       ##
-      matchLabels:
-        dashboards: "grafana"
+      matchLabels: {}
       ## @param platform.metrics.grafana.labels Additional custom labels for Grafana dashboard ConfigMap
       ##
       labels: {}
