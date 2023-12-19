@@ -915,8 +915,11 @@ platform:
       labels:
         grafana_dashboard: "1"
       datasources:
-        prometheus: my-prometheus-ds
+        prometheus: "my-prometheus-ds"
 ```
+
+This example will install a `ServiceMonitor` and a `GrafanaDashboard` in the namespace `monitoring-namespace`.    
+The `ServiceMonitor` will scrape metrics from Conduktor Console every 30 seconds and the `GrafanaDashboard` will be available in Grafana instance with label  `grafana: tooling` in the folder `tools` and use Prometheus datasource named `my-prometheus-ds`.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
