@@ -482,6 +482,86 @@ platform:
   ##
   initContainers: []
 
+  ## @section Conduktor-gateway metrics activation
+  ## @descriptionStart
+  ## Console expose metrics that could be collected and presented if your environment have the necessary components (Prometheus and Grafana operators)
+  ## @descriptionEnd
+  metrics:
+    ## @param platform.metrics.enabled Enable the export of Prometheus metrics
+    ##
+    enabled: false
+    ## Prometheus Operator ServiceMonitor configuration
+    ##
+    serviceMonitor:
+      ## @param platform.metrics.serviceMonitor.enabled if `true`, creates a Prometheus Operator ServiceMonitor (also requires `metrics.enabled` to be `true`)
+      ##
+      enabled: false
+      ## @param platform.metrics.serviceMonitor.namespace Namespace in which Prometheus is running
+      ##
+      namespace: ""
+      ## @param platform.metrics.serviceMonitor.annotations Additional custom annotations for the ServiceMonitor
+      ##
+      annotations: {}
+      ## @param platform.metrics.serviceMonitor.labels Extra labels for the ServiceMonitor
+      ##
+      labels: {}
+      ## @param platform.metrics.serviceMonitor.jobLabel The name of the label on the target service to use as the job name in Prometheus
+      ##
+      jobLabel: "app.kubernetes.io/name"
+      ## @param platform.metrics.serviceMonitor.honorLabels honorLabels chooses the metric's labels on collisions with target labels
+      ##
+      honorLabels: false
+      ## @param platform.metrics.serviceMonitor.interval Interval at which metrics should be scraped.
+      ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+      ## e.g:
+      ## interval: 10s
+      ##
+      interval: ""
+      ## @param platform.metrics.serviceMonitor.scrapeTimeout Timeout after which the scrape is ended
+      ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+      ## e.g:
+      ## scrapeTimeout: 10s
+      ##
+      scrapeTimeout: ""
+      ## @param platform.metrics.serviceMonitor.metricRelabelings Specify additional relabeling of metrics
+      ##
+      metricRelabelings: []
+      ## @param platform.metrics.serviceMonitor.relabelings Specify general relabeling
+      ##
+      relabelings: []
+      ## @param platform.metrics.serviceMonitor.selector Prometheus instance selector labels
+      ## ref: https://github.com/bitnami/charts/tree/main/bitnami/prometheus-operator#prometheus-configuration
+      ## selector:
+      ##   prometheus: my-prometheus
+      ##
+      selector: {}
+
+    ## Grafana dashboard (need grafana operator or sidecar to be enabled on namespace)
+    ## refs:
+    ##  - Grafana sidecar : https://github.com/grafana/helm-charts/tree/main/charts/grafana#sidecar-for-dashboards
+    ##  - Grafana operator : https://grafana.github.io/grafana-operator/docs/dashboards/
+    ##
+    grafana:
+      ## @param platform.metrics.grafana.enabled Enable grafana dashboards to installation
+      ##
+      enabled: false
+      ## @param platform.metrics.grafana.namespace Namespace used to deploy Grafana dashboards by default use the same namespace as Conduktor Csonsole
+      ##
+      namespace: ""
+      ## @param platform.metrics.grafana.matchLabels Label selector for Grafana instance
+      ##
+      matchLabels: {}
+      ## @param platform.metrics.grafana.labels Additional custom labels for Grafana dashboard ConfigMap
+      ##
+      labels: {}
+      ## @param platform.metrics.grafana.folder Grafana dashboard folder name
+      ##
+      folder: ""
+      datasources:
+        ## @param platform.metrics.grafana.datasources.prometheus Prometheus datasource to use for metric dashboard
+        ##
+        prometheus: prometheus
+
 ## @section Traffic Exposure Parameters
 ##
 

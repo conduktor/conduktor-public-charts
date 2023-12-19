@@ -53,3 +53,14 @@ See https://docs.conduktor.io/platform/configuration/cortex/ for configuration d
 
 {{- include "common.warnings.rollingTag" .Values.platform.image }}
 {{- include "conduktor.validateValues" . }}
+
+{{- if and .Values.platform.metrics.enabled .Values.platform.metrics.serviceMonitor.enabled }}
+{{- if not (.Capabilities.APIVersions.Has "monitoring.coreos.com/v1/ServiceMonitor") }}
+WARNING: Prometheus Operator is not installed in the cluster. ServiceMonitor will not be created.
+{{- end }}
+{{- if .Values.platform.metrics.grafana.enabled }}
+{{- if not (or (.Capabilities.APIVersions.Has "grafana.integreatly.org/v1beta1/GrafanaDashboard") (.Capabilities.APIVersions.Has "integreatly.org/v1alpha1/GrafanaDashboard")) }}
+WARNING: Grafana Operator in v4 ot v5 is not installed in the cluster. GrafanaDashboard will not be created.
+{{- end }}
+{{- end }}
+{{- end }}

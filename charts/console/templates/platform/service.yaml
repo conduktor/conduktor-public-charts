@@ -11,6 +11,9 @@ metadata:
     {{- if .Values.commonLabels }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
+    {{- if .Values.platform.metrics.serviceMonitor.enabled }}
+    metrics.conduktor.io/prometheus: "true"
+    {{- end }}
   {{- if or .Values.service.annotations .Values.commonAnnotations }}
   annotations:
     {{- if .Values.service.annotations }}

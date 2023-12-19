@@ -191,6 +191,31 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/co
 | `platform.sidecars`                           | Add additional sidecar containers to the Conduktor Platform pod(s)                                                                                            | `[]`                           |
 | `platform.initContainers`                     | Add additional init containers to the Conduktor Platform pod(s)                                                                                               | `[]`                           |
 
+### Conduktor-gateway metrics activation
+
+Console expose metrics that could be collected and presented if your environment have the necessary components (Prometheus and Grafana operators)
+
+| Name                                                | Description                                                                                            | Value                    |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------ |
+| `platform.metrics.enabled`                          | Enable the export of Prometheus metrics                                                                | `false`                  |
+| `platform.metrics.serviceMonitor.enabled`           | if `true`, creates a Prometheus Operator ServiceMonitor (also requires `metrics.enabled` to be `true`) | `false`                  |
+| `platform.metrics.serviceMonitor.namespace`         | Namespace in which Prometheus is running                                                               | `""`                     |
+| `platform.metrics.serviceMonitor.annotations`       | Additional custom annotations for the ServiceMonitor                                                   | `{}`                     |
+| `platform.metrics.serviceMonitor.labels`            | Extra labels for the ServiceMonitor                                                                    | `{}`                     |
+| `platform.metrics.serviceMonitor.jobLabel`          | The name of the label on the target service to use as the job name in Prometheus                       | `app.kubernetes.io/name` |
+| `platform.metrics.serviceMonitor.honorLabels`       | honorLabels chooses the metric's labels on collisions with target labels                               | `false`                  |
+| `platform.metrics.serviceMonitor.interval`          | Interval at which metrics should be scraped.                                                           | `""`                     |
+| `platform.metrics.serviceMonitor.scrapeTimeout`     | Timeout after which the scrape is ended                                                                | `""`                     |
+| `platform.metrics.serviceMonitor.metricRelabelings` | Specify additional relabeling of metrics                                                               | `[]`                     |
+| `platform.metrics.serviceMonitor.relabelings`       | Specify general relabeling                                                                             | `[]`                     |
+| `platform.metrics.serviceMonitor.selector`          | Prometheus instance selector labels                                                                    | `{}`                     |
+| `platform.metrics.grafana.enabled`                  | Enable grafana dashboards to installation                                                              | `false`                  |
+| `platform.metrics.grafana.namespace`                | Namespace used to deploy Grafana dashboards by default use the same namespace as Conduktor Csonsole    | `""`                     |
+| `platform.metrics.grafana.matchLabels`              | Label selector for Grafana instance                                                                    | `{}`                     |
+| `platform.metrics.grafana.labels`                   | Additional custom labels for Grafana dashboard ConfigMap                                               | `{}`                     |
+| `platform.metrics.grafana.folder`                   | Grafana dashboard folder name                                                                          | `""`                     |
+| `platform.metrics.grafana.datasources.prometheus`   | Prometheus datasource to use for metric dashboard                                                      | `prometheus`             |
+
 ### Traffic Exposure Parameters
 
 | Name                               | Description                                                                                                                      | Value                    |
@@ -347,6 +372,7 @@ console, we recommend you to look at our
 - [Provide the license as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
 
 - [Provide additional credentials as a Kubernetes Secret](#provide-additional-credentials-as-a-kubernetes-secret)
+- [Install with Console technical monitoring](#install-with-console-technical-monitoring)
 
 ### Install with an enterprise license
 
@@ -839,6 +865,61 @@ serviceAccount:
   annotations:
     eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/my-role"
 ```
+
+### Install with Console technical monitoring
+
+If you want to enable the technical monitoring of Conduktor Console, you can enable built-in Prometheus metrics collector and Grafana dashboard.   
+But to work you need to have [prometheus-operator](https://github.com/prometheus-operator/prometheus-operator) and [grafana-operator](https://grafana.github.io/grafana-operator/docs/installation/helm/) installed in your cluster.
+We use following CRDs from these operators:
+- **ServiceMonitor** : `monitoring.coreos.com/v1/ServiceMonitor`
+- **GrafanaDashboard** : `grafana.integreatly.org/v1beta1/GrafanaDashboard` (v5) or `integreatly.org/v1alpha1/GrafanaDashboard` (v4)
+- **GrafanaFolder** : `grafana.integreatly.org/v1beta1/GrafanaFolder` (v5 only)
+
+You can also manually install Grafana dashboard from Json export located here [console.json](./grafana-dashboards/console.json). 
+It takes two inputs variables:
+- `DS_PROMETHEUS` : Prometheus Datasource name
+- `VAR_NAMESPACE` : Namespace where Conduktor Console is installed
+
+```yaml
+config:
+  organization:
+    name: "my-org"
+
+  admin:
+    email: "admin@my-org.com"
+    password: "admin"
+
+  database:
+    host: ''
+    port: 5432
+    name: 'postgres'
+    username: ''
+    password: ''
+
+platform:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: "monitoring-namespace"
+      labels:
+        monitor: "1"
+      interval: "30s"
+      scrapeTimeout: "10s"
+    grafana:
+      enabled: true
+      namespace: "monitoring-namespace"
+      folder: "tools"
+      matchLabels:
+        grafana: "tooling"
+      labels:
+        grafana_dashboard: "1"
+      datasources:
+        prometheus: "my-prometheus-ds"
+```
+
+This example will install a `ServiceMonitor` and a `GrafanaDashboard` in the namespace `monitoring-namespace`.    
+The `ServiceMonitor` will scrape metrics from Conduktor Console every 30 seconds and the `GrafanaDashboard` will be available in Grafana instance with label  `grafana: tooling` in the folder `tools` and use Prometheus datasource named `my-prometheus-ds`.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
