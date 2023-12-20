@@ -9,6 +9,14 @@ kind: GrafanaFolder
 metadata:
   name: {{ $consoleFolderName | quote }}
   namespace: {{ include "conduktor.platform.dashboard.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    "conduktor.io/dashboard": "true"
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.platform.metrics.grafana.labels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.platform.metrics.grafana.labels "context" $ ) | nindent 4 }}
+    {{- end }}
 spec:
   instanceSelector:
     matchLabels:
@@ -28,6 +36,9 @@ metadata:
     "conduktor.io/dashboard": "true"
     {{- if .Values.commonLabels }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.platform.metrics.grafana.labels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.platform.metrics.grafana.labels "context" $ ) | nindent 4 }}
     {{- end }}
 spec:
   instanceSelector:
@@ -57,6 +68,9 @@ metadata:
     conduktor.io/dashboard: "true"
     {{- if .Values.commonLabels }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.platform.metrics.grafana.labels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.platform.metrics.grafana.labels "context" $ ) | nindent 4 }}
     {{- end }}
 spec:
   {{- if .Values.platform.metrics.grafana.folder }}
