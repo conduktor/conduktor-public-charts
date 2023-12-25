@@ -29,6 +29,20 @@ gateway:
   replicas: 2
   ## @param gateway.secretRef Secret name to load sensitive env var from
   secretRef: ""
+  ## @param gateway.extraSecretEnvVars Array with extra secret environment variables
+  ## e.g:
+  ## extraSecretEnvVars:
+  ##  - name: SECRET_1
+  ##    valueFrom:
+  ##      secretKeyRef:
+  ##        name: secret-test
+  ##        key: SECRET_1
+  ##  - name: SECRET_2
+  ##    valueFrom:
+  ##      secretKeyRef:
+  ##        name: secret-test
+  ##        key: SECRET_2
+  extraSecretEnvVars: [ ]
   ## @param gateway.secretSha256sum [nullable] Optional sha256sum of the referenced secret. This could be set to have a automactic restart of gateway deployment if secret change
   secretSha256sum: ""
 
