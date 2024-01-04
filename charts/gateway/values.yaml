@@ -42,7 +42,7 @@ gateway:
   ##      secretKeyRef:
   ##        name: secret-test
   ##        key: SECRET_2
-  extraSecretEnvVars: [ ]
+  extraSecretEnvVars: []
   ## @param gateway.secretSha256sum [nullable] Optional sha256sum of the referenced secret. This could be set to have a automactic restart of gateway deployment if secret change
   secretSha256sum: ""
 
