@@ -3,6 +3,25 @@ entries:
   conduktor-gateway:
   - apiVersion: v2
     appVersion: 2.3.1
+    created: "2024-01-04T14:33:03.986878925Z"
+    dependencies:
+    - condition: kafka.enabled
+      name: kafka
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-kafka
+      version: 18.x.x
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: 2.x.x
+    description: Conduktor Gateway and associated backing Kafka
+    digest: 5206c6f0d33c55c741ff10dec0597a605ee86c7b7bbc83f4a4922c4ab1db031d
+    name: conduktor-gateway
+    urls:
+    - https://github.com/conduktor/conduktor-public-charts/releases/download/conduktor-gateway-2.3.2/conduktor-gateway-2.3.2.tgz
+    version: 2.3.2
+  - apiVersion: v2
+    appVersion: 2.3.1
     created: "2023-12-22T04:57:25.432400241Z"
     dependencies:
     - condition: kafka.enabled
@@ -136,6 +155,29 @@ entries:
     - https://raw.githubusercontent.com/conduktor/conduktor-public-charts/gh-pages/conduktor-proxy-1.0.0.tgz
     version: 1.0.0
   console:
+  - apiVersion: v2
+    appVersion: 1.20.0
+    created: "2024-01-04T14:33:04.225535255Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-common
+      version: 2.x.x
+    description: Helm chart to deploy Conduktor Platform on Kubernetes
+    digest: fb9c90b251b2b39848bdc4bde059f7a1203cd60c4553da48160b9bc299c6c477
+    home: https://www.conduktor.io
+    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    maintainers:
+    - email: support@conduktor.io
+      name: Conduktor Platform
+      url: https://docs.conduktor.io/platform
+    name: console
+    sources:
+    - https://github.com/conduktor/conduktor-public-charts/tree/main/charts/console
+    urls:
+    - https://github.com/conduktor/conduktor-public-charts/releases/download/console-1.5.2/console-1.5.2.tgz
+    version: 1.5.2
   - apiVersion: v2
     appVersion: 1.20.0
     created: "2023-12-19T15:35:02.367519682Z"
@@ -1556,4 +1598,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/conduktor/conduktor-public-charts/gh-pages/platform-controller-0.2.1.tgz
     version: 0.2.1
-generated: "2023-12-22T04:57:25.432530956Z"
+generated: "2024-01-04T14:33:04.225790311Z"
