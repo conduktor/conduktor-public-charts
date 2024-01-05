@@ -56,7 +56,7 @@ spec:
 {{ toPrettyJson $consoleDashboard | indent 4 }}
 {{- end }}
 ---
-{{- /* Support for v4 of Grafana operator */ -}}
+{{/* Support for v4 of Grafana operator */}}
 {{- if .Capabilities.APIVersions.Has "integreatly.org/v1alpha1/GrafanaDashboard" }}
 {{- $consoleDashboardName := printf "%s-%s" (include "common.names.fullname" .) "dashboards" | trunc 63 | trimSuffix "-" -}}
 apiVersion: integreatly.org/v1alpha1
@@ -76,7 +76,7 @@ spec:
   {{- if .Values.platform.metrics.grafana.folder }}
   customFolderName: {{ .Values.platform.metrics.grafana.folder | quote }}
   {{- end }}
-  datasou2rces:
+  datasources:
     - inputName: "DS_PROMETHEUS"
       datasourceName: {{ .Values.platform.metrics.grafana.datasources.prometheus | quote }}
     - inputName: "VAR_NAMESPACE"
