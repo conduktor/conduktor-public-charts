@@ -1,8 +1,8 @@
 apiVersion: v2
-appVersion: "2.4.0"
+appVersion: "2.5.0"
 description: Conduktor Gateway chart
 name: conduktor-gateway
-version: 2.4.0
+version: 2.5.0
 
 dependencies:
   - name: kafka
