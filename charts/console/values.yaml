@@ -854,14 +854,14 @@ platformCortex:
   resources:
     limits:
       ## @param platformCortex.resources.limits.cpu CPU limit for the platform cortex container
-      cpu: 1000m
+      cpu: 2000m
       ## @param platformCortex.resources.limits.memory Memory limit for the container
-      memory: 500Mi
+      memory: 2Gi
     requests:
       ## @param platformCortex.resources.requests.cpu CPU resource requests
       cpu: 500m
       ## @param platformCortex.resources.requests.memory Memory resource requests
-      memory: 200Mi
+      memory: 500Mi
   ## @param platformCortex.podSecurityContext Conduktor Platform Cortex Pod Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## default:
