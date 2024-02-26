@@ -25,12 +25,12 @@ In order to replicate the container startup scripts execute this command:
 {{- end }}
 
 {{ if .Values.ingress.enabled }}
-Conduktor Platform will be accessible at :  http://{{ .Values.ingress.hostname }}
+Conduktor Console will be accessible at :  http://{{ .Values.ingress.hostname }}
 {{- else }}
-Forward Platform service locally with the command (may take a few seconds to be ready):
+Forward Console service locally with the command (may take a few seconds to be ready):
 kubectl port-forward -n {{ .Release.Namespace }} svc/{{ template "common.names.fullname" . }} 8080:80
 
-Conduktor Platform will be accessible at : http://127.0.0.1:8080
+Conduktor Console will be accessible at : http://127.0.0.1:8080
 {{- end }}
 
 To connect use following admin account ADMIN_LOGIN and ADMIN_PASSWORD
@@ -38,11 +38,11 @@ To connect use following admin account ADMIN_LOGIN and ADMIN_PASSWORD
 ADMIN_LOGIN="{{ include "common.secrets.lookup" (dict "secret" (include "conduktor.platform.secretName" .) "key" "CDK_ADMIN_EMAIL" "defaultValue" .Values.config.admin.email "context" $) | b64dec }}"
 ADMIN_PASSWORD="$(kubectl get secret {{ include "conduktor.platform.secretName" .  }} -n {{ .Release.Namespace }} -o jsonpath="{.data.CDK_ADMIN_PASSWORD}" | base64 --decode)"
 
-More details on Platform configuration are available at https://docs.conduktor.io/platform/
+More details on Console configuration are available at https://docs.conduktor.io/platform/
 If you have any issue, please contact our support by browsing to https://www.conduktor.io/contact/support/
 
 {{ if and (empty .Values.config.license) (empty .Values.config.existingLicenseSecret) }}
-You are using the free version of Conduktor Platform.
+You are using the free version of Conduktor Console.
 If you need more, please contact our sales team by browsing to https://www.conduktor.io/contact/sales/
 {{- end }}
 

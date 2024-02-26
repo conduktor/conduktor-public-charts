@@ -6,10 +6,11 @@
 {{- $cortexUrl := printf "http://%v:%v/ready" $serviceName $cortexPort }}
 {{- $alertManagerUrl := printf "http://%v:%v/ready" $serviceName $alertManagerPort }}
 {{- $prometheusUrl := printf "http://%v:%v" $serviceName $prometheusPort }}
+{{- $prometheusTargetsUrl := printf "%v/api/v1/targets" $prometheusUrl }}
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "{{ include "common.names.fullname" . }}-test-platform-cortex"
+  name: "{{ include "common.names.fullname" . }}-test-cortex"
   annotations:
     "helm.sh/hook": test
     "helm.sh/hook-delete-policy": hook-succeeded
@@ -32,10 +33,10 @@ spec:
         - |
           retries=0
           max_retries=10
-          retry_interval=3
+          retry_interval=5
 
           while [ $retries -lt $max_retries ]; do
-            if curl -s URL | jq -e '.data.activeTargets[0].health == "up" | if . then true else false end'; then
+            if curl -sv {{ $prometheusTargetsUrl }} | jq -e '.data.activeTargets[0].health == "up" | if . then true else false end'; then
               exit 0
             else
               echo "Retry $((retries+1)) of $max_retries. Retrying in $retry_interval seconds..."
