@@ -221,8 +221,8 @@ monitoringConfig:
 ## Conduktor Platform container configuration
 ##
 platform:
-  ## Conduktor Platform image
-  ## ref: https://hub.docker.com/r/conduktor/conduktor-platform/tags/
+  ## Conduktor Console image
+  ## ref: https://hub.docker.com/r/conduktor/conduktor-console/tags/
   ## @param platform.image.registry Conduktor Platform image registry
   ## @param platform.image.repository Conduktor Platform image repository
   ## @param platform.image.tag Conduktor Platform image tag (immutable tags are recommended)
@@ -233,8 +233,8 @@ platform:
   ##
   image:
     registry: docker.io
-    repository: conduktor/conduktor-platform
-    tag: 1.20.0
+    repository: conduktor/conduktor-console
+    tag: 1.21.0
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -762,8 +762,8 @@ platformCortex:
   ##
   image:
     registry: docker.io
-    repository: conduktor/conduktor-platform-cortex
-    tag: 1.20.0
+    repository: conduktor/conduktor-console-cortex
+    tag: 1.21.0
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
