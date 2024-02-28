@@ -8,6 +8,8 @@ on:
       - edited
       - reopened
       - synchronize
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -19,7 +21,6 @@ jobs:
       - uses: actions/checkout@v3
         name: Checkout Conduktor Charts
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fetch history

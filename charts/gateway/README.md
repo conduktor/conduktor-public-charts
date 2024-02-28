@@ -94,6 +94,7 @@ Gateway embed metrics to be installed within you cluster if your have the correc
 | `metrics.prometheus.enable`              | Enable ServiceMonitor prometheus operator configuration for metrics scrapping | `false`      |
 | `metrics.prometheus.metricRelabelings`   | Configure metric relabeling in ServiceMonitor                                 | `{}`         |
 | `metrics.prometheus.relabelings`         | Configure relabelings in ServiceMonitor                                       | `{}`         |
+| `metrics.prometheus.extraParams`         | Extra parameters in ServiceMonitor                                            | `{}`         |
 | `metrics.grafana.enable`                 | Enable grafana dashboards to installation                                     | `false`      |
 | `metrics.grafana.datasources.prometheus` | Prometheus datasource to use for metric dashboard                             | `prometheus` |
 | `metrics.grafana.datasources.loki`       | Loki datasource to use for log dashboard                                      | `loki`       |
