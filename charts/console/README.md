@@ -124,7 +124,7 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/co
 ### Platform Deployment Parameters
 
 | Name                                          | Description                                                                                                                                                  | Value                         |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |-------------------------------|
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------- |
 | `platform.image.registry`                     | Conduktor Console image registry                                                                                                                             | `docker.io`                   |
 | `platform.image.repository`                   | Conduktor Console image repository                                                                                                                           | `conduktor/conduktor-console` |
 | `platform.image.tag`                          | Conduktor Console image tag (immutable tags are recommended)                                                                                                 | `1.21.1`                      |
@@ -258,7 +258,7 @@ Console expose metrics that could be collected and presented if your environment
 ### Platform Cortex Parameters
 
 | Name                                                | Description                                                                                                                                                         | Value                                |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |--------------------------------------|
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
 | `platformCortex.enabled`                            | Enable Conduktor Console Cortex                                                                                                                                     | `true`                               |
 | `platformCortex.image.registry`                     | Conduktor Console Cortex image registry                                                                                                                             | `docker.io`                          |
 | `platformCortex.image.repository`                   | Conduktor Console Cortex image repository                                                                                                                           | `conduktor/conduktor-console-cortex` |
