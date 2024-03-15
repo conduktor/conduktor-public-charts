@@ -2,25 +2,60 @@ name: Chart testing
 
 on:
   pull_request:
-    paths: ['charts/**']
+    paths: ["charts/**"]
     types:
       - opened
       - edited
       - reopened
       - synchronize
-    branches:
-      - main
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
+  check-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install readme-generator-for-helm
+        run: npm install -g @bitnami/readme-generator-for-helm@2.5.1
+
+      - uses: actions/checkout@v3
+        name: Checkout Conduktor Charts
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Execute readme-generator-for-helm
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TEMP_FILE: "${{runner.temp}}/pr-${{github.event.number}}.diff"
+        run: |
+          export PR_ID=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+          gh pr diff ${PR_ID} > $TEMP_FILE
+          files_changed="$(sed -nr 's/[\-\+]{3} [ab]\/(.*)/\1/p' $TEMP_FILE | sort | uniq)"
+          # Adding || true to avoid "Process exited with code 1" errors
+          charts_dirs_changed="$(echo "$files_changed" | xargs dirname | grep -o "charts/[^/]*" | sort | uniq || true)"
+          for chart in ${charts_dirs_changed}; do
+            echo "Updating README.md for ${chart}"
+            readme-generator --values "${chart}/values.yaml" --readme "${chart}/README.md" --schema "/tmp/schema.json"
+          done
+
+      - name: Check diff
+        run: |
+          if git status -s | grep -E 'charts/.*/README.md'; then
+            git diff
+            echo "::error title=README::README need to be re-generated ! Use bitnami/readme-generator-for-helm to re-generate it."
+            exit 1
+          fi
+
   chart-linting:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         name: Checkout Conduktor Charts
         with:
+          ref: ${{ github.event.pull_request.head.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fetch history
@@ -33,7 +68,7 @@ jobs:
         run: ct lint --config .github/ct-lint-config.yaml
 
   chart-testing:
-    runs-on: [ ubuntu-latest ]
+    runs-on: [ubuntu-latest]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -46,7 +81,7 @@ jobs:
       - name: Install helm
         uses: azure/setup-helm@v3
         with:
-          version: 'v3.10.1'
+          version: "v3.10.1"
 
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.6.0
