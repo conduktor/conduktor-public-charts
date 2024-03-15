@@ -39,6 +39,9 @@ spec:
       {{- if .Values.platform.metrics.serviceMonitor.relabelings }}
       relabelings: {{- include "common.tplvalues.render" ( dict "value" .Values.platform.metrics.serviceMonitor.relabelings "context" $) | nindent 8 }}
       {{- end }}
+      {{- if .Values.platform.metrics.serviceMonitor.extraParams }}
+      {{- toYaml .Values.platform.metrics.serviceMonitor.extraParams | nindent 6 }}
+      {{- end }}
   namespaceSelector:
     matchNames:
       - {{ include "common.names.namespace" . | quote }}

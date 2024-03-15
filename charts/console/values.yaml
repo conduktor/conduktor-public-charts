@@ -535,6 +535,18 @@ platform:
       ##   prometheus: my-prometheus
       ##
       selector: {}
+      ## @param platform.metrics.serviceMonitor.extraParams extra parameters in ServiceMonitor
+      ##  extraParams:
+      ##    basicAuth:
+      ##      password:
+      ##        name: conduktor-admin-user # secret name
+      ##        key: password
+      ##      username:
+      ##        name: conduktor-admin-user # secret name
+      ##        key: username
+      ##
+      extraParams: {}
+
 
     ## Grafana dashboard (need grafana operator or sidecar to be enabled on namespace)
     ## refs:
