@@ -209,6 +209,7 @@ Console expose metrics that could be collected and presented if your environment
 | `platform.metrics.serviceMonitor.metricRelabelings` | Specify additional relabeling of metrics                                                               | `[]`                     |
 | `platform.metrics.serviceMonitor.relabelings`       | Specify general relabeling                                                                             | `[]`                     |
 | `platform.metrics.serviceMonitor.selector`          | Prometheus instance selector labels                                                                    | `{}`                     |
+| `platform.metrics.serviceMonitor.extraParams`       | Extra parameters for the ServiceMonitor                                                                | `{}`                     |
 | `platform.metrics.grafana.enabled`                  | Enable grafana dashboards to installation                                                              | `false`                  |
 | `platform.metrics.grafana.namespace`                | Namespace used to deploy Grafana dashboards by default use the same namespace as Conduktor Csonsole    | `""`                     |
 | `platform.metrics.grafana.matchLabels`              | Label selector for Grafana instance                                                                    | `{}`                     |
@@ -346,10 +347,10 @@ Console expose metrics that could be collected and presented if your environment
 
 ## Snippets
 
-### Console configuration 
+### Console configuration
 
-If you are looking for additional snippets related to the configuration of 
-console, we recommend you to look at our 
+If you are looking for additional snippets related to the configuration of
+console, we recommend you to look at our
 [documentation](https://docs.conduktor.io/platform/configuration/configuration-snippets/).
 
 - [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
@@ -357,7 +358,7 @@ console, we recommend you to look at our
 - [Install with an enterprise license](#install-with-an-enterprise-license)
 - [Install without Conduktor monitoring](#install-without-conduktor-monitoring)
 
-### Kubernetes configuration 
+### Kubernetes configuration
 
 - [Install with a PodAffinity](#install-with-a-podaffinity)
 - [Install with a Toleration](#install-with-a-toleration)
@@ -393,7 +394,7 @@ config:
     password: ''
 
   license: "${ENTERPRISE_LICENSE}"
-```    
+```
 
 ### Install with a basic SSO configuration
 
@@ -421,7 +422,7 @@ config:
         callback-uri: http://localhost/auth/oauth/callback/auth0
         openid:
           issuer: https://conduktor-staging.eu.auth0.com/
-  
+
   license: '<license_key>'
 ```
 
@@ -489,7 +490,7 @@ config:
   admin:
     email: "<your_admin_email>"
     password: "<your_admin_password>"
-    
+
   database:
     host: '<postgres_host>'
     port: 5432
@@ -520,7 +521,7 @@ config:
     name: 'postgres'
 ```
 
-```yaml 
+```yaml
 # secrets.yaml
 apiVersion: v1
 kind: Secret
@@ -658,7 +659,7 @@ platformCortex:
 **NOTE:** We recommend to be using a secret (see [snippet](#provide-credentials-configuration-as-a-kubernetes-secret))
 in addition to the ConfigMap in order to protect your credentials.
 
-The ConfigMap is expected to contain a key `platform-config.yaml` which got 
+The ConfigMap is expected to contain a key `platform-config.yaml` which got
 the console configuration in YAML format.
 
 ```yaml
@@ -667,7 +668,7 @@ config:
   # We highly recommend you to be using both the secret and the ConfigMap
   # check our snippet 'Provide credentials configuration as a Kubernetes Secret'
   existingSecret: "<your_secret_name>"
-    
+
 platform:
   existingConfigmap: "<your_configmap_name>"
 ```
@@ -689,8 +690,8 @@ data:
 ### Provide additional credentials as a Kubernetes Secret
 
 In case our helm chart doesn't protect all the credentials you need, you can
-use this method to provide additional credentials through a Kubernetes 
-Secret Resource you previously created. You can have this case for LDAP 
+use this method to provide additional credentials through a Kubernetes
+Secret Resource you previously created. You can have this case for LDAP
 credentials, or for SSO credentials for example.
 
 The keys of your secret will be used as environment variables in the
@@ -868,14 +869,14 @@ serviceAccount:
 
 ### Install with Console technical monitoring
 
-If you want to enable the technical monitoring of Conduktor Console, you can enable built-in Prometheus metrics collector and Grafana dashboard.   
+If you want to enable the technical monitoring of Conduktor Console, you can enable built-in Prometheus metrics collector and Grafana dashboard.
 But to work you need to have [prometheus-operator](https://github.com/prometheus-operator/prometheus-operator) and [grafana-operator](https://grafana.github.io/grafana-operator/docs/installation/helm/) installed in your cluster.
 We use following CRDs from these operators:
 - **ServiceMonitor** : `monitoring.coreos.com/v1/ServiceMonitor`
 - **GrafanaDashboard** : `grafana.integreatly.org/v1beta1/GrafanaDashboard` (v5) or `integreatly.org/v1alpha1/GrafanaDashboard` (v4)
 - **GrafanaFolder** : `grafana.integreatly.org/v1beta1/GrafanaFolder` (v5 only)
 
-You can also manually install Grafana dashboard from Json export located here [console.json](./grafana-dashboards/console.json). 
+You can also manually install Grafana dashboard from Json export located here [console.json](./grafana-dashboards/console.json).
 It takes two inputs variables:
 - `DS_PROMETHEUS` : Prometheus Datasource name
 - `VAR_NAMESPACE` : Namespace where Conduktor Console is installed
@@ -918,7 +919,7 @@ platform:
         prometheus: "my-prometheus-ds"
 ```
 
-This example will install a `ServiceMonitor` and a `GrafanaDashboard` in the namespace `monitoring-namespace`.    
+This example will install a `ServiceMonitor` and a `GrafanaDashboard` in the namespace `monitoring-namespace`.
 The `ServiceMonitor` will scrape metrics from Conduktor Console every 30 seconds and the `GrafanaDashboard` will be available in Grafana instance with label  `grafana: tooling` in the folder `tools` and use Prometheus datasource named `my-prometheus-ds`.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
