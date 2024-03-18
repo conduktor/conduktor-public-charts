@@ -158,6 +158,15 @@ metrics:
     metricRelabelings: {}
     ## @param metrics.prometheus.relabelings Configure relabelings in ServiceMonitor
     relabelings: {}
+    ## @param metrics.prometheus.extraParams Extra parameters in ServiceMonitor
+    extraParams: {}
+      # basicAuth:
+      #   password:
+      #     name: conduktor-admin-user # secret name
+      #     key: password
+      #   username:
+      #     name: conduktor-admin-user # secret name
+      #     key: username
   grafana:
     ## @param metrics.grafana.enable Enable grafana dashboards to installation
     enable: false
