@@ -19,5 +19,8 @@ spec:
       {{- if .Values.metrics.prometheus.relabelings }}
       relabelings: {{- include "common.tplvalues.render" ( dict "value" .Values.metrics.prometheus.relabelings "context" $) | nindent 8 }}
       {{- end }}
+      {{- if .Values.metrics.prometheus.extraParams }}
+      {{- toYaml .Values.metrics.prometheus.extraParams | nindent 6 }}
+      {{- end }}
 {{- end }}
 {{- end }}

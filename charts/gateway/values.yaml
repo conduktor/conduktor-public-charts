@@ -21,7 +21,7 @@ gateway:
     ## @param gateway.image.repository Image in repository format (conduktor/conduktor-gateway)
     repository: conduktor/conduktor-gateway
     ## @param gateway.image.tag Image tag
-    tag: 2.6.1
+    tag: 3.0.0
     ## @param gateway.image.pullPolicy Kubernetes image pull policy
     pullPolicy: IfNotPresent
 
@@ -158,6 +158,15 @@ metrics:
     metricRelabelings: {}
     ## @param metrics.prometheus.relabelings Configure relabelings in ServiceMonitor
     relabelings: {}
+    ## @param metrics.prometheus.extraParams Extra parameters in ServiceMonitor
+    extraParams: {}
+      # basicAuth:
+      #   password:
+      #     name: conduktor-admin-user # secret name
+      #     key: password
+      #   username:
+      #     name: conduktor-admin-user # secret name
+      #     key: username
   grafana:
     ## @param metrics.grafana.enable Enable grafana dashboards to installation
     enable: false
