@@ -22,7 +22,7 @@ spec:
       {{- end }}
   endpoints:
     - port: http
-      path: "/admin/api/metrics"
+      path: "/api/metrics"
       scheme: http
       {{- if .Values.platform.metrics.serviceMonitor.interval }}
       interval: {{ .Values.platform.metrics.serviceMonitor.interval }}

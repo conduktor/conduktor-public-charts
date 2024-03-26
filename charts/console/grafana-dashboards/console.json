@@ -161,9 +161,7 @@
         "justifyMode": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -242,9 +240,7 @@
         "justifyMode": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -306,9 +302,7 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -323,7 +317,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "avg without(pod, instance) (index_total_clusters_count{namespace=\"$namespace\", service=~\"$service\"})",
+          "expr": "avg without(pod, instance) (console_indexer_kafka_cluster_succeeded_count {namespace=\"$namespace\", service=~\"$service\"} + console_indexer_kafka_cluster_failed_count {namespace=\"$namespace\", service=~\"$service\"})",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -437,10 +431,7 @@
               {
                 "id": "custom.lineStyle",
                 "value": {
-                  "dash": [
-                    10,
-                    10
-                  ],
+                  "dash": [10, 10],
                   "fill": "dash"
                 }
               }
@@ -477,10 +468,7 @@
               {
                 "id": "custom.lineStyle",
                 "value": {
-                  "dash": [
-                    10,
-                    10
-                  ],
+                  "dash": [10, 10],
                   "fill": "dash"
                 }
               }
@@ -646,10 +634,7 @@
               {
                 "id": "custom.lineStyle",
                 "value": {
-                  "dash": [
-                    10,
-                    10
-                  ],
+                  "dash": [10, 10],
                   "fill": "dash"
                 }
               }
@@ -686,10 +671,7 @@
               {
                 "id": "custom.lineStyle",
                 "value": {
-                  "dash": [
-                    10,
-                    10
-                  ],
+                  "dash": [10, 10],
                   "fill": "dash"
                 }
               }
@@ -892,12 +874,7 @@
       "maxPerRow": 2,
       "options": {
         "legend": {
-          "calcs": [
-            "mean",
-            "lastNotNull",
-            "max",
-            "min"
-          ],
+          "calcs": ["mean", "lastNotNull", "max", "min"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -1025,12 +1002,7 @@
       "maxPerRow": 3,
       "options": {
         "legend": {
-          "calcs": [
-            "mean",
-            "lastNotNull",
-            "max",
-            "min"
-          ],
+          "calcs": ["mean", "lastNotNull", "max", "min"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -1176,12 +1148,7 @@
       "maxPerRow": 3,
       "options": {
         "legend": {
-          "calcs": [
-            "mean",
-            "lastNotNull",
-            "max",
-            "min"
-          ],
+          "calcs": ["mean", "lastNotNull", "max", "min"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -1319,12 +1286,7 @@
       "maxPerRow": 3,
       "options": {
         "legend": {
-          "calcs": [
-            "mean",
-            "lastNotNull",
-            "max",
-            "min"
-          ],
+          "calcs": ["mean", "lastNotNull", "max", "min"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -1496,10 +1458,7 @@
       "links": [],
       "options": {
         "legend": {
-          "calcs": [
-            "lastNotNull",
-            "max"
-          ],
+          "calcs": ["lastNotNull", "max"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -1628,11 +1587,7 @@
       "links": [],
       "options": {
         "legend": {
-          "calcs": [
-            "lastNotNull",
-            "max",
-            "min"
-          ],
+          "calcs": ["lastNotNull", "max", "min"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -1778,9 +1733,7 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -1796,7 +1749,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "avg without(pod, instance) (index_cluster_succeeded_count{namespace=\"$namespace\", service=~\"$service\"})",
+          "expr": "avg without(pod, instance) (console_indexer_kafka_cluster_succeeded_count{namespace=\"$namespace\", service=~\"$service\"})",
           "format": "time_series",
           "fullMetaSearch": false,
           "hide": false,
@@ -1814,7 +1767,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "avg without(pod, instance) (index_cluster_skipped_count{namespace=\"$namespace\", service=~\"$service\"})",
+          "expr": "avg without(pod, instance) (console_indexer_kafka_cluster_skipped_count{namespace=\"$namespace\", service=~\"$service\"})",
           "format": "time_series",
           "hide": false,
           "instant": false,
@@ -1828,7 +1781,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "avg without(pod, instance) (index_cluster_failed_count{namespace=\"$namespace\", service=~\"$service\"})",
+          "expr": "avg without(pod, instance) (console_indexer_kafka_cluster_failed_count{namespace=\"$namespace\", service=~\"$service\"})",
           "hide": false,
           "instant": false,
           "legendFormat": "Failed",
@@ -1841,7 +1794,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "avg without(pod, instance) (index_cluster_timeout_count{namespace=\"$namespace\", service=~\"$service\"})",
+          "expr": "avg without(pod, instance) (console_indexer_kafka_cluster_timeout_count{namespace=\"$namespace\", service=~\"$service\"})",
           "hide": false,
           "instant": false,
           "legendFormat": "Timeout",
@@ -1954,9 +1907,7 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -1971,7 +1922,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "avg without(pod, instance) (registry_index_cluster_succeeded_count{namespace=\"$namespace\",service=~\"$service\"})",
+          "expr": "avg without(pod, instance) (console_indexer_schema_registry_cluster_succeeded_count{namespace=\"$namespace\",service=~\"$service\"})",
           "format": "time_series",
           "hide": false,
           "instant": false,
@@ -1986,7 +1937,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "avg without(pod, instance) (registry_index_cluster_skipped_count{namespace=\"$namespace\", service=~\"$service\"})",
+          "expr": "avg without(pod, instance) (console_indexer_schema_registry_cluster_skipped_count{namespace=\"$namespace\", service=~\"$service\"})",
           "format": "time_series",
           "hide": false,
           "instant": false,
@@ -2000,7 +1951,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "avg without(pod, instance) (registry_index_cluster_failed_count{namespace=\"$namespace\", service=~\"$service\"})",
+          "expr": "avg without(pod, instance) (console_indexer_schema_registry_cluster_failed_count{namespace=\"$namespace\", service=~\"$service\"})",
           "hide": false,
           "instant": false,
           "legendFormat": "Failed",
@@ -2013,7 +1964,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "avg without(pod, instance) (registry_index_cluster_timeout_count{namespace=\"$namespace\", service=~\"$service\"})",
+          "expr": "avg without(pod, instance) (console_indexer_schema_registry_cluster_timeout_count{namespace=\"$namespace\", service=~\"$service\"})",
           "hide": false,
           "instant": false,
           "legendFormat": "Timeout",
@@ -2126,9 +2077,7 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -2143,7 +2092,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "avg without(pod, instance) (kafka_connect_index_cluster_succeeded_count{namespace=\"$namespace\", service=~\"$service\"})",
+          "expr": "avg without(pod, instance) (console_indexer_kafka_connect_cluster_succeeded_count{namespace=\"$namespace\", service=~\"$service\"})",
           "format": "time_series",
           "hide": false,
           "instant": false,
@@ -2158,7 +2107,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "avg without(pod, instance) (kafka_connect_index_cluster_skipped_count{namespace=\"$namespace\", service=~\"$service\"})",
+          "expr": "avg without(pod, instance) (console_indexer_kafka_connect_cluster_skipped_count{namespace=\"$namespace\", service=~\"$service\"})",
           "format": "time_series",
           "hide": false,
           "instant": false,
@@ -2172,7 +2121,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "avg without(pod, instance) (kafka_connect_index_cluster_failed_count{namespace=\"$namespace\", service=~\"$service\"})",
+          "expr": "avg without(pod, instance) (console_indexer_kafka_connect_cluster_failed_count{namespace=\"$namespace\", service=~\"$service\"})",
           "hide": false,
           "instant": false,
           "legendFormat": "Failed",
@@ -2185,7 +2134,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "avg without(pod, instance) (kafka_connect_index_cluster_timeout_count{namespace=\"$namespace\", pod=~\"$pod\"})",
+          "expr": "avg without(pod, instance) (console_indexer_kafka_connect_cluster_timeout_count{namespace=\"$namespace\", pod=~\"$pod\"})",
           "hide": false,
           "instant": false,
           "legendFormat": "Timeout",
@@ -2265,12 +2214,7 @@
       "id": 48,
       "options": {
         "legend": {
-          "calcs": [
-            "last",
-            "min",
-            "max",
-            "mean"
-          ],
+          "calcs": ["last", "min", "max", "mean"],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true
@@ -2289,7 +2233,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "rate(index_total_duration_sum{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval]) / rate(index_total_duration_count{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])",
+          "expr": "rate(console_indexer_kafka_total_duration_sum{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval]) / rate(console_indexer_kafka_total_duration_count{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
@@ -2307,7 +2251,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "rate(registry_index_total_duration_sum{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval]) / rate(registry_index_total_duration_count{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])",
+          "expr": "rate(console_indexer_schema_registry_total_duration_sum{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval]) / rate(console_indexer_schema_registry_total_duration_count{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
@@ -2325,7 +2269,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "rate(kafka_connect_index_total_duration_sum{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval]) / rate(kafka_connect_index_total_duration_count{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])",
+          "expr": "rate(console_indexer_kafka_connect_total_duration_sum{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval]) / rate(console_indexer_kafka_connect_total_duration_count{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
@@ -2408,12 +2352,7 @@
       "maxPerRow": 2,
       "options": {
         "legend": {
-          "calcs": [
-            "last",
-            "min",
-            "max",
-            "mean"
-          ],
+          "calcs": ["last", "min", "max", "mean"],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true
@@ -2434,7 +2373,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "rate(index_cluster_duration_sum{namespace=\"$namespace\", pod=~\"$pod\", technical_id=\"$cluster\"}[$__rate_interval]) / rate(index_cluster_duration_count{namespace=\"$namespace\", pod=~\"$pod\",technical_id=\"$cluster\"}[$__rate_interval])",
+          "expr": "rate(console_indexer_kafka_cluster_duration_sum{namespace=\"$namespace\", pod=~\"$pod\", technical_id=\"$cluster\"}[$__rate_interval]) / rate(console_indexer_kafka_cluster_duration_count{namespace=\"$namespace\", pod=~\"$pod\",technical_id=\"$cluster\"}[$__rate_interval])",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
@@ -2452,7 +2391,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "rate(index_init_cluster_connection_duration_sum{namespace=\"$namespace\", pod=~\"$pod\", technical_id=\"$cluster\"}[$__rate_interval]) / rate(index_init_cluster_connection_duration_count{namespace=\"$namespace\", pod=~\"$pod\",technical_id=\"$cluster\"}[$__rate_interval])",
+          "expr": "rate(console_indexer_kafka_init_cluster_connection_duration_sum{namespace=\"$namespace\", pod=~\"$pod\", technical_id=\"$cluster\"}[$__rate_interval]) / rate(console_indexer_kafka_init_cluster_connection_duration_count{namespace=\"$namespace\", pod=~\"$pod\",technical_id=\"$cluster\"}[$__rate_interval])",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
@@ -2470,7 +2409,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "rate(index_list_topics_duration_sum{namespace=\"$namespace\", pod=~\"$pod\", technical_id=\"$cluster\"}[$__rate_interval]) / rate(index_list_topics_duration_count{namespace=\"$namespace\", pod=~\"$pod\",technical_id=\"$cluster\"}[$__rate_interval])",
+          "expr": "rate(console_indexer_kafka_list_topics_duration_sum{namespace=\"$namespace\", pod=~\"$pod\", technical_id=\"$cluster\"}[$__rate_interval]) / rate(console_indexer_kafka_list_topics_duration_count{namespace=\"$namespace\", pod=~\"$pod\",technical_id=\"$cluster\"}[$__rate_interval])",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
@@ -2488,7 +2427,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "rate(index_describe_topics_duration_sum{namespace=\"$namespace\", pod=~\"$pod\", technical_id=\"$cluster\"}[$__rate_interval]) / rate(index_describe_topics_duration_count{namespace=\"$namespace\", pod=~\"$pod\",technical_id=\"$cluster\"}[$__rate_interval])",
+          "expr": "rate(console_indexer_kafka_describe_topics_duration_sum{namespace=\"$namespace\", pod=~\"$pod\", technical_id=\"$cluster\"}[$__rate_interval]) / rate(console_indexer_kafka_describe_topics_duration_count{namespace=\"$namespace\", pod=~\"$pod\",technical_id=\"$cluster\"}[$__rate_interval])",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
@@ -2506,7 +2445,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "rate(index_get_topics_configs_duration_sum{namespace=\"$namespace\", pod=~\"$pod\", technical_id=\"$cluster\"}[$__rate_interval]) / rate(index_get_topics_configs_duration_count{namespace=\"$namespace\", pod=~\"$pod\",technical_id=\"$cluster\"}[$__rate_interval])",
+          "expr": "rate(console_indexer_kafka_get_topics_configs_duration_sum{namespace=\"$namespace\", pod=~\"$pod\", technical_id=\"$cluster\"}[$__rate_interval]) / rate(console_indexer_kafka_get_topics_configs_duration_count{namespace=\"$namespace\", pod=~\"$pod\",technical_id=\"$cluster\"}[$__rate_interval])",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
@@ -2524,7 +2463,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "rate(index_get_topics_partitions_duration_sum{namespace=\"$namespace\", pod=~\"$pod\", technical_id=\"$cluster\"}[$__rate_interval]) / rate(index_get_topics_partitions_duration_count{namespace=\"$namespace\", pod=~\"$pod\",technical_id=\"$cluster\"}[$__rate_interval])",
+          "expr": "rate(console_indexer_kafka_get_topics_partitions_duration_sum{namespace=\"$namespace\", pod=~\"$pod\", technical_id=\"$cluster\"}[$__rate_interval]) / rate(console_indexer_kafka_get_topics_partitions_duration_count{namespace=\"$namespace\", pod=~\"$pod\",technical_id=\"$cluster\"}[$__rate_interval])",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
@@ -2542,7 +2481,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "rate(index_get_consumers_groups_duration_sum{namespace=\"$namespace\", pod=~\"$pod\", technical_id=\"$cluster\"}[$__rate_interval]) / rate(index_get_consumers_groups_duration_count{namespace=\"$namespace\", pod=~\"$pod\",technical_id=\"$cluster\"}[$__rate_interval])",
+          "expr": "rate(console_indexer_kafka_get_consumers_groups_duration_sum{namespace=\"$namespace\", pod=~\"$pod\", technical_id=\"$cluster\"}[$__rate_interval]) / rate(console_indexer_kafka_get_consumers_groups_duration_count{namespace=\"$namespace\", pod=~\"$pod\",technical_id=\"$cluster\"}[$__rate_interval])",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
@@ -2560,7 +2499,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "rate(index_get_deployed_connectors_duration_sum{namespace=\"$namespace\", pod=~\"$pod\", technical_id=\"$cluster\"}[$__rate_interval]) / rate(index_get_deployed_connectors_duration_count{namespace=\"$namespace\", pod=~\"$pod\",technical_id=\"$cluster\"}[$__rate_interval])",
+          "expr": "rate(console_indexer_kafka_get_deployed_connectors_duration_sum{namespace=\"$namespace\", pod=~\"$pod\", technical_id=\"$cluster\"}[$__rate_interval]) / rate(console_indexer_kafka_get_deployed_connectors_duration_count{namespace=\"$namespace\", pod=~\"$pod\",technical_id=\"$cluster\"}[$__rate_interval])",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": false,
@@ -2656,12 +2595,7 @@
       "id": 49,
       "options": {
         "legend": {
-          "calcs": [
-            "lastNotNull",
-            "min",
-            "max",
-            "mean"
-          ],
+          "calcs": ["lastNotNull", "min", "max", "mean"],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true,
@@ -2682,7 +2616,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "rate(api__request_duration_seconds_sum{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval]) / rate(api__request_duration_seconds_count{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])",
+          "expr": "rate(console_api_request_duration_seconds_sum{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval]) / rate(console_api_request_duration_seconds_count{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])",
           "fullMetaSearch": false,
           "includeNullMetadata": false,
           "instant": false,
@@ -2810,9 +2744,7 @@
         "namePlacement": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -2827,7 +2759,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(api__request_duration_seconds_sum{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])) / sum(rate(api__request_duration_seconds_count{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])) > 0",
+          "expr": "sum(rate(console_api_request_duration_seconds_sum{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])) / sum(rate(console_api_request_duration_seconds_count{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
           "legendFormat": "[avg]",
@@ -2840,7 +2772,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.3, sum(rate(api__request_duration_seconds_bucket{namespace=\"$namespace\", pod=~\"$pod\"}[$__range])) by (le)) > 0",
+          "expr": "histogram_quantile(0.3, sum(rate(console_api_request_duration_seconds_bucket{namespace=\"$namespace\", pod=~\"$pod\"}[$__range])) by (le)) > 0",
           "hide": false,
           "interval": "1m",
           "legendFormat": "[30p]",
@@ -2853,7 +2785,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.5, sum(rate(api__request_duration_seconds_bucket{namespace=\"$namespace\", pod=~\"$pod\"}[$__range])) by (le)) > 0",
+          "expr": "histogram_quantile(0.5, sum(rate(console_api_request_duration_seconds_bucket{namespace=\"$namespace\", pod=~\"$pod\"}[$__range])) by (le)) > 0",
           "hide": false,
           "interval": "1m",
           "legendFormat": "[med]",
@@ -2866,7 +2798,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(api__request_duration_seconds_bucket{namespace=\"$namespace\", pod=~\"$pod\"}[$__range])) by (le)) > 0",
+          "expr": "histogram_quantile(0.95, sum(rate(console_api_request_duration_seconds_bucket{namespace=\"$namespace\", pod=~\"$pod\"}[$__range])) by (le)) > 0",
           "hide": false,
           "interval": "1m",
           "legendFormat": "[95p]",
@@ -2879,7 +2811,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum(rate(api__request_duration_seconds_bucket{namespace=\"$namespace\", pod=~\"$pod\"}[$__range])) by (le)) > 0",
+          "expr": "histogram_quantile(0.99, sum(rate(console_api_request_duration_seconds_bucket{namespace=\"$namespace\", pod=~\"$pod\"}[$__range])) by (le)) > 0",
           "hide": false,
           "interval": "1m",
           "legendFormat": "[99p]",
@@ -2893,12 +2825,7 @@
   ],
   "refresh": "",
   "schemaVersion": 38,
-  "tags": [
-    "conduktor-console",
-    "JVM",
-    "Pod",
-    "Indexer"
-  ],
+  "tags": ["conduktor-console", "JVM", "Pod", "Indexer"],
   "templating": {
     "list": [
       {
@@ -3073,7 +3000,7 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(index_cluster_duration_sum{pod=~\"$pod\"},technical_id)",
+        "definition": "label_values(console_indexer_kafka_cluster_duration_sum{pod=~\"$pod\"},technical_id)",
         "description": "Cluster technical identifier",
         "hide": 0,
         "includeAll": true,
@@ -3082,7 +3009,7 @@
         "name": "cluster",
         "options": [],
         "query": {
-          "query": "label_values(index_cluster_duration_sum{pod=~\"$pod\"},technical_id)",
+          "query": "label_values(console_indexer_kafka_cluster_duration_sum{pod=~\"$pod\"},technical_id)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,

@@ -1,4 +1,5 @@
 <a name="readme-top" id="readme-top"></a>
+
 # Conduktor Console
 
 > If you have any questions or [feedback](https://product.conduktor.help/c/55-helm-chart) contact our [support](https://www.conduktor.io/contact/support/).
@@ -127,7 +128,7 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/co
 | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------- |
 | `platform.image.registry`                     | Conduktor Console image registry                                                                                                                             | `docker.io`                   |
 | `platform.image.repository`                   | Conduktor Console image repository                                                                                                                           | `conduktor/conduktor-console` |
-| `platform.image.tag`                          | Conduktor Console image tag (immutable tags are recommended)                                                                                                 | `1.21.1`                      |
+| `platform.image.tag`                          | Conduktor Console image tag (immutable tags are recommended)                                                                                                 | `1.22.0`                      |
 | `platform.image.digest`                       | Conduktor Console image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`                          |
 | `platform.image.pullPolicy`                   | Conduktor Console image pull policy                                                                                                                          | `IfNotPresent`                |
 | `platform.image.pullSecrets`                  | Conduktor Console image pull secrets                                                                                                                         | `[]`                          |
@@ -263,7 +264,7 @@ Console expose metrics that could be collected and presented if your environment
 | `platformCortex.enabled`                            | Enable Conduktor Console Cortex                                                                                                                                     | `true`                               |
 | `platformCortex.image.registry`                     | Conduktor Console Cortex image registry                                                                                                                             | `docker.io`                          |
 | `platformCortex.image.repository`                   | Conduktor Console Cortex image repository                                                                                                                           | `conduktor/conduktor-console-cortex` |
-| `platformCortex.image.tag`                          | Conduktor Console Cortex image tag (immutable tags are recommended)                                                                                                 | `1.21.1`                             |
+| `platformCortex.image.tag`                          | Conduktor Console Cortex image tag (immutable tags are recommended)                                                                                                 | `1.22.0`                             |
 | `platformCortex.image.digest`                       | Conduktor Console Cortex image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`                                 |
 | `platformCortex.image.pullPolicy`                   | Conduktor Console Cortex image pull policy                                                                                                                          | `IfNotPresent`                       |
 | `platformCortex.image.pullSecrets`                  | Conduktor Console Cortex image pull secrets                                                                                                                         | `[]`                                 |
@@ -344,7 +345,6 @@ Console expose metrics that could be collected and presented if your environment
 | `platformCortex.service.sessionAffinity`            | Control where client requests go, to the same pod or round-robin                                                                                                    | `None`                               |
 | `platformCortex.service.sessionAffinityConfig`      | Additional settings for the sessionAffinity                                                                                                                         | `{}`                                 |
 
-
 ## Snippets
 
 ### Console configuration
@@ -387,11 +387,11 @@ config:
     password: "admin"
 
   database:
-    host: ''
+    host: ""
     port: 5432
-    name: 'postgres'
-    username: ''
-    password: ''
+    name: "postgres"
+    username: ""
+    password: ""
 
   license: "${ENTERPRISE_LICENSE}"
 ```
@@ -408,14 +408,14 @@ config:
     password: "admin"
 
   database:
-    host: ''
+    host: ""
     port: 5432
-    name: 'postgres'
-    username: ''
-    password: ''
+    name: "postgres"
+    username: ""
+    password: ""
   sso:
     oauth2:
-      - name: 'auth0'
+      - name: "auth0"
         default: true
         client-id: <client_id>
         client-secret: <client_secret>
@@ -423,7 +423,7 @@ config:
         openid:
           issuer: https://conduktor-staging.eu.auth0.com/
 
-  license: '<license_key>'
+  license: "<license_key>"
 ```
 
 ### Install with a kafka cluster
@@ -438,19 +438,19 @@ config:
     password: "admin"
 
   database:
-    host: ''
+    host: ""
     port: 5432
-    name: 'postgres'
-    username: ''
-    password: ''
+    name: "postgres"
+    username: ""
+    password: ""
   clusters:
     - id: my-local-kafka-cluster
       name: My Local Kafka Cluster
-      color: '#0013E7'
-      bootstrapServers: 'my-bootstrap-server:9092'
+      color: "#0013E7"
+      bootstrapServers: "my-bootstrap-server:9092"
       schemaRegistry:
         id: my-schema-registry
-        url: 'http://my-schema-registry:8081'
+        url: "http://my-schema-registry:8081"
 ```
 
 ### Install without Conduktor monitoring
@@ -465,11 +465,11 @@ config:
     password: "admin"
 
   database:
-    host: ''
+    host: ""
     port: 5432
-    name: 'postgres'
-    username: ''
-    password: ''
+    name: "postgres"
+    username: ""
+    password: ""
 
 platformCortex:
   enabled: false
@@ -477,9 +477,8 @@ platformCortex:
 
 ### Provide the license as a Kubernetes Secret
 
-This snippet expects that a *Kubernetes Secret Resource* already exists inside
+This snippet expects that a _Kubernetes Secret Resource_ already exists inside
 your cluster with a key named `CDK_LICENSE` containing your license key.
-
 
 ```yaml
 # values.yaml
@@ -492,11 +491,11 @@ config:
     password: "<your_admin_password>"
 
   database:
-    host: '<postgres_host>'
+    host: "<postgres_host>"
     port: 5432
-    name: '<postgres_database>'
-    username: '<postgres_username>'
-    password: '<postgres_password>'
+    name: "<postgres_database>"
+    username: "<postgres_username>"
+    password: "<postgres_password>"
 
   existingLicenseSecret: "<your_secret_name>"
 ```
@@ -506,8 +505,8 @@ config:
 We expect the secret to contain the following keys:
 
 - "CDK_ORGANIZATION_NAME": name of the organization
-- "CDK_ADMIN_EMAIL"      : email of the admin user
-- "CDK_ADMIN_PASSWORD"   : password of the admin user
+- "CDK_ADMIN_EMAIL" : email of the admin user
+- "CDK_ADMIN_PASSWORD" : password of the admin user
 - "CDK_DATABASE_PASSWORD": password of the database
 - "CDK_DATABASE_USERNAME": username of the database
 
@@ -516,9 +515,9 @@ We expect the secret to contain the following keys:
 config:
   existingSecret: "<your_secret_name>"
   database:
-    host: ''
+    host: ""
     port: 5432
-    name: 'postgres'
+    name: "postgres"
 ```
 
 ```yaml
@@ -539,6 +538,7 @@ data:
 ### Provide monitoring configuration as a Kubernetes Secret
 
 We expect the secret to contain the following keys:
+
 - For S3 like storage:
   - "CDK_MONITORING_STORAGE_S3_ACCESSKEYID" : S3 access key
   - "CDK_MONITORING_STORAGE_S3_SECRETACCESSKEY" : S3 secret access key
@@ -586,11 +586,11 @@ config:
     password: "<your_admin_password>"
 
   database:
-    host: '<postgres_host>'
+    host: "<postgres_host>"
     port: 5432
-    name: '<postgres_database>'
-    username: '<postgres_username>'
-    password: '<postgres_password>'
+    name: "<postgres_database>"
+    username: "<postgres_username>"
+    password: "<postgres_password>"
 
 platform:
   dataVolume:
@@ -622,11 +622,11 @@ config:
     password: "admin"
 
   database:
-    host: ''
+    host: ""
     port: 5432
-    name: 'postgres'
-    username: ''
-    password: ''
+    name: "postgres"
+    username: ""
+    password: ""
 
 platform:
   affinity:
@@ -708,11 +708,11 @@ config:
     password: "admin"
 
   database:
-    host: ''
+    host: ""
     port: 5432
-    name: 'postgres'
-    username: ''
-    password: ''
+    name: "postgres"
+    username: ""
+    password: ""
 
 platform:
   extraEnvVarsSecret: "<your_secret_name>"
@@ -732,11 +732,11 @@ config:
     password: "admin"
 
   database:
-    host: ''
+    host: ""
     port: 5432
-    name: 'postgres'
-    username: ''
-    password: ''
+    name: "postgres"
+    username: ""
+    password: ""
 
   platform:
     external:
@@ -769,11 +769,11 @@ config:
     password: "admin"
 
   database:
-    host: ''
+    host: ""
     port: 5432
-    name: 'postgres'
-    username: ''
-    password: ''
+    name: "postgres"
+    username: ""
+    password: ""
 
   platform:
     external:
@@ -794,11 +794,11 @@ config:
     password: "admin"
 
   database:
-    host: ''
+    host: ""
     port: 5432
-    name: 'postgres'
-    username: ''
-    password: ''
+    name: "postgres"
+    username: ""
+    password: ""
 
   platform:
     external:
@@ -831,11 +831,11 @@ config:
     password: "admin"
 
   database:
-    host: ''
+    host: ""
     port: 5432
-    name: 'postgres'
-    username: ''
-    password: ''
+    name: "postgres"
+    username: ""
+    password: ""
 
 serviceAccount:
   create: false
@@ -856,11 +856,11 @@ config:
     password: "admin"
 
   database:
-    host: ''
+    host: ""
     port: 5432
-    name: 'postgres'
-    username: ''
-    password: ''
+    name: "postgres"
+    username: ""
+    password: ""
 
 serviceAccount:
   annotations:
@@ -872,12 +872,14 @@ serviceAccount:
 If you want to enable the technical monitoring of Conduktor Console, you can enable built-in Prometheus metrics collector and Grafana dashboard.
 But to work you need to have [prometheus-operator](https://github.com/prometheus-operator/prometheus-operator) and [grafana-operator](https://grafana.github.io/grafana-operator/docs/installation/helm/) installed in your cluster.
 We use following CRDs from these operators:
+
 - **ServiceMonitor** : `monitoring.coreos.com/v1/ServiceMonitor`
 - **GrafanaDashboard** : `grafana.integreatly.org/v1beta1/GrafanaDashboard` (v5) or `integreatly.org/v1alpha1/GrafanaDashboard` (v4)
 - **GrafanaFolder** : `grafana.integreatly.org/v1beta1/GrafanaFolder` (v5 only)
 
 You can also manually install Grafana dashboard from Json export located here [console.json](./grafana-dashboards/console.json).
 It takes two inputs variables:
+
 - `DS_PROMETHEUS` : Prometheus Datasource name
 - `VAR_NAMESPACE` : Namespace where Conduktor Console is installed
 
@@ -891,11 +893,11 @@ config:
     password: "admin"
 
   database:
-    host: ''
+    host: ""
     port: 5432
-    name: 'postgres'
-    username: ''
-    password: ''
+    name: "postgres"
+    username: ""
+    password: ""
 
 platform:
   metrics:
@@ -920,7 +922,7 @@ platform:
 ```
 
 This example will install a `ServiceMonitor` and a `GrafanaDashboard` in the namespace `monitoring-namespace`.
-The `ServiceMonitor` will scrape metrics from Conduktor Console every 30 seconds and the `GrafanaDashboard` will be available in Grafana instance with label  `grafana: tooling` in the folder `tools` and use Prometheus datasource named `my-prometheus-ds`.
+The `ServiceMonitor` will scrape metrics from Conduktor Console every 30 seconds and the `GrafanaDashboard` will be available in Grafana instance with label `grafana: tooling` in the folder `tools` and use Prometheus datasource named `my-prometheus-ds`.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
