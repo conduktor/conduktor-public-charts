@@ -143,11 +143,11 @@ helm-monitoring-stack: ## Install monitoring stack prometheus and grafana
 		--set alertmanager.enabled=false \
 		--set grafana.enabled=false
 	@echo "Install grafana operator"
-	helm upgrade --install grafana-operator oci://ghcr.io/grafana/helm-charts/grafana-operator \
+	helm upgrade --install grafana-operator bitnami/grafana-operator \
 		--namespace prometheus-stack --create-namespace \
 		--set namespaceScope=false \
 		--set watchNamespaces="" \
-		--version v5.6.0
+		--set grafana.enabled=false
 	@echo "Install grafana"
 	kubectl apply -f resources/monitoring-stack-grafana-crd.yaml
 
