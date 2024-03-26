@@ -533,7 +533,7 @@ platform:
       ##   prometheus: my-prometheus
       ##
       selector: {}
-      ## @param platform.metrics.serviceMonitor.extraParams extra parameters in ServiceMonitor
+      ## @param platform.metrics.serviceMonitor.extraParams Extra parameters for the ServiceMonitor
       ##  extraParams:
       ##    basicAuth:
       ##      password:
