@@ -1,0 +1,119 @@
+###############
+# Create release Workflow that :
+# - update Chart.yaml version to input one and push to current checkout branch
+# - package Helm Chart using chart-releaser (https://github.com/helm/chart-releaser) tool
+# - create and publish Github release based on commit previously using release-drafter (https://github.com/release-drafter/release-drafter) tool
+# - upload tgz package as release asset
+# - update Helm index on gh-pages using chart-releaser (https://github.com/helm/chart-releaser) tool
+###############
+name: Create release
+run-name: Create release ${{ inputs.chart }}-${{ inputs.version }} by @${{ github.actor }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      chart:
+        type: choice
+        description: Chart to release
+        required: true
+        default: test-chart
+        options: #charts directories name supported
+          - console
+          - gateway
+      version:
+        type: string
+        description: Chart version to release
+        required: true
+      latest:
+        type: boolean
+        description: Is this release latest
+        required: true
+        default: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_NAME: "${{ inputs.chart }}-${{ inputs.version }}"
+      RELEASE_TAG: "${{ inputs.chart }}-${{ inputs.version }}"
+      CHART_DIR: "./charts/${{ inputs.chart }}"
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: "v3.10.1"
+
+      - name: Update chart version
+        uses: mikefarah/yq@master
+        env:
+          VERSION: ${{ inputs.version }}
+        with:
+          cmd: yq e -i '.version = env(VERSION)' ${{ env.CHART_DIR }}/Chart.yaml
+
+      - name: Commit chart version update
+        id: commit
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+          git diff
+          git commit -am "Update chart ${{ inputs.chart }} version to ${{ inputs.version }}"
+          git push
+
+          update_commit=$(git rev-parse HEAD)
+          echo "commit_sha1=${update_commit}" >> "${GITHUB_OUTPUT}"
+
+      - name: Package chart ${{ inputs.chart }}
+        id: package
+        run: |
+          id
+          docker run \
+            --user "${UID}:${GID}" \
+            --workdir /chart \
+            -v ${{ env.CHART_DIR }}:/chart \
+            quay.io/helmpack/chart-releaser \
+            package /chart --package-path .cr-release-packages
+
+          echo "package_file=${{ env.CHART_DIR }}/.cr-release-packages/${{ inputs.chart }}-${{ inputs.version }}.tgz" >> "${GITHUB_OUTPUT}"
+
+      - name: Create github release ${{ env.RELEASE_NAME }}
+        id: release
+        uses: release-drafter/release-drafter@v5
+        with:
+          config-name: "release-drafter/${{ inputs.chart }}.yaml"
+          publish: true
+          version: ${{ inputs.version }}
+          name: "${{ env.RELEASE_NAME }}"
+          tag: "${{ env.RELEASE_TAG }}"
+          latest: ${{ inputs.latest }}
+          commitish: ${{ steps.commit.outputs.commit_sha1 }}
+
+      - name: Upload package chart to release
+        id: upload
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ env.GITHUB_TOKEN }}
+          file: ${{ steps.package.outputs.package_file }}
+          tag: ${{ steps.release.outputs.tag_name }}
+
+      - name: Update helm index
+        run: |
+          owner=$(cut -d '/' -f 1 <<< "$GITHUB_REPOSITORY")
+          repo=$(cut -d '/' -f 2 <<< "$GITHUB_REPOSITORY")
+
+          docker run \
+            --user "${UID}:${GID}" \
+            --workdir /workdir \
+            -v $(pwd):/workdir \
+            quay.io/helmpack/chart-releaser \
+            index --index-path index.yaml --push -r "$repo" -o "$owner" --package-path ./charts/${{ inputs.chart }}/.cr-release-packages --token ${{ env.GITHUB_TOKEN }}
