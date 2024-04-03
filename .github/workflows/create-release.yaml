@@ -55,6 +55,9 @@ jobs:
         with:
           version: "v3.10.1"
 
+      - name: Add bitnami repository
+        run: helm repo add bitnami https://charts.bitnami.com/bitnami
+        
       - name: Install Chart Releaser
         env:
           CR_VERSION: 1.6.1
