@@ -63,7 +63,7 @@ jobs:
           echo $PATH
 
           mkdir -p ${{ env.CR_BIN_PATH }}
-          wget -O /tmp/cr.tar.gz https://github.com/helm/chart-releaser/releases/download/v${{env.CR_VERSION}}/chart-releaser_${{CR_VERSION}}_linux_amd64.tar.gz
+          wget -O /tmp/cr.tar.gz https://github.com/helm/chart-releaser/releases/download/v${{env.CR_VERSION}}/chart-releaser_${{env.CR_VERSION}}_linux_amd64.tar.gz
           tar -xzvf /tmp/cr.tar.gz -C ${{ env.CR_BIN_PATH }}
           sudo chmod +x ${{ env.CR_BIN_PATH }}/cr
           echo "${{env.CR_BIN_PATH}}" >> $GITHUB_PATH
