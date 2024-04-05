@@ -56,8 +56,8 @@ jobs:
         if: ${{ inputs.chart == 'gateway' }}
         run: 
           echo "PACKAGE_NAME=conduktor-gateway-${{ inputs.version }}.tgz" >> "${GITHUB_ENV}"
-          echo "RELEASE_TAG=conduktor-gateway-${{ inputs.version }}" >> "${GITHUB_ENV}"
-          echo "RELEASE_NAME=conduktor-gateway-${{ inputs.version }}" >> "${GITHUB_ENV}"
+          echo -e "\nRELEASE_TAG=conduktor-gateway-${{ inputs.version }}" >> "${GITHUB_ENV}"
+          echo -e "\nRELEASE_NAME=conduktor-gateway-${{ inputs.version }}" >> "${GITHUB_ENV}"
 
       - name: Install Helm
         uses: azure/setup-helm@v3
