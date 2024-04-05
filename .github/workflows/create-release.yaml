@@ -107,7 +107,11 @@ jobs:
         run: |
           cr version
           cr package ${{ env.CHART_DIR }} --package-path ${{ env.CHART_DIR }}/.cr-release-packages
-          echo "package_file=${{ env.CHART_DIR }}/.cr-release-packages/${{ inputs.chart }}-${{ inputs.version }}.tgz" >> "${GITHUB_OUTPUT}"
+          package_name=${{ inputs.chart }}
+          if [[ "${{ inputs.chart }}" == "gateway" ]];then
+            package_name="conduktor-gateway"
+          fi
+          echo "package_file=${{ env.CHART_DIR }}/.cr-release-packages/${package_name}-${{ inputs.version }}.tgz" >> "${GITHUB_OUTPUT}"
 
       - name: Create github release ${{ env.RELEASE_NAME }}
         id: release

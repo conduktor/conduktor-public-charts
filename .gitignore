@@ -36,3 +36,4 @@ Session.vim
 charts/**/charts
 
 .history
+.cr-release-packages
