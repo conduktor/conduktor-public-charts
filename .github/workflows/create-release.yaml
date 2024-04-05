@@ -52,12 +52,18 @@ jobs:
           token: ${{ secrets.CONDUKTORBOT_REPO_WRITE }}
       
       # :puke:
-      - name: Gateway ugly patch
+      - name: Gateway PACKAGE_NAME ugly patch
         if: ${{ inputs.chart == 'gateway' }}
         run: 
           echo "PACKAGE_NAME=conduktor-gateway-${{ inputs.version }}.tgz" >> "${GITHUB_ENV}"
-          echo -e "\nRELEASE_TAG=conduktor-gateway-${{ inputs.version }}" >> "${GITHUB_ENV}"
-          echo -e "\nRELEASE_NAME=conduktor-gateway-${{ inputs.version }}" >> "${GITHUB_ENV}"
+      - name: Gateway RELEASE_TAG ugly patch
+        if: ${{ inputs.chart == 'gateway' }}
+        run: 
+          echo "RELEASE_TAG=conduktor-gateway-${{ inputs.version }}" >> "${GITHUB_ENV}"
+      - name: Gateway RELEASE_NAME ugly patch
+        if: ${{ inputs.chart == 'gateway' }}
+        run: 
+          echo "RELEASE_NAME=conduktor-gateway-${{ inputs.version }}" >> "${GITHUB_ENV}"
 
       - name: Install Helm
         uses: azure/setup-helm@v3
