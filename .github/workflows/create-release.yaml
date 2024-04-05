@@ -53,7 +53,7 @@ jobs:
       
       # :puke:
       - name: Gateway ugly patch
-        if: ${{ inputs.chart == "gateway "}}
+        if: ${{ inputs.chart == "gateway" }}
         run: 
           echo "PACKAGE_NAME=conduktor-gateway-${{ inputs.version }}.tgz" >> "${GITHUB_ENV}"
           echo "RELEASE_TAG=conduktor-gateway-${{ inputs.version }}" >> "${GITHUB_ENV}"
