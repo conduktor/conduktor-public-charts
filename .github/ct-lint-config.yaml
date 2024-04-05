@@ -13,4 +13,5 @@ validate-yaml: true
 chart-repos:
   - bitnami=https://charts.bitnami.com/bitnami
 namespace: ct
-release-label: console
+release-label: test
+check-version-increment: false

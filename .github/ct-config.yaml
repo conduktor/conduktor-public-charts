@@ -15,4 +15,4 @@ helm-extra-args: "--timeout 300s"
 chart-repos:
   - bitnami=https://charts.bitnami.com/bitnami
 namespace: ct
-release-label: console
+release-label: test

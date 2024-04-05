@@ -22,7 +22,7 @@ spec:
       {{- end }}
   endpoints:
     - port: http
-      path: "/admin/api/metrics"
+      path: "/api/metrics"
       scheme: http
       {{- if .Values.platform.metrics.serviceMonitor.interval }}
       interval: {{ .Values.platform.metrics.serviceMonitor.interval }}
@@ -38,6 +38,9 @@ spec:
       {{- end }}
       {{- if .Values.platform.metrics.serviceMonitor.relabelings }}
       relabelings: {{- include "common.tplvalues.render" ( dict "value" .Values.platform.metrics.serviceMonitor.relabelings "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.platform.metrics.serviceMonitor.extraParams }}
+      {{- toYaml .Values.platform.metrics.serviceMonitor.extraParams | nindent 6 }}
       {{- end }}
   namespaceSelector:
     matchNames:

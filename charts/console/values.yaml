@@ -82,11 +82,11 @@ config:
   ## @param config.database.username Your Conduktor Console Database username
   ## @param config.database.password Your Conduktor Console Database password
   database:
-    host: ''
+    host: ""
     port: 5432
-    name: 'postgres'
-    password: ''
-    username: ''
+    name: "postgres"
+    password: ""
+    username: ""
 
   ## @param config.license Conduktor Console Enterprise license, if none given, the product will run in free tier
   license: ""
@@ -124,7 +124,6 @@ config:
       ## NOTE: 'config.platform.https.cert.path', 'config.platform.https.key.path'
       ## and 'config.platform.https.selfSigned' will be ignored
       existingSecret: ""
-
 
 ## @section Platform Monitoring product Parameters
 ## @descriptionStart
@@ -214,7 +213,6 @@ monitoringConfig:
     ##  projectId: ""
     ##  regionName: ""
 
-
 ## @section Platform Deployment Parameters
 ##
 
@@ -234,7 +232,7 @@ platform:
   image:
     registry: docker.io
     repository: conduktor/conduktor-console
-    tag: 1.21.0
+    tag: 1.22.0
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -535,6 +533,17 @@ platform:
       ##   prometheus: my-prometheus
       ##
       selector: {}
+      ## @param platform.metrics.serviceMonitor.extraParams Extra parameters for the ServiceMonitor
+      ##  extraParams:
+      ##    basicAuth:
+      ##      password:
+      ##        name: conduktor-admin-user # secret name
+      ##        key: password
+      ##      username:
+      ##        name: conduktor-admin-user # secret name
+      ##        key: username
+      ##
+      extraParams: {}
 
     ## Grafana dashboard (need grafana operator or sidecar to be enabled on namespace)
     ## refs:
@@ -763,7 +772,7 @@ platformCortex:
   image:
     registry: docker.io
     repository: conduktor/conduktor-console-cortex
-    tag: 1.21.0
+    tag: 1.22.0
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'

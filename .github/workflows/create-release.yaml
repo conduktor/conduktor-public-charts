@@ -1,0 +1,144 @@
+###############
+# Create release Workflow that :
+# - update Chart.yaml version to input one and push to current checkout branch
+# - package Helm Chart using chart-releaser (https://github.com/helm/chart-releaser) tool
+# - create and publish Github release based on commit previously using release-drafter (https://github.com/release-drafter/release-drafter) tool
+# - upload tgz package as release asset
+# - update Helm index on gh-pages using chart-releaser (https://github.com/helm/chart-releaser) tool
+###############
+name: Create release
+run-name: Create release ${{ inputs.chart }}-${{ inputs.version }} by @${{ github.actor }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      chart:
+        type: choice
+        description: Chart to release
+        required: true
+        default: test-chart
+        options: #charts directories name supported
+          - console
+          - gateway
+      version:
+        type: string
+        description: Chart version to release
+        required: true
+      latest:
+        type: boolean
+        description: Is this release latest
+        required: true
+        default: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_NAME: "${{ inputs.chart }}-${{ inputs.version }}"
+      RELEASE_TAG: "${{ inputs.chart }}-${{ inputs.version }}"
+      CHART_DIR: "./charts/${{ inputs.chart }}"
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.CONDUKTORBOT_REPO_WRITE }}
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: "v3.10.1"
+
+      - name: Add bitnami repository
+        run: helm repo add bitnami https://charts.bitnami.com/bitnami
+        
+      - name: Install Chart Releaser
+        env:
+          CR_VERSION: 1.6.1
+          CR_BIN_PATH: "/opt/hostedtoolcache/chart-releaser"
+        run: |
+          echo $PATH
+
+          mkdir -p ${{ env.CR_BIN_PATH }}
+          wget -O /tmp/cr.tar.gz https://github.com/helm/chart-releaser/releases/download/v${{env.CR_VERSION}}/chart-releaser_${{env.CR_VERSION}}_linux_amd64.tar.gz
+          tar -xzvf /tmp/cr.tar.gz -C ${{ env.CR_BIN_PATH }}
+          sudo chmod +x ${{ env.CR_BIN_PATH }}/cr
+          echo "${{env.CR_BIN_PATH}}" >> $GITHUB_PATH
+
+          echo "Chart releaser installed at ${{env.CR_BIN_PATH}}"
+
+      - name: Update chart version
+        uses: mikefarah/yq@master
+        env:
+          VERSION: ${{ inputs.version }}
+        with:
+          cmd: yq e -i '.version = env(VERSION)' ${{ env.CHART_DIR }}/Chart.yaml
+
+      - name: Setup ConduktorBot GPG
+        id: gpg
+        uses: crazy-max/ghaction-import-gpg@v5.3.0
+        with:
+          gpg_private_key: ${{ secrets.CONDUKTOR_BOT_GPG_PRIVATE_KEY }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          git_tag_gpgsign: true
+
+      - name: Commit chart version update
+        id: commit
+        run: |
+          git config user.name "${{ steps.gpg.outputs.name }}"
+          git config user.email "${{ steps.gpg.outputs.email }}"
+
+          git diff
+          git commit -am "Update chart ${{ inputs.chart }} version to ${{ inputs.version }}"
+          git push
+
+          update_commit=$(git rev-parse HEAD)
+          echo "commit_sha1=${update_commit}" >> "${GITHUB_OUTPUT}"
+
+      - name: Package chart ${{ inputs.chart }}
+        id: package
+        run: |
+          cr version
+          cr package ${{ env.CHART_DIR }} --package-path ${{ env.CHART_DIR }}/.cr-release-packages
+          echo "package_file=${{ env.CHART_DIR }}/.cr-release-packages/${{ inputs.chart }}-${{ inputs.version }}.tgz" >> "${GITHUB_OUTPUT}"
+
+      - name: Create github release ${{ env.RELEASE_NAME }}
+        id: release
+        uses: release-drafter/release-drafter@v5
+        with:
+          config-name: "release-drafter/${{ inputs.chart }}.yaml"
+          publish: true
+          version: ${{ inputs.version }}
+          name: "${{ env.RELEASE_NAME }}"
+          tag: "${{ env.RELEASE_TAG }}"
+          latest: ${{ inputs.latest }}
+          commitish: ${{ steps.commit.outputs.commit_sha1 }}
+
+      - name: Upload package chart to release
+        id: upload
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ env.GITHUB_TOKEN }}
+          file: ${{ steps.package.outputs.package_file }}
+          tag: ${{ steps.release.outputs.tag_name }}
+
+      - name: Update helm index
+        run: |
+          owner=$(cut -d '/' -f 1 <<< "$GITHUB_REPOSITORY")
+          repo=$(cut -d '/' -f 2 <<< "$GITHUB_REPOSITORY")
+
+          cr version
+          cr index \
+            --index-path index.yaml \
+            --push \
+            -r "$repo" \
+            -o "$owner" \
+            --package-path ${{ env.CHART_DIR }}/.cr-release-packages \
+            --token ${{ secrets.CONDUKTORBOT_REPO_WRITE }}
