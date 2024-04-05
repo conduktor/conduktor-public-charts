@@ -40,6 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RELEASE_NAME: "${{ inputs.chart }}-${{ inputs.version }}"
+      PACKAGE_NAME: "${{ inputs.chart }}-${{ inputs.version }}.tgz"
       RELEASE_TAG: "${{ inputs.chart }}-${{ inputs.version }}"
       CHART_DIR: "./charts/${{ inputs.chart }}"
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -49,6 +50,14 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.CONDUKTORBOT_REPO_WRITE }}
+      
+      # :puke:
+      - name: Gateway ugly patch
+        if: ${{ inputs.chart == "gateway "}}
+        run: 
+          echo "PACKAGE_NAME=conduktor-gateway-${{ inputs.version }}.tgz" >> "${GITHUB_ENV}"
+          echo "RELEASE_TAG=conduktor-gateway-${{ inputs.version }}" >> "${GITHUB_ENV}"
+          echo "RELEASE_NAME=conduktor-gateway-${{ inputs.version }}" >> "${GITHUB_ENV}"
 
       - name: Install Helm
         uses: azure/setup-helm@v3
@@ -107,11 +116,7 @@ jobs:
         run: |
           cr version
           cr package ${{ env.CHART_DIR }} --package-path ${{ env.CHART_DIR }}/.cr-release-packages
-          package_name=${{ inputs.chart }}
-          if [[ "${{ inputs.chart }}" == "gateway" ]];then
-            package_name="conduktor-gateway"
-          fi
-          echo "package_file=${{ env.CHART_DIR }}/.cr-release-packages/${package_name}-${{ inputs.version }}.tgz" >> "${GITHUB_OUTPUT}"
+          echo "package_file=${{ env.CHART_DIR }}/.cr-release-packages/${{ env.PACKAGE_NAME }}" >> "${GITHUB_OUTPUT}"
 
       - name: Create github release ${{ env.RELEASE_NAME }}
         id: release
