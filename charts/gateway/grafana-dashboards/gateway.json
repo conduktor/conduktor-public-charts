@@ -172,8 +172,8 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.3.2",
-      "repeat": "proxy_kcache_size_type",
+      "pluginVersion": "9.5.2",
+      "repeat": "gateway_kcache_size_type",
       "repeatDirection": "h",
       "targets": [
         {
@@ -183,7 +183,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "proxy_kcache_size{job=\"$job\", pod=~\"$pod\", type=\"$proxy_kcache_size_type\"}",
+          "expr": "gateway_kcache_size{job=\"$job\", pod=~\"$pod\", type=\"$gateway_kcache_size_type\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "__auto",
@@ -191,7 +191,7 @@
           "refId": "A"
         }
       ],
-      "title": "$proxy_kcache_size_type",
+      "title": "$gateway_kcache_size_type",
       "type": "stat"
     },
     {
@@ -204,7 +204,7 @@
       },
       "id": 154,
       "panels": [],
-      "title": "Kafka Proxy",
+      "title": "Kafka gateway",
       "type": "row"
     },
     {
@@ -330,7 +330,7 @@
         },
         "showUnfilled": true
       },
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "targets": [
         {
           "datasource": {
@@ -338,7 +338,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum(irate(proxy_latency_request_response_seconds_sum{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) / sum(irate(proxy_latency_request_response_seconds_count{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) > 0",
+          "expr": "sum(irate(gateway_latency_request_response_seconds_sum{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) / sum(irate(gateway_latency_request_response_seconds_count{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) > 0",
           "hide": false,
           "interval": "",
           "legendFormat": "[avg]",
@@ -351,7 +351,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.3, sum(rate(proxy_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) by (le)) > 0",
+          "expr": "histogram_quantile(0.3, sum(rate(gateway_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) by (le)) > 0",
           "hide": false,
           "interval": "1m",
           "legendFormat": "[30p]",
@@ -364,7 +364,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.5, sum(rate(proxy_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) by (le)) > 0",
+          "expr": "histogram_quantile(0.5, sum(rate(gateway_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) by (le)) > 0",
           "hide": false,
           "interval": "1m",
           "legendFormat": "[med]",
@@ -377,7 +377,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(proxy_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) by (le)) > 0",
+          "expr": "histogram_quantile(0.95, sum(rate(gateway_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) by (le)) > 0",
           "hide": false,
           "interval": "1m",
           "legendFormat": "[95p]",
@@ -390,7 +390,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum(rate(proxy_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) by (le)) > 0",
+          "expr": "histogram_quantile(0.99, sum(rate(gateway_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) by (le)) > 0",
           "hide": false,
           "interval": "1m",
           "legendFormat": "[99p]",
@@ -459,7 +459,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by(direction) (increase(proxy_bytes_exchanged_total{job=\"$job\", pod=~\"$pod\"}[$__range]))",
+          "expr": "sum by(direction) (increase(gateway_bytes_exchanged_total{job=\"$job\", pod=~\"$pod\"}[$__range]))",
           "legendFormat": "{{direction}}",
           "range": true,
           "refId": "A"
@@ -553,8 +553,8 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "proxy_brokered_active_connections{job=\"$job\", pod=~\"$pod\"}",
-          "legendFormat": "proxy_brokered - {{ pod }}",
+          "expr": "gateway_brokered_active_connections{job=\"$job\", pod=~\"$pod\"}",
+          "legendFormat": "gateway_brokered - {{ pod }}",
           "range": true,
           "refId": "A"
         }
@@ -647,7 +647,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(proxy_thread_request_received_total{job=\"$job\", pod=~\"$pod\"}[1m]))",
+          "expr": "sum(rate(gateway_thread_request_received_total{job=\"$job\", pod=~\"$pod\"}[1m]))",
           "legendFormat": "Requests",
           "range": true,
           "refId": "A"
@@ -658,7 +658,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(proxy_thread_request_rebuild_total{job=\"$job\", pod=~\"$pod\"}[1m]))",
+          "expr": "sum(rate(gateway_thread_request_rebuild_total{job=\"$job\", pod=~\"$pod\"}[1m]))",
           "hide": false,
           "legendFormat": "Rebuild",
           "range": true,
@@ -711,7 +711,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "targets": [
         {
           "datasource": {
@@ -719,7 +719,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum (proxy_thread_tasks{job=\"$job\", pod=~\"$pod\"})",
+          "expr": "sum (gateway_thread_tasks{job=\"$job\", pod=~\"$pod\"})",
           "hide": false,
           "legendFormat": "Total",
           "range": true,
@@ -731,7 +731,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by(name) (proxy_thread_tasks{job=\"$job\", pod=~\"$pod\"})",
+          "expr": "sum by(name) (gateway_thread_tasks{job=\"$job\", pod=~\"$pod\"})",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -824,7 +824,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by(tenant) (rate(proxy_thread_request_rebuild_total{job=\"$job\", pod=~\"$pod\"}[1m])) > 0",
+          "expr": "sum by(tenant) (rate(gateway_thread_request_rebuild_total{job=\"$job\", pod=~\"$pod\"}[1m])) > 0",
           "interval": "1m",
           "legendFormat": "{{tenant}}",
           "range": true,
@@ -876,9 +876,10 @@
           "fields": "",
           "values": false
         },
-        "showUnfilled": true
+        "showUnfilled": true,
+        "valueMode": "color"
       },
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "targets": [
         {
           "datasource": {
@@ -886,7 +887,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "round(sum by (api_key) (increase(proxy_thread_request_rebuild_total{tenant=~\"$tenant\", job=\"$job\", pod=~\"$pod\"}[$__range])) > 0)",
+          "expr": "round(sum by (api_key) (increase(gateway_thread_request_rebuild_total{tenant=~\"$tenant\", job=\"$job\", pod=~\"$pod\"}[$__range])) > 0)",
           "legendFormat": "{{api_key}}",
           "range": true,
           "refId": "A"
@@ -1044,7 +1045,7 @@
                 "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
-              "expr": "sum(irate(proxy_latency_request_response_seconds_sum{job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"} [1m])) / sum(irate(proxy_latency_request_response_seconds_count{job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m]))",
+              "expr": "sum(irate(gateway_latency_request_response_seconds_sum{job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"} [1m])) / sum(irate(gateway_latency_request_response_seconds_count{job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m]))",
               "hide": false,
               "legendFormat": "[avg]",
               "range": true,
@@ -1056,7 +1057,7 @@
                 "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
-              "expr": "histogram_quantile(0.3, sum(rate(proxy_latency_request_response_seconds_bucket{ job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m])) by (le))",
+              "expr": "histogram_quantile(0.3, sum(rate(gateway_latency_request_response_seconds_bucket{ job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m])) by (le))",
               "hide": false,
               "legendFormat": "[30p]",
               "range": true,
@@ -1068,7 +1069,7 @@
                 "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
-              "expr": "histogram_quantile(0.5, sum(rate(proxy_latency_request_response_seconds_bucket{ job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m])) by (le))",
+              "expr": "histogram_quantile(0.5, sum(rate(gateway_latency_request_response_seconds_bucket{ job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m])) by (le))",
               "hide": false,
               "legendFormat": "[med]",
               "range": true,
@@ -1080,7 +1081,7 @@
                 "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
-              "expr": "histogram_quantile(0.95, sum(rate(proxy_latency_request_response_seconds_bucket{ job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m])) by (le))",
+              "expr": "histogram_quantile(0.95, sum(rate(gateway_latency_request_response_seconds_bucket{ job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m])) by (le))",
               "hide": false,
               "legendFormat": "[95p]",
               "range": true,
@@ -1092,7 +1093,7 @@
                 "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
-              "expr": "histogram_quantile(0.99, sum(rate(proxy_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m])) by (le))",
+              "expr": "histogram_quantile(0.99, sum(rate(gateway_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m])) by (le))",
               "hide": false,
               "legendFormat": "[99p]",
               "range": true,
@@ -1209,7 +1210,7 @@
         "text": {},
         "textMode": "value"
       },
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "repeat": "jvm_threads_states_threads",
       "repeatDirection": "h",
       "targets": [
@@ -1296,7 +1297,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1429,7 +1430,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1564,7 +1565,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1804,7 +1805,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1943,7 +1944,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -2065,7 +2066,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -2223,7 +2224,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -2369,7 +2370,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -2536,7 +2537,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -2806,7 +2807,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -2940,7 +2941,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -3071,7 +3072,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -3178,7 +3179,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -3336,7 +3337,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -3458,7 +3459,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -3566,7 +3567,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -3688,7 +3689,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "9.5.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -3876,7 +3877,7 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(proxy_latency_request_response_seconds{job=\"$job\", pod=~\"$pod\"},tenant)",
+        "definition": "label_values(gateway_latency_request_response_seconds{job=\"$job\", pod=~\"$pod\"},tenant)",
         "hide": 0,
         "includeAll": true,
         "label": "Tenant",
@@ -3885,7 +3886,7 @@
         "name": "tenant",
         "options": [],
         "query": {
-          "query": "label_values(proxy_latency_request_response_seconds{job=\"$job\", pod=~\"$pod\"},tenant)",
+          "query": "label_values(gateway_latency_request_response_seconds{job=\"$job\", pod=~\"$pod\"},tenant)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
@@ -3933,16 +3934,16 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(proxy_kcache_size{job=\"$job\", pod=~\"$pod\"},type)",
+        "definition": "label_values(gateway_kcache_size{job=\"$job\", pod=~\"$pod\"},type)",
         "hide": 2,
         "includeAll": true,
         "label": "kcache_key",
         "multi": false,
         "multiFormat": "glob",
-        "name": "proxy_kcache_size_type",
+        "name": "gateway_kcache_size_type",
         "options": [],
         "query": {
-          "query": "label_values(proxy_kcache_size{job=\"$job\", pod=~\"$pod\"},type)",
+          "query": "label_values(gateway_kcache_size{job=\"$job\", pod=~\"$pod\"},type)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
