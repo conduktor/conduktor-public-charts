@@ -26,7 +26,6 @@
 
 - console ([doc](charts/console/README.md), [values](charts/console/values.yaml))
 - conduktor-gateway ([doc](charts/gateway/README.md), [values](charts/gateway/gateway/values.yaml))
-- platform-controller (deprecated) ([doc](https://helm.conduktor.io/platform-controller/README.md), [values](https://helm.conduktor.io/platform-controller/values.yaml))
 
 ## Usage
 
