@@ -20,7 +20,6 @@
 ## Charts
 
 - console ([doc](https://github.com/conduktor/conduktor-public-charts/blob/main/charts/console/README.md), [values](https://github.com/conduktor/conduktor-public-charts/blob/main/charts/console/values.yaml))
-- platform-controller (deprecated) ([doc](platform-controller/README.md), [values](platform-controller/values.yaml))
 - conduktor-gateway ([doc](https://github.com/conduktor/conduktor-public-charts/blob/main/charts/gateway/README.md), [values](https://github.com/conduktor/conduktor-public-charts/blob/main/charts/gateway/values.yaml))
 
 ## Prerequisites
