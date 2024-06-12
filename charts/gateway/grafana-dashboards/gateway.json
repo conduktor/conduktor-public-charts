@@ -338,7 +338,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum(irate(gateway_latency_request_response_seconds_sum{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) / sum(irate(gateway_latency_request_response_seconds_count{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) > 0",
+          "expr": "sum(irate(gateway_latency_request_response_seconds_sum{job=\"$job\", pod=~\"$pod\", vcluster=~\"$vcluster\"}[$__range])) / sum(irate(gateway_latency_request_response_seconds_count{job=\"$job\", pod=~\"$pod\", vcluster=~\"$vcluster\"}[$__range])) > 0",
           "hide": false,
           "interval": "",
           "legendFormat": "[avg]",
@@ -351,7 +351,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.3, sum(rate(gateway_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) by (le)) > 0",
+          "expr": "histogram_quantile(0.3, sum(rate(gateway_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", vcluster=~\"$vcluster\"}[$__range])) by (le)) > 0",
           "hide": false,
           "interval": "1m",
           "legendFormat": "[30p]",
@@ -364,7 +364,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.5, sum(rate(gateway_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) by (le)) > 0",
+          "expr": "histogram_quantile(0.5, sum(rate(gateway_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", vcluster=~\"$vcluster\"}[$__range])) by (le)) > 0",
           "hide": false,
           "interval": "1m",
           "legendFormat": "[med]",
@@ -377,7 +377,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(gateway_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) by (le)) > 0",
+          "expr": "histogram_quantile(0.95, sum(rate(gateway_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", vcluster=~\"$vcluster\"}[$__range])) by (le)) > 0",
           "hide": false,
           "interval": "1m",
           "legendFormat": "[95p]",
@@ -390,7 +390,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum(rate(gateway_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=~\"$tenant\"}[$__range])) by (le)) > 0",
+          "expr": "histogram_quantile(0.99, sum(rate(gateway_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", vcluster=~\"$vcluster\"}[$__range])) by (le)) > 0",
           "hide": false,
           "interval": "1m",
           "legendFormat": "[99p]",
@@ -824,14 +824,14 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by(tenant) (rate(gateway_thread_request_rebuild_total{job=\"$job\", pod=~\"$pod\"}[1m])) > 0",
+          "expr": "sum by(vcluster) (rate(gateway_thread_request_rebuild_total{job=\"$job\", pod=~\"$pod\"}[1m])) > 0",
           "interval": "1m",
-          "legendFormat": "{{tenant}}",
+          "legendFormat": "{{vcluster}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Rebuild rate / tenant",
+      "title": "Rebuild rate / vcluster",
       "type": "timeseries"
     },
     {
@@ -887,7 +887,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "round(sum by (api_key) (increase(gateway_thread_request_rebuild_total{tenant=~\"$tenant\", job=\"$job\", pod=~\"$pod\"}[$__range])) > 0)",
+          "expr": "round(sum by (api_key) (increase(gateway_thread_request_rebuild_total{vcluster=~\"$vcluster\", job=\"$job\", pod=~\"$pod\"}[$__range])) > 0)",
           "legendFormat": "{{api_key}}",
           "range": true,
           "refId": "A"
@@ -1036,7 +1036,7 @@
             }
           },
           "pluginVersion": "9.1.7",
-          "repeat": "tenant",
+          "repeat": "vcluster",
           "repeatDirection": "h",
           "targets": [
             {
@@ -1045,7 +1045,7 @@
                 "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
-              "expr": "sum(irate(gateway_latency_request_response_seconds_sum{job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"} [1m])) / sum(irate(gateway_latency_request_response_seconds_count{job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m]))",
+              "expr": "sum(irate(gateway_latency_request_response_seconds_sum{job=\"$job\", pod=~\"$pod\", vcluster=\"$vcluster\"} [1m])) / sum(irate(gateway_latency_request_response_seconds_count{job=\"$job\", pod=~\"$pod\", vcluster=\"$vcluster\"}[1m]))",
               "hide": false,
               "legendFormat": "[avg]",
               "range": true,
@@ -1057,7 +1057,7 @@
                 "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
-              "expr": "histogram_quantile(0.3, sum(rate(gateway_latency_request_response_seconds_bucket{ job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m])) by (le))",
+              "expr": "histogram_quantile(0.3, sum(rate(gateway_latency_request_response_seconds_bucket{ job=\"$job\", pod=~\"$pod\", vcluster=\"$vcluster\"}[1m])) by (le))",
               "hide": false,
               "legendFormat": "[30p]",
               "range": true,
@@ -1069,7 +1069,7 @@
                 "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
-              "expr": "histogram_quantile(0.5, sum(rate(gateway_latency_request_response_seconds_bucket{ job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m])) by (le))",
+              "expr": "histogram_quantile(0.5, sum(rate(gateway_latency_request_response_seconds_bucket{ job=\"$job\", pod=~\"$pod\", vcluster=\"$vcluster\"}[1m])) by (le))",
               "hide": false,
               "legendFormat": "[med]",
               "range": true,
@@ -1081,7 +1081,7 @@
                 "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
-              "expr": "histogram_quantile(0.95, sum(rate(gateway_latency_request_response_seconds_bucket{ job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m])) by (le))",
+              "expr": "histogram_quantile(0.95, sum(rate(gateway_latency_request_response_seconds_bucket{ job=\"$job\", pod=~\"$pod\", vcluster=\"$vcluster\"}[1m])) by (le))",
               "hide": false,
               "legendFormat": "[95p]",
               "range": true,
@@ -1093,14 +1093,14 @@
                 "uid": "${DS_PROMETHEUS}"
               },
               "editorMode": "code",
-              "expr": "histogram_quantile(0.99, sum(rate(gateway_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", tenant=\"$tenant\"}[1m])) by (le))",
+              "expr": "histogram_quantile(0.99, sum(rate(gateway_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\", vcluster=\"$vcluster\"}[1m])) by (le))",
               "hide": false,
               "legendFormat": "[99p]",
               "range": true,
               "refId": "E"
             }
           ],
-          "title": "Latency request response by tenant  $tenant",
+          "title": "Latency request response by vcluster  $vcluster",
           "transformations": [
             {
               "id": "filterByValue",
@@ -1124,7 +1124,7 @@
           "type": "histogram"
         }
       ],
-      "title": "Tenant latency",
+      "title": "vCluster latency",
       "type": "row"
     },
     {
@@ -3877,16 +3877,16 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(gateway_latency_request_response_seconds{job=\"$job\", pod=~\"$pod\"},tenant)",
+        "definition": "label_values(vcluster)",
         "hide": 0,
         "includeAll": true,
-        "label": "Tenant",
+        "label": "vCluster",
         "multi": true,
         "multiFormat": "glob",
-        "name": "tenant",
+        "name": "vcluster",
         "options": [],
         "query": {
-          "query": "label_values(gateway_latency_request_response_seconds{job=\"$job\", pod=~\"$pod\"},tenant)",
+          "query": "label_values(vcluster)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
