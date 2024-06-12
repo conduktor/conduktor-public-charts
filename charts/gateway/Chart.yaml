@@ -2,7 +2,7 @@ apiVersion: v2
 appVersion: "3.1.0"
 description: Conduktor Gateway chart
 name: conduktor-gateway
-version: 3.1.0
+version: 3.0.3
 dependencies:
   - name: kafka
     repository: https://charts.bitnami.com/bitnami
