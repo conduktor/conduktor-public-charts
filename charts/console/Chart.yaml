@@ -1,7 +1,7 @@
 apiVersion: v2
 name: console
 appVersion: 1.24.0
-version: 1.8.1
+version: 1.9.0
 description: Helm chart to deploy Conduktor Console on Kubernetes
 icon: https://www.conduktor.io/svgs/logo/symbol.svg
 home: https://www.conduktor.io
