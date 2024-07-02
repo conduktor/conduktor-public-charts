@@ -111,7 +111,7 @@ spec:
         {{- if .Values.tls.enable }}
         - name: keystore
           secret:
-            secretName: {{ required "A .tls.secretRef is required when .tls.enabled is true" .Values.tls.secretRef }}
+            secretName: {{ required "A .tls.secretRef is required when .tls.enable is true" .Values.tls.secretRef }}
             items:
             - key: {{ .Values.tls.keystoreKey }}
               path: {{ .Values.tls.keystoreFile }}
