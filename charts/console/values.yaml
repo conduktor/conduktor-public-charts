@@ -791,7 +791,7 @@ platformCortex:
     ##
     debug: false
 
-  ## @param platformCortex.replicaCount Number of Conduktor Console replicas to deploy
+  ## @param platformCortex.replicaCount Number of Conduktor Console Cortex replicas to deploy
   ##
   replicaCount: 1
 
