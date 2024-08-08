@@ -791,6 +791,8 @@ platformCortex:
     ##
     debug: false
 
+  ## This is an EXPERIMENTAL parameter as the behavior of multiple Cortex instances is not yet fully defined.
+  ## We recommend keeping replicaCount set to 1 to prevent potential issues or instability.
   ## @param platformCortex.replicaCount Number of Conduktor Console Cortex replicas to deploy
   ##
   replicaCount: 1
