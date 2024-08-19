@@ -122,6 +122,6 @@ jobs:
         run: ct install --config .github/ct-config.yaml
         if: steps.list-changed.outputs.changed == 'true'
 
-      - name: Create k3d cluster
+      - name: Delete k3d cluster
         if: always()
         run: make k3d-down

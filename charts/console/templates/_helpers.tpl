@@ -194,6 +194,15 @@ Platform service internal domain name
 
 
 {{/*
+Platform probe scheme HTTP or HTTPS
+*/}}
+{{- define "conduktor.platform.probe.scheme" -}}
+{{- $isSSLEnabled := not (empty (include "conduktor.platform.tls.enabled" .)) }}
+{{- $proto := ternary "HTTPS" "HTTP" $isSSLEnabled -}}
+{{- printf "%s" $proto -}}
+{{- end -}}
+
+{{/*
 Platform internal url from service in format http(s)://platform.nsp.svc.cluster.local:8080
 */}}
 {{- define "conduktor.platform.internalUrl" -}}
