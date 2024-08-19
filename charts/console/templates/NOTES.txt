@@ -33,7 +33,7 @@ kubectl port-forward -n {{ .Release.Namespace }} svc/{{ template "common.names.f
 {{- $isSSLEnabled := not (empty (include "conduktor.platform.tls.enabled" .)) }}
 {{- $proto := ternary "https" "http" (or .Values.ingress.tls $isSSLEnabled) -}}
 
-Conduktor Console will be accessible at : {{- printf "%s://127.0.0.1:8080" $proto -}}
+Conduktor Console will be accessible at : {{ printf "%s://127.0.0.1:8080" $proto }}
 {{- end }}
 
 To connect use following admin account ADMIN_LOGIN and ADMIN_PASSWORD
