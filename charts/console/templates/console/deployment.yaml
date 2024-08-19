@@ -165,6 +165,7 @@ spec:
           {{- else if .Values.platform.livenessProbe.enabled }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.platform.livenessProbe "enabled") "context" $) | nindent 12 }}
             httpGet:
+              scheme: {{ include "conduktor.platform.probe.scheme" . | quote }}
               path: /api/health/live
               port: http
           {{- end }}
@@ -173,6 +174,7 @@ spec:
           {{- else if .Values.platform.readinessProbe.enabled }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.platform.readinessProbe "enabled") "context" $) | nindent 12 }}
             httpGet:
+              scheme: {{ include "conduktor.platform.probe.scheme" . | quote }}
               path: /api/health/ready
               port: http
           {{- end }}
@@ -181,6 +183,7 @@ spec:
           {{- else if .Values.platform.startupProbe.enabled }}
           startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.platform.startupProbe "enabled") "context" $) | nindent 12 }}
             httpGet:
+              scheme: {{ include "conduktor.platform.probe.scheme" . | quote }}
               path: /api/health/live
               port: http
           {{- end }}
