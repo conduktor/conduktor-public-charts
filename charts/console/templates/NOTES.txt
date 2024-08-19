@@ -25,12 +25,15 @@ In order to replicate the container startup scripts execute this command:
 {{- end }}
 
 {{ if .Values.ingress.enabled }}
-Conduktor Console will be accessible at :  http://{{ .Values.ingress.hostname }}
+Conduktor Console will be accessible at :  {{ include "conduktor.platform.externalUrl" . }}
 {{- else }}
 Forward Console service locally with the command (may take a few seconds to be ready):
 kubectl port-forward -n {{ .Release.Namespace }} svc/{{ template "common.names.fullname" . }} 8080:80
 
-Conduktor Console will be accessible at : http://127.0.0.1:8080
+{{- $isSSLEnabled := not (empty (include "conduktor.platform.tls.enabled" .)) }}
+{{- $proto := ternary "https" "http" (or .Values.ingress.tls $isSSLEnabled) -}}
+
+Conduktor Console will be accessible at : {{- printf "%s://127.0.0.1:8080" $proto -}}
 {{- end }}
 
 To connect use following admin account ADMIN_LOGIN and ADMIN_PASSWORD
