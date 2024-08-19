@@ -70,11 +70,14 @@ name: conduktor
 You need to have [chart-testing](https://github.com/helm/chart-testing) installed and a running kubernetes cluster.
 
 ```shell
-# Create tests namespace if not exists
-kubectl create namespace ct || true
-
-# Run tests
-ct install --config .github/ct-config.yaml
+# Update helm dependencies
+make helm-deps
+# Create local K3D cluster for test and local dev (require k3d, helm and kubectl)
+make k3d-up
+# Run Chart-testing tests on chart that contain changes (require chart-testing and helm)
+make test-chart
+# Delete K3D cluster
+make k3d-down
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
