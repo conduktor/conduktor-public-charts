@@ -1,11 +1,13 @@
 # Global Vars
 #############
 
-WORKING_DIR 	= $(shell pwd)
-OS 				= $(shell uname -s)
-ARCH 			= $(shell uname -m)
-NAMESPACE 		= conduktor
-TEST_NAMESPACE 	= ct
+WORKING_DIR 	 = $(shell pwd)
+OS 				 = $(shell uname -s)
+ARCH 			 = $(shell uname -m)
+NAMESPACE 		 = conduktor
+TEST_NAMESPACE 	 = ct
+K3D_KUBECONFIG   = .k3d/kubeconfig.yml
+K3D_CONTEXT_NAME = k3d-conduktor-platform
 
 # Helm dependencies specific default variables
 ##############################################
@@ -64,6 +66,7 @@ k3d-down: ## Teardown k3d cluster
 create-k3d-cluster: ## Create k3d cluster
 	@echo "Creating k3d directory if not existing"
 	mkdir .k3d || true
+
 	@echo "Create the test cluster"
 	k3d cluster create -p "80:80@loadbalancer" \
 		--k3s-arg '--disable=traefik@server:0' \
@@ -75,25 +78,39 @@ create-k3d-cluster: ## Create k3d cluster
         --kubeconfig-switch-context=true \
         --kubeconfig-update-default=true \
         conduktor-platform
-	@echo "Add kubeconfig to .k3d/kubeconfig.yml"
-	k3d kubeconfig get conduktor-platform > .k3d/kubeconfig.yml
+
+	@echo "Add kubeconfig to $(K3D_KUBECONFIG)"
+	k3d kubeconfig get conduktor-platform > $(CURDIR)/$(K3D_KUBECONFIG)
+
 	# k3d create a kubeconfig with host `0.0.0.0`, it's a problem as
 	# cluster certificate only got DSN for `localhost`
 	@if [ "${UNAME_S}" = "Linux" ]; then \
-		sed -i "s/0\.0\.0\.0/localhost/g" ./.k3d/kubeconfig.yml; \
+		sed -i "s/0\.0\.0\.0/localhost/g" $(CURDIR)/$(K3D_KUBECONFIG); \
     fi
 	@if [ "${UNAME_S}" = "Darwin" ]; then \
-  		sed -i -e "s/0\.0\.0\.0/localhost/" .k3d/kubeconfig.yml; \
+  		sed -i -e "s/0\.0\.0\.0/localhost/" $(CURDIR)/$(K3D_KUBECONFIG); \
     fi
+
+	@echo "Current context : $(shell kubectl config current-context)"
+
+.PHONY: check-kube-context
+check-kube-context: ## Validate that current kube context used is K3D to prevent installing chart on another cluster
+	@if [ "$(shell kubectl config current-context)" != "$(K3D_CONTEXT_NAME)" ]; then
+		@echo -e "Current context is not K3D cluster ! ($(shell kubectl config current-context))"
+		exit 1
+	fi
 
 .PHONY: delete-k3d-cluster
 delete-k3d-cluster: ## Delete k3d cluster
+	make check-kube-context
 	@echo "Deleting k3d cluster"
 	k3d cluster delete conduktor-platform || true
-	rm -rf .k3d || true
+	rm -rf ~/.k3d || true
 
 .PHONY: helm-nginx
 helm-nginx: ## Install nginx-ingress helm chart from ingress-nginx
+	make check-kube-context
+
 	@echo "Installing nginx-ingress"
 	helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
 	  --namespace ingress-nginx --create-namespace
@@ -103,6 +120,7 @@ helm-nginx: ## Install nginx-ingress helm chart from ingress-nginx
 
 .PHONY: helm-postgresql
 helm-postgresql: ## Install postgresql helm chart from bitnami
+	make check-kube-context
 	kubectl create namespace ${NAMESPACE} || true
 	@echo "Installing postgresql"
 	helm upgrade --install postgresql bitnami/postgresql \
@@ -118,6 +136,7 @@ helm-postgresql: ## Install postgresql helm chart from bitnami
 
 .PHONY: helm-minio
 helm-minio: ## Install minio helm chart from bitnami
+	make check-kube-context
 	kubectl create namespace ${NAMESPACE} || true
 	@echo "Installing Minio"
 	helm upgrade --install minio bitnami/minio \
@@ -132,6 +151,7 @@ helm-minio: ## Install minio helm chart from bitnami
 .PHONY: helm-monitoring-stack
 .ONESHELL:
 helm-monitoring-stack: ## Install monitoring stack prometheus and grafana
+	make check-kube-context
 	@echo "Add prometheus helm repo"
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts || true
 	helm repo update
@@ -153,4 +173,11 @@ helm-monitoring-stack: ## Install monitoring stack prometheus and grafana
 
 .PHONY: create-test-ns
 create-test-ns: ## Create test namespace
+	make check-kube-context
 	kubectl create namespace ${TEST_NAMESPACE} || true
+
+.PHONY: test-chart
+test-chart: ## Run chart-testing 
+	make check-kube-context
+	make create-test-ns
+	ct install --config $(CURDIR)/.github/ct-config.yaml

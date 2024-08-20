@@ -1,0 +1,4 @@
+# See ASDF https://asdf-vm.com/
+helm-ct 3.11.0
+helm 3.14.0
+k3d 5.7.3
