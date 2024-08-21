@@ -16,7 +16,6 @@ helm install myGateway conduktor/conduktor-gateway
 
 This section contains configuration of the gateway
 
-
 ### Conduktor-gateway image configuration
 
 This section define the image to be used
@@ -60,7 +59,6 @@ This section is for configuring gateway to handle certificate to manage SSL endp
 ### Conduktor-gateway service configurations
 
 This section contains kubernetes services configuration
-
 
 ### Conduktor-gateway external service configurations
 
@@ -106,6 +104,7 @@ Shared kubernetes configuration of the chart
 | Name                    | Description                                                    | Value   |
 | ----------------------- | -------------------------------------------------------------- | ------- |
 | `serviceAccount.create` | Create Kubernetes service account. Default kube value if false | `false` |
+| `serviceAccount.name`   | Service account name to attach to the Gateway deployment       | `""`    |
 | `commonLabels`          | Labels to be applied to all ressources created by this chart   | `{}`    |
 | `nodeSelector`          | Container node selector                                        | `{}`    |
 | `tolerations`           | Container tolerations                                          | `[]`    |
@@ -118,4 +117,3 @@ Enable and configure chart dependencies if not available in your deployment
 | Name            | Description                                                                   | Value   |
 | --------------- | ----------------------------------------------------------------------------- | ------- |
 | `kafka.enabled` | Deploy a kafka along side gateway (This should only used for testing purpose) | `false` |
-
