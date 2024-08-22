@@ -30,7 +30,7 @@ This section contains configuration of the Gateway.
 
 
 | Name                         | Description                                                                                                                        | Value                                                                                                                                                                                                                                                                                                                       |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |                                                                               |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |                                                                              
 | `gateway.replicas`           | number of gateway instances to be deployed                                                                                         | `2`                                                                                                                                                                                                                                                                                                                         |
 | `gateway.secretRef`          | Secret name to load sensitive env var from                                                                                         | `""`                                                                                                                                                                                                                                                                                                                        |
 | `gateway.extraSecretEnvVars` | Array with extra secret environment variables                                                                                      | `[]`                                                                                                                                                                                                                                                                                                                        |
@@ -42,7 +42,7 @@ This section contains configuration of the Gateway.
 | `gateway.admin.port`         | Admin http server port                                                                                                             | `8888`                                                                                                                                                                                                                                                                                                                      |
 | `gateway.jmx.enable`         | Enable jmx jvm options                                                                                                             | `false`                                                                                                                                                                                                                                                                                                                     |
 | `gateway.jmx.port`           | jmx port to expose by default jvm args                                                                                             | `9999`                                                                                                                                                                                                                                                                                                                      |
-| `gateway.jmx.jvmArgs`        | arguments to pass to the gateway container jvm                                                                                     | `-Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1` |
+| `gateway.jmx.jvmArgs`        | Arguments to pass to the gateway container jvm                                                                                     | `-Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1` |
 | `gateway.startupProbeDelay`  | Optional delay in second before startup probe should be running (default 10)                                                       | `""`                                                                                                                                                                                                                                                                                                                        |
 | `gateway.podLabels`          | Specific labels to be added to gateway pod by deployment                                                                           | `{}`                                                                                                                                                                                                                                                                                                                        |
 | `gateway.podAnnotations`     | gateway pod annotations                                                                                                            | `{}`                                                                                                                                                                                                                                                                                                                        |
@@ -52,7 +52,7 @@ This section contains configuration of the Gateway.
 
 ### TLS configuration
 
-This section is for configuring gateway to handle certificate to manage SSL endpoint inside gateway deployment
+This section is for configuring gateway to handle certificate to manage SSL endpoint inside gateway deployment.
 
 | Name               | Description                           | Value          |
 | ------------------ | ------------------------------------- | -------------- |
@@ -61,14 +61,14 @@ This section is for configuring gateway to handle certificate to manage SSL endp
 | `tls.keystoreKey`  | Key in the secret to load as keystore | `keystore.jks` |
 | `tls.keystoreFile` | File name to mount keystore as        | `keystore.jks` |
 
-### Conduktor-gateway service configurations
+### Conduktor Gateway service configurations
 
-This section contains kubernetes services configuration
+This section contains kubernetes services configuration.
 
 
-### Conduktor-gateway external service configurations
+### Conduktor Gateway external service configurations
 
-This section specify external service configuration
+This section specify external service configuration.
 
 | Name                           | Description                                         | Value       |
 | ------------------------------ | --------------------------------------------------- | ----------- |
@@ -79,17 +79,17 @@ This section specify external service configuration
 | `service.external.admin`       | Enable admin exposition on external service         | `false`     |
 | `service.external.jmx`         | Enable jmx exposition on external service           | `false`     |
 
-### Conduktor-gateway internal service configurations
+### Conduktor Gateway internal service configurations
 
-This section specify internal service configuration
+This section specify internal service configuration.
 
 | Name                           | Description | Value |
 | ------------------------------ | ----------- | ----- |
 | `service.internal.annotations` |             | `{}`  |
 
-### Conduktor-gateway metrics activation
+### Conduktor Gateway metrics activation
 
-Gateway embed metrics to be installed within you cluster if your have the correct capabilities (Prometheus and Grafana operators)
+Gateway embedded metrics to be installed within you cluster if your have the correct capabilities (Prometheus and Grafana operators).
 
 | Name                                     | Description                                                                   | Value        |
 | ---------------------------------------- | ----------------------------------------------------------------------------- | ------------ |
@@ -105,7 +105,7 @@ Gateway embed metrics to be installed within you cluster if your have the correc
 
 ### Kubernetes common configuration
 
-Shared kubernetes configuration of the chart
+Shared Kubernetes configuration of the chart.
 
 | Name                    | Description                                                    | Value   |
 | ----------------------- | -------------------------------------------------------------- | ------- |
@@ -117,7 +117,7 @@ Shared kubernetes configuration of the chart
 
 ### Dependencies
 
-Enable and configure chart dependencies if not available in your deployment
+Enable and configure chart dependencies if not available in your deployment.
 
 | Name            | Description                                                                   | Value   |
 | --------------- | ----------------------------------------------------------------------------- | ------- |
