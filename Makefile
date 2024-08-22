@@ -32,7 +32,7 @@ install-githooks: ## Install git hooks
 .PHONY: install-readme-generator
 install-readme-generator: ## Install bitnami/readme-generator-for-helm using NMP
 	@echo "Check that NPM is installed"
-	command -v npm
+	command -v npm || echo -e "Missing NPM"; exit 1;
 	@echo "Install readme-generator"
 	npm install -g @bitnami/readme-generator-for-helm@2.6.1
 
