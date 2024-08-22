@@ -12,21 +12,25 @@ helm install myGateway conduktor/conduktor-gateway
 
 ## Parameters
 
+### Conduktor Gateway image configuration
+
+This section define the image to be used.
+
+| Name                       | Description                                               | Value                         |
+| -------------------------- | --------------------------------------------------------- | ----------------------------- |
+| `gateway.image.registry`    | Docker registry to use                                   | `docker.io`                   |
+| `gateway.image.repository`  | Image in repository format (conduktor/conduktor-gateway) | `conduktor/conduktor-gateway` |
+| `gateway.image.tag`         | Image tag                                                | `3.2.1`                       |
+| `gateway.image.pullPolicy`  | Kubernetes image pull policy                             | `IfNotPresent`                |               
+
+
 ### Conduktor Gateway configurations
 
 This section contains configuration of the Gateway.
 
 
-### Conduktor Gateway image configuration
-
-This section define the image to be used
-
 | Name                         | Description                                                                                                                        | Value                                                                                                                                                                                                                                                                                                                       |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `gateway.image.registry`     | Docker registry to use                                                                                                             | `docker.io`                                                                                                                                                                                                                                                                                                                 |
-| `gateway.image.repository`   | Image in repository format (conduktor/conduktor-gateway)                                                                           | `conduktor/conduktor-gateway`                                                                                                                                                                                                                                                                                               |
-| `gateway.image.tag`          | Image tag                                                                                                                          | `3.2.1`                                                                                                                                                                                                                                                                                                                     |
-| `gateway.image.pullPolicy`   | Kubernetes image pull policy                                                                                                       | `IfNotPresent`                                                                                                                                                                                                                                                                                                              |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |                                                                               |
 | `gateway.replicas`           | number of gateway instances to be deployed                                                                                         | `2`                                                                                                                                                                                                                                                                                                                         |
 | `gateway.secretRef`          | Secret name to load sensitive env var from                                                                                         | `""`                                                                                                                                                                                                                                                                                                                        |
 | `gateway.extraSecretEnvVars` | Array with extra secret environment variables                                                                                      | `[]`                                                                                                                                                                                                                                                                                                                        |
