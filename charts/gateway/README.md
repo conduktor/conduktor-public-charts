@@ -16,6 +16,7 @@ helm install myGateway conduktor/conduktor-gateway
 
 This section contains configuration of the gateway
 
+
 ### Conduktor-gateway image configuration
 
 This section define the image to be used
@@ -59,6 +60,7 @@ This section is for configuring gateway to handle certificate to manage SSL endp
 ### Conduktor-gateway service configurations
 
 This section contains kubernetes services configuration
+
 
 ### Conduktor-gateway external service configurations
 
