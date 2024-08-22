@@ -27,7 +27,7 @@ help: ## Prints help for targets with comments
 
 .PHONY: install-githooks
 install-githooks: ## Install git hooks
-	git config --local include.path ./.gitconfig
+	git config --local core.hooksPath .githooks
 
 .PHONY: install-readme-generator
 install-readme-generator: ## Install bitnami/readme-generator-for-helm using NMP
