@@ -25,7 +25,6 @@ jobs:
       - uses: actions/checkout@v3
         name: Checkout Conduktor Charts
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Execute readme-generator-for-helm
@@ -40,7 +39,7 @@ jobs:
           charts_dirs_changed="$(echo "$files_changed" | xargs dirname | grep -o "charts/[^/]*" | sort | uniq || true)"
           for chart in ${charts_dirs_changed}; do
             echo "Updating README.md for ${chart}"
-            readme-generator --values "${chart}/values.yaml" --readme "${chart}/README.md" --schema "/tmp/schema.json"
+            readme-generator --values "${chart}/values.yaml" --readme "${chart}/README.md"
           done
 
       - name: Check diff

@@ -8,8 +8,7 @@
 </p>
 
 <p align="center">
-    <a href="https://docs.conduktor.io/platform/installation/get-started/kubernetes/"><strong>Explore the docs 
-»</strong></a>
+    <a href="https://docs.conduktor.io/platform/installation/get-started/kubernetes/"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://github.com/conduktor/conduktor-public-charts/issues">Report Bug</a>
@@ -64,6 +63,24 @@ port: 5432
 username: postgres
 password: conduktor
 name: conduktor
+```
+
+### Setup git hooks
+Pre-commit git hook require to have npm or bitnami [`readme-generator`](https://github.com/bitnami/readme-generator-for-helm) installed. 
+
+> Note: If readme-generator not installed, hook will try to install if globally using npm
+
+
+```shell
+$ make install-githooks
+```
+Now every time you commit to the project, pre-commit hook will run the readme-generator tool to synchronize changes between charts values.yaml and README.md.
+
+### Re-generate chart README
+You can also run [`readme-generator`](https://github.com/bitnami/readme-generator-for-helm) directly using : 
+
+```shell
+$ make generate-readme
 ```
 
 ### Run chart tests
