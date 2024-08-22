@@ -35,9 +35,7 @@ Helm Chart to deploy Conduktor Console on Kubernetes.
 
 ### Global parameters
 
-Global Docker image parameters
-Please, note that this will override the image parameters, including dependencies, configured to use the global value
-Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
+**Global Docker image parameters**: Please, note that this will override the image parameters, including dependencies, configured to use the global value.
 
 | Name                      | Description                                     | Value |
 | ------------------------- | ----------------------------------------------- | ----- |
@@ -62,7 +60,7 @@ Current available global Docker image parameters: imageRegistry, imagePullSecret
 
 ### Platform product Parameters
 
-You can paste here your Conduktor Console Configuration
+You can paste here your Conduktor Console configuration.
 
 Refer to our [documentation](https://docs.conduktor.io/platform/configuration/env-variables/) for the full list of product configuration properties.
 
@@ -83,9 +81,11 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/en
 | `config.platform.https.selfSigned`     | Enable HTTPS with a self-signed certificate (not recommended for production) based on 'config.platform.external.url' (required).                     | `false`    |
 | `config.platform.https.existingSecret` | Enable HTTPS with an existing secret containing the tls.crt and tls.key (required).                                                                  | `""`       |
 
+A list of Kafka clusters can be configured by adding them under the `config.clusters` key. See [Install with a Kafka cluster](#install-with-a-kafka-cluster) below. Alternatively, clusters can be added in the Console UI.
+
 ### Platform Monitoring product Parameters
 
-You can paste here your Conduktor Console Cortex Configuration
+You can paste here your Conduktor Console Cortex configuration.
 
 Refer to our [documentation](https://docs.conduktor.io/platform/configuration/cortex/) for the full list of product configuration properties.
 
@@ -354,7 +354,8 @@ console, we recommend you to look at our
 [documentation](https://docs.conduktor.io/platform/configuration/configuration-snippets/).
 
 - [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
-- [Install with a registered kafka cluster](#install-with-a-kafka-cluster)
+- [Install with a registered Kafka cluster](#install-with-a-kafka-cluster)
+- [Install with a Confluent Cloud cluster](#install-with-a-confluent-cloud-cluster)
 - [Install with an enterprise license](#install-with-an-enterprise-license)
 - [Install without Conduktor monitoring](#install-without-conduktor-monitoring)
 
@@ -426,7 +427,7 @@ config:
   license: "<license_key>"
 ```
 
-### Install with a kafka cluster
+### Install with a Kafka cluster
 
 ```yaml
 config:
@@ -452,6 +453,42 @@ config:
         id: my-schema-registry
         url: "http://my-schema-registry:8081"
 ```
+
+### Install with a Confluent Cloud cluster
+
+```yaml
+config:
+  organization:
+    name: "my-org"
+
+  admin:
+    email: "admin@my-org.com"
+    password: "admin"
+
+  database:
+    host: ""
+    port: 5432
+    name: "postgres"
+    username: ""
+    password: ""
+  clusters:
+    - id: confluent-cloud-cluster
+      name: Confluent Cloud Cluster
+      color: "#0013E7"
+      bootstrapServers: pkc-xxxxx.region.provider.confluent.cloud:9092
+      properties: |
+        sasl.mechanism=PLAIN
+        security.protocol=SASL_SSL
+        sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="YOUR_API_KEY" password="YOUR_API_SECRET";
+      schemaRegistry:
+      id: confluent-cloud-sr
+      url: https://psrc-xxxxx.region.provider.confluent.cloud
+      properties: |
+        basic.auth.credentials.source=USER_INFO
+        basic.auth.user.info=SR_API_KEY:SR_API_SECRET
+```
+
+
 
 ### Install without Conduktor monitoring
 

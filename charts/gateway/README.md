@@ -1,10 +1,10 @@
-## Conduktor gateway chart
+## Conduktor Gateway chart
 
-A Kafka booster
+A Kafka protocol aware proxy.
 
 ## Installation
 
-```
+```sh
 helm repo add conduktor https://helm.conduktor.io
 helm repo update
 helm install myGateway conduktor/conduktor-gateway
@@ -12,12 +12,12 @@ helm install myGateway conduktor/conduktor-gateway
 
 ## Parameters
 
-### Conduktor-gateway configurations
+### Conduktor Gateway configurations
 
-This section contains configuration of the gateway
+This section contains configuration of the Gateway.
 
 
-### Conduktor-gateway image configuration
+### Conduktor Gateway image configuration
 
 This section define the image to be used
 
@@ -119,3 +119,25 @@ Enable and configure chart dependencies if not available in your deployment
 | --------------- | ----------------------------------------------------------------------------- | ------- |
 | `kafka.enabled` | Deploy a kafka along side gateway (This should only used for testing purpose) | `false` |
 
+
+## Example
+
+The following `values.yaml` file can be used to set up Gateway to proxy traffic to a Confluent Cloud cluster:
+
+```yaml
+gateway:
+  env:
+    # Configure connection to Confluent Cloud
+    KAFKA_BOOTSTRAP_SERVERS: pkc-xxxxx.region.provider.confluent.cloud:9092
+    KAFKA_SASL_MECHANISM: PLAIN
+    KAFKA_SECURITY_PROTOCOL: SASL_SSL
+    KAFKA_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="<your API key>" password="<your API secret>";
+    # Configure Client -> Gateway
+    GATEWAY_SECURITY_PROTOCOL: DELEGATED_SASL_PLAINTEXT
+    # clients will be able to authenticate to Gateway with the Confluent Cloud API keys/secrets, no TLS on Gateway
+  portRange:
+    start: 9099
+    count: 100 # to accomodate large shared (Basic or Standard) Confluent Cloud clusters
+```
+See [Gateway Documentation](https://docs.conduktor.io/gateway/configuration/env-variables/) for a list of environment variables that can be used.
+In particular, the [Client to Gateway Authentication page](https://docs.conduktor.io/gateway/configuration/client-authentication/) details the different authentication mechanisms that can be used with Gateway.
