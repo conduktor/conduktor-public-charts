@@ -35,7 +35,9 @@ Helm Chart to deploy Conduktor Console on Kubernetes.
 
 ### Global parameters
 
-**Global Docker image parameters**: Please, note that this will override the image parameters, including dependencies, configured to use the global value.
+Global Docker image parameters
+Please, note that this will override the image parameters, including dependencies, configured to use the global value
+Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
 
 | Name                      | Description                                     | Value |
 | ------------------------- | ----------------------------------------------- | ----- |
@@ -60,9 +62,11 @@ Helm Chart to deploy Conduktor Console on Kubernetes.
 
 ### Platform product Parameters
 
-You can paste here your Conduktor Console configuration.
+You can paste here your Conduktor Console Configuration.
 
 Refer to our [documentation](https://docs.conduktor.io/platform/configuration/env-variables/) for the full list of product configuration properties.
+
+A list of Kafka clusters can be configured by adding them under the `config.clusters` key. See [Install with a Kafka cluster](#install-with-a-kafka-cluster) below. Alternatively, clusters can be added in the Console UI.
 
 | Name                                   | Description                                                                                                                                          | Value      |
 | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
@@ -81,11 +85,9 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/en
 | `config.platform.https.selfSigned`     | Enable HTTPS with a self-signed certificate (not recommended for production) based on 'config.platform.external.url' (required).                     | `false`    |
 | `config.platform.https.existingSecret` | Enable HTTPS with an existing secret containing the tls.crt and tls.key (required).                                                                  | `""`       |
 
-A list of Kafka clusters can be configured by adding them under the `config.clusters` key. See [Install with a Kafka cluster](#install-with-a-kafka-cluster) below. Alternatively, clusters can be added in the Console UI.
-
 ### Platform Monitoring product Parameters
 
-You can paste here your Conduktor Console Cortex configuration.
+You can paste here your Conduktor Console Cortex Configuration.
 
 Refer to our [documentation](https://docs.conduktor.io/platform/configuration/cortex/) for the full list of product configuration properties.
 
