@@ -188,6 +188,8 @@ serviceAccount:
   # Specifies whether a service account should be created
   # If AWS IAM is used, need to have create: false
   create: false
+  ## @param serviceAccount.name Service account name to attach to the Gateway deployment
+  name: ""
 
 ## @param commonLabels Labels to be applied to all ressources created by this chart
 commonLabels: {}

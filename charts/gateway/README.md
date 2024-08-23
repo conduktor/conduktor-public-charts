@@ -108,6 +108,7 @@ Shared Kubernetes configuration of the chart.
 | Name                    | Description                                                    | Value   |
 | ----------------------- | -------------------------------------------------------------- | ------- |
 | `serviceAccount.create` | Create Kubernetes service account. Default kube value if false | `false` |
+| `serviceAccount.name`   | Service account name to attach to the Gateway deployment       | `""`    |
 | `commonLabels`          | Labels to be applied to all ressources created by this chart   | `{}`    |
 | `nodeSelector`          | Container node selector                                        | `{}`    |
 | `tolerations`           | Container tolerations                                          | `[]`    |
@@ -143,3 +144,4 @@ gateway:
 ```
 See [Gateway Documentation](https://docs.conduktor.io/gateway/configuration/env-variables/) for a list of environment variables that can be used.
 In particular, the [Client to Gateway Authentication page](https://docs.conduktor.io/gateway/configuration/client-authentication/) details the different authentication mechanisms that can be used with Gateway.
+
