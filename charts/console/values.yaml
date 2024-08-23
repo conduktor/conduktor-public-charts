@@ -60,9 +60,11 @@ diagnosticMode:
 
 ## @section Platform product Parameters
 ## @descriptionStart
-## You can paste here your Conduktor Console Configuration
+## You can paste here your Conduktor Console Configuration.
 ##
 ## Refer to our [documentation](https://docs.conduktor.io/platform/configuration/env-variables/) for the full list of product configuration properties.
+##
+## A list of Kafka clusters can be configured by adding them under the `config.clusters` key. See [Install with a Kafka cluster](#install-with-a-kafka-cluster) below. Alternatively, clusters can be added in the Console UI.
 ## @descriptionEnd
 
 config:
@@ -127,7 +129,7 @@ config:
 
 ## @section Platform Monitoring product Parameters
 ## @descriptionStart
-## You can paste here your Conduktor Console Cortex Configuration
+## You can paste here your Conduktor Console Cortex Configuration.
 ##
 ## Refer to our [documentation](https://docs.conduktor.io/platform/configuration/cortex/) for the full list of product configuration properties.
 ## @descriptionEnd

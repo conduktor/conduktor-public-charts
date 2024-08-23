@@ -1,76 +1,78 @@
-## Conduktor gateway chart
+## Conduktor Gateway chart
 
-A Kafka booster
+A Kafka-protocol aware proxy.
 
 ## Installation
 
-```
+```sh
 helm repo add conduktor https://helm.conduktor.io
 helm repo update
-helm install myGateway conduktor/conduktor-gateway
+helm install my-gateway conduktor/conduktor-gateway
 ```
 
 ## Parameters
 
-### Conduktor-gateway configurations
+### Gateway image configuration
 
-This section contains configuration of the gateway
+This section defines the image to be used.
 
+| Name                       | Description                                              | Value                         |
+| -------------------------- | -------------------------------------------------------- | ----------------------------- |
+| `gateway.image.registry`   | Docker registry to use                                   | `docker.io`                   |
+| `gateway.image.repository` | Image in repository format (conduktor/conduktor-gateway) | `conduktor/conduktor-gateway` |
+| `gateway.image.tag`        | Image tag                                                | `3.2.1`                       |
+| `gateway.image.pullPolicy` | Kubernetes image pull policy                             | `IfNotPresent`                |
 
-### Conduktor-gateway image configuration
+### Gateway configurations
 
-This section define the image to be used
+This section contains configuration of the Conduktor Gateway.
 
 | Name                         | Description                                                                                                                        | Value                                                                                                                                                                                                                                                                                                                       |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `gateway.image.registry`     | Docker registry to use                                                                                                             | `docker.io`                                                                                                                                                                                                                                                                                                                 |
-| `gateway.image.repository`   | Image in repository format (conduktor/conduktor-gateway)                                                                           | `conduktor/conduktor-gateway`                                                                                                                                                                                                                                                                                               |
-| `gateway.image.tag`          | Image tag                                                                                                                          | `3.2.1`                                                                                                                                                                                                                                                                                                                     |
-| `gateway.image.pullPolicy`   | Kubernetes image pull policy                                                                                                       | `IfNotPresent`                                                                                                                                                                                                                                                                                                              |
 | `gateway.replicas`           | number of gateway instances to be deployed                                                                                         | `2`                                                                                                                                                                                                                                                                                                                         |
 | `gateway.secretRef`          | Secret name to load sensitive env var from                                                                                         | `""`                                                                                                                                                                                                                                                                                                                        |
 | `gateway.extraSecretEnvVars` | Array with extra secret environment variables                                                                                      | `[]`                                                                                                                                                                                                                                                                                                                        |
 | `gateway.secretSha256sum`    | Optional sha256sum of the referenced secret. This could be set to have a automactic restart of gateway deployment if secret change | `""`                                                                                                                                                                                                                                                                                                                        |
-| `gateway.env`                | Environment variables for gateway deployment                                                                                       | `{}`                                                                                                                                                                                                                                                                                                                        |
-| `gateway.interceptors`       | Json configuration for interceptors to be loaded at startup by gateway                                                             | `[]`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.env`                | Environment variables for Gateway deployment                                                                                       | `{}`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.interceptors`       | Json configuration for interceptors to be loaded at startup by Gateway                                                             | `[]`                                                                                                                                                                                                                                                                                                                        |
 | `gateway.portRange.start`    | Start port of the gateway port range                                                                                               | `9092`                                                                                                                                                                                                                                                                                                                      |
 | `gateway.portRange.count`    | Max number of broker to expose                                                                                                     | `7`                                                                                                                                                                                                                                                                                                                         |
-| `gateway.admin.port`         | Admin http server port                                                                                                             | `8888`                                                                                                                                                                                                                                                                                                                      |
-| `gateway.jmx.enable`         | Enable jmx jvm options                                                                                                             | `false`                                                                                                                                                                                                                                                                                                                     |
-| `gateway.jmx.port`           | jmx port to expose by default jvm args                                                                                             | `9999`                                                                                                                                                                                                                                                                                                                      |
-| `gateway.jmx.jvmArgs`        | arguments to pass to the gateway container jvm                                                                                     | `-Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1` |
+| `gateway.admin.port`         | Admin HTTP server port                                                                                                             | `8888`                                                                                                                                                                                                                                                                                                                      |
+| `gateway.jmx.enable`         | Enable JMX JVM options                                                                                                             | `false`                                                                                                                                                                                                                                                                                                                     |
+| `gateway.jmx.port`           | JMX port to expose by default JVM args                                                                                             | `9999`                                                                                                                                                                                                                                                                                                                      |
+| `gateway.jmx.jvmArgs`        | Arguments to pass to the gateway container JVM                                                                                     | `-Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1` |
 | `gateway.startupProbeDelay`  | Optional delay in second before startup probe should be running (default 10)                                                       | `""`                                                                                                                                                                                                                                                                                                                        |
-| `gateway.podLabels`          | Specific labels to be added to gateway pod by deployment                                                                           | `{}`                                                                                                                                                                                                                                                                                                                        |
-| `gateway.podAnnotations`     | gateway pod annotations                                                                                                            | `{}`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.podLabels`          | Specific labels to be added to Gateway pod by deployment                                                                           | `{}`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.podAnnotations`     | Gateway pod annotations                                                                                                            | `{}`                                                                                                                                                                                                                                                                                                                        |
 | `gateway.securityContext`    | Container security context                                                                                                         | `{}`                                                                                                                                                                                                                                                                                                                        |
-| `gateway.volumes`            | Define user specific volumes for gateway deployment                                                                                | `{}`                                                                                                                                                                                                                                                                                                                        |
-| `gateway.volumeMounts`       | Define user specific volumeMounts  for gateway container in deployment                                                             | `{}`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.volumes`            | Define user specific volumes for Gateway deployment                                                                                | `{}`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.volumeMounts`       | Define user specific volumeMounts for Gateway container in deployment                                                              | `{}`                                                                                                                                                                                                                                                                                                                        |
 
 ### TLS configuration
 
-This section is for configuring gateway to handle certificate to manage SSL endpoint inside gateway deployment
+This section is for configuring Gateway to handle certificate to manage TLS endpoint inside Gateway deployment.
 
 | Name               | Description                           | Value          |
 | ------------------ | ------------------------------------- | -------------- |
-| `tls.enable`       | Enable tls injection into gateway     | `false`        |
+| `tls.enable`       | Enable TLS injection into Gateway     | `false`        |
 | `tls.secretRef`    | Secret name with keystore to load     | `""`           |
 | `tls.keystoreKey`  | Key in the secret to load as keystore | `keystore.jks` |
 | `tls.keystoreFile` | File name to mount keystore as        | `keystore.jks` |
 
-### Conduktor-gateway service configurations
+### Gateway service configurations
 
-This section contains kubernetes services configuration
+This section contains Kubernetes services configuration.
 
 
-### Conduktor-gateway external service configurations
+### Gateway external service configurations
 
-This section specify external service configuration
+This section specifies external service configuration
 
 | Name                           | Description                                         | Value       |
 | ------------------------------ | --------------------------------------------------- | ----------- |
-| `service.external.enable`      | Enable a service for external connection to gateway | `false`     |
+| `service.external.enable`      | Enable a service for external connection to Gateway | `false`     |
 | `service.external.type`        | Type of load balancer                               | `ClusterIP` |
-| `service.external.ip`          | Ip to configure                                     | `""`        |
+| `service.external.ip`          | IP to configure                                     | `""`        |
 | `service.external.annotations` |                                                     | `{}`        |
 | `service.external.admin`       | Enable admin exposition on external service         | `false`     |
 | `service.external.jmx`         | Enable jmx exposition on external service           | `false`     |
@@ -83,25 +85,25 @@ This section specify internal service configuration
 | ------------------------------ | ----------- | ----- |
 | `service.internal.annotations` |             | `{}`  |
 
-### Conduktor-gateway metrics activation
+### Gateway metrics activation
 
-Gateway embed metrics to be installed within you cluster if your have the correct capabilities (Prometheus and Grafana operators)
+Gateway embed metrics to be installed within you cluster if your have the correct capabilities (Prometheus and Grafana operators).
 
 | Name                                     | Description                                                                   | Value        |
 | ---------------------------------------- | ----------------------------------------------------------------------------- | ------------ |
-| `metrics.alerts.enable`                  | Enable prometheus alerts if prometheus alerts rules is supported on cluster   | `false`      |
-| `metrics.checklyAlerts.enable`           | Enable alerts for checky jobs if prometheus rules is supported on cluster     | `false`      |
-| `metrics.prometheus.enable`              | Enable ServiceMonitor prometheus operator configuration for metrics scrapping | `false`      |
+| `metrics.alerts.enable`                  | Enable Prometheus alerts if Prometheus alerts rules is supported on cluster   | `false`      |
+| `metrics.checklyAlerts.enable`           | Enable alerts for checky jobs if Prometheus rules is supported on cluster     | `false`      |
+| `metrics.prometheus.enable`              | Enable ServiceMonitor Prometheus operator configuration for metrics scrapping | `false`      |
 | `metrics.prometheus.metricRelabelings`   | Configure metric relabeling in ServiceMonitor                                 | `{}`         |
 | `metrics.prometheus.relabelings`         | Configure relabelings in ServiceMonitor                                       | `{}`         |
 | `metrics.prometheus.extraParams`         | Extra parameters in ServiceMonitor                                            | `{}`         |
-| `metrics.grafana.enable`                 | Enable grafana dashboards to installation                                     | `false`      |
+| `metrics.grafana.enable`                 | Enable Grafana dashboards to installation                                     | `false`      |
 | `metrics.grafana.datasources.prometheus` | Prometheus datasource to use for metric dashboard                             | `prometheus` |
 | `metrics.grafana.datasources.loki`       | Loki datasource to use for log dashboard                                      | `loki`       |
 
 ### Kubernetes common configuration
 
-Shared kubernetes configuration of the chart
+Shared Kubernetes configuration of the chart.
 
 | Name                    | Description                                                    | Value   |
 | ----------------------- | -------------------------------------------------------------- | ------- |
@@ -114,8 +116,32 @@ Shared kubernetes configuration of the chart
 
 ### Dependencies
 
-Enable and configure chart dependencies if not available in your deployment
+Enable and configure chart dependencies if not available in your deployment.
 
 | Name            | Description                                                                   | Value   |
 | --------------- | ----------------------------------------------------------------------------- | ------- |
 | `kafka.enabled` | Deploy a kafka along side gateway (This should only used for testing purpose) | `false` |
+
+
+## Example
+
+The following `values.yaml` file can be used to set up Gateway to proxy traffic to a Confluent Cloud cluster:
+
+```yaml
+gateway:
+  env:
+    # Configure connection to Confluent Cloud
+    KAFKA_BOOTSTRAP_SERVERS: pkc-xxxxx.region.provider.confluent.cloud:9092
+    KAFKA_SASL_MECHANISM: PLAIN
+    KAFKA_SECURITY_PROTOCOL: SASL_SSL
+    KAFKA_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="<your API key>" password="<your API secret>";
+    # Configure Client -> Gateway
+    GATEWAY_SECURITY_PROTOCOL: DELEGATED_SASL_PLAINTEXT
+    # clients will be able to authenticate to Gateway with the Confluent Cloud API keys/secrets, no TLS on Gateway
+  portRange:
+    start: 9099
+    count: 100 # to accomodate large shared (Basic or Standard) Confluent Cloud clusters
+```
+See [Gateway Documentation](https://docs.conduktor.io/gateway/configuration/env-variables/) for a list of environment variables that can be used.
+In particular, the [Client to Gateway Authentication page](https://docs.conduktor.io/gateway/configuration/client-authentication/) details the different authentication mechanisms that can be used with Gateway.
+
