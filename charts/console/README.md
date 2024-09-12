@@ -130,7 +130,7 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/co
 | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------- |
 | `platform.image.registry`                     | Conduktor Console image registry                                                                                                                             | `docker.io`                   |
 | `platform.image.repository`                   | Conduktor Console image repository                                                                                                                           | `conduktor/conduktor-console` |
-| `platform.image.tag`                          | Conduktor Console image tag (immutable tags are recommended)                                                                                                 | `1.26.0`                      |
+| `platform.image.tag`                          | Conduktor Console image tag (immutable tags are recommended)                                                                                                 | `1.27.0`                      |
 | `platform.image.digest`                       | Conduktor Console image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`                          |
 | `platform.image.pullPolicy`                   | Conduktor Console image pull policy                                                                                                                          | `IfNotPresent`                |
 | `platform.image.pullSecrets`                  | Conduktor Console image pull secrets                                                                                                                         | `[]`                          |
@@ -266,7 +266,7 @@ Console expose metrics that could be collected and presented if your environment
 | `platformCortex.enabled`                            | Enable Conduktor Console Cortex                                                                                                                                     | `true`                               |
 | `platformCortex.image.registry`                     | Conduktor Console Cortex image registry                                                                                                                             | `docker.io`                          |
 | `platformCortex.image.repository`                   | Conduktor Console Cortex image repository                                                                                                                           | `conduktor/conduktor-console-cortex` |
-| `platformCortex.image.tag`                          | Conduktor Console Cortex image tag (immutable tags are recommended)                                                                                                 | `1.26.0`                             |
+| `platformCortex.image.tag`                          | Conduktor Console Cortex image tag (immutable tags are recommended)                                                                                                 | `1.27.0`                             |
 | `platformCortex.image.digest`                       | Conduktor Console Cortex image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`                                 |
 | `platformCortex.image.pullPolicy`                   | Conduktor Console Cortex image pull policy                                                                                                                          | `IfNotPresent`                       |
 | `platformCortex.image.pullSecrets`                  | Conduktor Console Cortex image pull secrets                                                                                                                         | `[]`                                 |
@@ -363,20 +363,42 @@ console, we recommend you to look at our
 
 ### Kubernetes configuration
 
-- [Install with a PodAffinity](#install-with-a-podaffinity)
-- [Install with a Toleration](#install-with-a-toleration)
-- [Install with a Self-Signed Certificate](#install-with-self-signed-tls-certificate)
-- [Install with a custom service account](#install-with-a-custom-service-account)
-- [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
-- [Store console data into a PersistentVolume](#store-platform-data-into-a-persistent-volume)
-
-- [Provide credentials as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
-- [Provide monitoring configuration as a Kubernetes Secret](#provide-monitoring-configuration-as-a-kubernetes-secret)
-- [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
-- [Provide the license as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
-
-- [Provide additional credentials as a Kubernetes Secret](#provide-additional-credentials-as-a-kubernetes-secret)
-- [Install with Console technical monitoring](#install-with-console-technical-monitoring)
+- [Conduktor Console](#conduktor-console)
+  - [TL;DR](#tldr)
+  - [Introduction](#introduction)
+  - [Prerequisites](#prerequisites)
+  - [Parameters](#parameters)
+    - [Global parameters](#global-parameters)
+    - [Common parameters](#common-parameters)
+    - [Platform product Parameters](#platform-product-parameters)
+    - [Platform Monitoring product Parameters](#platform-monitoring-product-parameters)
+    - [Platform Deployment Parameters](#platform-deployment-parameters)
+    - [Conduktor-gateway metrics activation](#conduktor-gateway-metrics-activation)
+    - [Traffic Exposure Parameters](#traffic-exposure-parameters)
+    - [Other Parameters](#other-parameters)
+    - [Platform Cortex Parameters](#platform-cortex-parameters)
+  - [Snippets](#snippets)
+    - [Console configuration](#console-configuration)
+    - [Kubernetes configuration](#kubernetes-configuration)
+    - [Install with an enterprise license](#install-with-an-enterprise-license)
+    - [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
+    - [Install with a Kafka cluster](#install-with-a-kafka-cluster)
+    - [Install with a Confluent Cloud cluster](#install-with-a-confluent-cloud-cluster)
+    - [Install without Conduktor monitoring](#install-without-conduktor-monitoring)
+    - [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
+    - [Provide credentials configuration as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
+    - [Provide monitoring configuration as a Kubernetes Secret](#provide-monitoring-configuration-as-a-kubernetes-secret)
+    - [Store platform data into a Persistent Volume](#store-platform-data-into-a-persistent-volume)
+    - [Install with a PodAffinity](#install-with-a-podaffinity)
+    - [Provide console configuration as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
+    - [Provide additional credentials as a Kubernetes Secret](#provide-additional-credentials-as-a-kubernetes-secret)
+    - [Install with a toleration](#install-with-a-toleration)
+    - [Install with Self-Signed TLS certificate](#install-with-self-signed-tls-certificate)
+    - [Install with a custom TLS certificate on the platform Pod](#install-with-a-custom-tls-certificate-on-the-platform-pod)
+    - [Install with a custom service account](#install-with-a-custom-service-account)
+    - [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
+    - [Install with Console technical monitoring](#install-with-console-technical-monitoring)
+  - [Troubleshooting](#troubleshooting)
 
 ### Install with an enterprise license
 
