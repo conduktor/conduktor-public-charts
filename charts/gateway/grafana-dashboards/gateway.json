@@ -3671,8 +3671,8 @@
       {
         "current": {
           "selected": true,
-          "text": "conduktor-gateway",
-          "value": "conduktor-gateway"
+          "text": "{{ .Values.nameOverride | default .Chart.Name }}",
+          "value": "{{ .Values.nameOverride | default .Chart.Name }}"
         },
         "hide": 2,
         "includeAll": false,
@@ -3682,11 +3682,11 @@
         "options": [
           {
             "selected": true,
-            "text": "conduktor-gateway",
-            "value": "conduktor-gateway"
+            "text": "{{ .Values.nameOverride | default .Chart.Name }}",
+            "value": "{{ .Values.nameOverride | default .Chart.Name }}"
           }
         ],
-        "query": "conduktor-gateway",
+        "query": "{{ .Values.nameOverride | default .Chart.Name }}",
         "queryValue": "",
         "skipUrlSync": false,
         "type": "custom"
