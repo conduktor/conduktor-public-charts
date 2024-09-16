@@ -145,6 +145,7 @@ service:
 ## @descriptionStart
 ## Gateway embed metrics to be installed within you cluster if your have the correct capabilities (Prometheus and Grafana operators).
 ## @descriptionEnd
+nameOverride: ""
 metrics:
   alerts:
     ## @param metrics.alerts.enable Enable Prometheus alerts if Prometheus alerts rules is supported on cluster
@@ -154,7 +155,7 @@ metrics:
     enable: false
   prometheus:
     ## @param metrics.prometheus.enable Enable ServiceMonitor Prometheus operator configuration for metrics scrapping
-    enable: false
+    enable: true
     ## @param metrics.prometheus.metricRelabelings Configure metric relabeling in ServiceMonitor
     metricRelabelings: {}
     ## @param metrics.prometheus.relabelings Configure relabelings in ServiceMonitor
@@ -170,7 +171,7 @@ metrics:
       #     key: username
   grafana:
     ## @param metrics.grafana.enable Enable Grafana dashboards to installation
-    enable: false
+    enable: true
     datasources:
       ## @param metrics.grafana.datasources.prometheus Prometheus datasource to use for metric dashboard
       prometheus: prometheus

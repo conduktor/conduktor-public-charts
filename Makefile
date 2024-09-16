@@ -121,9 +121,9 @@ create-k3d-cluster: ## Create k3d cluster
 
 .PHONY: check-kube-context
 check-kube-context: ## Validate that current kube context used is K3D to prevent installing chart on another cluster
-	@if [ "$(shell kubectl config current-context)" != "$(K3D_CONTEXT_NAME)" ]; then
-		@echo -e "Current context is not K3D cluster ! ($(shell kubectl config current-context))"
-		exit 1
+	@if [ "$(shell kubectl config current-context)" != "$(K3D_CONTEXT_NAME)" ]; then \
+		echo -e "Current context is not K3D cluster! ($(shell kubectl config current-context))"; \
+		exit 1; \
 	fi
 
 .PHONY: delete-k3d-cluster
