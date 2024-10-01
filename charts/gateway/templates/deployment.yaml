@@ -65,7 +65,7 @@ spec:
                 name: {{ .Values.gateway.secretRef }}
             {{- end }}
           ports:
-            {{- range untilStep (int .Values.gateway.portRange.start) (int (add .Values.gateway.portRange.count 1)) 1 }}
+            {{- range untilStep (int .Values.gateway.portRange.start) (int (add .Values.gateway.portRange.start .Values.gateway.portRange.count)) 1 }}
             - containerPort: {{ . }}
               protocol: TCP
             {{- end }}
