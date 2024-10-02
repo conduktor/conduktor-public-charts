@@ -183,13 +183,22 @@ metrics:
 ## Shared Kubernetes configuration of the chart.
 ## @descriptionEnd
 
+## ServiceAccount configuration for the Conduktor Gateway pods
+##
 serviceAccount:
-  ## @param serviceAccount.create Create Kubernetes service account. Default kube value if false
-  # Specifies whether a service account should be created
-  # If AWS IAM is used, need to have create: false
-  create: false
-  ## @param serviceAccount.name Service account name to attach to the Gateway deployment
+  ## @param serviceAccount.create Specifies whether a ServiceAccount should be created
+  ##
+  create: true
+  ## @param serviceAccount.name The name of the ServiceAccount to use.
+  ## If not set and create is true, a name is generated using the common.names.fullname template
+  ##
   name: ""
+  ## @param serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
+  ##
+  annotations: {}
+  ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
+  ##
+  automountServiceAccountToken: true
 
 ## @param commonLabels Labels to be applied to all ressources created by this chart
 commonLabels: {}
