@@ -57,7 +57,7 @@ gateway:
     ## @param gateway.portRange.start Start port of the gateway port range
     start: 9092
     ## @param gateway.portRange.count Max number of broker to expose
-    count: 10
+    count: 7
 
   admin:
     ## @param gateway.admin.port Admin HTTP server port
@@ -154,7 +154,7 @@ metrics:
     enable: false
   prometheus:
     ## @param metrics.prometheus.enable Enable ServiceMonitor Prometheus operator configuration for metrics scrapping
-    enable: true
+    enable: false
     ## @param metrics.prometheus.metricRelabelings Configure metric relabeling in ServiceMonitor
     metricRelabelings: {}
     ## @param metrics.prometheus.relabelings Configure relabelings in ServiceMonitor
@@ -170,7 +170,7 @@ metrics:
       #     key: username
   grafana:
     ## @param metrics.grafana.enable Enable Grafana dashboards to installation
-    enable: true
+    enable: false
     datasources:
       ## @param metrics.grafana.datasources.prometheus Prometheus datasource to use for metric dashboard
       prometheus: prometheus
@@ -218,4 +218,4 @@ affinity: {}
 ## @descriptionEnd
 kafka:
   ## @param kafka.enabled Deploy a kafka along side gateway (This should only used for testing purpose)
-  enabled: true
+  enabled: false

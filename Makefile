@@ -32,7 +32,7 @@ install-githooks: ## Install git hooks
 .PHONY: install-readme-generator
 install-readme-generator: ## Install bitnami/readme-generator-for-helm using NMP
 	@echo "Check that NPM is installed"
-	command -v npm || echo -e "Missing NPM"; exit 1;
+	command -v npm || { echo -e "Missing NPM"; exit 1; }
 	@echo "Install readme-generator"
 	npm install -g @bitnami/readme-generator-for-helm@2.6.1
 
@@ -49,7 +49,6 @@ generate-readme: ## Re-generate charts README
 	@echo
 	@echo "Updating README.md for gateway chart"
 	readme-generator --values "./charts/gateway/values.yaml" --readme "./charts/gateway/README.md"
-
 
 .PHONY: helm-deps
 helm-deps: ## Install helm dependencies
@@ -91,7 +90,7 @@ k3d-down: ## Teardown k3d cluster
 .PHONY: create-k3d-cluster
 create-k3d-cluster: ## Create k3d cluster
 	@echo "Creating k3d directory if not existing"
-	mkdir .k3d || true
+	mkdir -p .k3d || true
 
 	@echo "Create the test cluster"
 	k3d cluster create -p "80:80@loadbalancer" \
@@ -107,13 +106,12 @@ create-k3d-cluster: ## Create k3d cluster
 
 	@echo "Add kubeconfig to $(K3D_KUBECONFIG)"
 	k3d kubeconfig get conduktor-platform > $(CURDIR)/$(K3D_KUBECONFIG)
-
 	# k3d create a kubeconfig with host `0.0.0.0`, it's a problem as
 	# cluster certificate only got DSN for `localhost`
-	@if [ "${UNAME_S}" = "Linux" ]; then \
+	@if [ "$(OS)" = "Linux" ]; then \
 		sed -i "s/0\.0\.0\.0/localhost/g" $(CURDIR)/$(K3D_KUBECONFIG); \
     fi
-	@if [ "${UNAME_S}" = "Darwin" ]; then \
+	@if [ "$(OS)" = "Darwin" ]; then \
   		sed -i -e "s/0\.0\.0\.0/localhost/" $(CURDIR)/$(K3D_KUBECONFIG); \
     fi
 
@@ -121,9 +119,9 @@ create-k3d-cluster: ## Create k3d cluster
 
 .PHONY: check-kube-context
 check-kube-context: ## Validate that current kube context used is K3D to prevent installing chart on another cluster
-	@if [ "$(shell kubectl config current-context)" != "$(K3D_CONTEXT_NAME)" ]; then
-		@echo -e "Current context is not K3D cluster ! ($(shell kubectl config current-context))"
-		exit 1
+	@if [ "$(shell kubectl config current-context)" != "$(K3D_CONTEXT_NAME)" ]; then \
+		echo -e "Current context is not K3D cluster ! ($(shell kubectl config current-context))"; \
+		exit 1; \
 	fi
 
 .PHONY: delete-k3d-cluster
