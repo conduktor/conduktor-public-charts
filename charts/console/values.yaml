@@ -90,6 +90,20 @@ config:
     password: ""
     username: ""
 
+  ## @param config.sql_database.enabled Enable SQL database for Conduktor Console
+  ## @param config.sql_database.host Your Conduktor Console SQL Database host
+  ## @param config.sql_database.port Your Conduktor Console SQL Database port
+  ## @param config.sql_database.name Your Conduktor Console SQL Database name
+  ## @param config.sql_database.username Your Conduktor Console SQL Database username
+  ## @param config.sql_database.password Your Conduktor Console SQL Database password
+  sql_database:
+    host: ""
+    port: 1234
+    name: "sql-postgres"
+    password: ""
+    username: ""
+    enabled: false
+
   ## @param config.license Conduktor Console Enterprise license, if none given, the product will run in free tier
   license: ""
 

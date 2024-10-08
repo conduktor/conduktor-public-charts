@@ -45,6 +45,12 @@ Return the full configuration for the platform ConfigMap
 {{- $_ := unset $database "username" -}}
 {{- $_ := set $config "database" $database -}}
 
+{{/* Delete SQL database password/username from ConfigMap */}}
+{{- $sql_database := .Values.config.database | deepCopy -}}
+{{- $_ := unset $sql_database "password" -}}
+{{- $_ := unset $sql_database "username" -}}
+{{- $_ := set $config "sql_database" $sql_database -}}
+
 {{ include "common.tplvalues.render" (dict "value" $config "context" $) }}
 {{- end -}}
 
