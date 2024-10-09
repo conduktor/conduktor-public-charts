@@ -46,11 +46,13 @@ Return the full configuration for the platform ConfigMap
 {{- $_ := set $config "database" $database -}}
 
 {{/* Delete SQL database password/username from ConfigMap */}}
-{{- if .Values.config.kafkasql.database.enabled -}}
-  {{- $kafkasql := .Values.config.kafkasql | deepCopy -}}
-  {{- $_ := unset $kafkasql "password" -}}
-  {{- $_ := unset $kafkasql "username" -}}
-  {{- $_ := set $config "kafkasql" $kafkasql -}}
+{{- if (hasKey .Values.config "kafkasql" ) }}
+  {{- if (hasKey .Values.config.kafkasql "database") }}
+    {{- $kafkasql := .Values.config.kafkasql.database | deepCopy -}}
+    {{- $_ := unset $kafkasql "password" -}}
+    {{- $_ := unset $kafkasql "username" -}}
+    {{- $_ := set $config "kafkasql" $kafkasql -}}
+  {{- end -}}
 {{- end -}}
 
 {{ include "common.tplvalues.render" (dict "value" $config "context" $) }}
@@ -279,18 +281,6 @@ conduktor: invalid database configuration
     {{- else if not .Values.config.database.name -}}
 conduktor: invalid database configuration
            config.database.name MUST be set in values
-    {{- end -}}
-{{- end -}}
-{{- end -}}
-
-{{- define "conduktor.validateValues.kafkasql" -}}
-{{- if .Values.config.kafkasql.database.enabled -}}
-    {{- if not .Values.config.kafkasql.database.host -}}
-conduktor: invalid kafkasql configuration
-           config.kafkasql.database.host MUST be set in values
-    {{- else if not .Values.config.kafkasql.database.name -}}
-conduktor: invalid kafkasql configuration
-           config.kafkasql.database.name MUST be set in values
     {{- end -}}
 {{- end -}}
 {{- end -}}

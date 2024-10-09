@@ -90,7 +90,6 @@ config:
     password: ""
     username: ""
 
-  ## @param config.kafkasql.database.enabled Enable SQL database for Conduktor Console
   ## @param config.kafkasql.database.host Your Conduktor Console SQL Database host
   ## @param config.kafkasql.database.port Your Conduktor Console SQL Database port
   ## @param config.kafkasql.database.name Your Conduktor Console SQL Database name
@@ -104,7 +103,6 @@ config:
       name: "conduktor-sql"
       password: ""
       username: ""
-      enabled: false
 
   ## @param config.license Conduktor Console Enterprise license, if none given, the product will run in free tier
   license: ""
