@@ -46,11 +46,11 @@ Return the full configuration for the platform ConfigMap
 {{- $_ := set $config "database" $database -}}
 
 {{/* Delete SQL database password/username from ConfigMap */}}
-{{- if .Values.config.conduktor-sql.enabled -}}
-  {{- $conduktor-sql := .Values.config.conduktor-sql | deepCopy -}}
-  {{- $_ := unset $conduktor-sql "password" -}}
-  {{- $_ := unset $conduktor-sql "username" -}}
-  {{- $_ := set $config "conduktor-sql" $conduktor-sql -}}
+{{- if .Values.config.conduktorSql.enabled -}}
+  {{- $conduktorSql := .Values.config.conduktorSql | deepCopy -}}
+  {{- $_ := unset $conduktorSql "password" -}}
+  {{- $_ := unset $conduktorSql "username" -}}
+  {{- $_ := set $config "conduktorSql" $conduktorSql -}}
 {{- end -}}
 
 {{ include "common.tplvalues.render" (dict "value" $config "context" $) }}
@@ -283,14 +283,14 @@ conduktor: invalid database configuration
 {{- end -}}
 {{- end -}}
 
-{{- define "conduktor.validateValues.conduktor-sql" -}}
-{{- if .Values.config.conduktor-sql.enabled -}}
+{{- define "conduktor.validateValues.conduktorSql" -}}
+{{- if .Values.config.conduktorSql.enabled -}}
     {{- if not .Values.config.database.host -}}
-conduktor: invalid conduktor-sql configuration
-           config.conduktor-sql.host MUST be set in values
+conduktor: invalid conduktorSql configuration
+           config.conduktorSql.host MUST be set in values
     {{- else if not .Values.config.database.name -}}
-conduktor: invalid conduktor-sql configuration
-           config.conduktor-sql.name MUST be set in values
+conduktor: invalid conduktorSql configuration
+           config.conduktorSql.name MUST be set in values
     {{- end -}}
 {{- end -}}
 {{- end -}}
