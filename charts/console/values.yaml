@@ -90,6 +90,20 @@ config:
     password: ""
     username: ""
 
+  ## @param config.kafkasql.database.host Your Conduktor Console SQL Database host
+  ## @param config.kafkasql.database.port Your Conduktor Console SQL Database port
+  ## @param config.kafkasql.database.name Your Conduktor Console SQL Database name
+  ## @param config.kafkasql.database.username Your Conduktor Console SQL Database username
+  ## @param config.kafkasql.database.password Your Conduktor Console SQL Database password
+  ## NOTE: This is a Beta Feature still early in development
+  kafkasql:
+    database:
+      host: ""
+      port: 5432
+      name: "conduktor-sql"
+      password: ""
+      username: ""
+
   ## @param config.license Conduktor Console Enterprise license, if none given, the product will run in free tier
   license: ""
 
@@ -107,9 +121,11 @@ config:
   ## - "CDK_ADMIN_PASSWORD"   : password of the admin user
   ## - "CDK_DATABASE_PASSWORD": password of the database
   ## - "CDK_DATABASE_USERNAME": username of the database
+  ## - "CDK_SQL_DATABASE_PASSWORD": password of the SQL database
+  ## - "CDK_SQL_DATABASE_USERNAME": username of the SQL database
   ##
   ## NOTE: 'config.organization.name', 'config.admin.email', 'config.admin.password',
-  ## 'config.database.username', 'config.database.password' will be ignored
+  ## 'config.database.username', 'config.database.password', config.kafkasql.database.username, config.kafkasql.database.password will be ignored
   existingSecret: ""
 
   platform:
@@ -234,7 +250,7 @@ platform:
   image:
     registry: docker.io
     repository: conduktor/conduktor-console
-    tag: 1.27.1
+    tag: 1.28.0
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -774,7 +790,7 @@ platformCortex:
   image:
     registry: docker.io
     repository: conduktor/conduktor-console-cortex
-    tag: 1.27.1
+    tag: 1.28.0
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
