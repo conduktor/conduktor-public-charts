@@ -90,14 +90,14 @@ config:
     password: ""
     username: ""
 
-  ## @param config.conduktorSql.enabled Enable SQL database for Conduktor Console
-  ## @param config.conduktorSql.host Your Conduktor Console SQL Database host
-  ## @param config.conduktorSql.port Your Conduktor Console SQL Database port
-  ## @param config.conduktorSql.name Your Conduktor Console SQL Database name
-  ## @param config.conduktorSql.username Your Conduktor Console SQL Database username
-  ## @param config.conduktorSql.password Your Conduktor Console SQL Database password
+  ## @param config.kafkasql.enabled Enable SQL database for Conduktor Console
+  ## @param config.kafkasql.host Your Conduktor Console SQL Database host
+  ## @param config.kafkasql.port Your Conduktor Console SQL Database port
+  ## @param config.kafkasql.name Your Conduktor Console SQL Database name
+  ## @param config.kafkasql.username Your Conduktor Console SQL Database username
+  ## @param config.kafkasql.password Your Conduktor Console SQL Database password
   ## NOTE: This is a Beta Feature still early in development
-  conduktorSql:
+  kafkasql:
     host: ""
     port: 5432
     name: "conduktor-sql"
@@ -126,7 +126,7 @@ config:
   ## - "CDK_SQL_DATABASE_USERNAME": username of the SQL database
   ##
   ## NOTE: 'config.organization.name', 'config.admin.email', 'config.admin.password',
-  ## 'config.database.username', 'config.database.password', config.conduktorSql.username, config.conduktorSql.password will be ignored
+  ## 'config.database.username', 'config.database.password', config.kafkasql.username, config.kafkasql.password will be ignored
   existingSecret: ""
 
   platform:

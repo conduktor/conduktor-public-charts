@@ -78,10 +78,10 @@ A list of Kafka clusters can be configured by adding them under the `config.clus
 | `config.database.name`                 | Your Conduktor Console Database name                                                                                                                 | `postgres` |
 | `config.database.username`             | Your Conduktor Console Database username                                                                                                             | `""`       |
 | `config.database.password`             | Your Conduktor Console Database password                                                                                                             | `""`       |
-| `config.conduktorSql.host`            | Your Conduktor Console Kafka SQL host                                                                                                                | `""`       |
-| `config.conduktorSql.port`            | Your Conduktor Console Kafka SQL port                                                                                                                | `5432`     |
-| `config.conduktorSql.username`        | Your Conduktor Console Kafka SQL username                                                                                                            | `""`       |
-| `config.conduktorSql.password`        | Your Conduktor Console Kafka SQL password                                                                                                            | `""`       |
+| `config.kafkasql.host`            | Your Conduktor Console Kafka SQL host                                                                                                                | `""`       |
+| `config.kafkasql.port`            | Your Conduktor Console Kafka SQL port                                                                                                                | `5432`     |
+| `config.kafkasql.username`        | Your Conduktor Console Kafka SQL username                                                                                                            | `""`       |
+| `config.kafkasql.password`        | Your Conduktor Console Kafka SQL password                                                                                                            | `""`       |
 | `config.license`                       | Conduktor Console Enterprise license, if none given, the product will run in free tier                                                               | `""`       |
 | `config.existingLicenseSecret`         | Name of an existing secret containing the license                                                                                                    | `""`       |
 | `config.existingSecret`                | Name of an existing secret containing sensitive configuration                                                                                        | `""`       |

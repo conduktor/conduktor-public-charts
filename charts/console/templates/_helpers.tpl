@@ -46,11 +46,11 @@ Return the full configuration for the platform ConfigMap
 {{- $_ := set $config "database" $database -}}
 
 {{/* Delete SQL database password/username from ConfigMap */}}
-{{- if .Values.config.conduktorSql.enabled -}}
-  {{- $conduktorSql := .Values.config.conduktorSql | deepCopy -}}
-  {{- $_ := unset $conduktorSql "password" -}}
-  {{- $_ := unset $conduktorSql "username" -}}
-  {{- $_ := set $config "conduktorSql" $conduktorSql -}}
+{{- if .Values.config.kafkasql.enabled -}}
+  {{- $kafkasql := .Values.config.kafkasql | deepCopy -}}
+  {{- $_ := unset $kafkasql "password" -}}
+  {{- $_ := unset $kafkasql "username" -}}
+  {{- $_ := set $config "kafkasql" $kafkasql -}}
 {{- end -}}
 
 {{ include "common.tplvalues.render" (dict "value" $config "context" $) }}
@@ -283,14 +283,14 @@ conduktor: invalid database configuration
 {{- end -}}
 {{- end -}}
 
-{{- define "conduktor.validateValues.conduktorSql" -}}
-{{- if .Values.config.conduktorSql.enabled -}}
+{{- define "conduktor.validateValues.kafkasql" -}}
+{{- if .Values.config.kafkasql.enabled -}}
     {{- if not .Values.config.database.host -}}
-conduktor: invalid conduktorSql configuration
-           config.conduktorSql.host MUST be set in values
+conduktor: invalid kafkasql configuration
+           config.kafkasql.host MUST be set in values
     {{- else if not .Values.config.database.name -}}
-conduktor: invalid conduktorSql configuration
-           config.conduktorSql.name MUST be set in values
+conduktor: invalid kafkasql configuration
+           config.kafkasql.name MUST be set in values
     {{- end -}}
 {{- end -}}
 {{- end -}}
