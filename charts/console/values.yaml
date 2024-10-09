@@ -90,20 +90,21 @@ config:
     password: ""
     username: ""
 
-  ## @param config.kafkasql.enabled Enable SQL database for Conduktor Console
-  ## @param config.kafkasql.host Your Conduktor Console SQL Database host
-  ## @param config.kafkasql.port Your Conduktor Console SQL Database port
-  ## @param config.kafkasql.name Your Conduktor Console SQL Database name
-  ## @param config.kafkasql.username Your Conduktor Console SQL Database username
-  ## @param config.kafkasql.password Your Conduktor Console SQL Database password
+  ## @param config.kafkasql.database.enabled Enable SQL database for Conduktor Console
+  ## @param config.kafkasql.database.host Your Conduktor Console SQL Database host
+  ## @param config.kafkasql.database.port Your Conduktor Console SQL Database port
+  ## @param config.kafkasql.database.name Your Conduktor Console SQL Database name
+  ## @param config.kafkasql.database.username Your Conduktor Console SQL Database username
+  ## @param config.kafkasql.database.password Your Conduktor Console SQL Database password
   ## NOTE: This is a Beta Feature still early in development
   kafkasql:
-    host: ""
-    port: 5432
-    name: "conduktor-sql"
-    password: ""
-    username: ""
-    enabled: false
+    database:
+      host: ""
+      port: 5432
+      name: "conduktor-sql"
+      password: ""
+      username: ""
+      enabled: false
 
   ## @param config.license Conduktor Console Enterprise license, if none given, the product will run in free tier
   license: ""
@@ -126,7 +127,7 @@ config:
   ## - "CDK_SQL_DATABASE_USERNAME": username of the SQL database
   ##
   ## NOTE: 'config.organization.name', 'config.admin.email', 'config.admin.password',
-  ## 'config.database.username', 'config.database.password', config.kafkasql.username, config.kafkasql.password will be ignored
+  ## 'config.database.username', 'config.database.password', config.kafkasql.database.username, config.kafkasql.database.password will be ignored
   existingSecret: ""
 
   platform:

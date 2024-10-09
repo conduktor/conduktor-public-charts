@@ -46,7 +46,7 @@ Return the full configuration for the platform ConfigMap
 {{- $_ := set $config "database" $database -}}
 
 {{/* Delete SQL database password/username from ConfigMap */}}
-{{- if .Values.config.kafkasql.enabled -}}
+{{- if .Values.config.kafkasql.database.enabled -}}
   {{- $kafkasql := .Values.config.kafkasql | deepCopy -}}
   {{- $_ := unset $kafkasql "password" -}}
   {{- $_ := unset $kafkasql "username" -}}
@@ -284,13 +284,13 @@ conduktor: invalid database configuration
 {{- end -}}
 
 {{- define "conduktor.validateValues.kafkasql" -}}
-{{- if .Values.config.kafkasql.enabled -}}
-    {{- if not .Values.config.database.host -}}
+{{- if .Values.config.kafkasql.database.enabled -}}
+    {{- if not .Values.config.kafkasql.database.host -}}
 conduktor: invalid kafkasql configuration
-           config.kafkasql.host MUST be set in values
-    {{- else if not .Values.config.database.name -}}
+           config.kafkasql.database.host MUST be set in values
+    {{- else if not .Values.config.kafkasql.database.name -}}
 conduktor: invalid kafkasql configuration
-           config.kafkasql.name MUST be set in values
+           config.kafkasql.database.name MUST be set in values
     {{- end -}}
 {{- end -}}
 {{- end -}}
