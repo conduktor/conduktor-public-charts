@@ -78,6 +78,10 @@ A list of Kafka clusters can be configured by adding them under the `config.clus
 | `config.database.name`                 | Your Conduktor Console Database name                                                                                                                 | `postgres` |
 | `config.database.username`             | Your Conduktor Console Database username                                                                                                             | `""`       |
 | `config.database.password`             | Your Conduktor Console Database password                                                                                                             | `""`       |
+| `config.conduktor-sql.host`            | Your Conduktor Console Kafka SQL host                                                                                                                | `""`       |
+| `config.conduktor-sql.port`            | Your Conduktor Console Kafka SQL port                                                                                                                | `5432`     |
+| `config.conduktor-sql.username`        | Your Conduktor Console Kafka SQL username                                                                                                            | `""`       |
+| `config.conduktor-sql.password`        | Your Conduktor Console Kafka SQL password                                                                                                            | `""`       |
 | `config.license`                       | Conduktor Console Enterprise license, if none given, the product will run in free tier                                                               | `""`       |
 | `config.existingLicenseSecret`         | Name of an existing secret containing the license                                                                                                    | `""`       |
 | `config.existingSecret`                | Name of an existing secret containing sensitive configuration                                                                                        | `""`       |

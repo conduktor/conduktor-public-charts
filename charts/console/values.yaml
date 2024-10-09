@@ -90,16 +90,17 @@ config:
     password: ""
     username: ""
 
-  ## @param config.sql_database.enabled Enable SQL database for Conduktor Console
-  ## @param config.sql_database.host Your Conduktor Console SQL Database host
-  ## @param config.sql_database.port Your Conduktor Console SQL Database port
-  ## @param config.sql_database.name Your Conduktor Console SQL Database name
-  ## @param config.sql_database.username Your Conduktor Console SQL Database username
-  ## @param config.sql_database.password Your Conduktor Console SQL Database password
-  sql_database:
+  ## @param config.conduktor-sql.enabled Enable SQL database for Conduktor Console
+  ## @param config.conduktor-sql.host Your Conduktor Console SQL Database host
+  ## @param config.conduktor-sql.port Your Conduktor Console SQL Database port
+  ## @param config.conduktor-sql.name Your Conduktor Console SQL Database name
+  ## @param config.conduktor-sql.username Your Conduktor Console SQL Database username
+  ## @param config.conduktor-sql.password Your Conduktor Console SQL Database password
+  ## NOTE: This is a Beta Feature still early in development 
+  conduktor-sql:
     host: ""
-    port: 1234
-    name: "sql-postgres"
+    port: 5432
+    name: "conduktor-sql"
     password: ""
     username: ""
     enabled: false
@@ -121,9 +122,11 @@ config:
   ## - "CDK_ADMIN_PASSWORD"   : password of the admin user
   ## - "CDK_DATABASE_PASSWORD": password of the database
   ## - "CDK_DATABASE_USERNAME": username of the database
+  ## - "CDK_SQL_DATABASE_PASSWORD": password of the SQL database
+  ## - "CDK_SQL_DATABASE_USERNAME": username of the SQL database
   ##
   ## NOTE: 'config.organization.name', 'config.admin.email', 'config.admin.password',
-  ## 'config.database.username', 'config.database.password' will be ignored
+  ## 'config.database.username', 'config.database.password', config.conduktor-sql.username, config.conduktor-sql.password will be ignored
   existingSecret: ""
 
   platform:
