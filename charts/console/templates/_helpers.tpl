@@ -45,6 +45,16 @@ Return the full configuration for the platform ConfigMap
 {{- $_ := unset $database "username" -}}
 {{- $_ := set $config "database" $database -}}
 
+{{/* Delete SQL database password/username from ConfigMap */}}
+{{- if (hasKey .Values.config "kafkasql" ) }}
+  {{- if (hasKey .Values.config.kafkasql "database") }}
+    {{- $kafkasql := .Values.config.kafkasql.database | deepCopy -}}
+    {{- $_ := unset $kafkasql "password" -}}
+    {{- $_ := unset $kafkasql "username" -}}
+    {{- $_ := set $config "kafkasql" $kafkasql -}}
+  {{- end -}}
+{{- end -}}
+
 {{ include "common.tplvalues.render" (dict "value" $config "context" $) }}
 {{- end -}}
 

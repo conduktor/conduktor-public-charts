@@ -14,6 +14,7 @@ K3D_CONTEXT_NAME = k3d-conduktor-platform
 
 postgresql_password := conduktor
 postgresql_default_database := conduktor
+kafka_postgresql_default_database := conduktor
 minio_password := conduktor
 minio_default_bucket := conduktor
 
@@ -121,9 +122,9 @@ create-k3d-cluster: ## Create k3d cluster
 
 .PHONY: check-kube-context
 check-kube-context: ## Validate that current kube context used is K3D to prevent installing chart on another cluster
-	@if [ "$(shell kubectl config current-context)" != "$(K3D_CONTEXT_NAME)" ]; then
-		@echo -e "Current context is not K3D cluster ! ($(shell kubectl config current-context))"
-		exit 1
+	@if [ "$(shell kubectl config current-context)" != "$(K3D_CONTEXT_NAME)" ]; then \
+		printf "Current context is not K3D cluster ! (%s)\n" "$(shell kubectl config current-context)"; \
+		exit 1; \
 	fi
 
 .PHONY: delete-k3d-cluster
@@ -159,6 +160,21 @@ helm-postgresql: ## Install postgresql helm chart from bitnami
 	@echo "Waiting for postgresql to be ready..."
 	kubectl rollout status --watch --timeout=300s statefulset/postgresql -n ${NAMESPACE}
 
+
+.PHONY: kafka-postgresql
+kafka-postgresql: ## Install postgresql helm chart from bitnami
+	make check-kube-context
+	kubectl create namespace ${NAMESPACE} || true
+	@echo "Installing postgresql"
+	helm upgrade --install kafka-postgresql bitnami/postgresql \
+		--namespace ${NAMESPACE} --create-namespace \
+		--version 12.5.8 \
+		--set global.postgresql.auth.database=${postgresql_default_database} \
+		--set global.postgresql.auth.postgresPassword=${postgresql_password} \
+		--set auth.postgresPassword=${postgresql_password} \
+		--set primary.service.type=LoadBalancer
+	@echo "Waiting for postgresql to be ready..."
+	kubectl rollout status --watch --timeout=300s statefulset/postgresql -n ${NAMESPACE}
 
 .PHONY: helm-minio
 helm-minio: ## Install minio helm chart from bitnami
