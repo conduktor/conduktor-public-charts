@@ -37,7 +37,7 @@ install-readme-generator: ## Install bitnami/readme-generator-for-helm using NMP
 
 
 .PHONY: generate-readme
-generate-readme: ## Re-generate cgharts README
+generate-readme: ## Re-generate charts README
 	@echo "Check that readme-generator is installed"
 	command -v readme-generator || $(MAKE) install-readme-generator
 	
