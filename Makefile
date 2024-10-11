@@ -89,9 +89,6 @@ k3d-down: ## Teardown k3d cluster
 
 .PHONY: create-k3d-cluster
 create-k3d-cluster: ## Create k3d cluster
-	@echo "Creating k3d directory if not existing"
-	mkdir ~/.k3d || true
-
 	@echo "Create the test cluster"
 	k3d cluster create --config $(CURDIR)/k3d/config.yaml
 
