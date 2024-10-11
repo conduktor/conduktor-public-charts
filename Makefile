@@ -6,7 +6,6 @@ OS 				 = $(shell uname -s)
 ARCH 			 = $(shell uname -m)
 NAMESPACE 		 = conduktor
 TEST_NAMESPACE 	 = ct
-K3D_KUBECONFIG   = .k3d/kubeconfig.yml
 K3D_CONTEXT_NAME = k3d-conduktor-platform
 
 # Helm dependencies specific default variables
@@ -38,7 +37,7 @@ install-readme-generator: ## Install bitnami/readme-generator-for-helm using NMP
 
 
 .PHONY: generate-readme
-generate-readme: ## Re-generate charts README
+generate-readme: ## Re-generate cgharts README
 	@echo "Check that readme-generator is installed"
 	command -v readme-generator || $(MAKE) install-readme-generator
 	
@@ -91,47 +90,25 @@ k3d-down: ## Teardown k3d cluster
 .PHONY: create-k3d-cluster
 create-k3d-cluster: ## Create k3d cluster
 	@echo "Creating k3d directory if not existing"
-	mkdir .k3d || true
+	mkdir ~/.k3d || true
 
 	@echo "Create the test cluster"
-	k3d cluster create -p "80:80@loadbalancer" \
-		--k3s-arg '--disable=traefik@server:0' \
-		--wait \
-		--k3s-arg '--kubelet-arg=eviction-hard=imagefs.available<1%,nodefs.available<1%@agent:*' \
-        --k3s-arg '--kubelet-arg=eviction-minimum-reclaim=imagefs.available=1%,nodefs.available=1%@agent:*' \
-        --k3s-arg '--kubelet-arg=eviction-hard=imagefs.available<1%,nodefs.available<1%@server:0' \
-        --k3s-arg '--kubelet-arg=eviction-minimum-reclaim=imagefs.available=1%,nodefs.available=1%@server:0' \
-        --kubeconfig-switch-context=true \
-        --kubeconfig-update-default=true \
-        conduktor-platform
+	k3d cluster create --config $(CURDIR)/k3d/config.yaml
 
-	@echo "Add kubeconfig to $(K3D_KUBECONFIG)"
-	k3d kubeconfig get conduktor-platform > $(CURDIR)/$(K3D_KUBECONFIG)
-
-	# k3d create a kubeconfig with host `0.0.0.0`, it's a problem as
-	# cluster certificate only got DSN for `localhost`
-	@if [ "${UNAME_S}" = "Linux" ]; then \
-		sed -i "s/0\.0\.0\.0/localhost/g" $(CURDIR)/$(K3D_KUBECONFIG); \
-    fi
-	@if [ "${UNAME_S}" = "Darwin" ]; then \
-  		sed -i -e "s/0\.0\.0\.0/localhost/" $(CURDIR)/$(K3D_KUBECONFIG); \
-    fi
-
-	@echo "Current context : $(shell kubectl config current-context)"
+	@echo "Current context : $$(kubectl config current-context)"
 
 .PHONY: check-kube-context
 check-kube-context: ## Validate that current kube context used is K3D to prevent installing chart on another cluster
-	@if [ "$(shell kubectl config current-context)" != "$(K3D_CONTEXT_NAME)" ]; then
-		@echo -e "Current context is not K3D cluster ! ($(shell kubectl config current-context))"
-		exit 1
+	@if [ "$$(kubectl config current-context)" != "$(K3D_CONTEXT_NAME)" ]; then \
+		echo -e "Current context is not K3D cluster ! ($$(kubectl config current-context))"; \
+		exit 1; \
 	fi
 
 .PHONY: delete-k3d-cluster
 delete-k3d-cluster: ## Delete k3d cluster
 	make check-kube-context
 	@echo "Deleting k3d cluster"
-	k3d cluster delete conduktor-platform || true
-	rm -rf ~/.k3d || true
+	k3d cluster delete --config $(CURDIR)/k3d/config.yaml || true
 
 .PHONY: helm-nginx
 helm-nginx: ## Install nginx-ingress helm chart from ingress-nginx
@@ -195,7 +172,7 @@ helm-monitoring-stack: ## Install monitoring stack prometheus and grafana
 		--set watchNamespaces="" \
 		--set grafana.enabled=false
 	@echo "Install grafana"
-	kubectl apply -f resources/monitoring-stack-grafana-crd.yaml
+	kubectl apply -f k3d/monitoring-stack-grafana-crd.yaml
 
 .PHONY: create-test-ns
 create-test-ns: ## Create test namespace
