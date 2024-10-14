@@ -48,10 +48,12 @@ Return the full configuration for the platform ConfigMap
 {{/* Delete SQL database password/username from ConfigMap */}}
 {{- if (hasKey .Values.config "kafkasql" ) }}
   {{- if (hasKey .Values.config.kafkasql "database") }}
-    {{- $kafkasql := .Values.config.kafkasql.database | deepCopy -}}
-    {{- $_ := unset $kafkasql "password" -}}
-    {{- $_ := unset $kafkasql "username" -}}
+    {{- $kafkasql := .Values.config.kafkasql | deepCopy -}}
+    {{- $kafkasql_database := .Values.config.kafkasql.database -}}
+    {{- $_ := unset $kafkasql_database "password" -}}
+    {{- $_ := unset $kafkasql_database "username" -}}
     {{- $_ := set $config "kafkasql" $kafkasql -}}
+    {{- $_ := set $config "kafkasql.database" $kafkasql_database -}}
   {{- end -}}
 {{- end -}}
 

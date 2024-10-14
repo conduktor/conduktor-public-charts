@@ -15,6 +15,8 @@ K3D_CONTEXT_NAME = k3d-conduktor-platform
 postgresql_password := conduktor
 postgresql_default_database := conduktor
 kafka_postgresql_default_database := conduktor
+kafka_postgresql_password := conduktor
+kafka_postgresql_port := 5433 # Port can't be same as default since we are running 2 postgresql instances
 minio_password := conduktor
 minio_default_bucket := conduktor
 
@@ -68,6 +70,8 @@ k3d-up: ## Setup k3d cluster
 	make helm-nginx
 	@echo "Installing postgresql"
 	make helm-postgresql
+	@echo "Installing kafka postgresql"
+	make kafka-postgresql
 	@echo "Installing Minio"
 	make helm-minio
 	@echo "Create Test namespace"
@@ -160,7 +164,6 @@ helm-postgresql: ## Install postgresql helm chart from bitnami
 	@echo "Waiting for postgresql to be ready..."
 	kubectl rollout status --watch --timeout=300s statefulset/postgresql -n ${NAMESPACE}
 
-
 .PHONY: kafka-postgresql
 kafka-postgresql: ## Install postgresql helm chart from bitnami
 	make check-kube-context
@@ -170,8 +173,9 @@ kafka-postgresql: ## Install postgresql helm chart from bitnami
 		--namespace ${NAMESPACE} --create-namespace \
 		--version 12.5.8 \
 		--set global.postgresql.auth.database=${postgresql_default_database} \
-		--set global.postgresql.auth.postgresPassword=${postgresql_password} \
-		--set auth.postgresPassword=${postgresql_password} \
+		--set global.postgresql.auth.postgresPassword=${kafka_postgresql_password} \
+		--set global.postgresql.service.ports.postgresql=${kafka_postgresql_port} \
+		--set auth.postgresPassword=${kafka_postgresql_password} \
 		--set primary.service.type=LoadBalancer
 	@echo "Waiting for postgresql to be ready..."
 	kubectl rollout status --watch --timeout=300s statefulset/postgresql -n ${NAMESPACE}
