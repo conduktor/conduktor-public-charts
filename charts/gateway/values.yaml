@@ -155,6 +155,15 @@ metrics:
   prometheus:
     ## @param metrics.prometheus.enable Enable ServiceMonitor Prometheus operator configuration for metrics scrapping
     enable: false
+    ## @param metrics.prometheus.annotations Additional custom annotations for the ServiceMonitor
+    ##
+    annotations: { }
+    ## @param metrics.prometheus.labels Extra labels for the ServiceMonitor
+    ##
+    labels: { }
+    ## @param metrics.prometheus.jobLabel The name of the label on the target service to use as the job name in Prometheus
+    ##
+    jobLabel: "app.kubernetes.io/name"
     ## @param metrics.prometheus.metricRelabelings Configure metric relabeling in ServiceMonitor
     metricRelabelings: {}
     ## @param metrics.prometheus.relabelings Configure relabelings in ServiceMonitor
@@ -171,6 +180,9 @@ metrics:
   grafana:
     ## @param metrics.grafana.enable Enable Grafana dashboards to installation
     enable: false
+    ## @param  metrics.grafana.labels Additional custom labels for Grafana dashboard ConfigMap
+    ##
+    labels: { }
     datasources:
       ## @param metrics.grafana.datasources.prometheus Prometheus datasource to use for metric dashboard
       prometheus: prometheus
@@ -191,7 +203,7 @@ serviceAccount:
   ## @param serviceAccount.name Service account name to attach to the Gateway deployment
   name: ""
 
-## @param commonLabels Labels to be applied to all ressources created by this chart
+## @param commonLabels Labels to be applied to all resources created by this chart
 commonLabels: {}
 
 ## @param nodeSelector Container node selector
