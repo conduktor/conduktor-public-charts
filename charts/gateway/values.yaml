@@ -157,10 +157,10 @@ metrics:
     enable: false
     ## @param metrics.prometheus.annotations Additional custom annotations for the ServiceMonitor
     ##
-    annotations: { }
+    annotations: {}
     ## @param metrics.prometheus.labels Extra labels for the ServiceMonitor
     ##
-    labels: { }
+    labels: {}
     ## @param metrics.prometheus.jobLabel The name of the label on the target service to use as the job name in Prometheus
     ##
     jobLabel: "app.kubernetes.io/name"
@@ -182,7 +182,7 @@ metrics:
     enable: false
     ## @param  metrics.grafana.labels Additional custom labels for Grafana dashboard ConfigMap
     ##
-    labels: { }
+    labels: {}
     datasources:
       ## @param metrics.grafana.datasources.prometheus Prometheus datasource to use for metric dashboard
       prometheus: prometheus
