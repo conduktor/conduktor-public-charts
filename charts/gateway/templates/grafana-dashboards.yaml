@@ -1,5 +1,3 @@
-{{- if .Capabilities.APIVersions.Has "integreatly.org/v1alpha1/GrafanaDashboard" }}
-{{- if .Values.metrics.grafana.enable }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -26,7 +24,7 @@ spec:
     - inputName: "DS_PROMETHEUS"
       datasourceName: {{ .Values.metrics.grafana.datasources.prometheus | quote }}
     - inputName: "GATEWAY_NAME"
-      value: {{ include "conduktor-gateway.fullname" . | quote }}
+      datasourceName: {{ include "conduktor-gateway.fullname" . | quote }}
 ---
 apiVersion: integreatly.org/v1alpha1
 kind: GrafanaDashboard
@@ -45,6 +43,4 @@ spec:
     - inputName: "DS_PROMETHEUS"
       datasourceName: {{ .Values.metrics.grafana.datasources.prometheus | quote }}
     - inputName: "GATEWAY_NAME"
-      value: {{ include "conduktor-gateway.fullname" . | quote }}
-{{- end }}
-{{- end }}
+      datasourceName: {{ include "conduktor-gateway.fullname" . | quote }}
