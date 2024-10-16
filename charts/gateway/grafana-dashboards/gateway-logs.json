@@ -144,7 +144,7 @@
             "uid": "${DS_LOKI}"
           },
           "editorMode": "builder",
-            "expr": "sum by(pod) (count_over_time({app=\"${GATEWAY_NAME}\"} | pod =~ `$pod` [$__range]))",
+          "expr": "sum by(pod) (count_over_time({app=\"${GATEWAY_NAME}\"} | pod =~ `$pod` [$__range]))",
           "legendFormat": "{{pod}}",
           "queryType": "range",
           "refId": "A"
