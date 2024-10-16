@@ -25,6 +25,8 @@ spec:
   datasources:
     - inputName: "DS_PROMETHEUS"
       datasourceName: {{ .Values.metrics.grafana.datasources.prometheus | quote }}
+    - inputName: "GATEWAY_NAME"
+      value: {{ include "conduktor-gateway.fullname" . | quote }}
 ---
 apiVersion: integreatly.org/v1alpha1
 kind: GrafanaDashboard
@@ -42,5 +44,7 @@ spec:
       datasourceName: {{ .Values.metrics.grafana.datasources.loki | quote }}
     - inputName: "DS_PROMETHEUS"
       datasourceName: {{ .Values.metrics.grafana.datasources.prometheus | quote }}
+    - inputName: "GATEWAY_NAME"
+      value: {{ include "conduktor-gateway.fullname" . | quote }}
 {{- end }}
 {{- end }}

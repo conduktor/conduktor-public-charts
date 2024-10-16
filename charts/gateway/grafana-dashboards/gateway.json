@@ -7,6 +7,13 @@
       "type": "datasource",
       "pluginId": "prometheus",
       "pluginName": "Prometheus"
+    },
+    {
+      "name": "GATEWAY_NAME",
+      "label": "Gateway name",
+      "description": "The name of the gateway to monitor",
+      "type": "constant",
+      "value": "conduktor-gateway"
     }
   ],
   "__elements": {},
@@ -3671,8 +3678,8 @@
       {
         "current": {
           "selected": true,
-          "text": "conduktor-gateway",
-          "value": "conduktor-gateway"
+          "text": "${GATEWAY_NAME}",
+          "value": "${GATEWAY_NAME}"
         },
         "hide": 2,
         "includeAll": false,
@@ -3682,11 +3689,11 @@
         "options": [
           {
             "selected": true,
-            "text": "conduktor-gateway",
-            "value": "conduktor-gateway"
+            "text": "${GATEWAY_NAME}",
+            "value": "${GATEWAY_NAME}"
           }
         ],
-        "query": "conduktor-gateway",
+        "query": "${GATEWAY_NAME}",
         "queryValue": "",
         "skipUrlSync": false,
         "type": "custom"
