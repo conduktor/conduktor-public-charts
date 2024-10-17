@@ -171,6 +171,31 @@ helm-monitoring-stack: ## Install monitoring stack prometheus and grafana
 	@echo "Install grafana"
 	kubectl apply -f k3d/monitoring-stack-grafana-crd.yaml
 
+.PHONY: helm-monitoring-stack
+.ONESHELL:
+helm-monitoring-stack-grafana-alpha: ## Install monitoring stack prometheus and grafana with alpha api version
+	make check-kube-context
+	@echo "Add prometheus helm repo"
+	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts || true
+	helm repo update
+	@echo "Install prometheus stack"
+	helm upgrade --install prometheus-stack prometheus-community/kube-prometheus-stack \
+		--namespace prometheus-stack --create-namespace \
+		--set prometheus.prometheusSpec.podMonitorSelectorNilUsesHelmValues=false \
+		--set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false \
+		--set alertmanager.enabled=false \
+		--set grafana.enabled=false
+	@echo "Install grafana operator"
+	helm upgrade --install grafana-operator bitnami/grafana-operator \
+		--namespace prometheus-stack --create-namespace \
+		--set namespaceScope=false \
+		--set watchNamespaces="" \
+		--set grafana.enabled=false \
+		--version 2.9.3
+	@echo "Install grafana"
+	kubectl apply -f k3d/monitoring-stack-grafana-crd-alpha.yaml
+	kubectl apply -f k3d/monitoring-stack-grafana-ds-alpha.yaml
+
 .PHONY: create-test-ns
 create-test-ns: ## Create test namespace
 	make check-kube-context
