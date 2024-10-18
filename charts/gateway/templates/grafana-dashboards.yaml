@@ -5,6 +5,9 @@ kind: ConfigMap
 metadata:
   name: {{ include "conduktor-gateway.fullname" . | trunc 52 }}-dashboards
   labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
+  {{- if .Values.metrics.grafana.labels }}
+  {{- include "common.tplvalues.render" ( dict "value" .Values.metrics.grafana.labels "context" $ ) | nindent 4 }}
+  {{- end }}
 data:
   gateway.json: |
 {{ .Files.Get "grafana-dashboards/gateway.json" | indent 4 }}
@@ -25,6 +28,8 @@ spec:
   datasources:
     - inputName: "DS_PROMETHEUS"
       datasourceName: {{ .Values.metrics.grafana.datasources.prometheus | quote }}
+    - inputName: "GATEWAY_NAME"
+      datasourceName: {{ include "conduktor-gateway.fullname" . | quote }}
 ---
 apiVersion: integreatly.org/v1alpha1
 kind: GrafanaDashboard
@@ -42,5 +47,7 @@ spec:
       datasourceName: {{ .Values.metrics.grafana.datasources.loki | quote }}
     - inputName: "DS_PROMETHEUS"
       datasourceName: {{ .Values.metrics.grafana.datasources.prometheus | quote }}
+    - inputName: "GATEWAY_NAME"
+      datasourceName: {{ include "conduktor-gateway.fullname" . | quote }}
 {{- end }}
 {{- end }}

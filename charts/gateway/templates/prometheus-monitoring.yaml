@@ -4,8 +4,15 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: {{ include "conduktor-gateway.fullname" . | trunc 52 }}-monitoring
+  labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
+    {{- if .Values.metrics.prometheus.labels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.metrics.prometheus.labels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.metrics.prometheus.annotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.metrics.prometheus.annotations "context" $ ) | nindent 4 }}
+  {{- end }}
 spec:
-  jobLabel: app.kubernetes.io/name
+  jobLabel: {{ .Values.metrics.prometheus.jobLabel | quote }}
   selector:
     matchLabels: {{ include "conduktor-gateway.labels" . | nindent 6 }}
       metrics.conduktor.io/prometheus: "true"

@@ -89,17 +89,21 @@ This section specify internal service configuration
 
 Gateway embed metrics to be installed within you cluster if your have the correct capabilities (Prometheus and Grafana operators).
 
-| Name                                     | Description                                                                   | Value        |
-| ---------------------------------------- | ----------------------------------------------------------------------------- | ------------ |
-| `metrics.alerts.enable`                  | Enable Prometheus alerts if Prometheus alerts rules is supported on cluster   | `false`      |
-| `metrics.checklyAlerts.enable`           | Enable alerts for checky jobs if Prometheus rules is supported on cluster     | `false`      |
-| `metrics.prometheus.enable`              | Enable ServiceMonitor Prometheus operator configuration for metrics scrapping | `false`      |
-| `metrics.prometheus.metricRelabelings`   | Configure metric relabeling in ServiceMonitor                                 | `{}`         |
-| `metrics.prometheus.relabelings`         | Configure relabelings in ServiceMonitor                                       | `{}`         |
-| `metrics.prometheus.extraParams`         | Extra parameters in ServiceMonitor                                            | `{}`         |
-| `metrics.grafana.enable`                 | Enable Grafana dashboards to installation                                     | `false`      |
-| `metrics.grafana.datasources.prometheus` | Prometheus datasource to use for metric dashboard                             | `prometheus` |
-| `metrics.grafana.datasources.loki`       | Loki datasource to use for log dashboard                                      | `loki`       |
+| Name                                     | Description                                                                      | Value                    |
+| ---------------------------------------- | -------------------------------------------------------------------------------- | ------------------------ |
+| `metrics.alerts.enable`                  | Enable Prometheus alerts if Prometheus alerts rules is supported on cluster      | `false`                  |
+| `metrics.checklyAlerts.enable`           | Enable alerts for checky jobs if Prometheus rules is supported on cluster        | `false`                  |
+| `metrics.prometheus.enable`              | Enable ServiceMonitor Prometheus operator configuration for metrics scrapping    | `false`                  |
+| `metrics.prometheus.annotations`         | Additional custom annotations for the ServiceMonitor                             | `{}`                     |
+| `metrics.prometheus.labels`              | Extra labels for the ServiceMonitor                                              | `{}`                     |
+| `metrics.prometheus.jobLabel`            | The name of the label on the target service to use as the job name in Prometheus | `app.kubernetes.io/name` |
+| `metrics.prometheus.metricRelabelings`   | Configure metric relabeling in ServiceMonitor                                    | `{}`                     |
+| `metrics.prometheus.relabelings`         | Configure relabelings in ServiceMonitor                                          | `{}`                     |
+| `metrics.prometheus.extraParams`         | Extra parameters in ServiceMonitor                                               | `{}`                     |
+| `metrics.grafana.enable`                 | Enable Grafana dashboards to installation                                        | `false`                  |
+| `metrics.grafana.labels`                 | Additional custom labels for Grafana dashboard ConfigMap                         | `{}`                     |
+| `metrics.grafana.datasources.prometheus` | Prometheus datasource to use for metric dashboard                                | `prometheus`             |
+| `metrics.grafana.datasources.loki`       | Loki datasource to use for log dashboard                                         | `loki`                   |
 
 ### Kubernetes common configuration
 

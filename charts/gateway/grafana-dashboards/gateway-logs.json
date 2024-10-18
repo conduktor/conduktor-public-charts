@@ -15,6 +15,13 @@
       "type": "datasource",
       "pluginId": "prometheus",
       "pluginName": "Prometheus"
+    },
+    {
+      "name": "GATEWAY_NAME",
+      "label": "Gateway name",
+      "description": "The name of the gateway to monitor",
+      "type": "constant",
+      "value": "conduktor-gateway"
     }
   ],
   "__elements": {},
@@ -137,7 +144,7 @@
             "uid": "${DS_LOKI}"
           },
           "editorMode": "builder",
-          "expr": "sum by(pod) (count_over_time({app=\"conduktor-gateway\"} | pod =~ `$pod` [$__range]))",
+          "expr": "sum by(pod) (count_over_time({app=\"${GATEWAY_NAME}\"} | pod =~ `$pod` [$__range]))",
           "legendFormat": "{{pod}}",
           "queryType": "range",
           "refId": "A"
@@ -259,7 +266,7 @@
             "uid": "${DS_LOKI}"
           },
           "editorMode": "builder",
-          "expr": "sum by(pod, level) (count_over_time({app=\"conduktor-gateway\"} | pod =~ `$pod` | json level=\"level\" | __error__=`` | level =~ `ERROR|WARN` [$__range]))",
+          "expr": "sum by(pod, level) (count_over_time({app=\"${GATEWAY_NAME}\"} | pod =~ `$pod` | json level=\"level\" | __error__=`` | level =~ `ERROR|WARN` [$__range]))",
           "legendFormat": "{{level}}",
           "queryType": "range",
           "refId": "A"
@@ -298,7 +305,7 @@
             "uid": "${DS_LOKI}"
           },
           "editorMode": "builder",
-          "expr": "{app=\"conduktor-gateway\"} | pod =~ `$pod` | json level=\"level\", message=\"message\", thread=\"thread\", logger=\"loggerName\", pod=\"pod\" | __error__=`` | line_format `{{.message}}`",
+          "expr": "{app=\"${GATEWAY_NAME}\"} | pod =~ `$pod` | json level=\"level\", message=\"message\", thread=\"thread\", logger=\"loggerName\", pod=\"pod\" | __error__=`` | line_format `{{.message}}`",
           "legendFormat": "{{level}}",
           "queryType": "range",
           "refId": "A"
@@ -321,14 +328,14 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(kube_pod_labels{conduktor_app_name=\"conduktor-gateway\"}, pod)",
+        "definition": "label_values(kube_pod_labels{conduktor_app_name=\"${GATEWAY_NAME}\"}, pod)",
         "hide": 0,
         "includeAll": true,
         "multi": true,
         "name": "pod",
         "options": [],
         "query": {
-          "query": "label_values(kube_pod_labels{conduktor_app_name=\"conduktor-gateway\"}, pod)",
+          "query": "label_values(kube_pod_labels{conduktor_app_name=\"${GATEWAY_NAME}\"}, pod)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 2,
