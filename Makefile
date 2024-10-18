@@ -171,7 +171,7 @@ helm-monitoring-stack: ## Install monitoring stack prometheus and grafana
 	@echo "Install grafana"
 	kubectl apply -f k3d/monitoring-stack-grafana-crd.yaml
 
-.PHONY: helm-monitoring-stack
+.PHONY: helm-monitoring-stack-grafana-alpha
 .ONESHELL:
 helm-monitoring-stack-grafana-alpha: ## Install monitoring stack prometheus and grafana with alpha api version
 	make check-kube-context
