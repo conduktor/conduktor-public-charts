@@ -109,14 +109,16 @@ Gateway embed metrics to be installed within you cluster if your have the correc
 
 Shared Kubernetes configuration of the chart.
 
-| Name                    | Description                                                    | Value   |
-| ----------------------- | -------------------------------------------------------------- | ------- |
-| `serviceAccount.create` | Create Kubernetes service account. Default kube value if false | `false` |
-| `serviceAccount.name`   | Service account name to attach to the Gateway deployment       | `""`    |
-| `commonLabels`          | Labels to be applied to all resources created by this chart    | `{}`    |
-| `nodeSelector`          | Container node selector                                        | `{}`    |
-| `tolerations`           | Container tolerations                                          | `[]`    |
-| `affinity`              | Container affinity                                             | `{}`    |
+| Name                                          | Description                                                      | Value  |
+| --------------------------------------------- | ---------------------------------------------------------------- | ------ |
+| `serviceAccount.create`                       | Specifies whether a ServiceAccount should be created             | `true` |
+| `serviceAccount.name`                         | The name of the ServiceAccount to use.                           | `""`   |
+| `serviceAccount.annotations`                  | Additional Service Account annotations (evaluated as a template) | `{}`   |
+| `serviceAccount.automountServiceAccountToken` | Automount service account token for the server service account   | `true` |
+| `commonLabels`                                | Labels to be applied to all resources created by this chart      | `{}`   |
+| `nodeSelector`                                | Container node selector                                          | `{}`   |
+| `tolerations`                                 | Container tolerations                                            | `[]`   |
+| `affinity`                                    | Container affinity                                               | `{}`   |
 
 ### Dependencies
 
