@@ -139,7 +139,7 @@ monitoringConfig:
   ##
   ## NOTE: If set, corresponding secrets keys are ignored in monitoringConfig.storage
   ## The secret must contain the following keys:
-  ## CDK_MONITORING_STORAGE_S3_ACCESSKEYID and CDK_MONITORING_STORAGE_S3_SECRETACCESSKEY
+  ## CDK_MONITORING_STORAGE_S3_ACCESSKEYID and CDK_MONITORING_STORAGE_S3_SECRETACCESSKEY. To leverage IRSA leave these commented out in your S3 config
   ## or
   ## CDK_MONITORING_STORAGE_GCS_SERVICEACCOUNT
   ## or
