@@ -92,11 +92,13 @@ spec:
             httpGet:
               path: /health
               port: {{ .Values.gateway.admin.port }}
+              scheme: {{ .Values.tls.enable | ternary "HTTPS" "HTTP" }}
             periodSeconds: 5
           startupProbe:
             httpGet:
               path: /health
               port: {{ .Values.gateway.admin.port }}
+              scheme: {{ .Values.tls.enable | ternary "HTTPS" "HTTP" }}
             initialDelaySeconds: {{ .Values.gateway.startupProbeDelay | default 10 }}
           {{- with .Values.resources }}
           resources: {{- toYaml . | nindent 12 }}
