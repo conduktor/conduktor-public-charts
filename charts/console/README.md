@@ -2,7 +2,7 @@
 
 # Conduktor Console
 
-> If you have any questions or [feedback](https://product.conduktor.help/c/55-helm-chart) contact our [support](https://www.conduktor.io/contact/support/).
+> If you have any questions or [feedback]([https://product.conduktor.help/c/55-helm-chart](https://support.conduktor.io/hc/en-gb/requests/new?ticket_form_id=17438365654417)) contact our [support](https://www.conduktor.io/contact/support/).
 
 ## TL;DR
 
