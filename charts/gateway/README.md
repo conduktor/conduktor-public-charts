@@ -224,7 +224,7 @@ ingress:
   hostname: conduktor-gateway.mycompany.com
   tls: true
   selfSigned: false
-  ingress.secrets:
+  secrets:
     - name: my-tls-secret
       certificate: |
         -----BEGIN CERTIFICATE-----
