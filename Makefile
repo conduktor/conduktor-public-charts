@@ -122,7 +122,7 @@ helm-nginx: ## Install nginx-ingress helm chart from ingress-nginx
 	  --namespace ingress-nginx --create-namespace
 	@echo "Waiting for ingress-nginx to be ready..."
 	kubectl wait deployment -n ingress-nginx \
-		ingress-nginx-controller --for condition=Available=True --timeout=90s2
+		ingress-nginx-controller --for condition=Available=True --timeout=90s
 
 .PHONY: helm-postgresql
 helm-postgresql: ## Install postgresql helm chart from bitnami
