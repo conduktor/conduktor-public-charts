@@ -38,7 +38,7 @@ spec:
             {{- end}}
             {{- if not (hasKey .Values.gateway.env "GATEWAY_ADVERTISED_HOST") }}
             - name: GATEWAY_ADVERTISED_HOST
-              value: {{ include "conduktor-gateway.fullname" . | trunc 54 }}-internal
+              value: {{ include "conduktor-gateway.internalServiceName" . }}
             {{- end }}
             - name: GATEWAY_PORT_START
               value: {{ .Values.gateway.portRange.start | quote }}

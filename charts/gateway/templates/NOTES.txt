@@ -17,7 +17,7 @@ Please verify your connectivity
 {{- end }}
 
 {{- if not (hasKey .Values.gateway.env "GATEWAY_ADVERTISED_HOST") }}
-You can connect to gateway from inside your cluster with {{ include "conduktor-gateway.fullname" . | trunc 54 }}-internal:{{ .Values.gateway.portRange.start }} as bootstrap server.
+You can connect to gateway from inside your cluster with {{ include "conduktor-gateway.internalServiceName" . }}:{{ .Values.gateway.portRange.start }} as bootstrap server.
 {{- else }}
 You defined a specific domain to be advertised : {{ .Values.gateway.env.GATEWAY_ADVERTISED_HOST }}
 You'll need to configure your network connections to gateway with this domain.
