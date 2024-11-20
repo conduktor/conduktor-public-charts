@@ -11,7 +11,7 @@ Breaking Changes:
 
 🟡 - Breaks additional services (e.g. Grafana dashboard changes)
 
-🔴 - Breaks overall deployment of product
+🔴 - Breaks overall deployment of product (e.g. renaming variables in .values, major product releases)
 
 | Chart version | Supported Console version | Breaking changes |
 |---------------|---------------------------|------------------|
