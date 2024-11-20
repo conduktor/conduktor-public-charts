@@ -2,6 +2,8 @@
 
 A Kafka-protocol aware proxy.
 
+See our [compatibility matrix](docs/COMPATIBILITY_MATRIX.md)
+
 ## Installation
 
 ```sh

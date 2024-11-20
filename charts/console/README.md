@@ -4,6 +4,8 @@
 
 > If you have any questions or [feedback](https://product.conduktor.help/c/55-helm-chart) contact our [support](https://www.conduktor.io/contact/support/).
 
+See our [compatibility matrix](docs/COMPATIBILITY_MATRIX.md)
+
 ## TL;DR
 
 ```console
