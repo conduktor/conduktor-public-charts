@@ -69,6 +69,7 @@ database running.
 ```shell
 $ make helm-deps
 $ make k3d-up
+$ make install-dev-deps
 ```
 
 *Postgresql credentials:*
