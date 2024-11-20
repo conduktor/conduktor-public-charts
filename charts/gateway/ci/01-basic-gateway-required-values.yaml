@@ -1,3 +1,5 @@
+nameOverride: gateway-test-01
+
 kafka:
   enabled: true
   startupProbe:

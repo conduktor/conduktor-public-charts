@@ -1,0 +1,18 @@
+nameOverride: gateway-test-02
+
+gateway:
+  admin:
+    port: 8888
+
+ingress:
+  enabled: true
+  ingressClassName: "nginx"
+  hostname: gateway.private
+  tls: true
+  selfSigned: true
+
+kafka:
+  enabled: true
+  startupProbe:
+    enabled: true
+    failureThreshold: 30
