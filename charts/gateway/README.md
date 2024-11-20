@@ -172,3 +172,66 @@ gateway:
 See [Gateway Documentation](https://docs.conduktor.io/gateway/configuration/env-variables/) for a list of environment variables that can be used.
 In particular, the [Client to Gateway Authentication page](https://docs.conduktor.io/gateway/configuration/client-authentication/) details the different authentication mechanisms that can be used with Gateway.
 
+
+### Ingress configuration examples
+
+#### Nginx Ingress without TLS
+
+**values.yaml** :
+```yaml
+ingress:
+  enabled: true
+  ingressClassName: "nginx"
+  hostname: conduktor-gateway.mycompany.com
+  tls: false
+  selfSigned: false
+```
+
+#### Nginx Ingress with Self-signed TLS
+
+**values.yaml** :
+```yaml
+ingress:
+  enabled: true
+  ingressClassName: "nginx"
+  hostname: conduktor-gateway.mycompany.com
+  tls: true
+  selfSigned: true
+```
+
+#### Nginx Ingress with Let's Encrypt TLS
+
+**values.yaml** :
+```yaml
+ingress:
+  enabled: true
+  ingressClassName: "nginx"
+  hostname: conduktor-gateway.mycompany.com
+  tls: true
+  selfSigned: false
+  ingress.annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: nginx
+```
+
+#### Nginx Ingress with Custom TLS secret
+
+**values.yaml** :
+```yaml
+ingress:
+  enabled: true
+  ingressClassName: "nginx"
+  hostname: conduktor-gateway.mycompany.com
+  tls: true
+  selfSigned: false
+  ingress.secrets:
+    - name: my-tls-secret
+      certificate: |
+        -----BEGIN CERTIFICATE-----
+        ...
+        -----END CERTIFICATE-----
+      key: |
+        -----BEGIN RSA PRIVATE KEY-----
+        ...
+        -----END RSA PRIVATE KEY-----
+```
