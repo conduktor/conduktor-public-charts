@@ -64,10 +64,6 @@ k3d-up: ## Setup k3d cluster
 	make create-k3d-cluster
 	@echo "Installing nginx-ingress"
 	make helm-nginx
-	@echo "Installing postgresql"
-	make helm-postgresql
-	@echo "Installing Minio"
-	make helm-minio
 	@echo "Create Test namespace"
 	make create-test-ns
 
@@ -83,6 +79,16 @@ k3d-ci-up: ## Setup CI k3d cluster
 .PHONY: k3d-down
 k3d-down: ## Teardown k3d cluster
 	make delete-k3d-cluster
+
+.PHONY: k3d-ci-down
+install-dev-deps:  ## Install development dependencies (PostgreSQL, Minio, monitoring stack) not needed for CT tests
+	kubectl create namespace ${NAMESPACE} || true
+	@echo "Installing postgresql"
+	make helm-postgresql
+	@echo "Installing Minio"
+	make helm-minio
+	@echo "Installing Monitoring stack"
+	make helm-monitoring-stack
 
 # Extended targets
 ##################

@@ -79,3 +79,17 @@ opt-out for a custom bootstrap server.
 {{-     required "value .kafka.bootstrapServers is required" .Values.kafka.bootstrapServers -}}
 {{-   end -}}
 {{- end -}}
+
+{{/*
+Define internal service name
+*/}}
+{{- define "conduktor-gateway.internalServiceName" -}}
+{{- printf "%s-internal" (include "conduktor-gateway.fullname" . | trunc 54) -}}
+{{- end -}}
+
+{{/*
+Define external service name
+*/}}
+{{- define "conduktor-gateway.externalServiceName"}}
+{{- printf "%s-external" (include "conduktor-gateway.fullname" . | trunc 54) -}}
+{{- end -}}
