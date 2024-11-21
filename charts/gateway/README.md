@@ -235,3 +235,37 @@ ingress:
         ...
         -----END RSA PRIVATE KEY-----
 ```
+
+### Provide Extra Certificates
+*NOTE:* The example is for a `truststore` but the same technique could be applied if you need to configure a `keystore`.
+
+It's recommended to load your certificates as secrets.
+```shell
+kubectl create secret generic gateway-cert \
+    --from-file=./my.truststore
+```
+
+We can then proceed to mount the secret as a volume.
+Note the `mountPath` which is where our cert will be accessible from.
+
+```yaml
+gateway:
+  volumes:
+    - name: truststore
+      secret:
+        secretName: gateway-cert
+        items:
+        - key: kafka.truststore.jks
+          path: kafka.truststore.jks
+  volumeMounts:
+    - name: truststore
+      mountPath: /etc/gateway/tls/truststore/
+      readonly: true
+```
+
+Finally, we can configure our truststore location
+```yaml
+gateway:
+  env:
+    KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/gateway/tls/truststore/kafka.truststore.jks
+```
