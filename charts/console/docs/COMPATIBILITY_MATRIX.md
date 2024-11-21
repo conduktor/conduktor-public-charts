@@ -1,9 +1,9 @@
 # Conduktor Console Compatibility Matrix
 This compatibility matrix is a resource to help you find which versions of Conduktor Console work on which version of our Conduktor Console Helm Chart.
 
-> General recommendation is to use the version of Console that comes preconfigured with the helm chart. If needed you can adjust the version in your values property according to the supported console version.
+> In general we recommend you use the version of Console that comes preconfigured with the Helm chart. If needed you can adjust the version in your values property according to the supported Console version.
 
-> Breaking changes column will only list breaking change in the helmchart! We strongly recommend reading the full [changelog](https://docs.conduktor.io/changelog/) of Conduktor in case there are breaking within the components.
+> Breaking changes column will only list breaking change in the helmchart! You must review the Conduktor [changelog](https://docs.conduktor.io/changelog/) to determine whether there are breaking changes within the artefacts.
 
 ## Helm Chart Compatibility
 
@@ -11,7 +11,7 @@ Breaking Changes:
 
 🟡 - Breaks additional services (e.g. Grafana dashboard changes)
 
-🔴 - Breaks overall deployment of product (e.g. renaming variables in .values, major product releases)
+🔴 - Breaks overall deployment of the product (e.g. renaming variables in .values, major product releases)
 
 | Chart version | Supported Console version | Breaking changes |
 |---------------|---------------------------|------------------|
