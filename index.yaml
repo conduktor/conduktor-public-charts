@@ -3,6 +3,27 @@ entries:
   conduktor-gateway:
   - apiVersion: v2
     appVersion: 3.4.0
+    created: "2024-11-22T13:26:49.374608748Z"
+    dependencies:
+    - condition: kafka.enabled
+      name: kafka
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-kafka
+      version: 18.x.x
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-common
+      version: 2.x.x
+    description: Conduktor Gateway chart
+    digest: 1db897139b08b70efda2eddc753c549bb6fe56da8301731dc64f3b87b68ae98a
+    name: conduktor-gateway
+    urls:
+    - https://github.com/conduktor/conduktor-public-charts/releases/download/conduktor-gateway-3.4.1/conduktor-gateway-3.4.1.tgz
+    version: 3.4.1
+  - apiVersion: v2
+    appVersion: 3.4.0
     created: "2024-11-22T11:52:22.602848254Z"
     dependencies:
     - condition: kafka.enabled
@@ -2211,4 +2232,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/conduktor/conduktor-public-charts/gh-pages/platform-controller-0.2.1.tgz
     version: 0.2.1
-generated: "2024-11-22T11:52:22.603048198Z"
+generated: "2024-11-22T13:26:49.374829081Z"
