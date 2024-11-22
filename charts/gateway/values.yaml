@@ -95,6 +95,9 @@ gateway:
   ## @param gateway.volumeMounts Define user specific volumeMounts for Gateway container in deployment
   volumeMounts: {}
 
+  ## @param gateway.priorityClassName Define Gateway pods' priority based on an existing ClassName
+  priorityClassName: ""
+
 ## @section TLS configuration
 ## @descriptionStart
 ## This section is for configuring Gateway to handle certificate to manage TLS endpoint inside Gateway deployment.
