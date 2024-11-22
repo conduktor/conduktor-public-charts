@@ -398,6 +398,7 @@ console, we recommend you to look at our
     - [Install with a custom service account](#install-with-a-custom-service-account)
     - [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
     - [Install with Console technical monitoring](#install-with-console-technical-monitoring)
+    - [Install with custom certificates or keytab](#install-with-custom-certificates-or-keytab)
   - [Troubleshooting](#troubleshooting)
 
 ### Install with an enterprise license
@@ -984,6 +985,49 @@ platform:
 
 This example will install a `ServiceMonitor` and a `GrafanaDashboard` in the namespace `monitoring-namespace`.
 The `ServiceMonitor` will scrape metrics from Conduktor Console every 30 seconds and the `GrafanaDashboard` will be available in Grafana instance with label `grafana: tooling` in the folder `tools` and use Prometheus datasource named `my-prometheus-ds`.
+
+### Install with custom certificates or keytab
+*NOTE:* The example is for a `keytab` but the same technique could be applied if you need to configure an additional `truststore` or `keystore`.
+
+It's recommended to load your certificates and keytab as secrets.
+```shell
+kubectl create secret generic conduktor-console-keytab \
+    --from-file=./my.keytab
+```
+
+We can then proceed to mount the secret as a volume.
+Note the `mountPath` which is where your cert will be accessible from.
+```yaml
+platform:
+  extraVolumes:
+    - name: kafka-keytab
+      secret:
+        secretName: conduktor-console-keytab
+  extraVolumesMounts:
+    - name: kafka-keytab
+      readonly: true
+      mountPath: /etc/kafka
+```
+
+Finally, your cluster configuration should look something like this:
+```yaml
+config:
+  clusters:
+    - id: my-cluster
+      bootstrapServers: kafka:9092
+      properties: |
+          sasl.jaas.config=com.sun.security.auth.module.Krb5LoginModule required useKeyTab=true storeKey=true keyTab="/etc/kafka/my.keytab" principal="admin/for-kafka@TEST.CONDUKTOR.IO";
+          sasl.mechanism=GSSAPI
+          security.protocol=SASL_SSL
+          sasl.kerberos.service.name=kafka
+```
+
+If you need to mount the truststore you will probably need the [additional properties](https://docs.conduktor.io/platform/get-started/configuration/configuration-snippets/#2-way-ssl-keystore--truststore):
+```shell
+ssl.truststore.type=JKS
+ssl.truststore.location=/etc/kafka/my-truststore.jks
+ssl.truststore.password=conduktor
+```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
