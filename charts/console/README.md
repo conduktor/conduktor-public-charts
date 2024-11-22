@@ -4,6 +4,8 @@
 
 > If you have any questions you can [submit feedback](https://support.conduktor.io/hc/en-gb/requests/new?ticket_form_id=17438365654417) or contact [support](https://www.conduktor.io/contact/support/).
 
+See our [compatibility matrix](https://docs.conduktor.io/platform/get-started/installation/get-started/kubernetes/#helm-chart-compatibility)
+
 ## TL;DR
 
 ```console

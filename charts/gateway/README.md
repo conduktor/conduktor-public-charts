@@ -2,6 +2,8 @@
 
 A Kafka-protocol aware proxy.
 
+See our [compatibility matrix](https://docs.conduktor.io/gateway/get-started/kubernetes/#helm-chart-compatibility)
+
 ## Installation
 
 ```sh
