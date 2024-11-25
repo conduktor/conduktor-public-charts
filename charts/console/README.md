@@ -14,7 +14,7 @@ $ helm install my-platform conduktor/console \
     --create-namespace -n conduktor \
     --set config.organization.name="my-org" \
     --set config.admin.email="admin@conduktor.io" \
-    --set config.admin.password="admin" \
+    --set config.admin.password="Admin123!" \
     --set config.database.password="postgres" \
     --set config.database.username="postgres" \
     --set config.database.host="postgresql" \
