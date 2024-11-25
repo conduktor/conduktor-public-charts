@@ -6,7 +6,7 @@ config:
     name: conduktor
   admin:
     email: admin@conduktor.io
-    password: admin
+    password: testP4ss!
 
   database:
     name: platform
