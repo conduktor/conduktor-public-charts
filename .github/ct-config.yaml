@@ -16,3 +16,4 @@ chart-repos:
   - bitnami=https://charts.bitnami.com/bitnami
 namespace: ct
 release-label: test
+upgrade: true
