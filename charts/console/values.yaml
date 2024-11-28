@@ -68,21 +68,26 @@ diagnosticMode:
 ## @descriptionEnd
 
 config:
-  ## @param config.organization.name Your Conduktor Console Organization, you can only set it at install! You will need to change it in the Conduktor Console UI after the installation
+  ## @param config.organization.name Your Conduktor Console Organization. Default is `Conduktor` if not set.
+  ## Could be provided via an existing secret with `config.existingSecret` using the key `CDK_ORGANIZATION_NAME`.
   organization:
-    name: ""
+    name: "Conduktor"
 
   admin:
-    ## @param config.admin.email Your Conduktor Console Admin email, you can only set it at install! You will need to change it in the Conduktor Console UI after the installation
+    ## @param config.admin.email Your Conduktor Console Admin email. If changed a new admin user will be created with this email and previous admin user will still be available
+    ## Could be provided via an existing secret with `config.existingSecret` using the key `CDK_ADMIN_EMAIL`.
     email: ""
-    ## @param config.admin.password Your Conduktor Console Admin password, you can only set it at install! You will need to change it in the Conduktor Console UI after the installation
+    ## @param config.admin.password Your Conduktor Console Admin password. If change current admin user password will be updated.
+    ## Could be provided via an existing secret with `config.existingSecret` using the key `CDK_ADMIN_PASSWORD`.
     password: ""
 
   ## @param config.database.host Your Conduktor Console Database host
   ## @param config.database.port Your Conduktor Console Database port
   ## @param config.database.name Your Conduktor Console Database name
   ## @param config.database.username Your Conduktor Console Database username
+  ## Could be provided via an existing secret with `config.existingSecret` using the key `CDK_DATABASE_PASSWORD`.
   ## @param config.database.password Your Conduktor Console Database password
+  ## Could be provided via an existing secret with `config.existingSecret` using the key `CDK_DATABASE_USERNAME`.
   database:
     host: ""
     port: 5432
