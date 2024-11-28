@@ -29,6 +29,11 @@ on:
         description: Is this release latest
         required: true
         default: true
+      bump_chart:
+        type: boolean
+        description: Bump chart version and commit
+        required: true
+        default: true
 
 permissions:
   contents: write
@@ -88,13 +93,6 @@ jobs:
 
           echo "Chart releaser installed at ${{env.CR_BIN_PATH}}"
 
-      - name: Update chart version
-        uses: mikefarah/yq@master
-        env:
-          VERSION: ${{ inputs.version }}
-        with:
-          cmd: yq e -i '.version = env(VERSION)' ${{ env.CHART_DIR }}/Chart.yaml
-
       - name: Setup ConduktorBot GPG
         id: gpg
         uses: crazy-max/ghaction-import-gpg@v5.3.0
@@ -104,15 +102,31 @@ jobs:
           git_commit_gpgsign: true
           git_tag_gpgsign: true
 
-      - name: Commit chart version update
-        id: commit
+      - name: Setup git config
         run: |
           git config user.name "${{ steps.gpg.outputs.name }}"
           git config user.email "${{ steps.gpg.outputs.email }}"
 
-          git diff
-          git commit -am "Update chart ${{ inputs.chart }} version to ${{ inputs.version }}"
-          git push https://${{ steps.gpg.outputs.name }}:${{ secrets.CONDUKTORBOT_REPO_WRITE }}@github.com/${{ env.GITHUB_REPOSITORY }}.git
+      - name: Update chart version
+        if: ${{ inputs.bump_chart }}
+        uses: mikefarah/yq@master
+        env:
+          VERSION: ${{ inputs.version }}
+        with:
+          cmd: yq e -i '.version = env(VERSION)' ${{ env.CHART_DIR }}/Chart.yaml
+
+      - name: Commit chart version update
+        id: commit
+        run: |
+          if ${{ inputs.bump_chart }}; then
+            echo "Bumping chart version"
+            git add ${{ env.CHART_DIR }}/Chart.yaml
+            git diff
+            git commit -am "Update chart ${{ inputs.chart }} version to ${{ inputs.version }}"
+            git push
+          else
+            echo "Not bumping chart version"
+          fi
 
           update_commit=$(git rev-parse HEAD)
           echo "commit_sha1=${update_commit}" >> "${GITHUB_OUTPUT}"
