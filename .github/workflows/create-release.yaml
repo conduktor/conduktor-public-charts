@@ -112,7 +112,7 @@ jobs:
 
           git diff
           git commit -am "Update chart ${{ inputs.chart }} version to ${{ inputs.version }}"
-          git push
+          git push https://${{ steps.gpg.outputs.name }}:${{ secrets.CONDUKTORBOT_REPO_WRITE }}@github.com/${{ env.GITHUB_REPOSITORY }}.git
 
           update_commit=$(git rev-parse HEAD)
           echo "commit_sha1=${update_commit}" >> "${GITHUB_OUTPUT}"
