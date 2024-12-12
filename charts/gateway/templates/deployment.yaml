@@ -57,6 +57,8 @@ spec:
             {{- if .Values.gateway.extraSecretEnvVars }}
             {{- toYaml .Values.gateway.extraSecretEnvVars | nindent 12 }}
             {{- end }}
+            - name: DEPLOYED_BY
+              value: HelmChart/{{ .Chart.Version }}
           envFrom:
             - configMapRef:
                 name: {{ include "conduktor-gateway.fullname" . }}

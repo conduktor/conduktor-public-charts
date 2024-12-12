@@ -122,6 +122,8 @@ spec:
               value: /conduktor/https/tls.crt
             - name: CDK_PLATFORM_HTTPS_KEY_PATH
               value: /conduktor/https/tls.key
+            - name: DEPLOYED_BY
+              value: HelmChart/{{ .Chart.Version }}
             {{- end }}
             {{- if .Values.platform.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.platform.extraEnvVars "context" $) | nindent 12 }}
