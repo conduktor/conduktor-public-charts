@@ -67,9 +67,14 @@ use the Makefile target `k3d-up` to start a cluster with nginx and a postgresql
 database running.
 
 ```shell
-$ make helm-deps
-$ make k3d-up
-$ make install-dev-deps
+# Update helm dependencies
+make helm-deps
+
+# Create local K3D cluster for test and local dev (require k3d, helm and kubectl)
+make k3d-up
+
+# Install dependencies like a Postgresql, Minio, Monitoring stack, etc.
+make install-dev-deps
 ```
 
 *Postgresql credentials:*
@@ -80,6 +85,24 @@ port: 5432
 username: postgres
 password: conduktor
 name: conduktor
+```
+
+### Install charts in local K3D cluster
+
+```shell
+ # Install Conduktor Gateway chart
+helm install gateway charts/gateway --namespace conduktor --set kafka.enabled=true 
+
+# Install Conduktor Console chart
+helm install console charts/console \
+  --namespace conduktor \
+  --set config.organization.name=test \
+  --set config.admin.email=test@test.io \
+  --set config.admin.password=testP4ss! \
+  --set config.database.password=conduktor \
+  --set config.database.username=postgres \
+  --set config.database.host=postgresql.conduktor.svc.cluster.local \
+  --set config.database.name=conduktor
 ```
 
 ### Setup git hooks
