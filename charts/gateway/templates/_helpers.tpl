@@ -40,7 +40,6 @@ Common labels
 helm.sh/chart: {{ include "conduktor-gateway.chart" . }}
 app.kubernetes.io/name: {{ include "conduktor-gateway.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/component: gateway
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -53,7 +52,6 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- define "conduktor-gateway.podSelectorLabels" -}}
 app.kubernetes.io/name: {{ include "conduktor-gateway.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/component: gateway
 {{- end -}}
 
 {{/*
