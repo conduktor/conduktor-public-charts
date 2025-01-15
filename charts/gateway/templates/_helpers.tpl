@@ -52,9 +52,6 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- define "conduktor-gateway.podSelectorLabels" -}}
 app.kubernetes.io/name: {{ include "conduktor-gateway.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-{{- if .Values.gateway.podLabels }}
-{{ include "common.tplvalues.render" (dict "value" .Values.gateway.podLabels "context" $) }}
-{{- end }}
 {{- end -}}
 
 {{/*
