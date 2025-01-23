@@ -1,5 +1,10 @@
 nameOverride: gateway-test-02
 
+commonLabels:
+  conduktor.io/team: gateway
+  conduktor.io/app-env: free
+  conduktor.io/env: staging
+
 gateway:
   admin:
     port: 8888
