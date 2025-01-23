@@ -1,5 +1,8 @@
 nameOverride: gateway-test-01
-
+commonLabels:
+  conduktor.io/team: gateway
+  conduktor.io/app-env: free
+  conduktor.io/env: staging
 kafka:
   enabled: true
   startupProbe:
