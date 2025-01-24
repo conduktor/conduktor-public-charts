@@ -400,6 +400,27 @@ console, we recommend you to look at our
 
 ### Kubernetes configuration
 
+
+- [Install with an enterprise license](#install-with-an-enterprise-license)
+- [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
+- [Install with a Kafka cluster](#install-with-a-kafka-cluster)
+- [Install with a Confluent Cloud cluster](#install-with-a-confluent-cloud-cluster)
+- [Install without Conduktor monitoring](#install-without-conduktor-monitoring)
+- [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
+- [Provide credentials configuration as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
+- [Provide monitoring configuration as a Kubernetes Secret](#provide-monitoring-configuration-as-a-kubernetes-secret)
+- [Store platform data into a Persistent Volume](#store-platform-data-into-a-persistent-volume)
+- [Install with a PodAffinity](#install-with-a-podaffinity)
+- [Provide console configuration as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
+- [Provide additional credentials as a Kubernetes Secret](#provide-additional-credentials-as-a-kubernetes-secret)
+- [Install with a toleration](#install-with-a-toleration)
+- [Install with Self-Signed TLS certificate](#install-with-self-signed-tls-certificate)
+- [Install with a custom TLS certificate on the platform Pod](#install-with-a-custom-tls-certificate-on-the-platform-pod)
+- [Install with a custom service account](#install-with-a-custom-service-account)
+- [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
+- [Install with Console technical monitoring](#install-with-console-technical-monitoring)
+- [Install with custom certificates or keytab](#install-with-custom-certificates-or-keytab)
+
 ### Install with an enterprise license
 
 ```yaml
