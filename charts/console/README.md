@@ -33,6 +33,41 @@ Helm Chart to deploy Conduktor Console on Kubernetes.
 - Kubernetes 1.19+
 - Helm 3.2.0+
 
+  - [Parameters](#parameters)
+    - [Global parameters](#global-parameters)
+    - [Common parameters](#common-parameters)
+    - [Platform product Parameters](#platform-product-parameters)
+    - [Platform Monitoring product Parameters](#platform-monitoring-product-parameters)
+    - [Platform Deployment Parameters](#platform-deployment-parameters)
+    - [Platform Metrics activation](#platform-metrics-activation)
+    - [Traffic Exposure Parameters](#traffic-exposure-parameters)
+    - [Other Parameters](#other-parameters)
+    - [Platform Cortex Parameters](#platform-cortex-parameters)
+  - [Snippets](#snippets)
+    - [Console configuration](#console-configuration)
+    - [Kubernetes configuration](#kubernetes-configuration)
+    - [Install with an enterprise license](#install-with-an-enterprise-license)
+    - [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
+    - [Install with a Kafka cluster](#install-with-a-kafka-cluster)
+    - [Install with a Confluent Cloud cluster](#install-with-a-confluent-cloud-cluster)
+    - [Install without Conduktor monitoring](#install-without-conduktor-monitoring)
+    - [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
+    - [Provide credentials configuration as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
+    - [Provide monitoring configuration as a Kubernetes Secret](#provide-monitoring-configuration-as-a-kubernetes-secret)
+    - [Store platform data into a Persistent Volume](#store-platform-data-into-a-persistent-volume)
+    - [Install with a PodAffinity](#install-with-a-podaffinity)
+    - [Provide console configuration as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
+    - [Provide additional credentials as a Kubernetes Secret](#provide-additional-credentials-as-a-kubernetes-secret)
+    - [Install with a toleration](#install-with-a-toleration)
+    - [Install with Self-Signed TLS certificate](#install-with-self-signed-tls-certificate)
+    - [Install with a custom TLS certificate on the platform Pod](#install-with-a-custom-tls-certificate-on-the-platform-pod)
+    - [Install with a custom service account](#install-with-a-custom-service-account)
+    - [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
+    - [Install with Console technical monitoring](#install-with-console-technical-monitoring)
+    - [Install with custom certificates or keytab](#install-with-custom-certificates-or-keytab)
+  - [Troubleshooting](#troubleshooting)
+
+
 ## Parameters
 
 ### Global parameters
@@ -196,7 +231,7 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/co
 | `platform.sidecars`                           | Add additional sidecar containers to the Conduktor Console pod(s)                                                                                            | `[]`                          |
 | `platform.initContainers`                     | Add additional init containers to the Conduktor Console pod(s)                                                                                               | `[]`                          |
 
-### Conduktor-gateway metrics activation
+### Platform Metrics activation
 
 Console expose metrics that could be collected and presented if your environment have the necessary components (Prometheus and Grafana operators)
 
@@ -365,43 +400,26 @@ console, we recommend you to look at our
 
 ### Kubernetes configuration
 
-- [Conduktor Console](#conduktor-console)
-  - [TL;DR](#tldr)
-  - [Introduction](#introduction)
-  - [Prerequisites](#prerequisites)
-  - [Parameters](#parameters)
-    - [Global parameters](#global-parameters)
-    - [Common parameters](#common-parameters)
-    - [Platform product Parameters](#platform-product-parameters)
-    - [Platform Monitoring product Parameters](#platform-monitoring-product-parameters)
-    - [Platform Deployment Parameters](#platform-deployment-parameters)
-    - [Conduktor-gateway metrics activation](#conduktor-gateway-metrics-activation)
-    - [Traffic Exposure Parameters](#traffic-exposure-parameters)
-    - [Other Parameters](#other-parameters)
-    - [Platform Cortex Parameters](#platform-cortex-parameters)
-  - [Snippets](#snippets)
-    - [Console configuration](#console-configuration)
-    - [Kubernetes configuration](#kubernetes-configuration)
-    - [Install with an enterprise license](#install-with-an-enterprise-license)
-    - [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
-    - [Install with a Kafka cluster](#install-with-a-kafka-cluster)
-    - [Install with a Confluent Cloud cluster](#install-with-a-confluent-cloud-cluster)
-    - [Install without Conduktor monitoring](#install-without-conduktor-monitoring)
-    - [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
-    - [Provide credentials configuration as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
-    - [Provide monitoring configuration as a Kubernetes Secret](#provide-monitoring-configuration-as-a-kubernetes-secret)
-    - [Store platform data into a Persistent Volume](#store-platform-data-into-a-persistent-volume)
-    - [Install with a PodAffinity](#install-with-a-podaffinity)
-    - [Provide console configuration as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
-    - [Provide additional credentials as a Kubernetes Secret](#provide-additional-credentials-as-a-kubernetes-secret)
-    - [Install with a toleration](#install-with-a-toleration)
-    - [Install with Self-Signed TLS certificate](#install-with-self-signed-tls-certificate)
-    - [Install with a custom TLS certificate on the platform Pod](#install-with-a-custom-tls-certificate-on-the-platform-pod)
-    - [Install with a custom service account](#install-with-a-custom-service-account)
-    - [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
-    - [Install with Console technical monitoring](#install-with-console-technical-monitoring)
-    - [Install with custom certificates or keytab](#install-with-custom-certificates-or-keytab)
-  - [Troubleshooting](#troubleshooting)
+
+- [Install with an enterprise license](#install-with-an-enterprise-license)
+- [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
+- [Install with a Kafka cluster](#install-with-a-kafka-cluster)
+- [Install with a Confluent Cloud cluster](#install-with-a-confluent-cloud-cluster)
+- [Install without Conduktor monitoring](#install-without-conduktor-monitoring)
+- [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
+- [Provide credentials configuration as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
+- [Provide monitoring configuration as a Kubernetes Secret](#provide-monitoring-configuration-as-a-kubernetes-secret)
+- [Store platform data into a Persistent Volume](#store-platform-data-into-a-persistent-volume)
+- [Install with a PodAffinity](#install-with-a-podaffinity)
+- [Provide console configuration as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
+- [Provide additional credentials as a Kubernetes Secret](#provide-additional-credentials-as-a-kubernetes-secret)
+- [Install with a toleration](#install-with-a-toleration)
+- [Install with Self-Signed TLS certificate](#install-with-self-signed-tls-certificate)
+- [Install with a custom TLS certificate on the platform Pod](#install-with-a-custom-tls-certificate-on-the-platform-pod)
+- [Install with a custom service account](#install-with-a-custom-service-account)
+- [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
+- [Install with Console technical monitoring](#install-with-console-technical-monitoring)
+- [Install with custom certificates or keytab](#install-with-custom-certificates-or-keytab)
 
 ### Install with an enterprise license
 
