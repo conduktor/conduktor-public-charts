@@ -38,26 +38,17 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-
 {{/*
 Common labels
 */}}
 {{- define "conduktor-gateway.labels" -}}
-helm.sh/chart: {{ include "conduktor-gateway.chart" . }}
-app.kubernetes.io/name: {{ include "conduktor-gateway.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- if .Values.commonLabels }}
-{{ include "common.tplvalues.render" (dict "value" .Values.commonLabels "context" $) }}
-{{- end }}
+{{- /* Delegate to common.labels.standard for Kubernetes standard labels */ -}}
+{{ include "common.labels.standard" (dict "customLabels" .Values.commonLabels "context" $) }}
 {{- end -}}
 
 {{- define "conduktor-gateway.podSelectorLabels" -}}
-app.kubernetes.io/name: {{ include "conduktor-gateway.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+{{- /* Delegate to common.labels.matchLabels for selector-specific labels */ -}}
+{{ include "common.labels.matchLabels" (dict "customLabels" .Values.podLabels "context" $) }}
 {{- end -}}
 
 {{/*
