@@ -394,3 +394,7 @@ affinity: {}
 kafka:
   ## @param kafka.enabled Deploy a kafka along side gateway (This should only used for testing purpose)
   enabled: false
+  ## @param kafka.listeners.overrideListeners Override Kafka listeners configuration
+  ## @param kafka.listeners.overrideListeners.PLAINTEXT Custom PLAINTEXT listener configuration
+  listeners:
+    overrideListeners: "PLAINTEXT://:9092"
