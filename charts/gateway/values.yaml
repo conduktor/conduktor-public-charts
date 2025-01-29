@@ -394,3 +394,6 @@ affinity: {}
 kafka:
   ## @param kafka.enabled Deploy a kafka along side gateway (This should only used for testing purpose)
   enabled: false
+  ## @param kafka.listeners.overrideListeners Overrides the Kafka 'listeners' configuration setting.
+  listeners:
+    overrideListeners: []
