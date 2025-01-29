@@ -180,9 +180,10 @@ Shared Kubernetes configuration of the chart.
 
 Enable and configure chart dependencies if not available in your deployment.
 
-| Name            | Description                                                                   | Value   |
-| --------------- | ----------------------------------------------------------------------------- | ------- |
-| `kafka.enabled` | Deploy a kafka along side gateway (This should only used for testing purpose) | `false` |
+| Name                                | Description                                                                   | Value   |
+| ----------------------------------- | ----------------------------------------------------------------------------- | ------- |
+| `kafka.enabled`                     | Deploy a kafka along side gateway (This should only used for testing purpose) | `false` |
+| `kafka.listeners.overrideListeners` | Overrides the Kafka 'listeners' configuration setting.                        | `[]`    |
 
 
 ## Example
