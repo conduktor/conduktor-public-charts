@@ -8,7 +8,7 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     tags:
       - bitnami-kafka
-    version: 18.x.x
+    version: 31.0.x # https://github.com/bitnami/charts/blob/kafka/31.0.0/bitnami/kafka/Chart.lock uses bitnami common 2.27.0
     condition: kafka.enabled
   - name: common
     version: 2.x.x

@@ -1,0 +1,32 @@
+
+commonLabels:
+  test: ben
+  hello: world
+  new: entry
+
+gateway:
+  env: 
+    GATEWAY_SECURED_METRICS: 'false'
+    GATEWAY_SECURITY_PROTOCOL: 'SASL_PLAINTEXT'
+    GATEWAY_SASL_MECHANISM: 'PLAIN'
+    GATEWAY_SASL_JAAS_CONFIG: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="user" password="bitnami";'
+  portRange:
+    start: 9092
+
+service:
+  external:
+    enable: false
+    type: ClusterIP
+    annotations: 
+      prometheus.io/scrape: "true"
+      prometheus.io/path: /metrics
+      prometheus.io/port: "8888"
+
+metrics:
+  prometheus:
+    enable: true
+  grafana:
+    enable: true
+
+kafka:
+  enabled: true
