@@ -47,8 +47,8 @@ Common labels
 {{- end -}}
 
 {{- define "conduktor-gateway.podSelectorLabels" -}}
-{{- /* Delegate to common.labels.matchLabels for selector-specific labels */ -}}
-{{ include "common.labels.matchLabels" (dict "customLabels" .Values.podLabels "context" $) }}
+app.kubernetes.io/name: {{ include "conduktor-gateway.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{/*

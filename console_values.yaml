@@ -1,0 +1,26 @@
+
+commonLabels:
+  test: ben
+  hello: world
+  new: entry
+
+config:
+  organization:
+      name: Conduktor
+  admin:
+      email: admin@conduktor.io
+      password: C0nduk0r!
+  database:
+      name: postgresql.conduktor.svc.cluster.local
+      username: postgres
+      password: conduktor
+      host: 10.42.0.11
+      port: 5432
+  cluster:
+      name: gw-test-conduktor-gateway-internal
+      id: gw-test-conduktor-gateway-internal
+      bootstrapServers: gw-test-kafka.conduktor.svc.cluster.local:9092
+      properties: |
+        security.protocol=SASL_PLAINTEXT
+        sasl.mechanism=PLAIN
+        sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin";
