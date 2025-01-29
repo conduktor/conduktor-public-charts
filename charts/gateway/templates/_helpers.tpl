@@ -68,7 +68,7 @@ opt-out for a custom bootstrap server.
 */}}
 {{- define "conduktor-gateway.kafka-bootstrap-server" -}}
 {{-   if .Values.kafka.enabled -}}
-{{-     printf "%s-kafka.%s.svc.%s:9092" .Release.Name .Release.Namespace (default "cluster.local" .Values.clusterDomain) -}}
+{{-     printf "%s-kafka-controller-headless.%s.svc.%s:9092" .Release.Name .Release.Namespace (default "cluster.local" .Values.clusterDomain) -}}
 {{-   else -}}
 {{-     required "value .kafka.bootstrapServers is required" .Values.kafka.bootstrapServers -}}
 {{-   end -}}
