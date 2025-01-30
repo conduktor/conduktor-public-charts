@@ -392,19 +392,19 @@ affinity: {}
 ## Enable and configure chart dependencies if not available in your deployment.
 ## @descriptionEnd
 kafka:
-  ## @param kafka.enabled Deploy a kafka along side gateway (This should only used for testing purpose)
+  ## @param kafka.enabled NEVER USE IN PRODUCTION. Deploys a local 1 broker Kafka cluster alongside Gateway. This should only be used for testing purposes.
   enabled: false
   # These below values are set to allow the gateway to connect to the kafka cluster without authentication
   # leave as default to allow kafka to connect to gateway out of the box.
-  ## @param kafka.listeners.overrideListeners Overrides the Kafka 'listeners' configuration setting.
-  ## @param kafka.listeners.client.protocol Client protocol
-  ## @param kafka.listeners.client.port Client port
-  ## @param kafka.listeners.controller.protocol Controller protocol
-  ## @param kafka.listeners.controller.port Controller port
-  ## @param kafka.listeners.interBroker.protocol InterBroker protocol
-  ## @param kafka.listeners.interBroker.port InterBroker port
+  ## @skip kafka.listeners.overrideListeners
+  ## @skip kafka.listeners.client.protocol
+  ## @skip kafka.listeners.client.port
+  ## @skip kafka.listeners.controller.protocol
+  ## @skip kafka.listeners.controller.port
+  ## @skip kafka.listeners.interBroker.protocol
+  ## @skip kafka.listeners.interBroker.port
   listeners:
-    overrideListeners: []
+    # overrideListeners: []
     client:
       protocol: PLAINTEXT
       port: 9092
@@ -414,6 +414,6 @@ kafka:
     interBroker:
       protocol: PLAINTEXT
       port: 9094
-  ## @param kafka.controller.replicaCount Number of replicas for the Kafka controller - only 1 replica for demo 
+  ## @skip kafka.controller.replicaCount
   controller:
     replicaCount: 1
