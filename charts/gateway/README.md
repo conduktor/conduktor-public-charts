@@ -180,17 +180,9 @@ Shared Kubernetes configuration of the chart.
 
 Enable and configure chart dependencies if not available in your deployment.
 
-| Name                                   | Description                                                                   | Value       |
-| -------------------------------------- | ----------------------------------------------------------------------------- | ----------- |
-| `kafka.enabled`                        | Deploy a kafka along side gateway (This should only used for testing purpose) | `false`     |
-| `kafka.listeners.overrideListeners`    | Overrides the Kafka 'listeners' configuration setting.                        | `[]`        |
-| `kafka.listeners.client.protocol`      | Client protocol                                                               | `PLAINTEXT` |
-| `kafka.listeners.client.port`          | Client port                                                                   | `9092`      |
-| `kafka.listeners.controller.protocol`  | Controller protocol                                                           | `PLAINTEXT` |
-| `kafka.listeners.controller.port`      | Controller port                                                               | `9093`      |
-| `kafka.listeners.interBroker.protocol` | InterBroker protocol                                                          | `PLAINTEXT` |
-| `kafka.listeners.interBroker.port`     | InterBroker port                                                              | `9094`      |
-| `kafka.controller.replicaCount`        | Number of replicas for the Kafka controller - only 1 replica for demo         | `1`         |
+| Name            | Description                                                                                                                       | Value   |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `kafka.enabled` | NEVER USE IN PRODUCTION. Deploys a local 1 broker Kafka cluster alongside Gateway. This should only be used for testing purposes. | `false` |
 
 
 ## Example
