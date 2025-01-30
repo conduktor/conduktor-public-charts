@@ -394,6 +394,26 @@ affinity: {}
 kafka:
   ## @param kafka.enabled Deploy a kafka along side gateway (This should only used for testing purpose)
   enabled: false
+  # These below values are set to allow the gateway to connect to the kafka cluster without authentication
+  # leave as default to allow kafka to connect to gateway out of the box.
   ## @param kafka.listeners.overrideListeners Overrides the Kafka 'listeners' configuration setting.
+  ## @param kafka.listeners.client.protocol Client protocol
+  ## @param kafka.listeners.client.port Client port
+  ## @param kafka.listeners.controller.protocol Controller protocol
+  ## @param kafka.listeners.controller.port Controller port
+  ## @param kafka.listeners.interBroker.protocol InterBroker protocol
+  ## @param kafka.listeners.interBroker.port InterBroker port
   listeners:
     overrideListeners: []
+    client:
+      protocol: PLAINTEXT
+      port: 9092
+    controller:
+      protocol: PLAINTEXT
+      port: 9093
+    interBroker:
+      protocol: PLAINTEXT
+      port: 9094
+  ## @param kafka.controller.replicaCount Number of replicas for the Kafka controller - only 1 replica for demo 
+  controller:
+    replicaCount: 1
