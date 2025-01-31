@@ -343,6 +343,7 @@ kafka:
   ## @skip kafka.controller.replicaCount
   ## @skip kafka.extraConfigYaml
   listeners:
+    overrideListeners: []
     client:
       protocol: PLAINTEXT
       port: 9092
