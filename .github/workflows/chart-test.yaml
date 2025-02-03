@@ -119,6 +119,30 @@ jobs:
           make k3d-ci-up
           kubectl create ns ct || true
 
+      - name: Get PR number
+        if: github.event_name == 'pull_request'
+        id: get-pr
+        run: echo "PR_NUMBER=${{ github.event.number }}" >> $GITHUB_ENV
+
+      - name: Check if PR is in breaking upgrades list
+        id: check-breaking
+        run: |
+          if [ -f ".github/ct-breaking-upgrades.json" ]; then
+            BREAKING=$(jq '.breaking_prs | index($ENV.PR_NUMBER | tonumber)' .github/ct-breaking-upgrades.json)
+            if [ "$BREAKING" != "null" ]; then
+              echo "breaking=true" >> $GITHUB_OUTPUT
+            else
+              echo "breaking=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "breaking=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Disable upgrade testing if breaking change
+        if: steps.check-breaking.outputs.breaking == 'true'
+        run: |
+          sed -i 's/upgrade: true/upgrade: false/' .github/ct-config.yaml
+
       - name: Run chart-testing (install)
         run: ct install --config .github/ct-config.yaml
         if: steps.list-changed.outputs.changed == 'true'
