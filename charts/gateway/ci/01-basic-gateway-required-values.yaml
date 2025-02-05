@@ -1,7 +1,4 @@
 nameOverride: gateway-test-01
 
-kafka:
+tests:
   enabled: true
-  startupProbe:
-    enabled: true
-    failureThreshold: 30
