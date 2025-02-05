@@ -63,44 +63,33 @@ Create the name of the service account to use
 {{- end -}}
 
 {{/*
-Helper function to check if KAFKA_BOOTSTRAP_SERVERS exists in gateway.env
-*/}}
-{{- define "check-kafka-bootstrap-server-env" -}}
-  {{- $found := false -}}
-  {{- if hasKey .Values.gateway.env "KAFKA_BOOTSTRAP_SERVERS" }}
-      {{- $found = true -}}
-  {{- end }}
-  {{ $found }}
-{{- end -}}
-
-{{/*
-Helper function to check if KAFKA_BOOTSTRAP_SERVERS exists in gateway.extraSecretEnvVars
-*/}}
-{{- define "check-kafka-bootstrap-server-extraSecretEnvVars" -}}
-  {{- $found := false -}}
-  {{- range .Values.gateway.extraSecretEnvVars -}}
-    {{- if eq .name "KAFKA_BOOTSTRAP_SERVERS" -}}
-      {{- $found = true -}}
-    {{- end -}}
-  {{- end -}}
-  {{ $found }}
-{{- end -}}
-
-{{/*
-Helper function to check if KAFKA_BOOTSTRAP_SERVERS exists in gateway.env or gateway.extraSecretEnvVars.
-If it does not exist in either, or exists in both fail the chart.
+Helper function to check if KAFKA_BOOTSTRAP_SERVERS exists in either gateway.env or gateway.extraSecretEnvVars.
+If it does not exist in either, or exists in both, fail the chart.
 */}}
 {{- define "conduktor-gateway.kafka-bootstrap-server" -}}
-  {{- $foundEnv := include "check-kafka-bootstrap-server-env" . | fromYaml }}
-  {{- $foundExtraSecretEnvVars := include "check-kafka-bootstrap-server-extraSecretEnvVars" . | fromYaml }}
-  {{- printf "foundEnv: %t, foundExtraSecretEnvVars: %t" $foundEnv $foundExtraSecretEnvVars | quote -}}
-  {{- if and (not $foundEnv) (not $foundExtraSecretEnvVars) -}}
-    {{- fail "KAFKA_BOOTSTRAP_SERVERS is not set in gateway.env or gateway.extraSecretEnvVars" -}}
-  {{- end -}}
-  {{- if and $foundEnv $foundExtraSecretEnvVars -}}
-    {{- fail "KAFKA_BOOTSTRAP_SERVERS is set in both gateway.env and gateway.extraSecretEnvVars. Only define once." -}}
-  {{- end -}}
-  Valid
+  {{- $env := .Values.gateway.env }}
+  {{- $extraEnv := .Values.gateway.extraSecretEnvVars }}
+
+  {{- $foundInEnv := hasKey $env "KAFKA_BOOTSTRAP_SERVERS" }}
+  {{- $foundInExtraEnv := false }}
+  
+  {{- if $extraEnv }}
+    {{- range $index, $item := $extraEnv }}
+      {{- if eq (index $item "name") "KAFKA_BOOTSTRAP_SERVERS" }}
+        {{- $foundInExtraEnv = true }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+
+  {{- if or $foundInEnv $foundInExtraEnv }}
+    {{- printf "Valid KAFKA_BOOTSTRAP_SERVERS found." }}
+  {{- else }}
+    {{- fail "KAFKA_BOOTSTRAP_SERVERS is not defined in either gateway.env or gateway.extraSecretEnvVars." }}
+  {{- end }}
+
+  {{- if and $foundInEnv $foundInExtraEnv }}
+    {{- fail "KAFKA_BOOTSTRAP_SERVERS is defined in both gateway.env and gateway.extraSecretEnvVars, which is invalid." }}
+  {{- end }}
 {{- end -}}
 
 {{/*

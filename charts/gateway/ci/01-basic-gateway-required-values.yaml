@@ -1,4 +1,8 @@
 nameOverride: gateway-test-01
 
+gateway:
+  env:
+    KAFKA_BOOTSTRAP_SERVERS: test-kafka.ct.svc.cluster.local:9092
+
 tests:
   enabled: true
