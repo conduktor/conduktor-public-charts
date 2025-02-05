@@ -7,16 +7,6 @@ To learn more about the release, try:
   $ helm status {{ .Release.Name }}
   $ helm get all {{ .Release.Name }}
 
-{{ if .Values.kafka.enabled }}
-Based on your configuration, this deployment create a kafka cluster to be used by gateway.
-This configuration should be for testing purpose only. Please do not use this kafka for production usages.
-{{ if hasKey .Values.gateway.env "KAFKA_BOOTSTRAP_SERVERS" }}
-WARNING: You defined a Kafka boostrap server in gateway configuration. This will override the auto generated configuration to connect to embedded kafka cluster.
-Please verify your connectivity
-{{- end }}
-{{- end }}
-
-{{- $internalServiceHost := printf "%s.%s.svc.%s" (include "conduktor-gateway.internalServiceName" .) .Release.Namespace .Values.clusterDomain  -}}
 {{- if not (hasKey .Values.gateway.env "GATEWAY_ADVERTISED_HOST") }}
 You can connect to gateway from inside your cluster with {{ $internalServiceHost }}:{{ .Values.gateway.portRange.start }} as bootstrap server.
 {{- else }}

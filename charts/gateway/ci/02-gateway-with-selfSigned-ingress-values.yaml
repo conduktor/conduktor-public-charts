@@ -11,8 +11,5 @@ ingress:
   tls: true
   selfSigned: true
 
-kafka:
+tests:
   enabled: true
-  startupProbe:
-    enabled: true
-    failureThreshold: 30

@@ -387,32 +387,6 @@ tolerations: []
 ## @param affinity Container affinity
 affinity: {}
 
-## @section Dependencies
-## @descriptionStart
-## Enable and configure chart dependencies if not available in your deployment.
-## @descriptionEnd
-kafka:
-  ## @param kafka.enabled NEVER USE IN PRODUCTION. Deploys a local 1 broker Kafka cluster alongside Gateway. This should only be used for testing purposes.
+## @skip tests
+tests:
   enabled: false
-  # These below values are set to allow the gateway to connect to the kafka cluster without authentication
-  # leave as default to allow kafka to connect to gateway out of the box.
-  ## @skip kafka.listeners
-  ## @skip kafka.controller.replicaCount
-  ## @skip kafka.extraConfigYaml
-  listeners:
-    overrideListeners: ""
-    client:
-      protocol: PLAINTEXT
-      port: 9092
-    controller:
-      protocol: PLAINTEXT
-      port: 9093
-    interBroker:
-      protocol: PLAINTEXT
-      port: 9094
-  extraConfigYaml:
-    default.replication.factor: 1
-    offsets.topic.replication.factor: 1
-    transaction.state.log.replication.factor: 1
-  controller:
-    replicaCount: 1

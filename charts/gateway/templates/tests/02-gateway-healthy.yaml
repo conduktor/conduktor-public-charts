@@ -1,3 +1,4 @@
+{{- if .Values.tests.enabled }}
 {{- $internalServiceName := include "conduktor-gateway.internalServiceName" . -}}
 {{- $internalServicePort := .Values.gateway.admin.port -}}
 {{- $internalHealthUrl := printf "http://%v:%v/health" $internalServiceName $internalServicePort -}}
@@ -33,3 +34,4 @@ spec:
               '--user', '{{ $adminLogin }}:{{ $adminPassword}}']
 {{- end }}
   restartPolicy: Never
+{{- end }}

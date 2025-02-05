@@ -63,15 +63,44 @@ Create the name of the service account to use
 {{- end -}}
 
 {{/*
-Computes the kafka bootstrap server URL. Resolves to embedded kafka by default but can be
-opt-out for a custom bootstrap server.
+Helper function to check if KAFKA_BOOTSTRAP_SERVERS exists in gateway.env
+*/}}
+{{- define "check-kafka-bootstrap-server-env" -}}
+  {{- $found := false -}}
+  {{- if hasKey .Values.gateway.env "KAFKA_BOOTSTRAP_SERVERS" }}
+      {{- $found = true -}}
+  {{- end }}
+  {{ $found }}
+{{- end -}}
+
+{{/*
+Helper function to check if KAFKA_BOOTSTRAP_SERVERS exists in gateway.extraSecretEnvVars
+*/}}
+{{- define "check-kafka-bootstrap-server-extraSecretEnvVars" -}}
+  {{- $found := false -}}
+  {{- range .Values.gateway.extraSecretEnvVars -}}
+    {{- if eq .name "KAFKA_BOOTSTRAP_SERVERS" -}}
+      {{- $found = true -}}
+    {{- end -}}
+  {{- end -}}
+  {{ $found }}
+{{- end -}}
+
+{{/*
+Helper function to check if KAFKA_BOOTSTRAP_SERVERS exists in gateway.env or gateway.extraSecretEnvVars.
+If it does not exist in either, or exists in both fail the chart.
 */}}
 {{- define "conduktor-gateway.kafka-bootstrap-server" -}}
-{{-   if .Values.kafka.enabled -}}
-{{-     printf "%s-kafka.%s.svc.%s:9092" .Release.Name .Release.Namespace (default "cluster.local" .Values.clusterDomain) -}}
-{{-   else -}}
-{{-     required "value .kafka.bootstrapServers is required" .Values.kafka.bootstrapServers -}}
-{{-   end -}}
+  {{- $foundEnv := include "check-kafka-bootstrap-server-env" . | fromYaml }}
+  {{- $foundExtraSecretEnvVars := include "check-kafka-bootstrap-server-extraSecretEnvVars" . | fromYaml }}
+  {{- printf "foundEnv: %t, foundExtraSecretEnvVars: %t" $foundEnv $foundExtraSecretEnvVars | quote -}}
+  {{- if and (not $foundEnv) (not $foundExtraSecretEnvVars) -}}
+    {{- fail "KAFKA_BOOTSTRAP_SERVERS is not set in gateway.env or gateway.extraSecretEnvVars" -}}
+  {{- end -}}
+  {{- if and $foundEnv $foundExtraSecretEnvVars -}}
+    {{- fail "KAFKA_BOOTSTRAP_SERVERS is set in both gateway.env and gateway.extraSecretEnvVars. Only define once." -}}
+  {{- end -}}
+  Valid
 {{- end -}}
 
 {{/*
