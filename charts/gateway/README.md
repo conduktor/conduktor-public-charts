@@ -176,14 +176,6 @@ Shared Kubernetes configuration of the chart.
 | `tolerations`                                 | Container tolerations                                            | `[]`   |
 | `affinity`                                    | Container affinity                                               | `{}`   |
 
-### Dependencies
-
-Enable and configure chart dependencies if not available in your deployment.
-
-| Name            | Description                                                                                                                       | Value   |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| `kafka.enabled` | NEVER USE IN PRODUCTION. Deploys a local 1 broker Kafka cluster alongside Gateway. This should only be used for testing purposes. | `false` |
-
 
 ## Example
 
