@@ -1,674 +1,112 @@
 {{- if .Values.tests.enabled }}
----
-# Source: kafka/templates/networkpolicy.yaml
-kind: NetworkPolicy
-apiVersion: networking.k8s.io/v1
-metadata:
-  name: kafka
-  namespace: "default"
-  labels:
-    app.kubernetes.io/instance: kafka
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kafka
-    app.kubernetes.io/version: 3.9.0
-    helm.sh/chart: kafka-31.3.1
-spec:
-  podSelector:
-    matchLabels:
-      app.kubernetes.io/instance: kafka
-      app.kubernetes.io/name: kafka
-  policyTypes:
-    - Ingress
-    - Egress
-  egress:
-    - {}
-  ingress:
-    # Allow client connections
-    - ports:
-        - port: 9092
-        - port: 9094
-        - port: 9093
----
-# Source: kafka/templates/broker/pdb.yaml
-apiVersion: policy/v1
-kind: PodDisruptionBudget
-metadata:
-  name: kafka-broker
-  namespace: "default"
-  labels:
-    app.kubernetes.io/instance: kafka
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kafka
-    app.kubernetes.io/version: 3.9.0
-    helm.sh/chart: kafka-31.3.1
-    app.kubernetes.io/component: broker
-    app.kubernetes.io/part-of: kafka
-spec:
-  maxUnavailable: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/instance: kafka
-      app.kubernetes.io/name: kafka
-      app.kubernetes.io/component: broker
-      app.kubernetes.io/part-of: kafka
----
-# Source: kafka/templates/controller-eligible/pdb.yaml
-apiVersion: policy/v1
-kind: PodDisruptionBudget
-metadata:
-  name: kafka-controller
-  namespace: "default"
-  labels:
-    app.kubernetes.io/instance: kafka
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kafka
-    app.kubernetes.io/version: 3.9.0
-    helm.sh/chart: kafka-31.3.1
-    app.kubernetes.io/component: controller-eligible
-    app.kubernetes.io/part-of: kafka
-spec:
-  maxUnavailable: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/instance: kafka
-      app.kubernetes.io/name: kafka
-      app.kubernetes.io/component: controller-eligible
-      app.kubernetes.io/part-of: kafka
----
-# Source: kafka/templates/provisioning/serviceaccount.yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: kafka-provisioning
-  namespace: "default"
-  labels:
-    app.kubernetes.io/instance: kafka
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kafka
-    app.kubernetes.io/version: 3.9.0
-    helm.sh/chart: kafka-31.3.1
-automountServiceAccountToken: false
----
-# Source: kafka/templates/rbac/serviceaccount.yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: kafka
-  namespace: "default"
-  labels:
-    app.kubernetes.io/instance: kafka
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kafka
-    app.kubernetes.io/version: 3.9.0
-    helm.sh/chart: kafka-31.3.1
-    app.kubernetes.io/component: kafka
-automountServiceAccountToken: false
----
-# Source: kafka/templates/secrets.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: kafka-user-passwords
-  namespace: "default"
-  labels:
-    app.kubernetes.io/instance: kafka
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kafka
-    app.kubernetes.io/version: 3.9.0
-    helm.sh/chart: kafka-31.3.1
-type: Opaque
-data:
-  client-passwords: "WGVyaVU1ZXYyMw=="
-  system-user-password: "WGVyaVU1ZXYyMw=="
-  inter-broker-password: "RU9aM1poT0VUbw=="
-  controller-password: "UFBXRk44eXhaZg=="
----
-# Source: kafka/templates/secrets.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: kafka-kraft-cluster-id
-  namespace: "default"
-  labels:
-    app.kubernetes.io/instance: kafka
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kafka
-    app.kubernetes.io/version: 3.9.0
-    helm.sh/chart: kafka-31.3.1
-type: Opaque
-data:
-  kraft-cluster-id: "RGN0THVpcEVzSG5mbnpQUXlGZ0E5Uw=="
----
-# Source: kafka/templates/controller-eligible/configmap.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: kafka-controller-configuration
-  namespace: "default"
-  labels:
-    app.kubernetes.io/instance: kafka
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kafka
-    app.kubernetes.io/version: 3.9.0
-    helm.sh/chart: kafka-31.3.1
-    app.kubernetes.io/component: controller-eligible
-    app.kubernetes.io/part-of: kafka
-data:
-  server.properties: |-
-    # Listeners configuration
-    listeners=CLIENT://:9092,INTERNAL://:9094,CONTROLLER://:9093
-    advertised.listeners=CLIENT://advertised-address-placeholder:9092,INTERNAL://advertised-address-placeholder:9094
-    listener.security.protocol.map=CLIENT:SASL_PLAINTEXT,INTERNAL:SASL_PLAINTEXT,CONTROLLER:SASL_PLAINTEXT
-    # KRaft process roles
-    process.roles=controller,broker
-    #node.id=
-    controller.listener.names=CONTROLLER
-    controller.quorum.voters=0@kafka-controller-0.kafka-controller-headless.default.svc.cluster.local:9093,1@kafka-controller-1.kafka-controller-headless.default.svc.cluster.local:9093,2@kafka-controller-2.kafka-controller-headless.default.svc.cluster.local:9093
-    # Kraft Controller listener SASL settings
-    sasl.mechanism.controller.protocol=PLAIN
-    listener.name.controller.sasl.enabled.mechanisms=PLAIN
-    listener.name.controller.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="controller_user" password="controller-password-placeholder" user_controller_user="controller-password-placeholder";
-    # Kafka data logs directory
-    log.dir=/bitnami/kafka/data
-    # Kafka application logs directory
-    logs.dir=/opt/bitnami/kafka/logs
-
-    # Common Kafka Configuration
-    
-    sasl.enabled.mechanisms=PLAIN,SCRAM-SHA-256,SCRAM-SHA-512
-    # Interbroker configuration
-    inter.broker.listener.name=INTERNAL
-    sasl.mechanism.inter.broker.protocol=PLAIN
-    # Listeners SASL JAAS configuration
-    listener.name.client.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required user_user1="password-placeholder-0";
-    listener.name.client.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required;
-    listener.name.client.scram-sha-512.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required;
-    listener.name.internal.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="inter_broker_user" password="interbroker-password-placeholder" user_inter_broker_user="interbroker-password-placeholder" user_user1="password-placeholder-0";
-    listener.name.internal.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="inter_broker_user" password="interbroker-password-placeholder";
-    listener.name.internal.scram-sha-512.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="inter_broker_user" password="interbroker-password-placeholder";
-    # End of SASL JAAS configuration
-
-    # Custom Kafka Configuration
----
-# Source: kafka/templates/scripts-configmap.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: kafka-scripts
-  namespace: "default"
-  labels:
-    app.kubernetes.io/instance: kafka
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kafka
-    app.kubernetes.io/version: 3.9.0
-    helm.sh/chart: kafka-31.3.1
-data:
-  kafka-init.sh: |-
-    #!/bin/bash
-
-    set -o errexit
-    set -o nounset
-    set -o pipefail
-
-    error(){
-      local message="${1:?missing message}"
-      echo "ERROR: ${message}"
-      exit 1
-    }
-
-    retry_while() {
-        local -r cmd="${1:?cmd is missing}"
-        local -r retries="${2:-12}"
-        local -r sleep_time="${3:-5}"
-        local return_value=1
-
-        read -r -a command <<< "$cmd"
-        for ((i = 1 ; i <= retries ; i+=1 )); do
-            "${command[@]}" && return_value=0 && break
-            sleep "$sleep_time"
-        done
-        return $return_value
-    }
-
-    replace_in_file() {
-        local filename="${1:?filename is required}"
-        local match_regex="${2:?match regex is required}"
-        local substitute_regex="${3:?substitute regex is required}"
-        local posix_regex=${4:-true}
-
-        local result
-
-        # We should avoid using 'sed in-place' substitutions
-        # 1) They are not compatible with files mounted from ConfigMap(s)
-        # 2) We found incompatibility issues with Debian10 and "in-place" substitutions
-        local -r del=$'\001' # Use a non-printable character as a 'sed' delimiter to avoid issues
-        if [[ $posix_regex = true ]]; then
-            result="$(sed -E "s${del}${match_regex}${del}${substitute_regex}${del}g" "$filename")"
-        else
-            result="$(sed "s${del}${match_regex}${del}${substitute_regex}${del}g" "$filename")"
-        fi
-        echo "$result" > "$filename"
-    }
-
-    kafka_conf_set() {
-        local file="${1:?missing file}"
-        local key="${2:?missing key}"
-        local value="${3:?missing value}"
-
-        # Check if the value was set before
-        if grep -q "^[#\\s]*$key\s*=.*" "$file"; then
-            # Update the existing key
-            replace_in_file "$file" "^[#\\s]*${key}\s*=.*" "${key}=${value}" false
-        else
-            # Add a new key
-            printf '\n%s=%s' "$key" "$value" >>"$file"
-        fi
-    }
-
-    replace_placeholder() {
-      local placeholder="${1:?missing placeholder value}"
-      local password="${2:?missing password value}"
-      local -r del=$'\001' # Use a non-printable character as a 'sed' delimiter to avoid issues with delimiter symbols in sed string
-      sed -i "s${del}$placeholder${del}$password${del}g" "$KAFKA_CONFIG_FILE"
-    }
-
-    append_file_to_kafka_conf() {
-        local file="${1:?missing source file}"
-        local conf="${2:?missing kafka conf file}"
-
-        cat "$1" >> "$2"
-    }
-
-    configure_external_access() {
-      # Configure external hostname
-      if [[ -f "/shared/external-host.txt" ]]; then
-        host=$(cat "/shared/external-host.txt")
-      elif [[ -n "${EXTERNAL_ACCESS_HOST:-}" ]]; then
-        host="$EXTERNAL_ACCESS_HOST"
-      elif [[ -n "${EXTERNAL_ACCESS_HOSTS_LIST:-}" ]]; then
-        read -r -a hosts <<<"$(tr ',' ' ' <<<"${EXTERNAL_ACCESS_HOSTS_LIST}")"
-        host="${hosts[$POD_ID]}"
-      elif [[ "$EXTERNAL_ACCESS_HOST_USE_PUBLIC_IP" =~ ^(yes|true)$ ]]; then
-        host=$(curl -s https://ipinfo.io/ip)
-      else
-        error "External access hostname not provided"
-      fi
-
-      # Configure external port
-      if [[ -f "/shared/external-port.txt" ]]; then
-        port=$(cat "/shared/external-port.txt")
-      elif [[ -n "${EXTERNAL_ACCESS_PORT:-}" ]]; then
-        if [[ "${EXTERNAL_ACCESS_PORT_AUTOINCREMENT:-}" =~ ^(yes|true)$ ]]; then
-          port="$((EXTERNAL_ACCESS_PORT + POD_ID))"
-        else
-          port="$EXTERNAL_ACCESS_PORT"
-        fi
-      elif [[ -n "${EXTERNAL_ACCESS_PORTS_LIST:-}" ]]; then
-        read -r -a ports <<<"$(tr ',' ' ' <<<"${EXTERNAL_ACCESS_PORTS_LIST}")"
-        port="${ports[$POD_ID]}"
-      else
-        error "External access port not provided"
-      fi
-      # Configure Kafka advertised listeners
-      sed -i -E "s|^(advertised\.listeners=\S+)$|\1,EXTERNAL://${host}:${port}|" "$KAFKA_CONFIG_FILE"
-    }
-    configure_kafka_sasl() {
-
-      # Replace placeholders with passwords
-      replace_placeholder "interbroker-password-placeholder" "$KAFKA_INTER_BROKER_PASSWORD"
-      replace_placeholder "controller-password-placeholder" "$KAFKA_CONTROLLER_PASSWORD"
-      read -r -a passwords <<<"$(tr ',;' ' ' <<<"${KAFKA_CLIENT_PASSWORDS:-}")"
-      for ((i = 0; i < ${#passwords[@]}; i++)); do
-          replace_placeholder "password-placeholder-${i}\"" "${passwords[i]}\""
-      done
-    }
-
-    export KAFKA_CONFIG_FILE=/config/server.properties
-    cp /configmaps/server.properties $KAFKA_CONFIG_FILE
-
-    # Get pod ID and role, last and second last fields in the pod name respectively
-    POD_ID=$(echo "$MY_POD_NAME" | rev | cut -d'-' -f 1 | rev)
-    POD_ROLE=$(echo "$MY_POD_NAME" | rev | cut -d'-' -f 2 | rev)
-
-    # Configure node.id and/or broker.id
-    if [[ -f "/bitnami/kafka/data/meta.properties" ]]; then
-        if grep -q "broker.id" /bitnami/kafka/data/meta.properties; then
-          ID="$(grep "broker.id" /bitnami/kafka/data/meta.properties | awk -F '=' '{print $2}')"
-          kafka_conf_set "$KAFKA_CONFIG_FILE" "node.id" "$ID"
-        else
-          ID="$(grep "node.id" /bitnami/kafka/data/meta.properties | awk -F '=' '{print $2}')"
-          kafka_conf_set "$KAFKA_CONFIG_FILE" "node.id" "$ID"
-        fi
-    else
-        ID=$((POD_ID + KAFKA_MIN_ID))
-        kafka_conf_set "$KAFKA_CONFIG_FILE" "node.id" "$ID"
-    fi
-    replace_placeholder "advertised-address-placeholder" "${MY_POD_NAME}.kafka-${POD_ROLE}-headless.default.svc.cluster.local"
-    if [[ "${EXTERNAL_ACCESS_ENABLED:-false}" =~ ^(yes|true)$ ]]; then
-      configure_external_access
-    fi
-    configure_kafka_sasl
-    if [ -f /secret-config/server-secret.properties ]; then
-      append_file_to_kafka_conf /secret-config/server-secret.properties $KAFKA_CONFIG_FILE
-    fi
----
-# Source: kafka/templates/controller-eligible/svc-headless.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: kafka-controller-headless
-  namespace: "default"
-  labels:
-    app.kubernetes.io/instance: kafka
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kafka
-    app.kubernetes.io/version: 3.9.0
-    helm.sh/chart: kafka-31.3.1
-    app.kubernetes.io/component: controller-eligible
-    app.kubernetes.io/part-of: kafka
-spec:
-  type: ClusterIP
-  clusterIP: None
-  publishNotReadyAddresses: true
-  ports:
-    - name: tcp-interbroker
-      port: 9094
-      protocol: TCP
-      targetPort: interbroker
-    - name: tcp-client
-      port: 9092
-      protocol: TCP
-      targetPort: client
-    - name: tcp-controller
-      protocol: TCP
-      port: 9093
-      targetPort: controller
-  selector:
-    app.kubernetes.io/instance: kafka
-    app.kubernetes.io/name: kafka
-    app.kubernetes.io/component: controller-eligible
-    app.kubernetes.io/part-of: kafka
----
-# Source: kafka/templates/svc.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: kafka
-  namespace: "default"
-  labels:
-    app.kubernetes.io/instance: kafka
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kafka
-    app.kubernetes.io/version: 3.9.0
-    helm.sh/chart: kafka-31.3.1
-    app.kubernetes.io/component: kafka
-spec:
-  type: ClusterIP
-  sessionAffinity: None
-  ports:
-    - name: tcp-client
-      port: 9092
-      protocol: TCP
-      targetPort: client
-      nodePort: null
-  selector:
-    app.kubernetes.io/instance: kafka
-    app.kubernetes.io/name: kafka
-    app.kubernetes.io/part-of: kafka
----
-# Source: kafka/templates/controller-eligible/statefulset.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: kafka-controller
-  namespace: "default"
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-99"
   labels:
-    app.kubernetes.io/instance: kafka
-    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kafka
-    app.kubernetes.io/version: 3.9.0
-    helm.sh/chart: kafka-31.3.1
-    app.kubernetes.io/component: controller-eligible
-    app.kubernetes.io/part-of: kafka
+    app.kubernetes.io/instance: kafka
+  name: kafka
 spec:
-  podManagementPolicy: Parallel
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/instance: kafka
       app.kubernetes.io/name: kafka
-      app.kubernetes.io/component: controller-eligible
-      app.kubernetes.io/part-of: kafka
-  serviceName: kafka-controller-headless
-  updateStrategy:
-    type: RollingUpdate
+      app.kubernetes.io/instance: kafka
+  serviceName: kafka-hl
   template:
     metadata:
       labels:
-        app.kubernetes.io/instance: kafka
-        app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: kafka
-        app.kubernetes.io/version: 3.9.0
-        helm.sh/chart: kafka-31.3.1
-        app.kubernetes.io/component: controller-eligible
-        app.kubernetes.io/part-of: kafka
-      annotations:
-        checksum/configuration: 87540d3286f1f8c07254ce6e34bff4018bb0e34bd8544c210183ee2d0215768d
-        checksum/passwords-secret: 2989eb613ea00c786d55a53aac07564f51f61ff8d7825f2827cb1a501e53798c
+        app.kubernetes.io/instance: kafka
+      name: kafka
     spec:
-      
-      automountServiceAccountToken: false
-      hostNetwork: false
-      hostIPC: false
-      affinity:
-        podAffinity:
-          
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - podAffinityTerm:
-                labelSelector:
-                  matchLabels:
-                    app.kubernetes.io/instance: kafka
-                    app.kubernetes.io/name: kafka
-                    app.kubernetes.io/component: controller-eligible
-                topologyKey: kubernetes.io/hostname
-              weight: 1
-        nodeAffinity:
-          
-      securityContext:
-        fsGroup: 1001
-        fsGroupChangePolicy: Always
-        seccompProfile:
-          type: RuntimeDefault
-        supplementalGroups: []
-        sysctls: []
-      serviceAccountName: kafka
-      enableServiceLinks: true
-      initContainers:
-        - name: kafka-init
-          image: docker.io/bitnami/kafka:3.9.0-debian-12-r6
-          imagePullPolicy: IfNotPresent
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-              - ALL
-            readOnlyRootFilesystem: true
-            runAsGroup: 1001
-            runAsNonRoot: true
-            runAsUser: 1001
-            seLinuxOptions: {}
-          resources:
-            limits: {}
-            requests: {} 
-          command:
-            - /bin/bash
-          args:
-            - -ec
-            - |
-              /scripts/kafka-init.sh
-          env:
-            - name: BITNAMI_DEBUG
-              value: "false"
-            - name: MY_POD_NAME
-              valueFrom:
-                fieldRef:
-                    fieldPath: metadata.name
-            - name: KAFKA_VOLUME_DIR
-              value: "/bitnami/kafka"
-            - name: KAFKA_MIN_ID
-              value: "0"
-            - name: KAFKA_CLIENT_USERS
-              value: "user1"
-            - name: KAFKA_CLIENT_PASSWORDS
-              valueFrom:
-                secretKeyRef:
-                  name: kafka-user-passwords
-                  key: client-passwords
-            - name: KAFKA_INTER_BROKER_USER
-              value: "inter_broker_user"
-            - name: KAFKA_INTER_BROKER_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: kafka-user-passwords
-                  key: inter-broker-password
-            - name: KAFKA_CONTROLLER_USER
-              value: "controller_user"
-            - name: KAFKA_CONTROLLER_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: kafka-user-passwords
-                  key: controller-password
-          volumeMounts:
-            - name: data
-              mountPath: /bitnami/kafka
-            - name: kafka-config
-              mountPath: /config
-            - name: kafka-configmaps
-              mountPath: /configmaps
-            - name: kafka-secret-config
-              mountPath: /secret-config
-            - name: scripts
-              mountPath: /scripts
-            - name: tmp
-              mountPath: /tmp
       containers:
         - name: kafka
-          image: docker.io/bitnami/kafka:3.9.0-debian-12-r6
-          imagePullPolicy: "IfNotPresent"
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-              - ALL
-            readOnlyRootFilesystem: true
-            runAsGroup: 1001
-            runAsNonRoot: true
-            runAsUser: 1001
-            seLinuxOptions: {}
+          image: docker.io/bitnami/kafka:3.1.0-debian-11-r0
+          imagePullPolicy: IfNotPresent
           env:
             - name: BITNAMI_DEBUG
               value: "false"
-            - name: KAFKA_HEAP_OPTS
-              value: "-Xmx1024m -Xms1024m"
-            - name: KAFKA_KRAFT_CLUSTER_ID
-              valueFrom:
-                secretKeyRef:
-                  name: kafka-kraft-cluster-id
-                  key: kraft-cluster-id
-            - name: KAFKA_KRAFT_BOOTSTRAP_SCRAM_USERS
-              value: "true"
-            - name: KAFKA_CLIENT_USERS
-              value: "user1"
-            - name: KAFKA_CLIENT_PASSWORDS
-              valueFrom:
-                secretKeyRef:
-                  name: kafka-user-passwords
-                  key: client-passwords
-            - name: KAFKA_INTER_BROKER_USER
-              value: "inter_broker_user"
-            - name: KAFKA_INTER_BROKER_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: kafka-user-passwords
-                  key: inter-broker-password
-            - name: KAFKA_CONTROLLER_USER
-              value: "controller_user"
-            - name: KAFKA_CONTROLLER_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: kafka-user-passwords
-                  key: controller-password
+            - name: KAFKA_CFG_NODE_ID
+              value: "0"
+            - name: KAFKA_CFG_PROCESS_ROLES
+              value: "broker,controller"
+            - name: KAFKA_CFG_LISTENERS
+              value: "PLAINTEXT://:9092,CONTROLLER://:9093"
+            - name: KAFKA_CFG_ADVERTISED_LISTENERS
+              value: "PLAINTEXT://kafka:9092"
+            - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
+              value: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT"
+            - name: KAFKA_CFG_CONTROLLER_QUORUM_VOTERS
+              value: "0@kafka:9093"
+            - name: KAFKA_CFG_INTER_BROKER_LISTENER_NAME
+              value: "PLAINTEXT"
+            - name: KAFKA_CFG_DEFAULT_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+              value: "1"
           ports:
+            - name: kafka
+              containerPort: 9092
+              protocol: TCP
             - name: controller
               containerPort: 9093
-            - name: client
-              containerPort: 9092
-            - name: interbroker
-              containerPort: 9094
+              protocol: TCP
           livenessProbe:
-            failureThreshold: 3
+            tcpSocket:
+              port: 9092
             initialDelaySeconds: 10
             periodSeconds: 10
-            successThreshold: 1
             timeoutSeconds: 5
-            exec:
-              command:
-                - pgrep
-                - -f
-                - kafka
+            failureThreshold: 5
           readinessProbe:
-            failureThreshold: 6
+            tcpSocket:
+              port: 9092
             initialDelaySeconds: 5
             periodSeconds: 10
-            successThreshold: 1
             timeoutSeconds: 5
-            tcpSocket:
-              port: "controller"
-          resources:
-            limits:
-              cpu: 750m
-              ephemeral-storage: 2Gi
-              memory: 768Mi
-            requests:
-              cpu: 500m
-              ephemeral-storage: 50Mi
-              memory: 512Mi
+            failureThreshold: 5
           volumeMounts:
-            - name: data
+            - name: kafka-data
               mountPath: /bitnami/kafka
-            - name: logs
-              mountPath: /opt/bitnami/kafka/logs
-            - name: kafka-config
-              mountPath: /opt/bitnami/kafka/config/server.properties
-              subPath: server.properties
-            - name: tmp
-              mountPath: /tmp
+      restartPolicy: Always
+      securityContext:
+        fsGroup: 1001
+      terminationGracePeriodSeconds: 0
       volumes:
-        - name: kafka-configmaps
-          configMap:
-            name: kafka-controller-configuration
-        - name: kafka-secret-config
-          emptyDir: {}
-        - name: kafka-config
-          emptyDir: {}
-        - name: tmp
-          emptyDir: {}
-        - name: scripts
-          configMap:
-            name: kafka-scripts
-            defaultMode: 493
-        - name: logs
-          emptyDir: {}
-  volumeClaimTemplates:
-    - apiVersion: v1
-      kind: PersistentVolumeClaim
-      metadata:
-        name: data
-      spec:
-        accessModes:
-          - "ReadWriteOnce"
-        resources:
-          requests:
-            storage: "8Gi"
+        - emptyDir:
+            medium: Memory
+          name: kafka-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-99"
+  labels:
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/instance: kafka
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+  name: kafka
+spec:
+  ports:
+    - name: kafka
+      port: 9092
+      protocol: TCP
+      targetPort: 9092
+    - name: controller
+      port: 9093
+      protocol: TCP
+      targetPort: 9093
+  publishNotReadyAddresses: true
+  selector:
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/instance: kafka
+  type: ClusterIP
 {{- end }}
