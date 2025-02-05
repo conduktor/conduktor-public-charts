@@ -4,6 +4,10 @@ gateway:
   admin:
     port: 8888
 
+  env:
+    KAFKA_BOOTSTRAP_SERVERS: test-kafka.ct.svc.cluster.local:9092
+
+
 ingress:
   enabled: true
   ingressClassName: "nginx"
