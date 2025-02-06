@@ -6,82 +6,109 @@ metadata:
     "helm.sh/hook": pre-install
     "helm.sh/hook-weight": "-99"
   labels:
-    app.kubernetes.io/name: kafka
+    app.kubernetes.io/component: kafka
     app.kubernetes.io/instance: kafka
+    app.kubernetes.io/name: kafka
   name: kafka
 spec:
-  replicas: 1
+  replicas: 3
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app.kubernetes.io/name: kafka
+      app.kubernetes.io/component: kafka
       app.kubernetes.io/instance: kafka
+      app.kubernetes.io/name: kafka
   serviceName: kafka-hl
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: kafka
+        app.kubernetes.io/component: kafka
         app.kubernetes.io/instance: kafka
+        app.kubernetes.io/name: kafka
       name: kafka
     spec:
       containers:
-        - name: kafka
-          image: docker.io/bitnami/kafka:3.1.0-debian-11-r0
-          imagePullPolicy: IfNotPresent
-          env:
+        - env:
             - name: BITNAMI_DEBUG
               value: "false"
-            - name: KAFKA_CFG_NODE_ID
+            - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+              value: "PLAINTEXT:SASL_PLAINTEXT,SSL:SASL_SSL"
+            - name: KAFKA_LISTENER_SECURITY_PROTOCOL
+              value: "SASL_SSL"
+            - name: KAFKA_ADVERTISED_LISTENER
+              value: "SASL_SSL://{{ .Values.kafka.host }}:9093"
+            - name: KAFKA_LISTENER_NAME_SASL_SSL
+              value: "SASL_SSL"
+            - name: KAFKA_LISTENER_PORT_SASL_SSL
+              value: "9093"
+            - name: KAFKA_LISTENER_SECURITY_PROTOCOL_SASL_SSL
+              value: "SASL_SSL"
+            - name: KAFKA_SASL_MECHANISM
+              value: "PLAIN"
+            - name: KAFKA_SASL_JAAS_CONFIG
+              value: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"{{ .Values.kafka.username }}\" password=\"{{ .Values.kafka.password }}\";"
+            - name: KAFKA_ZOOKEEPER_CONNECT
+              value: "{{ .Values.kafka.zookeeper.host }}:2181"
+            - name: KAFKA_ZOOKEEPER_CHROOT
+              value: "/kafka"
+            - name: KAFKA_BROKER_ID
               value: "0"
-            - name: KAFKA_CFG_PROCESS_ROLES
-              value: "broker,controller"
-            - name: KAFKA_CFG_LISTENERS
-              value: "PLAINTEXT://:9092,CONTROLLER://:9093"
-            - name: KAFKA_CFG_ADVERTISED_LISTENERS
-              value: "PLAINTEXT://kafka:9092"
-            - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
-              value: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT"
-            - name: KAFKA_CFG_CONTROLLER_QUORUM_VOTERS
-              value: "0@kafka:9093"
-            - name: KAFKA_CFG_INTER_BROKER_LISTENER_NAME
+            - name: KAFKA_LISTENER_NAME_PLAINTEXT
               value: "PLAINTEXT"
-            - name: KAFKA_CFG_DEFAULT_REPLICATION_FACTOR
-              value: "1"
-            - name: KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR
-              value: "1"
-            - name: KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
-              value: "1"
-          ports:
-            - name: kafka
-              containerPort: 9092
-              protocol: TCP
-            - name: controller
-              containerPort: 9093
-              protocol: TCP
+            - name: KAFKA_PORT
+              value: "9092"
+            - name: KAFKA_LISTENER_PORT_PLAINTEXT
+              value: "9092"
+            - name: KAFKA_ADVERTISED_LISTENER_PLAINTEXT
+              value: "PLAINTEXT://{{ .Values.kafka.host }}:9092"
+          image: docker.io/bitnami/kafka:3.9.0-debian-12-r1
+          imagePullPolicy: IfNotPresent
           livenessProbe:
-            tcpSocket:
-              port: 9092
-            initialDelaySeconds: 10
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec kafka-server-start.sh /opt/bitnami/kafka/config/server.properties
+            failureThreshold: 6
+            initialDelaySeconds: 30
             periodSeconds: 10
+            successThreshold: 1
             timeoutSeconds: 5
-            failureThreshold: 5
+          name: kafka
+          ports:
+            - containerPort: 9092
+              name: tcp-kafka
+              protocol: TCP
+            - containerPort: 9093
+              name: tcp-kafka-secure
+              protocol: TCP
           readinessProbe:
-            tcpSocket:
-              port: 9092
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - "kafka-topics.sh --zookeeper {{ .Values.kafka.zookeeper.host }}:2181 --list"
+            failureThreshold: 6
             initialDelaySeconds: 5
             periodSeconds: 10
+            successThreshold: 1
             timeoutSeconds: 5
-            failureThreshold: 5
-          volumeMounts:
-            - name: kafka-data
-              mountPath: /bitnami/kafka
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+          securityContext:
+            runAsUser: 1001
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
       restartPolicy: Always
       securityContext:
         fsGroup: 1001
       terminationGracePeriodSeconds: 0
-      volumes:
-        - emptyDir:
-            medium: Memory
-          name: kafka-data
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+    type: RollingUpdate
 ---
 apiVersion: v1
 kind: Service
@@ -90,23 +117,23 @@ metadata:
     "helm.sh/hook": pre-install
     "helm.sh/hook-weight": "-99"
   labels:
-    app.kubernetes.io/name: kafka
     app.kubernetes.io/instance: kafka
+    app.kubernetes.io/name: kafka
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
-  name: kafka
+  name: kafka-hl
 spec:
   ports:
-    - name: kafka
+    - name: tcp-kafka
       port: 9092
       protocol: TCP
-      targetPort: 9092
-    - name: controller
+      targetPort: tcp-kafka
+    - name: tcp-kafka-secure
       port: 9093
       protocol: TCP
-      targetPort: 9093
+      targetPort: tcp-kafka-secure
   publishNotReadyAddresses: true
   selector:
-    app.kubernetes.io/name: kafka
     app.kubernetes.io/instance: kafka
+    app.kubernetes.io/name: kafka
   type: ClusterIP
 {{- end }}
