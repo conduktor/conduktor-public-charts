@@ -1,4 +1,3 @@
-{{- if .Values.tests.enabled }}
 {{- $internalServiceName := include "conduktor-gateway.internalServiceName" . -}}
 {{- $internalServicePort := .Values.gateway.admin.port -}}
 {{- $internalHealthUrl := printf "http://%v:%v/health" $internalServiceName $internalServicePort -}}
@@ -23,4 +22,3 @@ spec:
       args: [ '--insecure', "--verbose" ,'{{ $externalHealthUrl }}']
 {{- end }}
   restartPolicy: Never
-{{- end }}
