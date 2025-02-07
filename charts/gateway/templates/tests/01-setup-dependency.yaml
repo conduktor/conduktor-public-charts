@@ -64,9 +64,6 @@ kind: PodDisruptionBudget
 metadata:
   name: kafka-controller
   namespace: "default"
-  annotations:
-    "helm.sh/hook": pre-install
-    "helm.sh/hook-weight": "-99"
   labels:
     app.kubernetes.io/instance: kafka
     app.kubernetes.io/managed-by: Helm
@@ -136,10 +133,7 @@ metadata:
     helm.sh/chart: kafka-31.0.0
 type: Opaque
 data:
-  client-passwords: "RWllenRIdElsaQ=="
-  system-user-password: "RWllenRIdElsaQ=="
-  inter-broker-password: "YmdZNGFUWm45Qw=="
-  controller-password: "dDFqVHJ4NTQ1Nw=="
+  inter-broker-password: "MEVaZnMwUFYyVQ=="
 ---
 # Source: kafka/templates/secrets.yaml
 apiVersion: v1
@@ -158,7 +152,7 @@ metadata:
     helm.sh/chart: kafka-31.0.0
 type: Opaque
 data:
-  kraft-cluster-id: "Q1lua1Z1Unh0NUY3Y1lPMUgwZVZsaw=="
+  kraft-cluster-id: "RnNYb2tvSkgxZjU2YWJlMFpUWmZ4Sg=="
 ---
 # Source: kafka/templates/controller-eligible/configmap.yaml
 apiVersion: v1
@@ -182,16 +176,12 @@ data:
     # Listeners configuration
     listeners=CLIENT://:9092,INTERNAL://:9094,CONTROLLER://:9093
     advertised.listeners=CLIENT://advertised-address-placeholder:9092,INTERNAL://advertised-address-placeholder:9094
-    listener.security.protocol.map=CLIENT:SASL_PLAINTEXT,INTERNAL:SASL_PLAINTEXT,CONTROLLER:SASL_PLAINTEXT
+    listener.security.protocol.map=CLIENT:PLAINTEXT,INTERNAL:SASL_PLAINTEXT,CONTROLLER:PLAINTEXT
     # KRaft process roles
     process.roles=controller,broker
     #node.id=
     controller.listener.names=CONTROLLER
-    controller.quorum.voters=0@kafka-controller-0.kafka-controller-headless.default.svc.cluster.local:9093,1@kafka-controller-1.kafka-controller-headless.default.svc.cluster.local:9093,2@kafka-controller-2.kafka-controller-headless.default.svc.cluster.local:9093
-    # Kraft Controller listener SASL settings
-    sasl.mechanism.controller.protocol=PLAIN
-    listener.name.controller.sasl.enabled.mechanisms=PLAIN
-    listener.name.controller.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="controller_user" password="controller-password-placeholder" user_controller_user="controller-password-placeholder";
+    controller.quorum.voters=0@kafka-controller-0.kafka-controller-headless.default.svc.cluster.local:9093
     # Kafka data logs directory
     log.dir=/bitnami/kafka/data
     # Kafka application logs directory
@@ -204,15 +194,15 @@ data:
     inter.broker.listener.name=INTERNAL
     sasl.mechanism.inter.broker.protocol=PLAIN
     # Listeners SASL JAAS configuration
-    listener.name.client.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required user_user1="password-placeholder-0";
-    listener.name.client.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required;
-    listener.name.client.scram-sha-512.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required;
     listener.name.internal.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="inter_broker_user" password="interbroker-password-placeholder" user_inter_broker_user="interbroker-password-placeholder" user_user1="password-placeholder-0";
     listener.name.internal.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="inter_broker_user" password="interbroker-password-placeholder";
     listener.name.internal.scram-sha-512.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="inter_broker_user" password="interbroker-password-placeholder";
     # End of SASL JAAS configuration
 
     # Custom Kafka Configuration
+    default.replication.factor=1
+    offsets.topic.replication.factor=1
+    transaction.state.log.replication.factor=1
 ---
 # Source: kafka/templates/scripts-configmap.yaml
 apiVersion: v1
@@ -343,11 +333,6 @@ data:
 
       # Replace placeholders with passwords
       replace_placeholder "interbroker-password-placeholder" "$KAFKA_INTER_BROKER_PASSWORD"
-      replace_placeholder "controller-password-placeholder" "$KAFKA_CONTROLLER_PASSWORD"
-      read -r -a passwords <<<"$(tr ',;' ' ' <<<"${KAFKA_CLIENT_PASSWORDS:-}")"
-      for ((i = 0; i < ${#passwords[@]}; i++)); do
-          replace_placeholder "password-placeholder-${i}\"" "${passwords[i]}\""
-      done
     }
 
     export KAFKA_CONFIG_FILE=/config/server.properties
@@ -468,7 +453,7 @@ metadata:
     app.kubernetes.io/part-of: kafka
 spec:
   podManagementPolicy: Parallel
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/instance: kafka
@@ -489,8 +474,8 @@ spec:
         app.kubernetes.io/component: controller-eligible
         app.kubernetes.io/part-of: kafka
       annotations:
-        checksum/configuration: 6140b072db45383250f1b16af341b469e6282fb713d50485d2de1ff5d405f821
-        checksum/passwords-secret: 04a6b725816d156e1b3d2e25a6b868b30fcc49f6885ee4620a9cb0c274e834b2
+        checksum/configuration: 2fd3af7672fd5fa213942227bd308a52b0eb8113bea44d273e362f2d63362179
+        checksum/passwords-secret: 2f6b3eada0ce0a52ce1c4f265fb2957c9b1ac188ad439a17f41bd9b0ec9956d2
     spec:
       
       automountServiceAccountToken: false
@@ -554,13 +539,6 @@ spec:
               value: "/bitnami/kafka"
             - name: KAFKA_MIN_ID
               value: "0"
-            - name: KAFKA_CLIENT_USERS
-              value: "user1"
-            - name: KAFKA_CLIENT_PASSWORDS
-              valueFrom:
-                secretKeyRef:
-                  name: kafka-user-passwords
-                  key: client-passwords
             - name: KAFKA_INTER_BROKER_USER
               value: "inter_broker_user"
             - name: KAFKA_INTER_BROKER_PASSWORD
@@ -568,13 +546,6 @@ spec:
                 secretKeyRef:
                   name: kafka-user-passwords
                   key: inter-broker-password
-            - name: KAFKA_CONTROLLER_USER
-              value: "controller_user"
-            - name: KAFKA_CONTROLLER_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: kafka-user-passwords
-                  key: controller-password
           volumeMounts:
             - name: data
               mountPath: /bitnami/kafka
@@ -614,13 +585,6 @@ spec:
                   key: kraft-cluster-id
             - name: KAFKA_KRAFT_BOOTSTRAP_SCRAM_USERS
               value: "true"
-            - name: KAFKA_CLIENT_USERS
-              value: "user1"
-            - name: KAFKA_CLIENT_PASSWORDS
-              valueFrom:
-                secretKeyRef:
-                  name: kafka-user-passwords
-                  key: client-passwords
             - name: KAFKA_INTER_BROKER_USER
               value: "inter_broker_user"
             - name: KAFKA_INTER_BROKER_PASSWORD
@@ -628,13 +592,6 @@ spec:
                 secretKeyRef:
                   name: kafka-user-passwords
                   key: inter-broker-password
-            - name: KAFKA_CONTROLLER_USER
-              value: "controller_user"
-            - name: KAFKA_CONTROLLER_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: kafka-user-passwords
-                  key: controller-password
           ports:
             - name: controller
               containerPort: 9093
@@ -694,17 +651,8 @@ spec:
           configMap:
             name: kafka-scripts
             defaultMode: 493
+        - name: data
+          emptyDir: {}
         - name: logs
           emptyDir: {}
-  volumeClaimTemplates:
-    - apiVersion: v1
-      kind: PersistentVolumeClaim
-      metadata:
-        name: data
-      spec:
-        accessModes:
-          - "ReadWriteOnce"
-        resources:
-          requests:
-            storage: "8Gi"
 {{- end }}
