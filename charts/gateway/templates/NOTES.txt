@@ -14,6 +14,8 @@ You defined a specific domain to be advertised : {{ .Values.gateway.env.GATEWAY_
 You'll need to configure your network connections to gateway with this domain.
 {{- end }}
 
+{{- include "conduktor-gateway.kafka-bootstrap-server" . }}
+
 {{ if .Values.ingress.enabled -}}
 {{- $proto := ternary "https" "http" .Values.ingress.tls }}
 Admin API is available from outside yor cluster at {{ printf "%s://%s" $proto .Values.ingress.hostname }}.

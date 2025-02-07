@@ -20,7 +20,6 @@ spec:
         {{- with .Values.gateway.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        kafka-bootstrap-check: {{ include "conduktor-gateway.kafka-bootstrap-server" . | quote }}
       labels: {{ include "conduktor-gateway.labels" . | nindent 8 }}
       {{- if .Values.gateway.podLabels }}
       {{- toYaml .Values.gateway.podLabels | nindent 8 }}

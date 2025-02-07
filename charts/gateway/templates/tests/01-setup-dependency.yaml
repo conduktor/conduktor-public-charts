@@ -64,6 +64,9 @@ kind: PodDisruptionBudget
 metadata:
   name: kafka-controller
   namespace: "default"
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-99"
   labels:
     app.kubernetes.io/instance: kafka
     app.kubernetes.io/managed-by: Helm

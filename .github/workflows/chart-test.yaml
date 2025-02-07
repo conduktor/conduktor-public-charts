@@ -119,21 +119,14 @@ jobs:
           make k3d-ci-up
           kubectl create ns ct || true
 
-      - name: Get PR number
-        if: github.event_name == 'pull_request'
-        id: get-pr
-        run: echo "PR_NUMBER=${{ github.event.number }}" >> $GITHUB_ENV
-
-      - name: Check if PR is in breaking upgrades list
+      - name: Check if PR has breaking label
         id: check-breaking
+        env:
+            GH_TOKEN: ${{ secrets.CONDUKTORBOT_ACTION_TOKEN }}
         run: |
-          if [ -f ".github/ct-breaking-upgrades.json" ]; then
-            BREAKING=$(jq '.breaking_prs | index($ENV.PR_NUMBER | tonumber)' .github/ct-breaking-upgrades.json)
-            if [ "$BREAKING" != "null" ]; then
-              echo "breaking=true" >> $GITHUB_OUTPUT
-            else
-              echo "breaking=false" >> $GITHUB_OUTPUT
-            fi
+          labels=$(gh pr view ${{ github.event.number }} --json labels --jq '.labels | map(.name)')
+          if echo "$labels" | grep -q 'breaking'; then
+            echo "breaking=true" >> $GITHUB_OUTPUT
           else
             echo "breaking=false" >> $GITHUB_OUTPUT
           fi
