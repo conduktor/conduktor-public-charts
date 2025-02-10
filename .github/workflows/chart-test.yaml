@@ -119,20 +119,8 @@ jobs:
           make k3d-ci-up
           kubectl create ns ct || true
 
-      - name: Check if PR has breaking label
-        id: check-breaking
-        env:
-            GH_TOKEN: ${{ secrets.CONDUKTORBOT_ACTION_TOKEN }}
-        run: |
-          labels=$(gh pr view ${{ github.event.number }} --json labels --jq '.labels | map(.name)')
-          if echo "$labels" | grep -q 'breaking'; then
-            echo "breaking=true" >> $GITHUB_OUTPUT
-          else
-            echo "breaking=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Disable upgrade testing if breaking change
-        if: steps.check-breaking.outputs.breaking == 'true'
+        if: contains(github.event.pull_request.labels.*.name, 'breaking')
         run: |
           sed -i 's/upgrade: true/upgrade: false/' .github/ct-config.yaml
 
