@@ -131,6 +131,10 @@ spec:
             {{- if .Values.platformCortex.enabled }}
             - name: CDK_MONITORING_CLUSTERS-REFRESH-INTERVAL
               value: {{ include "conduktor.monitoring.clustersRefreshInterval" . | quote }}
+            - name: CDK_MONITORING_USE-AGGREGATED-METRICS
+              value: {{ include "conduktor.monitoring.useAggregatedMetrics" . | quote }}
+            - name: CDK_MONITORING_ENABLE-NON-AGGREGATED-METRICS
+              value: {{ include "conduktor.monitoring.enableNonAggregatedMetrics" . | quote }}
             - name: CDK_MONITORING_CORTEX-URL
               value: {{ include "conduktor.monitoring.cortexUrl" . | quote }}
             - name: CDK_MONITORING_ALERT-MANAGER-URL

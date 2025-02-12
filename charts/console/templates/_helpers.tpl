@@ -312,6 +312,28 @@ Return platform monitoring api poll rate for clusters. Default to 60s
 {{- end -}}
 
 {{/*
+Return platform monitoring use aggregated metrics for graph. Default to false
+*/}}
+{{- define "conduktor.monitoring.useAggregatedMetrics" -}}
+{{- $use := "false" -}}
+{{- if .Values.config.monitoring -}}
+{{- $use := (default $use (index .Values "config" "monitoring" "use-aggregated-metrics")) }}
+{{- end -}}
+{{- printf "%s" $use -}}
+{{- end -}}
+
+{{/*
+Return platform monitoring enable non aggregated metrics collection. Default to true
+*/}}
+{{- define "conduktor.monitoring.enableNonAggregatedMetrics" -}}
+{{- $enable := "true" -}}
+{{- if .Values.config.monitoring -}}
+{{- $enable := (default $use (index .Values "config" "monitoring" "enable-non-aggregated-metrics")) }}
+{{- end -}}
+{{- printf "%s" $enable -}}
+{{- end -}}
+
+{{/*
 Return platform monitoring cortex url. Like http(s)://cortex.nsp.svc.cluster.local:9009/
 */}}
 {{- define "conduktor.monitoring.cortexUrl" -}}
