@@ -328,7 +328,7 @@ Return platform monitoring enable non aggregated metrics collection. Default to 
 {{- define "conduktor.monitoring.enableNonAggregatedMetrics" -}}
 {{- $enable := "true" -}}
 {{- if .Values.config.monitoring -}}
-{{- $enable := (default $use (index .Values "config" "monitoring" "enable-non-aggregated-metrics")) }}
+{{- $enable := (default $enable (index .Values "config" "monitoring" "enable-non-aggregated-metrics")) }}
 {{- end -}}
 {{- printf "%s" $enable -}}
 {{- end -}}
