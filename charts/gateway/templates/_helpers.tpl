@@ -81,9 +81,7 @@ If it does not exist in either, or exists in both, fail the chart.
     {{- end }}
   {{- end }}
 
-  {{- if or $foundInEnv $foundInExtraEnv }}
-    {{- printf "Valid KAFKA_BOOTSTRAP_SERVERS found." }}
-  {{- else }}
+  {{- if not (or $foundInEnv $foundInExtraEnv) }}
     {{- fail "KAFKA_BOOTSTRAP_SERVERS is not defined in either gateway.env or gateway.extraSecretEnvVars." }}
   {{- end }}
 
@@ -93,8 +91,33 @@ If it does not exist in either, or exists in both, fail the chart.
 {{- end -}}
 
 {{/*
-Define internal service name
+print_kafka_bootstrap_servers: This template function is used to print the Kafka bootstrap servers.
+Usage: {{ include "print_kafka_bootstrap_servers" . }}
 */}}
+{{- define "print_kafka_bootstrap_servers" }}
+{{- $servers := "" }}
+
+{{- if .Values.gateway.extraSecretEnvVars }}
+  {{- range .Values.gateway.extraSecretEnvVars }}
+    {{- if eq .name "KAFKA_BOOTSTRAP_SERVERS" }}
+      {{- $servers = .value }}
+    {{- end }}
+  {{- end }}
+{{- else if .Values.gateway.env.KAFKA_BOOTSTRAP_SERVERS }}
+  {{- $servers = .Values.gateway.env.KAFKA_BOOTSTRAP_SERVERS }}
+{{- end }}
+
+{{- if $servers }}
+  {{- $serverList := split "," $servers }}
+Kafka Bootstrap Servers:
+  {{- range $serverList }}
+  - {{ . | trim }}
+  {{- end }}
+{{- else }}
+No Kafka Bootstrap Servers configured.
+{{- end }}
+{{- end }}
+
 {{- define "conduktor-gateway.internalServiceName" -}}
 {{- printf "%s-internal" (include "conduktor-gateway.fullname" . | trunc 54) -}}
 {{- end -}}

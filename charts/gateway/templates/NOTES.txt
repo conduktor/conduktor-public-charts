@@ -1,20 +1,24 @@
-Thank you for installing {{ .Chart.Name }}.
+CHART NAME: {{ .Chart.Name }}
+RELEASE NAME: {{ .Release.Name }}
+CHART VERSION: {{ .Chart.Version }}
+APP VERSION: {{ .Chart.AppVersion }}
 
-Your release is named {{ .Release.Name }}.
+Thank you for installing {{ .Chart.Name }}.
 
 To learn more about the release, try:
 
-  $ helm status {{ .Release.Name }}
-  $ helm get all {{ .Release.Name }}
+  $ helm status {{ .Release.Name }} -n {{ include "common.names.namespace" . | quote }}
+  $ helm get all {{ .Release.Name }} -n {{ include "common.names.namespace" . | quote }}
 
 {{- if not (hasKey .Values.gateway.env "GATEWAY_ADVERTISED_HOST") }}
-You can connect to gateway from inside your cluster with {{ $internalServiceHost }}:{{ .Values.gateway.portRange.start }} as bootstrap server.
+You can connect to Gateway from inside your cluster with {{ $internalServiceHost }}:{{ .Values.gateway.portRange.start }} as bootstrap server.
 {{- else }}
 You defined a specific domain to be advertised : {{ .Values.gateway.env.GATEWAY_ADVERTISED_HOST }}
 You'll need to configure your network connections to gateway with this domain.
 {{- end }}
 
 {{- include "conduktor-gateway.kafka-bootstrap-server" . }}
+{{- include "print_kafka_bootstrap_servers" . }}
 
 {{ if .Values.ingress.enabled -}}
 {{- $proto := ternary "https" "http" .Values.ingress.tls }}
