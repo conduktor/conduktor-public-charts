@@ -107,6 +107,12 @@ helm install console charts/console \
   --set config.database.name=conduktor
 ```
 
+### Cleanup local K3D cluster
+
+```shell
+make k3d-down
+```
+
 ### Setup git hooks
 Pre-commit git hook require to have npm or bitnami [`readme-generator`](https://github.com/bitnami/readme-generator-for-helm) installed. 
 
