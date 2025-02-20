@@ -1,7 +1,8 @@
 nameOverride: gateway-test-01
 
-kafka:
+gateway:
+  env:
+    KAFKA_BOOTSTRAP_SERVERS: kafka.default.svc.cluster.local:9092
+
+tests:
   enabled: true
-  startupProbe:
-    enabled: true
-    failureThreshold: 30
