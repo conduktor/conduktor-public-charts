@@ -178,6 +178,36 @@ In particular, the [Client to Gateway Authentication page](https://docs.condukto
 
 ### Ingress configuration examples
 
+#### External Service
+
+ **note for any ingress you will need to configure a service also**
+ 
+below is the simplest configuration to deploy a load balancer with an ingress set up**
+
+example
+```
+service:
+  ## @section Gateway external service configurations
+  ## @descriptionStart
+  ## This section specifies external service configuration
+  ## @descriptionEnd
+  external:
+    ## @param service.external.enable Enable a service for external connection to Gateway
+    enable: true
+    ## @param service.external.type Type of load balancer
+    type: LoadBalancer
+    ## @param service.external.ip IP to configure
+    ip: ""
+    ## @param service.external.annotations
+    annotations: {}
+    # LoadBalancer externaldns gke support by annotation https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/gke.md#verify-using-an-external-load-balancer
+    # external-dns.alpha.kubernetes.io/hostname: "{{ required "A valid .Values.gateway.domain is required!" .Values.gateway.domain }}"
+    ## @param service.external.admin Enable admin exposition on external service
+    admin: false
+    ## @param service.external.jmx Enable jmx exposition on external service
+    jmx: false
+```
+
 #### Nginx Ingress without TLS
 
 **values.yaml** :
