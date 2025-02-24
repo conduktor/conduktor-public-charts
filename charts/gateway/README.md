@@ -185,7 +185,7 @@ In particular, the [Client to Gateway Authentication page](https://docs.condukto
 below is the simplest configuration to deploy a load balancer with an ingress set up**
 
 example
-```
+```yaml
 service:
   ## @section Gateway external service configurations
   ## @descriptionStart
