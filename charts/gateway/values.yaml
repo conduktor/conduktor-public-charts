@@ -274,7 +274,7 @@ metrics:
     metricRelabelings: {}
     ## @param metrics.prometheus.relabelings Configure relabelings in ServiceMonitor
     relabelings: {}
-    ## @param metrics.prometheus.extraParams Extra parameters in ServiceMonitor
+    ## @param metrics.prometheus.extraParams Extra parameters in ServiceMonitor. See https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.Endpoint
     extraParams: {}
       # basicAuth:
       #   password:
@@ -286,9 +286,18 @@ metrics:
   grafana:
     ## @param metrics.grafana.enable Enable Grafana dashboards to installation
     enable: false
-    ## @param  metrics.grafana.labels Additional custom labels for Grafana dashboard ConfigMap
+    ## @param metrics.grafana.namespace Namespace used to deploy Grafana dashboards by default use the same namespace as Conduktor Gateway
+    ##
+    namespace: ""
+    ## @param metrics.grafana.matchLabels Label selector for Grafana instance (for grafana-operator v5 only)
+    ##
+    matchLabels: { }
+    ## @param metrics.grafana.labels Additional custom labels for Grafana dashboard ConfigMap
     ##
     labels: {}
+    ## @param metrics.grafana.folder Grafana dashboard folder name
+    ##
+    folder: ""
     datasources:
       ## @param metrics.grafana.datasources.prometheus Prometheus datasource to use for metric dashboard
       prometheus: prometheus
