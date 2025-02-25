@@ -96,8 +96,12 @@ install-dev-deps:  ## Install development dependencies (PostgreSQL, Minio, monit
 .PHONY: create-k3d-cluster
 create-k3d-cluster: ## Create k3d cluster
 	@echo "Create the test cluster"
-	k3d cluster create --config $(CURDIR)/k3d/config.yaml
-
+	@if grep -q btrfs /proc/mounts; then \
+		echo "Btrfs filesystem detected. Mounting /dev/mapper. See https://k3d.io/v5.8.3/faq/faq/"; \
+		k3d cluster create --config $(CURDIR)/k3d/config.yaml -v /dev/mapper:/dev/mapper; \
+	else \
+		k3d cluster create --config $(CURDIR)/k3d/config.yaml; \
+	fi
 	@echo "Current context : $$(kubectl config current-context)"
 
 .PHONY: check-kube-context
@@ -127,7 +131,6 @@ helm-nginx: ## Install nginx-ingress helm chart from ingress-nginx
 .PHONY: helm-postgresql
 helm-postgresql: ## Install postgresql helm chart from bitnami
 	make check-kube-context
-	kubectl create namespace ${NAMESPACE} || true
 	@echo "Installing postgresql"
 	helm upgrade --install postgresql bitnami/postgresql \
 		--namespace ${NAMESPACE} --create-namespace \
@@ -143,7 +146,6 @@ helm-postgresql: ## Install postgresql helm chart from bitnami
 .PHONY: helm-minio
 helm-minio: ## Install minio helm chart from bitnami
 	make check-kube-context
-	kubectl create namespace ${NAMESPACE} || true
 	@echo "Installing Minio"
 	helm upgrade --install minio bitnami/minio \
 		--namespace ${NAMESPACE} --create-namespace \
@@ -175,7 +177,7 @@ helm-monitoring-stack: ## Install monitoring stack prometheus and grafana
 		--set watchNamespaces="" \
 		--set grafana.enabled=false
 	@echo "Install grafana"
-	kubectl apply -f k3d/monitoring-stack-grafana-crd.yaml
+	kubectl apply -f k3d/grafana-v5-api-v1beta1/monitoring-stack-grafana.yaml
 
 .PHONY: helm-monitoring-stack-grafana-alpha
 .ONESHELL:
@@ -199,8 +201,8 @@ helm-monitoring-stack-grafana-alpha: ## Install monitoring stack prometheus and 
 		--set grafana.enabled=false \
 		--version 2.9.3
 	@echo "Install grafana"
-	kubectl apply -f k3d/monitoring-stack-grafana-crd-alpha.yaml
-	kubectl apply -f k3d/monitoring-stack-grafana-ds-alpha.yaml
+	kubectl apply -f k3d/grafana-v4-api-v1alpha1/monitoring-stack-grafana.yaml
+	kubectl apply -f k3d/grafana-v4-api-v1alpha1/monitoring-stack-grafana-ds.yaml
 
 .PHONY: create-test-ns
 create-test-ns: ## Create test namespace
