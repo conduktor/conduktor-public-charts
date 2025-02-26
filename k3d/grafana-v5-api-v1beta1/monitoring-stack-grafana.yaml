@@ -12,8 +12,8 @@ spec:
     auth:
       disable_login_form: "false"
     security:
-      admin_user: root
-      admin_password: secret
+      admin_user: admin
+      admin_password: admin
   deployment:
     spec:
       template:
@@ -21,6 +21,20 @@ spec:
           containers:
             - name: grafana
               image: grafana/grafana:10.2.2
+  ingress:
+    metadata:
+      annotations:
+        kubernetes.io/ingress.class: "nginx"
+    spec:
+      rules:
+          - host: grafana.private
+            http:
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
+                  backend:
+                    serviceName: grafana-service
+                    servicePort: grafana-http
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource

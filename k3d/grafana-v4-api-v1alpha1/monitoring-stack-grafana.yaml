@@ -11,8 +11,8 @@ spec:
     log:
       mode: "console"
     security:
-      admin_user: root
-      admin_password: secret
+      admin_user: admin
+      admin_password: admin
   deployment:
     replicas: 1
   baseImage: grafana/grafana:10.2.2
