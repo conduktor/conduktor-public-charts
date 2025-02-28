@@ -31,3 +31,19 @@ spec:
       isDefault: false
       jsonData:
         "tlsSkipVerify": true
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDataSource
+metadata:
+  name: "loki-ds"
+  namespace: "prometheus-stack"
+spec:
+  name: "loki-ds"
+  datasources:
+    - name: loki
+      type: loki
+      url: http://loki-grafana-loki-querier:3100
+      access: proxy
+      isDefault: false
+      jsonData:
+        "tlsSkipVerify": true

@@ -16,20 +16,9 @@ spec:
   deployment:
     replicas: 1
   baseImage: grafana/grafana:10.2.2
----
-# Has to go in it's own file due to how old grafana API works: https://github.com/grafana/grafana-operator/issues/652
-apiVersion: integreatly.org/v1alpha1
-kind: GrafanaDataSource
-metadata:
-  name: "prometheus-ds"
-  namespace: "prometheus-stack"
-spec:
-  name: prometheus-ds
-  datasources:
-    - name: prometheus
-      type: prometheus
-      url: http://prometheus-stack-kube-prom-prometheus:9090
-      access: proxy
-      isDefault: true
-      jsonData:
-        tlsSkipVerify: true
+  dashboardLabelSelector:
+    - matchExpressions:
+      - key: "grafana_dashboard"
+        operator: In
+        values: [ "1" ]
+
