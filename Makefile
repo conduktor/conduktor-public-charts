@@ -80,7 +80,7 @@ k3d-ci-up: ## Setup CI k3d cluster
 k3d-down: ## Teardown k3d cluster
 	make delete-k3d-cluster
 
-.PHONY: k3d-ci-down
+.PHONY: install-dev-deps
 install-dev-deps:  ## Install development dependencies (PostgreSQL, Minio, monitoring stack) not needed for CT tests
 	kubectl create namespace ${NAMESPACE} || true
 	@echo "Installing postgresql"
@@ -168,7 +168,7 @@ helm-monitoring-stack: ## Install monitoring stack prometheus and grafana
 		--namespace prometheus-stack --create-namespace \
 		--set prometheus.prometheusSpec.podMonitorSelectorNilUsesHelmValues=false \
 		--set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false \
-		--set alertmanager.enabled=false \
+		--set alertmanager.enabled=true \
 		--set grafana.enabled=false
 	@echo "Install grafana operator"
 	helm upgrade --install grafana-operator bitnami/grafana-operator \
@@ -191,7 +191,7 @@ helm-monitoring-stack-grafana-alpha: ## Install monitoring stack prometheus and 
 		--namespace prometheus-stack --create-namespace \
 		--set prometheus.prometheusSpec.podMonitorSelectorNilUsesHelmValues=false \
 		--set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false \
-		--set alertmanager.enabled=false \
+		--set alertmanager.enabled=true \
 		--set grafana.enabled=false
 	@echo "Install grafana operator"
 	helm upgrade --install grafana-operator bitnami/grafana-operator \

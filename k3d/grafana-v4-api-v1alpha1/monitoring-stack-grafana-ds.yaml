@@ -15,3 +15,19 @@ spec:
       isDefault: true
       jsonData:
         tlsSkipVerify: true
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDataSource
+metadata:
+  name: "alertmanager-ds"
+  namespace: "prometheus-stack"
+spec:
+  name: "alertmanager-ds"
+  datasources:
+    - name: alertmanager
+      type: alertmanager
+      url: http://prometheus-stack-kube-prom-alertmanager:9093
+      access: proxy
+      isDefault: false
+      jsonData:
+        "tlsSkipVerify": true
