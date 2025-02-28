@@ -284,7 +284,7 @@ metrics:
       #     name: conduktor-admin-user # secret name
       #     key: username
   grafana:
-    ## @param metrics.grafana.enable Enable Grafana dashboards to installation
+    ## @param metrics.grafana.enable Enable Grafana dashboards to installation. Dashboards can be installed as Sidecar ConfigMap or using Grafana operator CRDs (v4 or v5)
     enable: false
     ## @param metrics.grafana.namespace Namespace used to deploy Grafana dashboards by default use the same namespace as Conduktor Gateway
     ##
@@ -292,9 +292,12 @@ metrics:
     ## @param metrics.grafana.matchLabels Label selector for Grafana instance (for grafana-operator v5 only)
     ##
     matchLabels: { }
-    ## @param metrics.grafana.labels Additional custom labels for Grafana dashboard ConfigMap
+    ## @param metrics.grafana.labels Additional custom labels for Grafana dashboard ConfigMap. Used by Sidecar ConfigMap loading https://github.com/grafana/helm-charts/tree/main/charts/grafana#sidecar-for-dashboards
     ##
-    labels: {}
+    labels:
+      ## @skip metrics.grafana.labels.grafana_dashboard Default label of Grafana Sidecar (sidecar.dashboards.label)
+      ##
+      grafana_dashboard: '1'
     ## @param metrics.grafana.folder Grafana dashboard folder name
     ##
     folder: ""
