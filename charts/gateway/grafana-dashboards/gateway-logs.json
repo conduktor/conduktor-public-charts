@@ -318,31 +318,59 @@
   "refresh": "30s",
   "schemaVersion": 37,
   "style": "dark",
-  "tags": [],
+  "tags": ["Conduktor", "conduktor-gateway", "Logs", "Pod"],
   "templating": {
     "list": [
       {
-        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "${GATEWAY_NAME}",
+          "value": "${GATEWAY_NAME}"
+        },
+        "hide": 2,
+        "includeAll": false,
+        "label": "Job",
+        "multi": false,
+        "name": "job",
+        "options": [
+          {
+            "selected": true,
+            "text": "${GATEWAY_NAME}",
+            "value": "${GATEWAY_NAME}"
+          }
+        ],
+        "query": "${GATEWAY_NAME}",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "type": "custom"
+      },
+      {
+        "allFormat": "glob",
         "current": {},
         "datasource": {
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(kube_pod_labels{conduktor_app_name=\"${GATEWAY_NAME}\"}, pod)",
+        "definition": "label_values(up{job=\"$job\"}, pod)",
         "hide": 0,
         "includeAll": true,
+        "label": "pod",
         "multi": true,
+        "multiFormat": "glob",
         "name": "pod",
         "options": [],
         "query": {
-          "query": "label_values(kube_pod_labels{conduktor_app_name=\"${GATEWAY_NAME}\"}, pod)",
+          "query": "label_values(up{job=\"$job\"}, pod)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
         "sort": 0,
-        "type": "query"
+        "tagValuesQuery": "",
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
       }
     ]
   },
@@ -353,6 +381,6 @@
   "timepicker": {},
   "timezone": "",
   "title": "Conduktor Gateway logs",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }

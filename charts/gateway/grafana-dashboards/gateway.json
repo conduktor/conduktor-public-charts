@@ -213,7 +213,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
+          "editorMode": "code",
           "expr": "abs(min(gateway_license_remaining_days{job=\"$job\"}))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -368,7 +368,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
+          "editorMode": "code",
           "expr": "count(sum by(vcluster) (gateway_thread_request_rebuild_total{job=\"$job\", pod=~\"$pod\"}))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -474,7 +474,7 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
-      "description": "",
+      "description": "Show each pod CPU usage with total of resource CPU requests and limits for the selected pods.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -696,7 +696,7 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
-      "description": "",
+      "description": "Show each pod memory usage with total of resource memory requests and limits for the selected pods.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -925,7 +925,7 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
-      "description": "Average/P90/P99 requests/responses latency",
+      "description": "Average/p90/p99 requests/responses time latency",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1006,7 +1006,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
+          "editorMode": "code",
           "expr": "sum(rate(gateway_latency_request_response_seconds_sum{job=\"$job\", pod=~\"$pod\"}[$__rate_interval])) / sum(rate(gateway_latency_request_response_seconds_count{job=\"$job\", pod=~\"$pod\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "hide": false,
@@ -1022,7 +1022,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
+          "editorMode": "code",
           "expr": "max(histogram_quantile(0.9, rate(gateway_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\"}[$__rate_interval])))",
           "fullMetaSearch": false,
           "hide": false,
@@ -1038,7 +1038,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
+          "editorMode": "code",
           "expr": "max(histogram_quantile(0.99, rate(gateway_latency_request_response_seconds_bucket{job=\"$job\", pod=~\"$pod\"}[$__rate_interval])))",
           "fullMetaSearch": false,
           "hide": false,
@@ -1057,7 +1057,7 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
-      "description": "Received requests",
+      "description": "Sum of received requests per Kafka APIKey from all selected pods.\nFilter FETCH and PRODUCE apiKey by default.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1162,7 +1162,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
+          "editorMode": "code",
           "expr": "sum by(api_key) (irate(gateway_thread_request_rebuild_total{vcluster=~\"$vcluster\", job=\"$job\", pod=~\"$pod\"}[5m]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -1180,7 +1180,7 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
-      "description": "Number of openned/closed connection to Kafka cluster from all selected pods",
+      "description": "Sum of opened/closed connection to Kafka cluster from all selected pods",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1261,7 +1261,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
+          "editorMode": "code",
           "expr": "sum by(job) (increase(gateway_upstream_connection_close_rate_seconds_count{vcluster=~\"$vcluster\", job=\"$job\", pod=~\"$pod\"}[5m]))",
           "fullMetaSearch": false,
           "hide": false,
@@ -1278,7 +1278,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
+          "editorMode": "code",
           "expr": "sum by(job) (increase(gateway_upstream_connection_creation_rate_seconds_count{vcluster=~\"$vcluster\", job=\"$job\", pod=~\"$pod\"}[5m]))",
           "fullMetaSearch": false,
           "hide": false,
@@ -1311,6 +1311,7 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
+      "description": "Sum of requests per second per vCluster from all selected pods",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1489,7 +1490,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
+          "editorMode": "code",
           "exemplar": false,
           "expr": "sum by(direction, vcluster) (increase(gateway_bytes_exchanged_vcluster_total{job=\"$job\", pod=~\"$pod\", vcluster=~\"$vcluster\"}[$__rate_interval]))",
           "format": "time_series",
@@ -4039,7 +4040,7 @@
   "refresh": "30s",
   "schemaVersion": 37,
   "style": "dark",
-  "tags": [],
+  "tags": ["Conduktor", "conduktor-gateway", "JVM", "Pod"],
   "templating": {
     "list": [
       {
@@ -4238,7 +4239,7 @@
     ]
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {
@@ -4269,6 +4270,6 @@
   },
   "timezone": "browser",
   "title": "Conduktor Gateway",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }

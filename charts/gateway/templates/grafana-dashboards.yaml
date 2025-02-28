@@ -1,7 +1,10 @@
 {{- if .Values.metrics.grafana.enable }}
 {{- $configMapName := printf "%s-dashboards" ( include "conduktor-gateway.fullname" . | trunc 52) -}}
+{{- $gatewayNsRelease := printf "%s/%s" (include "common.names.namespace" .) .Release.Name -}}
 {{- $gatewayDashboard :=  .Files.Get "grafana-dashboards/gateway.json" | fromJson }}
+{{- $_ := set $gatewayDashboard "title" (printf "Conduktor Gateway [%s]" $gatewayNsRelease) -}}
 {{- $gatewayLogsDashboard :=  .Files.Get "grafana-dashboards/gateway-logs.json" | fromJson }}
+{{- $_2 := set $gatewayLogsDashboard "title" (printf "Conduktor Gateway logs [%s]" $gatewayNsRelease) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -66,6 +69,8 @@ spec:
     name:  {{ $configMapName | quote }}
     key: gateway-logs.json
   datasources:
+    - inputName: "DS_LOKI"
+      datasourceName: {{ .Values.metrics.grafana.datasources.loki | quote }}
     - inputName: "DS_PROMETHEUS"
       datasourceName: {{ .Values.metrics.grafana.datasources.prometheus | quote }}
     - inputName: "GATEWAY_NAME"
