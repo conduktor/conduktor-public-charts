@@ -269,7 +269,7 @@ metrics:
     labels: {}
     ## @param metrics.prometheus.jobLabel The name of the label on the target service to use as the job name in Prometheus
     ##
-    jobLabel: "app.kubernetes.io/name"
+    jobLabel: "app.kubernetes.io/instance"
     ## @param metrics.prometheus.metricRelabelings Configure metric relabeling in ServiceMonitor
     metricRelabelings: {}
     ## @param metrics.prometheus.relabelings Configure relabelings in ServiceMonitor
