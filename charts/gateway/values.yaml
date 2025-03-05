@@ -291,13 +291,11 @@ metrics:
     namespace: ""
     ## @param metrics.grafana.matchLabels Label selector for Grafana instance (for grafana-operator v5 only)
     ##
-    matchLabels: { }
+    matchLabels: {}
     ## @param metrics.grafana.labels Additional custom labels for Grafana dashboard ConfigMap. Used by Sidecar ConfigMap loading https://github.com/grafana/helm-charts/tree/main/charts/grafana#sidecar-for-dashboards
     ##
-    labels:
-      ## @skip metrics.grafana.labels.grafana_dashboard Default label of Grafana Sidecar (sidecar.dashboards.label)
-      ##
-      grafana_dashboard: '1'
+    labels: {}
+    #  grafana_dashboard: '1' #Default label of Grafana Sidecar (sidecar.dashboards.label)
     ## @param metrics.grafana.folder Grafana dashboard folder name
     ##
     folder: ""
