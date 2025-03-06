@@ -22,7 +22,7 @@ This section defines the image to be used.
 | -------------------------- | -------------------------------------------------------- | ----------------------------- |
 | `gateway.image.registry`   | Docker registry to use                                   | `docker.io`                   |
 | `gateway.image.repository` | Image in repository format (conduktor/conduktor-gateway) | `conduktor/conduktor-gateway` |
-| `gateway.image.tag`        | Image tag                                                | `3.6.0`                       |
+| `gateway.image.tag`        | Image tag                                                | `3.6.1`                       |
 | `gateway.image.pullPolicy` | Kubernetes image pull policy                             | `IfNotPresent`                |
 
 ### Gateway configurations
