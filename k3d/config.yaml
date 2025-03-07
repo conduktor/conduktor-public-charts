@@ -1,6 +1,7 @@
-apiVersion: k3d.io/v1alpha3
+apiVersion: k3d.io/v1alpha5
 kind: Simple
-name: conduktor-platform # name that you want to give to your cluster (will still be prefixed with `k3d-`)
+metadata:
+  name: conduktor-platform # name that you want to give to your cluster (will still be prefixed with `k3d-`)
 servers: 1
 kubeAPI: # same as `--api-port myhost.my.domain:6445` (where the name would resolve to 127.0.0.1)
   host: "localhost" # important for the `server` setting in the kubeconfig

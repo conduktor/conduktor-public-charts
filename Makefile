@@ -80,7 +80,7 @@ k3d-ci-up: ## Setup CI k3d cluster
 k3d-down: ## Teardown k3d cluster
 	make delete-k3d-cluster
 
-.PHONY: k3d-ci-down
+.PHONY: install-dev-deps
 install-dev-deps:  ## Install development dependencies (PostgreSQL, Minio, monitoring stack) not needed for CT tests
 	kubectl create namespace ${NAMESPACE} || true
 	@echo "Installing postgresql"
@@ -96,8 +96,12 @@ install-dev-deps:  ## Install development dependencies (PostgreSQL, Minio, monit
 .PHONY: create-k3d-cluster
 create-k3d-cluster: ## Create k3d cluster
 	@echo "Create the test cluster"
-	k3d cluster create --config $(CURDIR)/k3d/config.yaml
-
+	@if grep -q btrfs /proc/mounts; then \
+		echo "Btrfs filesystem detected. Mounting /dev/mapper. See https://k3d.io/v5.8.3/faq/faq/"; \
+		k3d cluster create --config $(CURDIR)/k3d/config.yaml -v /dev/mapper:/dev/mapper; \
+	else \
+		k3d cluster create --config $(CURDIR)/k3d/config.yaml; \
+	fi
 	@echo "Current context : $$(kubectl config current-context)"
 
 .PHONY: check-kube-context
@@ -127,7 +131,6 @@ helm-nginx: ## Install nginx-ingress helm chart from ingress-nginx
 .PHONY: helm-postgresql
 helm-postgresql: ## Install postgresql helm chart from bitnami
 	make check-kube-context
-	kubectl create namespace ${NAMESPACE} || true
 	@echo "Installing postgresql"
 	helm upgrade --install postgresql bitnami/postgresql \
 		--namespace ${NAMESPACE} --create-namespace \
@@ -143,7 +146,6 @@ helm-postgresql: ## Install postgresql helm chart from bitnami
 .PHONY: helm-minio
 helm-minio: ## Install minio helm chart from bitnami
 	make check-kube-context
-	kubectl create namespace ${NAMESPACE} || true
 	@echo "Installing Minio"
 	helm upgrade --install minio bitnami/minio \
 		--namespace ${NAMESPACE} --create-namespace \
@@ -166,41 +168,72 @@ helm-monitoring-stack: ## Install monitoring stack prometheus and grafana
 		--namespace prometheus-stack --create-namespace \
 		--set prometheus.prometheusSpec.podMonitorSelectorNilUsesHelmValues=false \
 		--set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false \
-		--set alertmanager.enabled=false \
+		--set alertmanager.enabled=true \
 		--set grafana.enabled=false
-	@echo "Install grafana operator"
-	helm upgrade --install grafana-operator bitnami/grafana-operator \
-		--namespace prometheus-stack --create-namespace \
-		--set namespaceScope=false \
-		--set watchNamespaces="" \
-		--set grafana.enabled=false
-	@echo "Install grafana"
-	kubectl apply -f k3d/monitoring-stack-grafana-crd.yaml
+	@echo "Waiting for prometheus operator to be ready..."
+	kubectl rollout status --watch --timeout=300s deployment/prometheus-stack-kube-prom-operator -n prometheus-stack
 
-.PHONY: helm-monitoring-stack-grafana-alpha
-.ONESHELL:
-helm-monitoring-stack-grafana-alpha: ## Install monitoring stack prometheus and grafana with alpha api version
-	make check-kube-context
-	@echo "Add prometheus helm repo"
-	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts || true
-	helm repo update
-	@echo "Install prometheus stack"
-	helm upgrade --install prometheus-stack prometheus-community/kube-prometheus-stack \
-		--namespace prometheus-stack --create-namespace \
-		--set prometheus.prometheusSpec.podMonitorSelectorNilUsesHelmValues=false \
-		--set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false \
-		--set alertmanager.enabled=false \
-		--set grafana.enabled=false
+	@echo "Install loki"
+	helm upgrade --install loki bitnami/grafana-loki \
+		--namespace prometheus-stack --create-namespace
+
+	@echo "Waiting for loki querier to be ready..."
+	kubectl rollout status --watch --timeout=300s deployment/loki-grafana-loki-query-frontend -n prometheus-stack
+
 	@echo "Install grafana operator"
 	helm upgrade --install grafana-operator bitnami/grafana-operator \
 		--namespace prometheus-stack --create-namespace \
-		--set namespaceScope=false \
-		--set watchNamespaces="" \
+		--set operator.namespaceScope=false \
+		--set operator.watchNamespace="" \
+		--set grafana.enabled=false
+
+	@echo "Waiting for grafana operator to be ready..."
+	kubectl rollout status --watch --timeout=300s deployment/grafana-operator -n prometheus-stack
+
+	@echo "Setup grafana"
+	kubectl apply -f k3d/grafana-v5-api-v1beta1/monitoring-stack-grafana.yaml
+
+	@echo "Waiting for grafana instance to be ready..."
+	@sleep 5 # wait for operator to pick up the CRD
+	kubectl rollout status --watch --timeout=300s deployment/grafana-deployment -n prometheus-stack
+
+.PHONY: helm-grafana-alpha
+.ONESHELL:
+helm-grafana-alpha: ## Replace latest grafana operator with version 2.9.3 with v1alpha1 CRDs
+	make check-kube-context
+	@echo "Uninstall latest grafana operator and CRDs"
+	helm uninstall grafana-operator -n prometheus-stack
+	make delete-integreatly-crds
+	@echo "Cleanup CRDs"
+	make delete-grafana-crds
+
+	@echo "Install grafana operator 2.9.3"
+	helm upgrade --install grafana-operator bitnami/grafana-operator \
+		--namespace prometheus-stack --create-namespace \
+		--set operator.scanAllNamespaces=true \
+		--set operator.watchNamespace="" \
+		--set operator.watchNamespaces="" \
 		--set grafana.enabled=false \
 		--version 2.9.3
-	@echo "Install grafana"
-	kubectl apply -f k3d/monitoring-stack-grafana-crd-alpha.yaml
-	kubectl apply -f k3d/monitoring-stack-grafana-ds-alpha.yaml
+
+	@echo "Waiting for grafana operator to be ready..."
+	kubectl rollout status --watch --timeout=300s deployment/grafana-operator -n prometheus-stack
+
+	@echo "Setup grafana v1alpha1 CRDs	"
+	kubectl apply -f k3d/grafana-v4-api-v1alpha1/monitoring-stack-grafana.yaml
+	kubectl apply -f k3d/grafana-v4-api-v1alpha1/monitoring-stack-grafana-ds.yaml
+
+	@echo "Waiting for grafana instance to be ready..."
+	@sleep 5 # wait for operator to pick up the CRD
+	kubectl rollout status --watch --timeout=300s deployment/grafana-deployment -n prometheus-stack
+
+delete-grafana-crds:
+	@echo "Deleting CRDs and their instances containing 'integreatly.org'..."
+	@kubectl get crds -o name | grep integreatly.org | xargs -I {} sh -c ' \
+	  echo "Deleting CRD {} and $$(echo {} | cut -d'/' -f 2-) its instances..."; \
+	  kubectl delete $$(echo {} | cut -d'/' -f 2-) --all && kubectl delete {}; \
+	'
+	@echo "Deletion complete."
 
 .PHONY: create-test-ns
 create-test-ns: ## Create test namespace

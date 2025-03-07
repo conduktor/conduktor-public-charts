@@ -14,7 +14,7 @@ metadata:
 spec:
   jobLabel: {{ .Values.metrics.prometheus.jobLabel | quote }}
   selector:
-    matchLabels: {{ include "conduktor-gateway.labels" . | nindent 6 }}
+    matchLabels: {{ include "conduktor-gateway.podSelectorLabels" . | nindent 6 }}
       metrics.conduktor.io/prometheus: "true"
   endpoints:
     - port: admin-http
