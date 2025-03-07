@@ -50,6 +50,9 @@ gateway:
   ## @param gateway.env [object] Environment variables for Gateway deployment
   env: {}
 
+  ## @param gateway.licenseKey License key to activate Conduktor Gateway not used if `gateway.secretRef` is set
+  licenseKey: ""
+
   ## @param gateway.interceptors Json configuration for interceptors to be loaded at startup by Gateway
   interceptors: "[]"
 
@@ -62,6 +65,15 @@ gateway:
   admin:
     ## @param gateway.admin.port Admin HTTP server port
     port: 8888
+    ## @param gateway.admin.users[0].username API Admin username. (not used if `gateway.secretRef` is set)
+    ## @param gateway.admin.users[0].password API Admin password. If empty, a random password will be generated (not used if `gateway.secretRef` is set)
+    ## @param gateway.admin.users[0].admin API user admin role flag. (not used if `gateway.secretRef` is set)
+    users:
+      - username: "admin"
+        password: ""
+        admin: true
+    ## @param gateway.admin.securedMetrics Enable secured metrics using api users credentials
+    securedMetrics: false
 
   jmx:
     ## @param gateway.jmx.enable Enable JMX JVM options
