@@ -24,6 +24,12 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 {{- end -}}
 
+{{/*
+Create default secret name
+*/}}
+{{- define "conduktor-gateway.secretName" -}}
+{{- printf "%s-secret" (include "conduktor-gateway.fullname" . | trunc 63 | trimSuffix "-") -}}
+{{- end -}}
 
 {{/*
 Create chart name and version as used by the chart label.
@@ -101,3 +107,18 @@ Namespace of the platform grafana dashboards
     {{- include "common.names.namespace" . -}}
   {{- end -}}
 {{- end -}}
+
+{{/*
+Generate default password for users if not defined and return a json of all users
+*/}}
+{{- define "conduktor-gateway.patchApiUsers" -}}
+{{- if .Values.gateway.admin.users -}}
+{{- range .Values.gateway.admin.users -}}
+{{- if not .password -}}
+{{- $_ := set . "password" (randAlphaNum 15) -}}
+{{- end -}}
+{{- end -}}
+{{- toJson .Values.gateway.admin.users -}}
+{{- end -}}
+{{- end -}}
+
