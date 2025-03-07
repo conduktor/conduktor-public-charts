@@ -80,7 +80,7 @@ k3d-ci-up: ## Setup CI k3d cluster
 k3d-down: ## Teardown k3d cluster
 	make delete-k3d-cluster
 
-.PHONY: k3d-ci-down
+.PHONY: install-dev-deps
 install-dev-deps:  ## Install development dependencies (PostgreSQL, Minio, monitoring stack) not needed for CT tests
 	kubectl create namespace ${NAMESPACE} || true
 	@echo "Installing postgresql"
@@ -96,8 +96,12 @@ install-dev-deps:  ## Install development dependencies (PostgreSQL, Minio, monit
 .PHONY: create-k3d-cluster
 create-k3d-cluster: ## Create k3d cluster
 	@echo "Create the test cluster"
-	k3d cluster create --config $(CURDIR)/k3d/config.yaml
-
+	@if grep -q btrfs /proc/mounts; then \
+		echo "Btrfs filesystem detected. Mounting /dev/mapper. See https://k3d.io/v5.8.3/faq/faq/"; \
+		k3d cluster create --config $(CURDIR)/k3d/config.yaml -v /dev/mapper:/dev/mapper; \
+	else \
+		k3d cluster create --config $(CURDIR)/k3d/config.yaml; \
+	fi
 	@echo "Current context : $$(kubectl config current-context)"
 
 .PHONY: check-kube-context
