@@ -187,6 +187,12 @@ The following `values.yaml` file can be used to set up Gateway to proxy traffic 
 
 ```yaml
 gateway:
+  licenseKey: "<your license key>" # set GATEWAY_LICENSE_KEY secret env var
+  admin:
+    users: # generate GATEWAY_ADMIN_API_USERS secret env var 
+      - username: admin
+        password: "<your admin password>" # if empty, a random password will be generated
+        admin: true
   env:
     # Configure connection to Confluent Cloud
     KAFKA_BOOTSTRAP_SERVERS: pkc-xxxxx.region.provider.confluent.cloud:9092
