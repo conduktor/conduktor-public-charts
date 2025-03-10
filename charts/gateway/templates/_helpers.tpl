@@ -24,6 +24,12 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 {{- end -}}
 
+{{/*
+Create default secret name
+*/}}
+{{- define "conduktor-gateway.secretName" -}}
+{{- printf "%s-secret" (include "conduktor-gateway.fullname" . | trunc 63 | trimSuffix "-") -}}
+{{- end -}}
 
 {{/*
 Create chart name and version as used by the chart label.
@@ -71,7 +77,7 @@ opt-out for a custom bootstrap server.
 */}}
 {{- define "conduktor-gateway.kafka-bootstrap-server" -}}
 {{-   if .Values.kafka.enabled -}}
-{{-     printf "%s-kafka.%s.svc.cluster.local:9092" .Release.Name .Release.Namespace -}}
+{{-     printf "%s-kafka.%s.svc.%s:9092" .Release.Name .Release.Namespace .Values.clusterDomain -}}
 {{-   else -}}
 {{-     required "value .kafka.bootstrapServers is required" .Values.kafka.bootstrapServers -}}
 {{-   end -}}
@@ -90,3 +96,18 @@ Define external service name
 {{- define "conduktor-gateway.externalServiceName"}}
 {{- printf "%s-external" (include "conduktor-gateway.fullname" . | trunc 54) -}}
 {{- end -}}
+
+{{/*
+Generate default password for users if not defined and return a json of all users
+*/}}
+{{- define "conduktor-gateway.patchApiUsers" -}}
+{{- if .Values.gateway.admin.users -}}
+{{- range .Values.gateway.admin.users -}}
+{{- if not .password -}}
+{{- $_ := set . "password" (randAlphaNum 15) -}}
+{{- end -}}
+{{- end -}}
+{{- toJson .Values.gateway.admin.users -}}
+{{- end -}}
+{{- end -}}
+
