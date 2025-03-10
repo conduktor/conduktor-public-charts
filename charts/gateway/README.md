@@ -14,6 +14,28 @@ helm install my-gateway conduktor/conduktor-gateway
 
 ## Parameters
 
+### Global parameters
+
+Global Docker image parameters
+Please, note that this will override the image parameters, including dependencies, configured to use the global value
+Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
+
+| Name                      | Description                              | Value |
+| ------------------------- | ---------------------------------------- | ----- |
+| `global.imagePullSecrets` | Docker login secrets name for image pull | `[]`  |
+| `global.env`              | The environment name                     | `""`  |
+
+### Common parameters
+
+| Name                | Description                                     | Value           |
+| ------------------- | ----------------------------------------------- | --------------- |
+| `nameOverride`      | String to partially override common.names.name  | `""`            |
+| `fullnameOverride`  | String to fully override common.names.fullname  | `""`            |
+| `namespaceOverride` | String to fully override common.names.namespace | `""`            |
+| `commonLabels`      | Labels to add to all deployed objects           | `{}`            |
+| `commonAnnotations` | Annotations to add to all deployed objects      | `{}`            |
+| `clusterDomain`     | Kubernetes cluster domain name                  | `cluster.local` |
+
 ### Gateway image configuration
 
 This section defines the image to be used.
@@ -146,7 +168,6 @@ Shared Kubernetes configuration of the chart.
 | `serviceAccount.name`                         | The name of the ServiceAccount to use.                           | `""`   |
 | `serviceAccount.annotations`                  | Additional Service Account annotations (evaluated as a template) | `{}`   |
 | `serviceAccount.automountServiceAccountToken` | Automount service account token for the server service account   | `true` |
-| `commonLabels`                                | Labels to be applied to all resources created by this chart      | `{}`   |
 | `nodeSelector`                                | Container node selector                                          | `{}`   |
 | `tolerations`                                 | Container tolerations                                            | `[]`   |
 | `affinity`                                    | Container affinity                                               | `{}`   |
