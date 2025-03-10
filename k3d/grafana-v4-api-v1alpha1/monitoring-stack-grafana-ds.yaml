@@ -1,0 +1,49 @@
+# Has to go in it's own file due to how old grafana API works: https://github.com/grafana/grafana-operator/issues/652
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDataSource
+metadata:
+  name: "prometheus-ds"
+  namespace: "prometheus-stack"
+spec:
+  name: prometheus-ds
+  datasources:
+    - name: prometheus
+      type: prometheus
+      url: http://prometheus-stack-kube-prom-prometheus:9090
+      access: proxy
+      isDefault: true
+      jsonData:
+        tlsSkipVerify: true
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDataSource
+metadata:
+  name: "alertmanager-ds"
+  namespace: "prometheus-stack"
+spec:
+  name: "alertmanager-ds"
+  datasources:
+    - name: alertmanager
+      type: alertmanager
+      url: http://prometheus-stack-kube-prom-alertmanager:9093
+      access: proxy
+      isDefault: false
+      jsonData:
+        "tlsSkipVerify": true
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDataSource
+metadata:
+  name: "loki-ds"
+  namespace: "prometheus-stack"
+spec:
+  name: "loki-ds"
+  datasources:
+    - name: loki
+      type: loki
+      url: http://loki-grafana-loki-querier:3100
+      access: proxy
+      isDefault: false
+      jsonData:
+        "tlsSkipVerify": true

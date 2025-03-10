@@ -9,15 +9,4 @@ metadata:
     release: prometheus
 spec: {{ $.Files.Get "prometheus-alerts/gateway-alerts.yaml" | nindent 2}}
 {{- end }}
-{{- if .Values.metrics.checklyAlerts.enable  }}
----
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  name: {{ include "conduktor-gateway.fullname" . | trunc 49 }}-checkly-alert
-  namespace: {{ .Release.Namespace }}
-  labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
-    release: prometheus
-spec: {{ $.Files.Get "prometheus-alerts/checkly-alerts.yaml" | nindent 2}}
-{{- end }}
 {{- end }}
