@@ -77,7 +77,7 @@ opt-out for a custom bootstrap server.
 */}}
 {{- define "conduktor-gateway.kafka-bootstrap-server" -}}
 {{-   if .Values.kafka.enabled -}}
-{{-     printf "%s-kafka.%s.svc.%s:9092" .Release.Name .Release.Namespace .Values.clusterDomain -}}
+{{-     printf "%s-kafka.%s.svc.%s:9092" .Release.Name .Release.Namespace (default "cluster.local" .Values.clusterDomain) -}}
 {{-   else -}}
 {{-     required "value .kafka.bootstrapServers is required" .Values.kafka.bootstrapServers -}}
 {{-   end -}}
@@ -112,13 +112,33 @@ Namespace of the platform grafana dashboards
 Generate default password for users if not defined and return a json of all users
 */}}
 {{- define "conduktor-gateway.patchApiUsers" -}}
-{{- if .Values.gateway.admin.users -}}
-{{- range .Values.gateway.admin.users -}}
-{{- if not .password -}}
-{{- $_ := set . "password" (randAlphaNum 15) -}}
-{{- end -}}
-{{- end -}}
-{{- toJson .Values.gateway.admin.users -}}
-{{- end -}}
+  {{- if .Values.gateway.admin.users -}}
+    {{- range .Values.gateway.admin.users -}}
+      {{- if empty .password -}}
+       {{- $_ := set . "password" (randAlphaNum 15) -}}
+      {{- end -}}
+    {{- end -}}
+    {{- toJson .Values.gateway.admin.users -}}
+  {{- else -}}
+    []
+  {{- end -}}
 {{- end -}}
 
+
+{{/*
+Get the first admin user from the list of users
+*/}}
+{{- define "conduktor-gateway.mainAdmin" -}}
+  {{- $users := . -}}
+  {{- $adminUser := dict -}}
+  {{- if not (empty $users) -}}
+    {{- range $user := $users -}}
+      {{- if and (hasKey $user "admin") $user.admin -}}
+        {{- if not $adminUser -}}
+          {{- $adminUser = $user -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- toJson $adminUser -}}
+{{- end -}}

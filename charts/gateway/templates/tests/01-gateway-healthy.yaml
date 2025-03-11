@@ -24,8 +24,8 @@ spec:
 {{- if .Values.gateway.admin.users }}
 {{- $internalAdminApiVclusterUrl := printf "http://%v:%v/gateway/v2/virtual-cluster" $internalServiceName $internalServicePort }}
 {{- $secretName := include "conduktor-gateway.secretName" . }}
-{{- $adminLogin := include "common.secrets.lookup" (dict "secret" $secretName "key" "GATEWAY_ADMIN_API_USER_0_USERNAME" "defaultValue" "admin" "context" $) }}
-{{- $adminPassword := include "common.secrets.lookup" (dict "secret" $secretName "key" "GATEWAY_ADMIN_API_USER_0_PASSWORD" "defaultValue" "conduktor" "context" $) }}
+{{- $adminLogin := include "common.secrets.lookup" (dict "secret" $secretName "key" .Values.gateway.admin.mainAdminSecretKeys.username "defaultValue" "admin" "context" $) }}
+{{- $adminPassword := include "common.secrets.lookup" (dict "secret" $secretName "key" .Values.gateway.admin.mainAdminSecretKeys.password "defaultValue" "conduktor" "context" $) }}
     - name: curl-gateway-admin-api
       image: curlimages/curl:8.1.2
       args: [ '--insecure', "--verbose" ,'{{ $internalAdminApiVclusterUrl }}',

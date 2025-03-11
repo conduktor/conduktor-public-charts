@@ -100,8 +100,15 @@ gateway:
       - username: "admin"
         password: ""
         admin: true
-    ## @param gateway.admin.securedMetrics Enable secured metrics using api users credentials
-    securedMetrics: false
+
+    ## @param gateway.admin.mainAdminSecretKeys.username Secret key used to store the username of the main admin user from `gateway.admin.users` (first with admin role)
+    ## @param gateway.admin.mainAdminSecretKeys.password Secret key used to store the password of the main admin user from `gateway.admin.users` (first with admin role)
+    mainAdminSecretKeys:
+      username: "GATEWAY_ADMIN_USERNAME"
+      password: "GATEWAY_ADMIN_PASSWORD"
+
+    ## @param gateway.admin.securedMetrics Enable secured metrics using api users credentials. If `gateway.secretRef` is set, this can't be used by `metrics.prometheus` to automatically configure basic auth on scrapping.
+    securedMetrics: true
 
   jmx:
     ## @param gateway.jmx.enable Enable JMX JVM options
