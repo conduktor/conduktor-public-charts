@@ -73,7 +73,7 @@ make helm-deps
 # Create local K3D cluster for test and local dev (require k3d, helm and kubectl)
 make k3d-up
 
-# Install dependencies like a Postgresql, Minio, Monitoring stack, etc.
+# Install dependencies like a Postgresql, Minio, Monitoring stack, and Kafka.
 make install-dev-deps
 ```
 
@@ -91,7 +91,9 @@ name: conduktor
 
 ```shell
  # Install Conduktor Gateway chart
-helm install gateway charts/gateway --namespace conduktor --set kafka.enabled=true 
+helm install gateway charts/gateway \
+  --namespace conduktor \
+  --set gateway.env.KAFKA_BOOTSTRAP_SERVERS="kafka-local-dev.conduktor.svc.cluster.local:9092"
 
 # Install Conduktor Console chart
 helm install console charts/console \
@@ -103,6 +105,12 @@ helm install console charts/console \
   --set config.database.username=postgres \
   --set config.database.host=postgresql.conduktor.svc.cluster.local \
   --set config.database.name=conduktor
+```
+
+### Cleanup local K3D cluster
+
+```shell
+make k3d-down
 ```
 
 ### Setup git hooks

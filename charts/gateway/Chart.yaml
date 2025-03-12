@@ -4,12 +4,6 @@ description: Conduktor Gateway chart
 name: conduktor-gateway
 version: 3.6.1
 dependencies:
-  - name: kafka
-    repository: https://charts.bitnami.com/bitnami
-    tags:
-      - bitnami-kafka
-    version: 18.x.x
-    condition: kafka.enabled
   - name: common
     version: 2.x.x
     repository: https://charts.bitnami.com/bitnami
