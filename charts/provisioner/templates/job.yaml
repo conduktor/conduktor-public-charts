@@ -1,0 +1,128 @@
+{{- if or .Values.console.enable .Values.gateway.enable -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "provisioner.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: conduktor-provisioning
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation
+    {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.cleanupAfterFinished.enabled }}
+  ttlSecondsAfterFinished: {{ .Values.cleanupAfterFinished.seconds }}
+  {{- end }}
+  parallelism: 1
+  template:
+    metadata:
+      labels: {{- include "provisioner.labels" . | nindent 8 }}
+        app.kubernetes.io/component: conduktor-provisioning
+      {{- if .Values.podAnnotations }}
+      annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.podAnnotations "context" $) | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- include "provisioner.imagePullSecrets" . | nindent 6 }}
+      {{- if .Values.schedulerName }}
+      schedulerName: {{ .Values.schedulerName }}
+      {{- end }}
+      restartPolicy: OnFailure
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{- end }}
+      {{- if .Values.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.topologySpreadConstraints "context" $) | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: 0
+      topologySpreadConstraints
+      {{- if .Values.podSecurityContext }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ template "provisioner.serviceAccountName" . }}
+      initContainers: [] # TODO
+      containers:
+      {{- if .Values.console.enable }}
+        - name: conduktor-ctl-console
+          image: {{ include "common.images.image" (dict "imageRoot" .Values.image "global" .Values.global) }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          {{- if .Values.console.containerSecurityContext }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.console.containerSecurityContext "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.console.command }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.console.command "context" $) | nindent 12 }}
+          {{- else }}
+          command:
+            - /bin/bash
+            - -c
+            - sleep
+            - infinity
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.console.args "context" $) | nindent 12 }}
+          {{- end }}
+          env:
+            - name: CDK_BASE_URL
+              value: {{ .Values.console.url | quote }}
+            - name: CDK_INSECURE
+              value: {{ .Values.console.insecure | quote }}
+            - name: CDK_AUTH_MODE
+              value: {{ .Values.console.authMode | quote }}
+            {{- if .Values.console.caCert -}}
+            - name: CDK_CACERT
+              value: {{ .Values.console.caCert | quote }}
+            {{- end }}
+            {{- if .Values.console.apiToken -}}
+            - name: CDK_API_KEY
+              value: {{ .Values.console.apiToken | quote }}
+            {{- end }}
+            {{- if .Values.console.username -}}
+            - name: CDK_USER
+              value: {{ .Values.console.username | quote }}
+            {{- end }}
+            {{- if .Values.console.password -}}
+            - name: CDK_PASSWORD
+              value: {{ .Values.console.password | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.console.secretRef }}
+                  key: password
+            {{- end }}
+          envFrom:
+            {{- if .Values.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.extraEnvVarsCM "context" $) }}
+            {{- end }}
+            {{- if .Values.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.extraEnvVarsSecret "context" $) }}
+            {{- end }}
+          {{- if .Values.resources }}
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: empty-dir
+              mountPath: /tmp
+              subPath: tmp-dir
+            - name: config
+              mountPath: /conf
+            {{- if .Values.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.tolerations "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: empty-dir
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: {{ include "provisioner.fullname" . }}
+        {{- if .Values.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
+{{- end }}
