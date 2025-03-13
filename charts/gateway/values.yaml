@@ -253,7 +253,7 @@ ingress:
 ## @descriptionEnd
 metrics:
   alerts:
-    ## @param metrics.alerts.enable Enable Prometheus alerts if Prometheus alerts rules is supported on cluster
+    ## @param metrics.alerts.enable Enable Prometheus alerts if Prometheus alerts rules are supported on cluster
     enable: false
   prometheus:
     ## @param metrics.prometheus.enable Enable ServiceMonitor Prometheus operator configuration for metrics scrapping

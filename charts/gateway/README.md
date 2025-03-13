@@ -115,7 +115,7 @@ Gateway embed metrics to be installed within you cluster if your have the correc
 
 | Name                                     | Description                                                                                                                                                                        | Value                        |
 | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| `metrics.alerts.enable`                  | Enable Prometheus alerts if Prometheus alerts rules is supported on cluster                                                                                                        | `false`                      |
+| `metrics.alerts.enable`                  | Enable Prometheus alerts if Prometheus alerts rules are supported on cluster                                                                                                       | `false`                      |
 | `metrics.prometheus.enable`              | Enable ServiceMonitor Prometheus operator configuration for metrics scrapping                                                                                                      | `false`                      |
 | `metrics.prometheus.annotations`         | Additional custom annotations for the ServiceMonitor                                                                                                                               | `{}`                         |
 | `metrics.prometheus.labels`              | Extra labels for the ServiceMonitor                                                                                                                                                | `{}`                         |
@@ -279,9 +279,9 @@ gateway:
 ### Monitoring
 
 #### Prometheus metrics
-Conduktor Gateway exposes metrics on `/api/metrics` endpoint that can be scraped by Prometheus. 
+Conduktor Gateway exposes metrics on the `/api/metrics` endpoint that can be scraped by Prometheus. 
 
-Conduktor Gateway chart can be configured to install Prometheus [ServiceMonitor CRD](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.ServiceMonitor) from [Prometheus Operator](https://prometheus-operator.dev/) to scrape metrics if API `monitoring.coreos.com/v1/ServiceMonitor` is available on Kubernetes Cluster.
+The Conduktor Gateway chart can be configured to install Prometheus [ServiceMonitor CRD](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.ServiceMonitor) from [Prometheus Operator](https://prometheus-operator.dev/) to scrape metrics if the API `monitoring.coreos.com/v1/ServiceMonitor` is available on the Kubernetes Cluster.
 
 To enable Prometheus scraping, set the following values in your `values.yaml`:
 ```yaml
@@ -297,7 +297,7 @@ metrics:
 ```
 
 ##### Prometheus alerts
-Some default alerts are provided in the [`gateway-alerts.yaml`](./prometheus-alerts/gateway-alerts.yaml) file that use [PrometheusRule CRD](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.PrometheusRule). 
+Some default alerts are provided in the [`gateway-alerts.yaml`](./prometheus-alerts/gateway-alerts.yaml) file that make use of [PrometheusRule CRD](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.PrometheusRule). 
 
 To enable alerts, set the following values in your `values.yaml`:
 ```yaml
@@ -307,9 +307,9 @@ metrics:
 ```
 
 #### Grafana dashboards
-Conduktor Gateway chart can be configured to install Grafana dashboards using [Grafana Operator](https://grafana.github.io/grafana-operator/).
+The Conduktor Gateway chart can be configured to install Grafana dashboards using [Grafana Operator](https://grafana.github.io/grafana-operator/).
 
-The chart support CRD Dashboard API v4 ([`integreatly.org/v1alpha1/GrafanaDashboard`](https://github.com/grafana/grafana-operator/blob/v4/documentation/dashboards.md)) and v5 ([`grafana.integreatly.org/v1beta1/GrafanaDashboard`](https://grafana.github.io/grafana-operator/docs/dashboards/)).
+The chart supports CRD Dashboard API v4 ([`integreatly.org/v1alpha1/GrafanaDashboard`](https://github.com/grafana/grafana-operator/blob/v4/documentation/dashboards.md)) and v5 ([`grafana.integreatly.org/v1beta1/GrafanaDashboard`](https://grafana.github.io/grafana-operator/docs/dashboards/)).
 
 To enable Grafana dashboards, set the following values in your `values.yaml`:
 ```yaml
@@ -325,10 +325,10 @@ metrics:
       #loki: loki # Loki datasource name to use for log dashboard (not required by main dashboard)
 ```
 
-The chart then install the Grafana dashboards as ConfigMap in the configured namespace. And init CRD if they are installed in Kubernetes Cluster.
+The chart then installs the Grafana dashboards as ConfigMap in the configured namespace. And init CRD if they are installed in Kubernetes Cluster.
 
 ##### Sidecar ConfigMap loading
-If you are not using Grafana Operator but official [Grafana Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/grafana), you can use the Sidecar provisioning to load dashboards from ConfigMap. 
+If you are not using the Grafana Operator but an official [Grafana Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/grafana), you can use the Sidecar provisioning to load dashboards from ConfigMap. 
 
 To enable Sidecar ConfigMap loading, set the following values in your `values.yaml`:
 ```yaml
