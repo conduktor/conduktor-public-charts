@@ -115,7 +115,7 @@ Generate default password for users if not defined and return a json of all user
   {{- if .Values.gateway.admin.users -}}
     {{- range .Values.gateway.admin.users -}}
       {{- if empty .password -}}
-       {{- $_ := set . "password" (randAlphaNum 15) -}}
+       {{- $_ := set . "password" (randAlphaNum 20) -}}
       {{- end -}}
     {{- end -}}
     {{- toJson .Values.gateway.admin.users -}}
@@ -141,4 +141,25 @@ Get the first admin user from the list of users
     {{- end -}}
   {{- end -}}
   {{- toJson $adminUser -}}
+{{- end -}}
+
+
+{{/*
+Check if env exist in context
+
+Params:
+  - envKey - String - Required - Name of the env.
+  - context - Context - Required - Parent context.
+*/}}
+{{- define "conduktor-gateway.envExists" -}}
+  {{- $exists := false -}}
+  {{- $exists = hasKey $.context.Values.gateway.env $.envkey -}}
+  {{- if not $exists -}}
+    {{- range $.context.Values.gateway.extraSecretEnvVars -}}
+      {{- if eq .name $.envkey -}}
+        {{- $exists = true -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $exists -}}
 {{- end -}}

@@ -81,6 +81,12 @@ gateway:
   ## @param gateway.licenseKey License key to activate Conduktor Gateway not used if `gateway.secretRef` is set
   licenseKey: ""
 
+  userPool:
+    ## @param gateway.userPool.secretKey Secret key (256bits) to encrypt service accounts credentials when `SASL_PLAIN` or `SASL_SSL` is used for `GATEWAY_SECURITY_PROTOCOL`. If empty, a random key will be generated. Not used if `gateway.secretRef` is set.
+    secretKey: ""
+    ## @param gateway.userPool.serviceAccountRequired If true, verify the existence of user mapping for the service account when the user connects in Non-Delegated `SASL_PLAIN` mode.
+    serviceAccountRequired: false
+
   ## @param gateway.interceptors Json configuration for interceptors to be loaded at startup by Gateway
   interceptors: "[]"
 
