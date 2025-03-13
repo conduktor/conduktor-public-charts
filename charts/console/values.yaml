@@ -1095,6 +1095,16 @@ platformCortex:
     ##
     sessionAffinityConfig: {}
 
+#provisioning:
+#  enabled: false
+#  gateway:
+#    enabled: false
+#  console:
+#    enabled: true
+#    extraEnvVarsSecret: "console-provisioner-secrets"
+#    extraEnvVarsCM: "console-provisioner-config"
+#    manifests: {}
+
 ## @skip tests
 tests:
   enabled: false
