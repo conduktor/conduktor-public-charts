@@ -1,10 +1,38 @@
 # Default values for conduktor-gateway
 
+## @section Global parameters
+## @descriptionStart
+## Global Docker image parameters
+## Please, note that this will override the image parameters, including dependencies, configured to use the global value
+## Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
+## @descriptionEnd
 global:
   ## @param global.imagePullSecrets [array, nullable] Docker login secrets name for image pull
-  imagePullSecrets:
+  imagePullSecrets: []
   ## @param global.env The environment name
   env: ""
+
+## @section Common parameters
+##
+
+## @param nameOverride String to partially override common.names.name
+##
+nameOverride: ""
+## @param fullnameOverride String to fully override common.names.fullname
+##
+fullnameOverride: ""
+## @param namespaceOverride String to fully override common.names.namespace
+##
+namespaceOverride: ""
+## @param commonLabels Labels to add to all deployed objects
+##
+commonLabels: {}
+## @param commonAnnotations Annotations to add to all deployed objects
+##
+commonAnnotations: {}
+## @param clusterDomain Kubernetes cluster domain name
+##
+clusterDomain: cluster.local
 
 gateway:
   ## @section Gateway image configuration
@@ -50,6 +78,15 @@ gateway:
   ## @param gateway.env [object] Environment variables for Gateway deployment
   env: {}
 
+  ## @param gateway.licenseKey License key to activate Conduktor Gateway not used if `gateway.secretRef` is set
+  licenseKey: ""
+
+  userPool:
+    ## @param gateway.userPool.secretKey Secret key (256bits) to encrypt service accounts credentials when `SASL_PLAIN` or `SASL_SSL` is used for `GATEWAY_SECURITY_PROTOCOL`. If empty, a random key will be generated. Not used if `gateway.secretRef` is set.
+    secretKey: ""
+    ## @param gateway.userPool.serviceAccountRequired If true, verify the existence of user mapping for the service account when the user connects in Non-Delegated `SASL_PLAIN` mode.
+    serviceAccountRequired: false
+
   ## @param gateway.interceptors Json configuration for interceptors to be loaded at startup by Gateway
   interceptors: "[]"
 
@@ -62,6 +99,22 @@ gateway:
   admin:
     ## @param gateway.admin.port Admin HTTP server port
     port: 8888
+    ## @param gateway.admin.users[0].username API Admin username. (not used if `gateway.secretRef` is set)
+    ## @param gateway.admin.users[0].password API Admin password. If empty, a random password will be generated (not used if `gateway.secretRef` is set)
+    ## @param gateway.admin.users[0].admin API user admin role flag. (not used if `gateway.secretRef` is set)
+    users:
+      - username: "admin"
+        password: ""
+        admin: true
+
+    ## @param gateway.admin.mainAdminSecretKeys.username Secret key used to store the username of the main admin user from `gateway.admin.users` (first with admin role)
+    ## @param gateway.admin.mainAdminSecretKeys.password Secret key used to store the password of the main admin user from `gateway.admin.users` (first with admin role)
+    mainAdminSecretKeys:
+      username: "GATEWAY_ADMIN_USERNAME"
+      password: "GATEWAY_ADMIN_PASSWORD"
+
+    ## @param gateway.admin.securedMetrics Enable secured metrics using api users credentials. If `gateway.secretRef` is set, this can't be used by `metrics.prometheus` to automatically configure basic auth on scrapping.
+    securedMetrics: true
 
   jmx:
     ## @param gateway.jmx.enable Enable JMX JVM options
@@ -324,9 +377,6 @@ serviceAccount:
   ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
   ##
   automountServiceAccountToken: true
-
-## @param commonLabels Labels to be applied to all resources created by this chart
-commonLabels: {}
 
 ## @param nodeSelector Container node selector
 nodeSelector: {}

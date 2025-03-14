@@ -26,6 +26,15 @@ spec:
       {{- if .Values.metrics.prometheus.relabelings }}
       relabelings: {{- include "common.tplvalues.render" ( dict "value" .Values.metrics.prometheus.relabelings "context" $) | nindent 8 }}
       {{- end }}
+      {{- if and .Values.gateway.admin.securedMetrics (not .Values.gateway.secretRef) }}
+      basicAuth:
+        username:
+          name: {{ include "conduktor-gateway.secretName" . }}
+          key: {{ .Values.gateway.admin.mainAdminSecretKeys.username | quote}}
+        password:
+          name: {{ include "conduktor-gateway.secretName" . }}
+          key: {{ .Values.gateway.admin.mainAdminSecretKeys.password | quote}}
+      {{- end }}
       {{- if .Values.metrics.prometheus.extraParams }}
       {{- toYaml .Values.metrics.prometheus.extraParams | nindent 6 }}
       {{- end }}
