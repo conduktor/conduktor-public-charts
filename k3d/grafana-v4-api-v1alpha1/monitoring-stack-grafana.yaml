@@ -21,4 +21,7 @@ spec:
       - key: "grafana_dashboard"
         operator: In
         values: [ "1" ]
-
+  dataStorage:
+    accessModes:
+      - ReadWriteOnce
+    size: 1Gi

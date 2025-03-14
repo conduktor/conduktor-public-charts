@@ -21,6 +21,14 @@ spec:
           containers:
             - name: grafana
               image: grafana/grafana:10.2.2
+  persistentVolumeClaim:
+    spec:
+      storageClassName: ""
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource
