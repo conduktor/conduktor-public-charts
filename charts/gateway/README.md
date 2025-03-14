@@ -113,21 +113,23 @@ This section contains Kubernetes ingress configuration.
 
 Gateway embed metrics to be installed within you cluster if your have the correct capabilities (Prometheus and Grafana operators).
 
-| Name                                     | Description                                                                      | Value                    |
-| ---------------------------------------- | -------------------------------------------------------------------------------- | ------------------------ |
-| `metrics.alerts.enable`                  | Enable Prometheus alerts if Prometheus alerts rules is supported on cluster      | `false`                  |
-| `metrics.checklyAlerts.enable`           | Enable alerts for checky jobs if Prometheus rules is supported on cluster        | `false`                  |
-| `metrics.prometheus.enable`              | Enable ServiceMonitor Prometheus operator configuration for metrics scrapping    | `false`                  |
-| `metrics.prometheus.annotations`         | Additional custom annotations for the ServiceMonitor                             | `{}`                     |
-| `metrics.prometheus.labels`              | Extra labels for the ServiceMonitor                                              | `{}`                     |
-| `metrics.prometheus.jobLabel`            | The name of the label on the target service to use as the job name in Prometheus | `app.kubernetes.io/name` |
-| `metrics.prometheus.metricRelabelings`   | Configure metric relabeling in ServiceMonitor                                    | `{}`                     |
-| `metrics.prometheus.relabelings`         | Configure relabelings in ServiceMonitor                                          | `{}`                     |
-| `metrics.prometheus.extraParams`         | Extra parameters in ServiceMonitor                                               | `{}`                     |
-| `metrics.grafana.enable`                 | Enable Grafana dashboards to installation                                        | `false`                  |
-| `metrics.grafana.labels`                 | Additional custom labels for Grafana dashboard ConfigMap                         | `{}`                     |
-| `metrics.grafana.datasources.prometheus` | Prometheus datasource to use for metric dashboard                                | `prometheus`             |
-| `metrics.grafana.datasources.loki`       | Loki datasource to use for log dashboard                                         | `loki`                   |
+| Name                                     | Description                                                                                                                                                                        | Value                        |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `metrics.alerts.enable`                  | Enable Prometheus alerts if Prometheus alerts rules are supported on cluster                                                                                                       | `false`                      |
+| `metrics.prometheus.enable`              | Enable ServiceMonitor Prometheus operator configuration for metrics scrapping                                                                                                      | `false`                      |
+| `metrics.prometheus.annotations`         | Additional custom annotations for the ServiceMonitor                                                                                                                               | `{}`                         |
+| `metrics.prometheus.labels`              | Extra labels for the ServiceMonitor                                                                                                                                                | `{}`                         |
+| `metrics.prometheus.jobLabel`            | The name of the label on the target service to use as the job name in Prometheus                                                                                                   | `app.kubernetes.io/instance` |
+| `metrics.prometheus.metricRelabelings`   | Configure metric relabeling in ServiceMonitor                                                                                                                                      | `{}`                         |
+| `metrics.prometheus.relabelings`         | Configure relabelings in ServiceMonitor                                                                                                                                            | `{}`                         |
+| `metrics.prometheus.extraParams`         | Extra parameters in ServiceMonitor. See https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.Endpoint                                                  | `{}`                         |
+| `metrics.grafana.enable`                 | Enable Grafana dashboards to installation. Dashboards can be installed as Sidecar ConfigMap or using Grafana operator CRDs (v4 or v5)                                              | `false`                      |
+| `metrics.grafana.namespace`              | Namespace used to deploy Grafana dashboards by default use the same namespace as Conduktor Gateway                                                                                 | `""`                         |
+| `metrics.grafana.matchLabels`            | Label selector for Grafana instance (for grafana-operator v5 only)                                                                                                                 | `{}`                         |
+| `metrics.grafana.labels`                 | Additional custom labels for Grafana dashboard ConfigMap. Used by Sidecar ConfigMap loading https://github.com/grafana/helm-charts/tree/main/charts/grafana#sidecar-for-dashboards | `{}`                         |
+| `metrics.grafana.folder`                 | Grafana dashboard folder name                                                                                                                                                      | `""`                         |
+| `metrics.grafana.datasources.prometheus` | Prometheus datasource to use for metric dashboard                                                                                                                                  | `prometheus`                 |
+| `metrics.grafana.datasources.loki`       | Loki datasource to use for log dashboard                                                                                                                                           | `loki`                       |
 
 ### Kubernetes common configuration
 
@@ -272,3 +274,75 @@ gateway:
   env:
     KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/gateway/tls/truststore/kafka.truststore.jks
 ```
+
+
+### Monitoring
+
+#### Prometheus metrics
+Conduktor Gateway exposes metrics on the `/api/metrics` endpoint that can be scraped by Prometheus. 
+
+The Conduktor Gateway chart can be configured to install Prometheus [ServiceMonitor CRD](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.ServiceMonitor) from [Prometheus Operator](https://prometheus-operator.dev/) to scrape metrics if the API `monitoring.coreos.com/v1/ServiceMonitor` is available on the Kubernetes Cluster.
+
+To enable Prometheus scraping, set the following values in your `values.yaml`:
+```yaml
+metrics:
+  prometheus:
+    enable: true
+    jobLabel: app.kubernetes.io/instance # Default label used to identify the job
+    #annotations: {} # Additional custom annotations for the ServiceMonitor
+    #labels: {} # Extra labels for the ServiceMonitor
+    #metricRelabelings: {} # Configure metric relabeling in ServiceMonitor
+    #relabelings: {} # Configure relabelings in ServiceMonitor
+    #extraParams: {} # Extra parameters in ServiceMonitor. See https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.Endpoint
+```
+
+##### Prometheus alerts
+Some default alerts are provided in the [`gateway-alerts.yaml`](./prometheus-alerts/gateway-alerts.yaml) file that make use of [PrometheusRule CRD](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.PrometheusRule). 
+
+To enable alerts, set the following values in your `values.yaml`:
+```yaml
+metrics:
+  alerts:
+    enable: true
+```
+
+#### Grafana dashboards
+The Conduktor Gateway chart can be configured to install Grafana dashboards using [Grafana Operator](https://grafana.github.io/grafana-operator/).
+
+The chart supports CRD Dashboard API v4 ([`integreatly.org/v1alpha1/GrafanaDashboard`](https://github.com/grafana/grafana-operator/blob/v4/documentation/dashboards.md)) and v5 ([`grafana.integreatly.org/v1beta1/GrafanaDashboard`](https://grafana.github.io/grafana-operator/docs/dashboards/)).
+
+To enable Grafana dashboards, set the following values in your `values.yaml`:
+```yaml
+metrics:
+  grafana:
+    enable: true
+    namespace: "" # Namespace used to deploy Grafana dashboards by default use the same namespace as Conduktor Gateway
+    #matchLabels: {} # Label selector for Grafana instance (for grafana-operator v5 only)
+    #labels: {} # Additional custom labels for Grafana dashboard ConfigMap. Used by Sidecar ConfigMap loading
+    #folder: ""
+    #datasources:
+      #prometheus: prometheus  # Prometheus datasource name to use for metric dashboard
+      #loki: loki # Loki datasource name to use for log dashboard (not required by main dashboard)
+```
+
+The chart then installs the Grafana dashboards as ConfigMap in the configured namespace. And init CRD if they are installed in Kubernetes Cluster.
+
+##### Sidecar ConfigMap loading
+If you are not using the Grafana Operator but an official [Grafana Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/grafana), you can use the Sidecar provisioning to load dashboards from ConfigMap. 
+
+To enable Sidecar ConfigMap loading, set the following values in your `values.yaml`:
+```yaml
+metrics:
+  grafana:
+    enable: true
+    namespace: "" # Namespace used to deploy Grafana dashboards by default use the same namespace as Conduktor Gateway
+    labels: 
+      grafana_dashboard: "1" # Label to enable Sidecar ConfigMap loading check Grafana chart sidecar.dashboards.label value for expected value
+```
+
+##### Import dashboards manually
+If you want to import dashboards manually, you can use the exported json files from the [grafana-dashboards](./grafana-dashboards) folder.
+
+> [!NOTE]  
+> Grafana Dashboard exported json files expect to have a datasource named `prometheus` and `loki` to be available in Grafana and that Conduktor Gateway run inside Kubernetes with `pod` label on metrics.
+> Dashboards are tested with Grafana **9.x** and **10.x**.

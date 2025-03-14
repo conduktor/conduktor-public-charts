@@ -1,46 +1,72 @@
-{{- if .Capabilities.APIVersions.Has "integreatly.org/v1alpha1/GrafanaDashboard" }}
 {{- if .Values.metrics.grafana.enable }}
+{{- $configMapName := printf "%s-dashboards" ( include "conduktor-gateway.fullname" . | trunc 52) -}}
+{{- $gatewayNsRelease := printf "%s/%s" (include "common.names.namespace" .) .Release.Name -}}
+{{- $gatewayDashboard :=  .Files.Get "grafana-dashboards/gateway.json" | fromJson }}
+{{- $_ := set $gatewayDashboard "title" (printf "Conduktor Gateway [%s]" $gatewayNsRelease) -}}
+{{- $gatewayLogsDashboard :=  .Files.Get "grafana-dashboards/gateway-logs.json" | fromJson }}
+{{- $_2 := set $gatewayLogsDashboard "title" (printf "Conduktor Gateway logs [%s]" $gatewayNsRelease) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "conduktor-gateway.fullname" . | trunc 52 }}-dashboards
+  name: {{ $configMapName | quote }}
+  namespace: {{ include "conduktor-gateway.dashboard.namespace" . | quote }}
   labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
-  {{- if .Values.metrics.grafana.labels }}
-  {{- include "common.tplvalues.render" ( dict "value" .Values.metrics.grafana.labels "context" $ ) | nindent 4 }}
-  {{- end }}
+    {{- if .Values.metrics.grafana.labels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.metrics.grafana.labels "context" $ ) | nindent 4 }}
+    {{- end }}
 data:
-  gateway.json: |
-{{ .Files.Get "grafana-dashboards/gateway.json" | indent 4 }}
-  gateway-logs.json: |
-{{ .Files.Get "grafana-dashboards/gateway-logs.json" | indent 4 }}
+  gateway.json: >
+{{ toPrettyJson $gatewayDashboard | indent 4 }}
+  gateway-logs.json: >
+{{ toPrettyJson $gatewayLogsDashboard | indent 4 }}
 ---
-apiVersion: integreatly.org/v1alpha1
+{{/* Support for v5 of Grafana operator */}}
+{{- if .Capabilities.APIVersions.Has "grafana.integreatly.org/v1beta1/GrafanaDashboard" }}
+apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
   name: {{ include "conduktor-gateway.fullname" . | trunc 47 }}-gateway-dashboard
+  namespace: {{ include "conduktor-gateway.dashboard.namespace" . | quote }}
   labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
-    conduktor.io/dashboard: "true"
+    "conduktor.io/dashboard": "true"
+    {{- if .Values.metrics.grafana.labels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.metrics.grafana.labels "context" $ ) | nindent 4 }}
+    {{- end }}
 spec:
-  customFolderName: Product
+  instanceSelector:
+    matchLabels:
+    {{- include "common.tplvalues.render" ( dict "value" .Values.metrics.grafana.matchLabels "context" $ ) | nindent 6 }}
+  {{- if .Values.metrics.grafana.folder }}
+  folder: {{ .Values.metrics.grafana.folder | quote }}
+  {{- end }}
   configMapRef:
-    name: {{ include "conduktor-gateway.fullname" . | trunc 52 }}-dashboards
+    name:  {{ $configMapName | quote }}
     key: gateway.json
   datasources:
     - inputName: "DS_PROMETHEUS"
       datasourceName: {{ .Values.metrics.grafana.datasources.prometheus | quote }}
     - inputName: "GATEWAY_NAME"
-      datasourceName: {{ include "conduktor-gateway.fullname" . | quote }}
+      datasourceName: {{ .Release.Name | quote }}
 ---
-apiVersion: integreatly.org/v1alpha1
+apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
-  name: {{ include "conduktor-gateway.fullname" . | trunc 49 }}-log-dashboard
+  name: {{ include "conduktor-gateway.fullname" . | trunc 47 }}-log-dashboard
+  namespace: {{ include "conduktor-gateway.dashboard.namespace" . | quote }}
   labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
-    conduktor.io/dashboard: "true"
+    "conduktor.io/dashboard": "true"
+    {{- if .Values.metrics.grafana.labels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.metrics.grafana.labels "context" $ ) | nindent 4 }}
+    {{- end }}
 spec:
-  customFolderName: Product
+  instanceSelector:
+    matchLabels:
+    {{- include "common.tplvalues.render" ( dict "value" .Values.metrics.grafana.matchLabels "context" $ ) | nindent 6 }}
+  {{- if .Values.metrics.grafana.folder }}
+  folder: {{ .Values.metrics.grafana.folder | quote }}
+  {{- end }}
   configMapRef:
-    name: {{ include "conduktor-gateway.fullname" . | trunc 52 }}-dashboards
+    name:  {{ $configMapName | quote }}
     key: gateway-logs.json
   datasources:
     - inputName: "DS_LOKI"
@@ -48,6 +74,57 @@ spec:
     - inputName: "DS_PROMETHEUS"
       datasourceName: {{ .Values.metrics.grafana.datasources.prometheus | quote }}
     - inputName: "GATEWAY_NAME"
-      datasourceName: {{ include "conduktor-gateway.fullname" . | quote }}
+      datasourceName: {{ .Release.Name | quote }}
+{{- end }}
+---
+{{/* Support for v4 of Grafana operator */}}
+{{- if .Capabilities.APIVersions.Has "integreatly.org/v1alpha1/GrafanaDashboard" }}
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "conduktor-gateway.fullname" . | trunc 47 }}-gateway-dashboard
+  namespace: {{ include "conduktor-gateway.dashboard.namespace" . | quote }}
+  labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
+    conduktor.io/dashboard: "true"
+    {{- if .Values.metrics.grafana.labels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.metrics.grafana.labels "context" $ ) | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.metrics.grafana.folder }}
+  customFolderName: {{ .Values.metrics.grafana.folder | quote }}
+  {{- end }}
+  configMapRef:
+    name:  {{ $configMapName | quote }}
+    key: gateway.json
+  datasources:
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: {{ .Values.metrics.grafana.datasources.prometheus | quote }}
+    - inputName: "GATEWAY_NAME"
+      datasourceName: {{ .Release.Name | quote }}
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "conduktor-gateway.fullname" . | trunc 49 }}-log-dashboard
+  namespace: {{ include "conduktor-gateway.dashboard.namespace" . | quote }}
+  labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
+    conduktor.io/dashboard: "true"
+    {{- if .Values.metrics.grafana.labels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.metrics.grafana.labels "context" $ ) | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.metrics.grafana.folder }}
+  customFolderName: {{ .Values.metrics.grafana.folder | quote }}
+  {{- end }}
+  configMapRef:
+    name:  {{ $configMapName | quote }}
+    key: gateway-logs.json
+  datasources:
+    - inputName: "DS_LOKI"
+      datasourceName: {{ .Values.metrics.grafana.datasources.loki | quote }}
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: {{ .Values.metrics.grafana.datasources.prometheus | quote }}
+    - inputName: "GATEWAY_NAME"
+      datasourceName: {{ .Release.Name | quote }}
 {{- end }}
 {{- end }}

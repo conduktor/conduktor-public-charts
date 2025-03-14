@@ -26,9 +26,9 @@ All types of contributions are encouraged and valued. See the [Table of Contents
 
 ## I Have a Question
 
-> If you want to ask a question, we assume that you have read the available [Documentation](https://docs.conduktor.io/) and charts READMEs. 
+> If you want to ask a question, we assume that you have read the available [Documentation](https://docs.conduktor.io/) and chart READMEs. 
 
-Before you ask a question, it is best to search for existing [Issues](https://github.com/conduktor/conduktor-public-charts/issues) that might help you. In case you have found a suitable issue and still need clarification, you can write your question in this issue. It is also advisable to search the internet for answers first.
+Before you ask a question, it is best to search for any existing [Issues](https://github.com/conduktor/conduktor-public-charts/issues) that might help you. In case you have found a suitable issue and still need clarification, you can write your question in this issue. It is also advisable to search the internet for answers first.
 
 If you then still feel the need to ask a question and need clarification, we recommend the following:
 
@@ -49,7 +49,7 @@ A good bug report shouldn't leave others needing to chase you up for more inform
 
 - Make sure that you are using the latest version.
 - Determine if your bug is really a bug and not an error on your side e.g. using incompatible environment components/versions (Make sure that you have read the [documentation](https://docs.conduktor.io/). If you are looking for support, you might want to check [this section](#i-have-a-question)).
-- To see if other users have experienced (and potentially already solved) the same issue you are having, check if there is not already a bug report existing for your bug or error in the [bug tracker](https://github.com/conduktor/conduktor-public-charts/issues?q=label%3Abug).
+- To see if other users have experienced (and potentially already solved) the same issue you are having, check if there is not already a bug report existing for your bug or error in the [issue tracker](https://github.com/conduktor/conduktor-public-charts/issues?q=label%3Abug).
 - Collect information about the bug:
   - Version of the Conduktor chart you are using
   - Version of Conduktor Console or Gateway you are using
@@ -88,7 +88,7 @@ This section guides you through submitting an enhancement suggestion for Condukt
 <!-- omit in toc -->
 #### How Do I Submit a Good Enhancement Suggestion?
 
-Enhancement suggestions are tracked as [GitHub issues](https://github.com/conduktor/conduktor-public-charts/issues) or in [Conduktor Roadmap](https://product.conduktor.help/).
+Enhancement suggestions are tracked as [GitHub issues](https://github.com/conduktor/conduktor-public-charts/issues) or in [Conduktor Roadmap](https://conduktor.io/roadmap).
 
 - Use a **clear and descriptive title** for the issue to identify the suggestion.
 - Provide a **step-by-step description of the suggested enhancement** in as many details as possible.

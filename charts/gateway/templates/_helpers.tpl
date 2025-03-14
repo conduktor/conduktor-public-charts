@@ -90,3 +90,14 @@ Define external service name
 {{- define "conduktor-gateway.externalServiceName"}}
 {{- printf "%s-external" (include "conduktor-gateway.fullname" . | trunc 54) -}}
 {{- end -}}
+
+{{/*
+Namespace of the platform grafana dashboards
+*/}}
+{{- define "conduktor-gateway.dashboard.namespace" -}}
+  {{- if not (empty .Values.metrics.grafana.namespace) -}}
+    {{- .Values.metrics.grafana.namespace -}}
+  {{- else -}}
+    {{- include "common.names.namespace" . -}}
+  {{- end -}}
+{{- end -}}
