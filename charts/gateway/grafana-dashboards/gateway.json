@@ -1684,7 +1684,7 @@
           "hide": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "{{vcluster}} {{direction}}",
+          "legendFormat": "{{vcluster}} - {{direction}}",
           "range": true,
           "refId": "B",
           "useBackend": false
