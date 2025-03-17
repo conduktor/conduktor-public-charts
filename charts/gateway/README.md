@@ -227,7 +227,7 @@ You can create a secret in your Kubernetes cluster and reference it in the `gate
 > This secret should contain **environment variables** that Gateway will use and need to be created in the same namespace as the Gateway deployment.
 
 > [!WARNING]  
-> When using `gateway.secretRef`, `gateway.licenseKey`, `gateway.admin.users` and `gateway.userPool.secretKey` are ignored and you should provide them in the secret using environment variables keys `GATEWAY_LICENSE_KEY`, `GATEWAY_ADMIN_API_USERS`, `GATEWAY_USER_POOL_SECRET_KEY` respectively.
+> When using `gateway.secretRef`, the following will be ignored as they are expected in the `gateway.secretRef` : `gateway.licenseKey`, `gateway.admin.users` and `gateway.userPool.secretKey` . You should provide them in the secret using environment variable keys: `GATEWAY_LICENSE_KEY`, `GATEWAY_ADMIN_API_USERS`, `GATEWAY_USER_POOL_SECRET_KEY` respectively.
 
 ```yaml
 apiVersion: v1
