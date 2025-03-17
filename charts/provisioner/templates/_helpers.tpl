@@ -13,6 +13,20 @@ Create a default fully qualified app name.
 {{- end }}
 
 {{/*
+Default fully qualified manifest config map name
+*/}}
+{{- define "provisioner.manifests.configMapName" -}}
+{{- include "common.names.fullname" . }}-manifests
+{{- end }}
+
+{{/*
+Default fully qualified secret name
+*/}}
+{{- define "provisioner.config.secrets" -}}
+{{- include "common.names.fullname" . }}-config-secret
+{{- end }}
+
+{{/*
 Return the proper Docker Image Registry Secret Names
 */}}
 {{- define "provisioner.imagePullSecrets" -}}

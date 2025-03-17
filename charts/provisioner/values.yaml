@@ -177,14 +177,13 @@ terminationGracePeriodSeconds: ""
 topologySpreadConstraints: [ ]
 
 
-## @section Provisioning configuration
+## @section Console provisioning configuration
 ##
 console:
   ## @param console.enable Enable Console provisioning
-  enable: true
+  enabled: false
   ## @param console.authMode Authentication mode on Console for Conduktor CLI, either "conduktor" or "external" if using API Gateway in front of Console.
   authMode: "conduktor"
-
 
   ## @param console.url URL of the Console
   url: ""
@@ -199,7 +198,7 @@ console:
   ## @param console.insecure Skip TLS verification
   insecure: false
   ## @param console.manifests Manifests YAML to apply on the Console
-  manifests: {}
+  manifests: []
   ## @param console.manifestsConfigMap Manifests YAML to apply on the Console
   manifestsConfigMap: ""
   ## @param console.manifestConfigMapKey Manifests YAML to apply on the Console
@@ -259,13 +258,22 @@ console:
 
 gateway:
   ## @param gateway.enable Enable Gateway provisioning
-  enable: true
+  enabled: true
   ## @param gateway.url URL of the Console
   url: ""
   ## @param gateway.username Username to authenticate on the Console
   username: ""
   ## @param gateway.password Password to authenticate on the Console
   password: ""
+
+
+  ## @param console.manifests Manifests YAML to apply on the Console
+  manifests: {}
+  ## @param console.manifestsConfigMap Manifests YAML to apply on the Console
+  manifestsConfigMap: ""
+  ## @param console.manifestConfigMapKey Manifests YAML to apply on the Console
+  manifestsConfigMapKey: "console-resources.yaml"
+
 
 
 ## @section Other Parameters
