@@ -14,6 +14,28 @@ helm install my-gateway conduktor/conduktor-gateway
 
 ## Parameters
 
+### Global parameters
+
+Global Docker image parameters
+Please, note that this will override the image parameters, including dependencies, configured to use the global value
+Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
+
+| Name                      | Description                              | Value |
+| ------------------------- | ---------------------------------------- | ----- |
+| `global.imagePullSecrets` | Docker login secrets name for image pull | `[]`  |
+| `global.env`              | The environment name                     | `""`  |
+
+### Common parameters
+
+| Name                | Description                                     | Value           |
+| ------------------- | ----------------------------------------------- | --------------- |
+| `nameOverride`      | String to partially override common.names.name  | `""`            |
+| `fullnameOverride`  | String to fully override common.names.fullname  | `""`            |
+| `namespaceOverride` | String to fully override common.names.namespace | `""`            |
+| `commonLabels`      | Labels to add to all deployed objects           | `{}`            |
+| `commonAnnotations` | Annotations to add to all deployed objects      | `{}`            |
+| `clusterDomain`     | Kubernetes cluster domain name                  | `cluster.local` |
+
 ### Gateway image configuration
 
 This section defines the image to be used.
@@ -29,27 +51,36 @@ This section defines the image to be used.
 
 This section contains configuration of the Conduktor Gateway.
 
-| Name                         | Description                                                                                                                        | Value                                                                                                                                                                                                                                                                                                                       |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `gateway.replicas`           | number of gateway instances to be deployed                                                                                         | `2`                                                                                                                                                                                                                                                                                                                         |
-| `gateway.secretRef`          | Secret name to load sensitive env var from                                                                                         | `""`                                                                                                                                                                                                                                                                                                                        |
-| `gateway.extraSecretEnvVars` | Array with extra secret environment variables                                                                                      | `[]`                                                                                                                                                                                                                                                                                                                        |
-| `gateway.secretSha256sum`    | Optional sha256sum of the referenced secret. This could be set to have a automactic restart of gateway deployment if secret change | `""`                                                                                                                                                                                                                                                                                                                        |
-| `gateway.env`                | Environment variables for Gateway deployment                                                                                       | `{}`                                                                                                                                                                                                                                                                                                                        |
-| `gateway.interceptors`       | Json configuration for interceptors to be loaded at startup by Gateway                                                             | `[]`                                                                                                                                                                                                                                                                                                                        |
-| `gateway.portRange.start`    | Start port of the gateway port range                                                                                               | `9092`                                                                                                                                                                                                                                                                                                                      |
-| `gateway.portRange.count`    | Max number of broker to expose                                                                                                     | `7`                                                                                                                                                                                                                                                                                                                         |
-| `gateway.admin.port`         | Admin HTTP server port                                                                                                             | `8888`                                                                                                                                                                                                                                                                                                                      |
-| `gateway.jmx.enable`         | Enable JMX JVM options                                                                                                             | `false`                                                                                                                                                                                                                                                                                                                     |
-| `gateway.jmx.port`           | JMX port to expose by default JVM args                                                                                             | `9999`                                                                                                                                                                                                                                                                                                                      |
-| `gateway.jmx.jvmArgs`        | Arguments to pass to the gateway container JVM                                                                                     | `-Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1` |
-| `gateway.startupProbeDelay`  | Optional delay in second before startup probe should be running (default 10)                                                       | `""`                                                                                                                                                                                                                                                                                                                        |
-| `gateway.podLabels`          | Specific labels to be added to Gateway pod by deployment                                                                           | `{}`                                                                                                                                                                                                                                                                                                                        |
-| `gateway.podAnnotations`     | Gateway pod annotations                                                                                                            | `{}`                                                                                                                                                                                                                                                                                                                        |
-| `gateway.securityContext`    | Container security context                                                                                                         | `{}`                                                                                                                                                                                                                                                                                                                        |
-| `gateway.volumes`            | Define user specific volumes for Gateway deployment                                                                                | `{}`                                                                                                                                                                                                                                                                                                                        |
-| `gateway.volumeMounts`       | Define user specific volumeMounts for Gateway container in deployment                                                              | `{}`                                                                                                                                                                                                                                                                                                                        |
-| `gateway.priorityClassName`  | Define Gateway pods' priority based on an existing ClassName                                                                       | `""`                                                                                                                                                                                                                                                                                                                        |
+| Name                                         | Description                                                                                                                                                                                                             | Value                                                                                                                                                                                                                                                                                                                       |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `gateway.replicas`                           | number of gateway instances to be deployed                                                                                                                                                                              | `2`                                                                                                                                                                                                                                                                                                                         |
+| `gateway.secretRef`                          | Secret name to load sensitive env var from                                                                                                                                                                              | `""`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.extraSecretEnvVars`                 | Array with extra secret environment variables                                                                                                                                                                           | `[]`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.secretSha256sum`                    | Optional sha256sum of the referenced secret. This could be set to have a automactic restart of gateway deployment if secret change                                                                                      | `""`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.env`                                | Environment variables for Gateway deployment                                                                                                                                                                            | `{}`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.licenseKey`                         | License key to activate Conduktor Gateway not used if `gateway.secretRef` is set                                                                                                                                        | `""`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.userPool.secretKey`                 | Secret key (256bits) to encrypt service accounts credentials when `SASL_PLAIN` or `SASL_SSL` is used for `GATEWAY_SECURITY_PROTOCOL`. If empty, a random key will be generated. Not used if `gateway.secretRef` is set. | `""`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.userPool.serviceAccountRequired`    | If true, verify the existence of user mapping for the service account when the user connects in Non-Delegated `SASL_PLAIN` mode.                                                                                        | `false`                                                                                                                                                                                                                                                                                                                     |
+| `gateway.interceptors`                       | Json configuration for interceptors to be loaded at startup by Gateway                                                                                                                                                  | `[]`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.portRange.start`                    | Start port of the gateway port range                                                                                                                                                                                    | `9092`                                                                                                                                                                                                                                                                                                                      |
+| `gateway.portRange.count`                    | Max number of broker to expose                                                                                                                                                                                          | `7`                                                                                                                                                                                                                                                                                                                         |
+| `gateway.admin.port`                         | Admin HTTP server port                                                                                                                                                                                                  | `8888`                                                                                                                                                                                                                                                                                                                      |
+| `gateway.admin.users[0].username`            | API Admin username. (not used if `gateway.secretRef` is set)                                                                                                                                                            | `admin`                                                                                                                                                                                                                                                                                                                     |
+| `gateway.admin.users[0].password`            | API Admin password. If empty, a random password will be generated (not used if `gateway.secretRef` is set)                                                                                                              | `""`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.admin.users[0].admin`               | API user admin role flag. (not used if `gateway.secretRef` is set)                                                                                                                                                      | `true`                                                                                                                                                                                                                                                                                                                      |
+| `gateway.admin.mainAdminSecretKeys.username` | Secret key used to store the username of the main admin user from `gateway.admin.users` (first with admin role)                                                                                                         | `GATEWAY_ADMIN_USERNAME`                                                                                                                                                                                                                                                                                                    |
+| `gateway.admin.mainAdminSecretKeys.password` | Secret key used to store the password of the main admin user from `gateway.admin.users` (first with admin role)                                                                                                         | `GATEWAY_ADMIN_PASSWORD`                                                                                                                                                                                                                                                                                                    |
+| `gateway.admin.securedMetrics`               | Enable secured metrics using api users credentials. If `gateway.secretRef` is set, this can't be used by `metrics.prometheus` to automatically configure basic auth on scrapping.                                       | `true`                                                                                                                                                                                                                                                                                                                      |
+| `gateway.jmx.enable`                         | Enable JMX JVM options                                                                                                                                                                                                  | `false`                                                                                                                                                                                                                                                                                                                     |
+| `gateway.jmx.port`                           | JMX port to expose by default JVM args                                                                                                                                                                                  | `9999`                                                                                                                                                                                                                                                                                                                      |
+| `gateway.jmx.jvmArgs`                        | Arguments to pass to the gateway container JVM                                                                                                                                                                          | `-Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1` |
+| `gateway.startupProbeDelay`                  | Optional delay in second before startup probe should be running (default 10)                                                                                                                                            | `""`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.podLabels`                          | Specific labels to be added to Gateway pod by deployment                                                                                                                                                                | `{}`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.podAnnotations`                     | Gateway pod annotations                                                                                                                                                                                                 | `{}`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.securityContext`                    | Container security context                                                                                                                                                                                              | `{}`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.volumes`                            | Define user specific volumes for Gateway deployment                                                                                                                                                                     | `{}`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.volumeMounts`                       | Define user specific volumeMounts for Gateway container in deployment                                                                                                                                                   | `{}`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.priorityClassName`                  | Define Gateway pods' priority based on an existing ClassName                                                                                                                                                            | `""`                                                                                                                                                                                                                                                                                                                        |
 
 ### TLS configuration
 
@@ -141,7 +172,6 @@ Shared Kubernetes configuration of the chart.
 | `serviceAccount.name`                         | The name of the ServiceAccount to use.                           | `""`   |
 | `serviceAccount.annotations`                  | Additional Service Account annotations (evaluated as a template) | `{}`   |
 | `serviceAccount.automountServiceAccountToken` | Automount service account token for the server service account   | `true` |
-| `commonLabels`                                | Labels to be applied to all resources created by this chart      | `{}`   |
 | `nodeSelector`                                | Container node selector                                          | `{}`   |
 | `tolerations`                                 | Container tolerations                                            | `[]`   |
 | `affinity`                                    | Container affinity                                               | `{}`   |
@@ -159,8 +189,14 @@ Enable and configure chart dependencies if not available in your deployment.
 
 The following `values.yaml` file can be used to set up Gateway to proxy traffic to a Confluent Cloud cluster:
 
-```yaml
+```yaml file=values.yaml
 gateway:
+  licenseKey: "<your license key>" # set GATEWAY_LICENSE_KEY secret env var
+  admin:
+    users: # generate GATEWAY_ADMIN_API_USERS secret env var 
+      - username: admin
+        password: "<your admin password>" # if empty, a random password will be generated
+        admin: true
   env:
     # Configure connection to Confluent Cloud
     KAFKA_BOOTSTRAP_SERVERS: pkc-xxxxx.region.provider.confluent.cloud:9092
@@ -177,6 +213,108 @@ gateway:
 See [Gateway Documentation](https://docs.conduktor.io/gateway/configuration/env-variables/) for a list of environment variables that can be used.
 In particular, the [Client to Gateway Authentication page](https://docs.conduktor.io/gateway/configuration/client-authentication/) details the different authentication mechanisms that can be used with Gateway.
 
+### How to provide secrets
+
+Some environment variables require sensitive information, such as API keys, passwords or license key. These should be provided as Kubernetes secrets. 
+
+This chart provide several ways to provide secrets to Gateway deployment:
+
+#### Provide you own secret with `gateway.secretRef`
+
+You can create a secret in your Kubernetes cluster and reference it in the `gateway.secretRef` field in the `values.yaml` file. 
+
+> [!IMPORTANT]  
+> This secret should contain **environment variables** that Gateway will use and need to be created in the same namespace as the Gateway deployment.
+
+> [!WARNING]  
+> When using `gateway.secretRef`, the following will be ignored as they are expected in the `gateway.secretRef` : `gateway.licenseKey`, `gateway.admin.users` and `gateway.userPool.secretKey`.   
+> You should provide them in the secret using environment variable keys: `GATEWAY_LICENSE_KEY`, `GATEWAY_ADMIN_API_USERS`, `GATEWAY_USER_POOL_SECRET_KEY` respectively.
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gateway-custom-secret
+type: Opaque
+data:
+  GATEWAY_LICENSE_KEY: <base64 encoded license key>
+  GATEWAY_USER_POOL_SECRET_KEY: <base64 encoded secret key (256bits string)>
+  GATEWAY_ADMIN_API_USERS: <base64 encoded admin users json>
+  KAFKA_SASL_JAAS_CONFIG: <base64 encoded SASL JAAS config>
+  #... other sensitive env vars
+```
+And then reference it in the `values.yaml` file:
+```yaml file=values.yaml
+gateway:
+  secretRef: gateway-custom-secret
+```
+
+#### Using `gateway.extraSecretEnvVars`
+
+You can also reference per-secret value in the `values.yaml` file directly. This is useful when using an existing secrets with different keys.
+
+```yaml file=custom-secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: existing-kafka-secret
+type: Opaque
+data:
+  jaas-config.properties: <base64 encoded SASL JAAS config>
+  #... other sensitive config
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: existing-gateway-secret
+type: Opaque
+data:
+  license: <base64 encoded license key>
+  user-pool-secret: <base64 encoded secret key (256bits string)>
+  #... other sensitive config
+```
+
+and then reference them in the `values.yaml` file:
+```yaml file=values.yaml
+gateway:
+  extraSecretEnvVars:
+    - name: GATEWAY_LICENSE_KEY
+      valueFrom:
+        secretKeyRef:
+          name: existing-gateway-secret
+          key: license
+    - name: GATEWAY_USER_POOL_SECRET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: existing-gateway-secret
+          key: user-pool-secret
+    - name: KAFKA_SASL_JAAS_CONFIG
+      valueFrom:
+        secretKeyRef:
+          name: existing-kafka-secret
+          key: jaas-config.properties
+```
+
+> [!NOTE]
+> In this example gateway chart will create a secret with only `GATEWAY_ADMIN_API_USERS` key with value from `gateway.admin.users` field 
+> as `GATEWAY_LICENSE_KEY` and `GATEWAY_USER_POOL_SECRET_KEY` are provided in the `gateway.extraSecretEnvVars` field.
+
+#### Using values and generated secrets
+
+If you don't want to create a secret, you can provide the sensitive information directly in the `values.yaml` file.
+This is useful for testing or when you don't want to manage secrets in your cluster but it's not recommended for production.
+
+```yaml file=values.yaml
+gateway:
+  licenseKey: "<your license key>" # set GATEWAY_LICENSE_KEY secret env var
+  admin:
+    users: # generate GATEWAY_ADMIN_API_USERS secret env var 
+      - username: admin
+        password: "<your admin password>" # if empty, a random password will be generated
+        admin: true
+  userPool:
+    secretKey: "<256bits long string>" # if empty, a random key will be generated
+```
 
 ### Ingress configuration examples
 

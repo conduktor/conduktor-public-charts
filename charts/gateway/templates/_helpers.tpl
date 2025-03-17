@@ -24,6 +24,12 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 {{- end -}}
 
+{{/*
+Create default secret name
+*/}}
+{{- define "conduktor-gateway.secretName" -}}
+{{- printf "%s-secret" (include "conduktor-gateway.fullname" . | trunc 63 | trimSuffix "-") -}}
+{{- end -}}
 
 {{/*
 Create chart name and version as used by the chart label.
@@ -71,7 +77,7 @@ opt-out for a custom bootstrap server.
 */}}
 {{- define "conduktor-gateway.kafka-bootstrap-server" -}}
 {{-   if .Values.kafka.enabled -}}
-{{-     printf "%s-kafka.%s.svc.cluster.local:9092" .Release.Name .Release.Namespace -}}
+{{-     printf "%s-kafka.%s.svc.%s:9092" .Release.Name .Release.Namespace (default "cluster.local" .Values.clusterDomain) -}}
 {{-   else -}}
 {{-     required "value .kafka.bootstrapServers is required" .Values.kafka.bootstrapServers -}}
 {{-   end -}}
@@ -100,4 +106,60 @@ Namespace of the platform grafana dashboards
   {{- else -}}
     {{- include "common.names.namespace" . -}}
   {{- end -}}
+{{- end -}}
+
+{{/*
+Generate default password for users if not defined and return a json of all users
+*/}}
+{{- define "conduktor-gateway.patchApiUsers" -}}
+  {{- if .Values.gateway.admin.users -}}
+    {{- range .Values.gateway.admin.users -}}
+      {{- if empty .password -}}
+       {{- $_ := set . "password" (randAlphaNum 20) -}}
+      {{- end -}}
+    {{- end -}}
+    {{- toJson .Values.gateway.admin.users -}}
+  {{- else -}}
+    []
+  {{- end -}}
+{{- end -}}
+
+
+{{/*
+Get the first admin user from the list of users
+*/}}
+{{- define "conduktor-gateway.mainAdmin" -}}
+  {{- $users := . -}}
+  {{- $adminUser := dict -}}
+  {{- if not (empty $users) -}}
+    {{- range $user := $users -}}
+      {{- if and (hasKey $user "admin") $user.admin -}}
+        {{- if not $adminUser -}}
+          {{- $adminUser = $user -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- toJson $adminUser -}}
+{{- end -}}
+
+
+{{/*
+Check if env exist in context
+
+Params:
+  - envKey - String - Required - Name of the env.
+  - context - Context - Required - Parent context.
+*/}}
+{{- define "conduktor-gateway.envExists" -}}
+  {{- $exists := false -}}
+  {{- $exists = hasKey $.context.Values.gateway.env $.envkey -}}
+  {{- if not $exists -}}
+    {{- range $.context.Values.gateway.extraSecretEnvVars -}}
+      {{- if eq .name $.envkey -}}
+        {{- $exists = true -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $exists -}}
 {{- end -}}

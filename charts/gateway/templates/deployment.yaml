@@ -13,6 +13,7 @@ spec:
     metadata:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/self-secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
         {{- if .Values.gateway.secretSha256sum }}
         checksum/secret: {{ .Values.gateway.secretSha256sum }}
         {{- end }}
@@ -50,6 +51,12 @@ spec:
             - name: JAVA_TOOL_OPTIONS
               value: {{ tpl .Values.gateway.jmx.jvmArgs . | quote }}
             {{- end}}
+            - name: GATEWAY_SECURED_METRICS
+              value: {{ .Values.gateway.admin.securedMetrics | quote }}
+            {{- if and .Values.gateway.userPool .Values.gateway.userPool.serviceAccountRequired }}
+            - name: GATEWAY_USER_POOL_SERVICE_ACCOUNT_REQUIRED
+              value: {{ .Values.gateway.userPool.serviceAccountRequired | quote }}
+            {{- end }}
             {{- if and .Values.tls.enable .Values.tls.secretRef}}
             - name: GATEWAY_SSL_KEY_STORE_PATH
               value: /etc/gateway/tls/{{ .Values.tls.keystoreFile }}
@@ -65,6 +72,9 @@ spec:
             {{- if .Values.gateway.secretRef }}
             - secretRef:
                 name: {{ .Values.gateway.secretRef }}
+            {{- else }}
+            - secretRef:
+                name: {{ include "conduktor-gateway.secretName" . }}
             {{- end }}
           ports:
             {{- range untilStep (int .Values.gateway.portRange.start) (int (add .Values.gateway.portRange.start .Values.gateway.portRange.count)) 1 }}
