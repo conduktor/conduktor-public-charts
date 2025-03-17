@@ -1,9 +1,9 @@
 
-{{- if or .Values.console.enable -}}
+{{- if or .Values.console.enabled .Values.gateway.enabled -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "provisioner.fullname" . }}
+  name: {{ include "provisioner.manifests.configMapName" . }}
   namespace: {{ include "common.names.namespace" . | quote }}
   labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
     app.kubernetes.io/component: conduktor-provisioning
@@ -11,7 +11,20 @@ metadata:
   annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
   {{- end }}
 data:
-   console-resources.yaml: |-
-     # TODO
-   gateway-resources.yaml: |-
-     # TODO
+  {{- if and .Values.console.manifests (not .Values.console.manifestsConfigMap) }}
+  {{ .Values.console.manifestsConfigMapKey }}: |
+    {{- range .Values.console.manifests }}
+    ---
+    {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+
+  {{- if and .Values.gateway.manifests (not .Values.gateway.manifestsConfigMap) }}
+  {{ .Values.gateway.manifestsConfigMapKey }}: |
+    {{ range .Values.gateway.manifests }}
+    ---
+    {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+
+{{- end }}
