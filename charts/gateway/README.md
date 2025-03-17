@@ -189,7 +189,7 @@ Enable and configure chart dependencies if not available in your deployment.
 
 The following `values.yaml` file can be used to set up Gateway to proxy traffic to a Confluent Cloud cluster:
 
-```yaml
+```yaml file=values.yaml
 gateway:
   licenseKey: "<your license key>" # set GATEWAY_LICENSE_KEY secret env var
   admin:
@@ -213,6 +213,107 @@ gateway:
 See [Gateway Documentation](https://docs.conduktor.io/gateway/configuration/env-variables/) for a list of environment variables that can be used.
 In particular, the [Client to Gateway Authentication page](https://docs.conduktor.io/gateway/configuration/client-authentication/) details the different authentication mechanisms that can be used with Gateway.
 
+### How to provide secrets
+
+Some environment variables require sensitive information, such as API keys, passwords or license key. These should be provided as Kubernetes secrets. 
+
+This chart provide several ways to provide secrets to Gateway deployment:
+
+#### Provide you own secret with `gateway.secretRef`
+
+You can create a secret in your Kubernetes cluster and reference it in the `gateway.secretRef` field in the `values.yaml` file. 
+
+> [!IMPORTANT]  
+> This secret should contain **environment variables** that Gateway will use and need to be created in the same namespace as the Gateway deployment.
+
+> [!WARNING]  
+> When using `gateway.secretRef`, `gateway.licenseKey`, `gateway.admin.users` and `gateway.userPool.secretKey` are ignored and you should provide them in the secret using environment variables keys `GATEWAY_LICENSE_KEY`, `GATEWAY_ADMIN_API_USERS`, `GATEWAY_USER_POOL_SECRET_KEY` respectively.
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gateway-custom-secret
+type: Opaque
+data:
+  GATEWAY_LICENSE_KEY: <base64 encoded license key>
+  GATEWAY_USER_POOL_SECRET_KEY: <base64 encoded secret key (256bits string)>
+  GATEWAY_ADMIN_API_USERS: <base64 encoded admin users json>
+  KAFKA_SASL_JAAS_CONFIG: <base64 encoded SASL JAAS config>
+  #... other sensitive env vars
+```
+And then reference it in the `values.yaml` file:
+```yaml file=values.yaml
+gateway:
+  secretRef: gateway-custom-secret
+```
+
+#### Using `gateway.extraSecretEnvVars`
+
+You can also reference per-secret value in the `values.yaml` file directly. This is useful when using an existing secrets with different keys.
+
+```yaml file=custom-secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: existing-kafka-secret
+type: Opaque
+data:
+  jaas-config.properties: <base64 encoded SASL JAAS config>
+  #... other sensitive config
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: existing-gateway-secret
+type: Opaque
+data:
+  license: <base64 encoded license key>
+  user-pool-secret: <base64 encoded secret key (256bits string)>
+  #... other sensitive config
+```
+
+and then reference them in the `values.yaml` file:
+```yaml file=values.yaml
+gateway:
+  extraSecretEnvVars:
+    - name: GATEWAY_LICENSE_KEY
+      valueFrom:
+        secretKeyRef:
+          name: existing-gateway-secret
+          key: license
+    - name: GATEWAY_USER_POOL_SECRET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: existing-gateway-secret
+          key: user-pool-secret
+    - name: KAFKA_SASL_JAAS_CONFIG
+      valueFrom:
+        secretKeyRef:
+          name: existing-kafka-secret
+          key: jaas-config.properties
+```
+
+> [!NOTE]
+> In this example gateway chart will create a secret with only `GATEWAY_ADMIN_API_USERS` key with value from `gateway.admin.users` field 
+> as `GATEWAY_LICENSE_KEY` and `GATEWAY_USER_POOL_SECRET_KEY` are provided in the `gateway.extraSecretEnvVars` field.
+
+#### Using values and generated secrets
+
+If you don't want to create a secret, you can provide the sensitive information directly in the `values.yaml` file.
+This is useful for testing or when you don't want to manage secrets in your cluster but it's not recommended for production.
+
+```yaml file=values.yaml
+gateway:
+  licenseKey: "<your license key>" # set GATEWAY_LICENSE_KEY secret env var
+  admin:
+    users: # generate GATEWAY_ADMIN_API_USERS secret env var 
+      - username: admin
+        password: "<your admin password>" # if empty, a random password will be generated
+        admin: true
+  userPool:
+    secretKey: "<256bits long string>" # if empty, a random key will be generated
+```
 
 ### Ingress configuration examples
 
