@@ -10,6 +10,7 @@ To learn more about the release, try:
   $ helm status {{ .Release.Name }} -n {{ include "common.names.namespace" . | quote }}
   $ helm get all {{ .Release.Name }} -n {{ include "common.names.namespace" . | quote }}
 
+{{- $internalServiceHost := printf "%s.%s.svc.%s" (include "conduktor-gateway.internalServiceName" .) .Release.Namespace .Values.clusterDomain  -}}
 {{- if not (hasKey .Values.gateway.env "GATEWAY_ADVERTISED_HOST") }}
 You can connect to Gateway from inside your cluster with {{ $internalServiceHost }}:{{ .Values.gateway.portRange.start }} as bootstrap server.
 {{- else }}
