@@ -242,7 +242,7 @@ Console expose metrics that could be collected and presented if your environment
 | `platform.metrics.serviceMonitor.namespace`         | Namespace in which Prometheus is running                                                               | `""`                     |
 | `platform.metrics.serviceMonitor.annotations`       | Additional custom annotations for the ServiceMonitor                                                   | `{}`                     |
 | `platform.metrics.serviceMonitor.labels`            | Extra labels for the ServiceMonitor                                                                    | `{}`                     |
-| `platform.metrics.serviceMonitor.jobLabel`          | The name of the label on the target service to use as the job name in Prometheus                       | `app.kubernetes.io/name` |
+| `platform.metrics.serviceMonitor.jobLabel`          | The name of the label on the target service to use as the job name in Prometheus                       | `app.kubernetes.io/instance` |
 | `platform.metrics.serviceMonitor.honorLabels`       | honorLabels chooses the metric's labels on collisions with target labels                               | `false`                  |
 | `platform.metrics.serviceMonitor.interval`          | Interval at which metrics should be scraped.                                                           | `""`                     |
 | `platform.metrics.serviceMonitor.scrapeTimeout`     | Timeout after which the scrape is ended                                                                | `""`                     |

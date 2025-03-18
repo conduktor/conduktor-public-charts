@@ -512,7 +512,7 @@ platform:
       labels: {}
       ## @param platform.metrics.serviceMonitor.jobLabel The name of the label on the target service to use as the job name in Prometheus
       ##
-      jobLabel: "app.kubernetes.io/name"
+      jobLabel: "app.kubernetes.io/instance"
       ## @param platform.metrics.serviceMonitor.honorLabels honorLabels chooses the metric's labels on collisions with target labels
       ##
       honorLabels: false
