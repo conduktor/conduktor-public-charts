@@ -33,10 +33,6 @@ spec:
             # Static env var to be reconsidered if we offer env way to configure them
             - name: GATEWAY_INTERCEPTOR_CONFIG_LOCATION
               value: /etc/gateway/config/interceptors.json
-            {{- if .Values.kafka.enabled }}
-            - name: KAFKA_BOOTSTRAP_SERVERS
-              value: {{ include "conduktor-gateway.kafka-bootstrap-server" . }}
-            {{- end}}
             {{- if not (hasKey .Values.gateway.env "GATEWAY_ADVERTISED_HOST") }}
             - name: GATEWAY_ADVERTISED_HOST
               value: {{ include "conduktor-gateway.internalServiceName" . }}

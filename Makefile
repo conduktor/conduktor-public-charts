@@ -34,7 +34,7 @@ install-readme-generator: ## Install bitnami/readme-generator-for-helm using NMP
 	@echo "Check that NPM is installed"
 	command -v npm || echo -e "Missing NPM"; exit 1;
 	@echo "Install readme-generator"
-	npm install -g @bitnami/readme-generator-for-helm@2.6.1
+	npm install -g @bitnami/readme-generator-for-helm@2.7.0
 
 
 .PHONY: generate-readme
@@ -90,6 +90,8 @@ install-dev-deps:  ## Install development dependencies (PostgreSQL, Minio, monit
 	make helm-minio
 	@echo "Installing Monitoring stack"
 	make helm-monitoring-stack
+	@echo "Installing Kafka"
+	make helm-kafka
 	@echo "Stack ready"
 	@echo "Postgresql:"
 	@echo "	Internal : postgresql.${NAMESPACE}.svc.cluster.local:5432"
@@ -173,6 +175,28 @@ helm-minio: ## Install minio helm chart from bitnami
 	    --set persistence.size=1Gi
 	@echo "Waiting for minio to be ready..."
 	kubectl rollout status --watch --timeout=300s deployment/minio -n ${NAMESPACE}
+
+.PHONY: helm-kafka
+helm-kafka: ## Install kafka helm chart from bitnami
+	make check-kube-context
+	kubectl create namespace ${NAMESPACE} || true
+	@echo "Installing Kafka"
+	helm upgrade --install kafka-local-dev bitnami/kafka \
+		--namespace ${NAMESPACE} --create-namespace \
+		--version 31.0.0 \
+		--set listeners.overrideListeners="" \
+		--set listeners.client.protocol=PLAINTEXT \
+		--set listeners.client.port=9092 \
+		--set listeners.controller.protocol=PLAINTEXT \
+		--set listeners.controller.port=9093 \
+		--set listeners.interBroker.protocol=PLAINTEXT \
+		--set listeners.interBroker.port=9094 \
+		--set extraConfigYaml.default\\.replication\\.factor=1 \
+		--set extraConfigYaml.offsets\\.topic\\.replication\\.factor=1 \
+		--set extraConfigYaml.transaction\\.state\\.log\\.replication\\.factor=1 \
+		--set controller.replicaCount=1
+	@echo "Waiting for kafka to be ready..."
+	kubectl rollout status --watch --timeout=300s statefulset/kafka-local-dev-controller -n ${NAMESPACE}
 
 .PHONY: helm-monitoring-stack
 .ONESHELL:
