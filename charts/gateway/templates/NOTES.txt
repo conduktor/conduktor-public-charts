@@ -10,29 +10,30 @@ To learn more about the release, try:
   $ helm status {{ .Release.Name }} -n {{ include "common.names.namespace" . | quote }}
   $ helm get all {{ .Release.Name }} -n {{ include "common.names.namespace" . | quote }}
 
+{{- include "conduktor-gateway.validate.kafka-bootstrap-server" . }}
+
+Gateway Bootstrap server :
 {{- $internalServiceHost := printf "%s.%s.svc.%s" (include "conduktor-gateway.internalServiceName" .) .Release.Namespace .Values.clusterDomain  -}}
 {{- if not (hasKey .Values.gateway.env "GATEWAY_ADVERTISED_HOST") }}
-You can connect to Gateway from inside your cluster with {{ $internalServiceHost }}:{{ .Values.gateway.portRange.start }} as bootstrap server.
+  Internally with : {{ $internalServiceHost }}:{{ .Values.gateway.portRange.start }}
 {{- else }}
-You defined a specific domain to be advertised : {{ .Values.gateway.env.GATEWAY_ADVERTISED_HOST }}
-You'll need to configure your network connections to gateway with this domain.
+  You defined a specific domain to be advertised : {{ .Values.gateway.env.GATEWAY_ADVERTISED_HOST }}
+  You'll need to configure your network connections to gateway with this domain.
 {{- end }}
+Check https://docs.conduktor.io/gateway/configuration/client-authentication/ for more information on how to configure your clients.
 
-{{- include "conduktor-gateway.kafka-bootstrap-server" . }}
-{{- include "print_kafka_bootstrap_servers" . }}
-
-{{ if .Values.ingress.enabled -}}
+Admin API :
+{{- if .Values.ingress.enabled }}
 {{- $proto := ternary "https" "http" .Values.ingress.tls }}
-Admin API is available from outside yor cluster at {{ printf "%s://%s" $proto .Values.ingress.hostname }}.
+  External access : {{ printf "%s://%s" $proto .Values.ingress.hostname }}
 {{- else }}
-Admin API is available from inside your cluster at {{ $internalServiceHost }}:{{ .Values.gateway.admin.port }}.
-It could be exposed outside using a port-forwarding or a LoadBalancer like
-  $ kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "conduktor-gateway.internalServiceName" . }} {{ .Values.gateway.admin.port }}:{{ .Values.gateway.admin.port }}
-Admin API will be available at http://127.0.0.1:{{ .Values.gateway.admin.port }}
+  Internal access : {{ $internalServiceHost }}:{{ .Values.gateway.admin.port }}.
+  It could be exposed outside using a port-forwarding or a LoadBalancer like and be available at http://127.0.0.1:{{ .Values.gateway.admin.port }}
+    $ kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "conduktor-gateway.internalServiceName" . }} {{ .Values.gateway.admin.port }}:{{ .Values.gateway.admin.port }}
 {{- end }}
 
 {{- if and (not .Values.gateway.secretRef) .Values.gateway.admin.users }}
-You can connect to gateway with the credentials:
-  ADMIN_LOGIN="$(kubectl get secret {{ include "conduktor-gateway.secretName" . }} -n {{ .Release.Namespace }} -o jsonpath="{.data.GATEWAY_ADMIN_API_USER_0_USERNAME}" | base64 --decode)"
-  ADMIN_PASSWORD="$(kubectl get secret {{ include "conduktor-gateway.secretName" . }} -n {{ .Release.Namespace }} -o jsonpath="{.data.GATEWAY_ADMIN_API_USER_0_PASSWORD}" | base64 --decode)"
+  Admin API credentials :
+    ADMIN_LOGIN="$(kubectl get secret {{ include "conduktor-gateway.secretName" . }} -n {{ .Release.Namespace }} -o jsonpath="{.data.GATEWAY_ADMIN_API_USER_0_USERNAME}" | base64 --decode)"
+    ADMIN_PASSWORD="$(kubectl get secret {{ include "conduktor-gateway.secretName" . }} -n {{ .Release.Namespace }} -o jsonpath="{.data.GATEWAY_ADMIN_API_USER_0_PASSWORD}" | base64 --decode)"
 {{- end }}

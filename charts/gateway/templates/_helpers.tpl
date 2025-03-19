@@ -66,13 +66,11 @@ Create the name of the service account to use
 Helper function to check if KAFKA_BOOTSTRAP_SERVERS exists in either gateway.env or gateway.extraSecretEnvVars.
 If it does not exist in either, or exists in both, fail the chart.
 */}}
-{{- define "conduktor-gateway.kafka-bootstrap-server" -}}
+{{- define "conduktor-gateway.validate.kafka-bootstrap-server" -}}
   {{- $env := .Values.gateway.env }}
   {{- $extraEnv := .Values.gateway.extraSecretEnvVars }}
-
   {{- $foundInEnv := hasKey $env "KAFKA_BOOTSTRAP_SERVERS" }}
   {{- $foundInExtraEnv := false }}
-  
   {{- if $extraEnv }}
     {{- range $index, $item := $extraEnv }}
       {{- if eq (index $item "name") "KAFKA_BOOTSTRAP_SERVERS" }}
@@ -80,43 +78,13 @@ If it does not exist in either, or exists in both, fail the chart.
       {{- end }}
     {{- end }}
   {{- end }}
-
   {{- if not (or $foundInEnv $foundInExtraEnv) }}
     {{- fail "KAFKA_BOOTSTRAP_SERVERS is not defined in either gateway.env or gateway.extraSecretEnvVars." }}
   {{- end }}
-
   {{- if and $foundInEnv $foundInExtraEnv }}
     {{- fail "KAFKA_BOOTSTRAP_SERVERS is defined in both gateway.env and gateway.extraSecretEnvVars, which is invalid." }}
   {{- end }}
 {{- end -}}
-
-{{/*
-print_kafka_bootstrap_servers: This template function is used to print the Kafka bootstrap servers.
-Usage: {{ include "print_kafka_bootstrap_servers" . }}
-*/}}
-{{- define "print_kafka_bootstrap_servers" }}
-{{- $servers := "" }}
-
-{{- if .Values.gateway.extraSecretEnvVars }}
-  {{- range .Values.gateway.extraSecretEnvVars }}
-    {{- if eq .name "KAFKA_BOOTSTRAP_SERVERS" }}
-      {{- $servers = .value }}
-    {{- end }}
-  {{- end }}
-{{- else if .Values.gateway.env.KAFKA_BOOTSTRAP_SERVERS }}
-  {{- $servers = .Values.gateway.env.KAFKA_BOOTSTRAP_SERVERS }}
-{{- end }}
-
-{{- if $servers }}
-  {{- $serverList := split "," $servers }}
-Kafka Bootstrap Servers:
-  {{- range $serverList }}
-  - {{ . | trim }}
-  {{- end }}
-{{- else }}
-No Kafka Bootstrap Servers configured.
-{{- end }}
-{{- end }}
 
 {{- define "conduktor-gateway.internalServiceName" -}}
 {{- printf "%s-internal" (include "conduktor-gateway.fullname" . | trunc 54) -}}
