@@ -39,3 +39,8 @@ You can connect to gateway with the credentials:
   ADMIN_LOGIN="$(kubectl get secret {{ include "conduktor-gateway.secretName" . }} -n {{ .Release.Namespace }} -o jsonpath="{.data.GATEWAY_ADMIN_API_USER_0_USERNAME}" | base64 --decode)"
   ADMIN_PASSWORD="$(kubectl get secret {{ include "conduktor-gateway.secretName" . }} -n {{ .Release.Namespace }} -o jsonpath="{.data.GATEWAY_ADMIN_API_USER_0_PASSWORD}" | base64 --decode)"
 {{- end }}
+
+{{ if .Values.resources -}}
+Depreciation Warning:
+- Root value "resources" is deprecated. We recommend using "gateway.resources" instead.
+{{- end }}

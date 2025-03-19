@@ -112,6 +112,9 @@ spec:
               port: {{ .Values.gateway.admin.port }}
               scheme: {{ .Values.tls.enable | ternary "HTTPS" "HTTP" }}
             initialDelaySeconds: {{ .Values.gateway.startupProbeDelay | default 10 }}
+          {{- with .Values.gateway.resources }}
+          resources: {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- with .Values.resources }}
           resources: {{- toYaml . | nindent 12 }}
           {{- end }}
