@@ -26,12 +26,10 @@ Admin API :
 {{- if .Values.ingress.enabled }}
 {{- $proto := ternary "https" "http" .Values.ingress.tls }}
   External access : {{ printf "%s://%s" $proto .Values.ingress.hostname }}
-{{- else }}
+{{- end }}
   Internal access : {{ $internalServiceHost }}:{{ .Values.gateway.admin.port }}.
   It could be exposed outside using a port-forwarding or a LoadBalancer like and be available at http://127.0.0.1:{{ .Values.gateway.admin.port }}
     $ kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "conduktor-gateway.internalServiceName" . }} {{ .Values.gateway.admin.port }}:{{ .Values.gateway.admin.port }}
-{{- end }}
-
 {{- if and (not .Values.gateway.secretRef) .Values.gateway.admin.users }}
   Admin API credentials :
     ADMIN_LOGIN="$(kubectl get secret {{ include "conduktor-gateway.secretName" . }} -n {{ .Release.Namespace }} -o jsonpath="{.data.GATEWAY_ADMIN_API_USER_0_USERNAME}" | base64 --decode)"
