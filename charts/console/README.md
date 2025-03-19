@@ -235,27 +235,27 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/co
 
 Console expose metrics that could be collected and presented if your environment have the necessary components (Prometheus and Grafana operators)
 
-| Name                                                | Description                                                                                            | Value                    |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------ |
-| `platform.metrics.enabled`                          | Enable the export of Prometheus metrics                                                                | `false`                  |
-| `platform.metrics.serviceMonitor.enabled`           | if `true`, creates a Prometheus Operator ServiceMonitor (also requires `metrics.enabled` to be `true`) | `false`                  |
-| `platform.metrics.serviceMonitor.namespace`         | Namespace in which Prometheus is running                                                               | `""`                     |
-| `platform.metrics.serviceMonitor.annotations`       | Additional custom annotations for the ServiceMonitor                                                   | `{}`                     |
-| `platform.metrics.serviceMonitor.labels`            | Extra labels for the ServiceMonitor                                                                    | `{}`                     |
+| Name                                                | Description                                                                                            | Value                        |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ---------------------------- |
+| `platform.metrics.enabled`                          | Enable the export of Prometheus metrics                                                                | `false`                      |
+| `platform.metrics.serviceMonitor.enabled`           | if `true`, creates a Prometheus Operator ServiceMonitor (also requires `metrics.enabled` to be `true`) | `false`                      |
+| `platform.metrics.serviceMonitor.namespace`         | Namespace in which Prometheus is running                                                               | `""`                         |
+| `platform.metrics.serviceMonitor.annotations`       | Additional custom annotations for the ServiceMonitor                                                   | `{}`                         |
+| `platform.metrics.serviceMonitor.labels`            | Extra labels for the ServiceMonitor                                                                    | `{}`                         |
 | `platform.metrics.serviceMonitor.jobLabel`          | The name of the label on the target service to use as the job name in Prometheus                       | `app.kubernetes.io/instance` |
-| `platform.metrics.serviceMonitor.honorLabels`       | honorLabels chooses the metric's labels on collisions with target labels                               | `false`                  |
-| `platform.metrics.serviceMonitor.interval`          | Interval at which metrics should be scraped.                                                           | `""`                     |
-| `platform.metrics.serviceMonitor.scrapeTimeout`     | Timeout after which the scrape is ended                                                                | `""`                     |
-| `platform.metrics.serviceMonitor.metricRelabelings` | Specify additional relabeling of metrics                                                               | `[]`                     |
-| `platform.metrics.serviceMonitor.relabelings`       | Specify general relabeling                                                                             | `[]`                     |
-| `platform.metrics.serviceMonitor.selector`          | Prometheus instance selector labels                                                                    | `{}`                     |
-| `platform.metrics.serviceMonitor.extraParams`       | Extra parameters for the ServiceMonitor                                                                | `{}`                     |
-| `platform.metrics.grafana.enabled`                  | Enable grafana dashboards to installation                                                              | `false`                  |
-| `platform.metrics.grafana.namespace`                | Namespace used to deploy Grafana dashboards by default use the same namespace as Conduktor Csonsole    | `""`                     |
-| `platform.metrics.grafana.matchLabels`              | Label selector for Grafana instance                                                                    | `{}`                     |
-| `platform.metrics.grafana.labels`                   | Additional custom labels for Grafana dashboard ConfigMap                                               | `{}`                     |
-| `platform.metrics.grafana.folder`                   | Grafana dashboard folder name                                                                          | `""`                     |
-| `platform.metrics.grafana.datasources.prometheus`   | Prometheus datasource to use for metric dashboard                                                      | `prometheus`             |
+| `platform.metrics.serviceMonitor.honorLabels`       | honorLabels chooses the metric's labels on collisions with target labels                               | `false`                      |
+| `platform.metrics.serviceMonitor.interval`          | Interval at which metrics should be scraped.                                                           | `""`                         |
+| `platform.metrics.serviceMonitor.scrapeTimeout`     | Timeout after which the scrape is ended                                                                | `""`                         |
+| `platform.metrics.serviceMonitor.metricRelabelings` | Specify additional relabeling of metrics                                                               | `[]`                         |
+| `platform.metrics.serviceMonitor.relabelings`       | Specify general relabeling                                                                             | `[]`                         |
+| `platform.metrics.serviceMonitor.selector`          | Prometheus instance selector labels                                                                    | `{}`                         |
+| `platform.metrics.serviceMonitor.extraParams`       | Extra parameters for the ServiceMonitor                                                                | `{}`                         |
+| `platform.metrics.grafana.enabled`                  | Enable grafana dashboards to installation                                                              | `false`                      |
+| `platform.metrics.grafana.namespace`                | Namespace used to deploy Grafana dashboards by default use the same namespace as Conduktor Csonsole    | `""`                         |
+| `platform.metrics.grafana.matchLabels`              | Label selector for Grafana instance                                                                    | `{}`                         |
+| `platform.metrics.grafana.labels`                   | Additional custom labels for Grafana dashboard ConfigMap                                               | `{}`                         |
+| `platform.metrics.grafana.folder`                   | Grafana dashboard folder name                                                                          | `""`                         |
+| `platform.metrics.grafana.datasources.prometheus`   | Prometheus datasource to use for metric dashboard                                                      | `prometheus`                 |
 
 ### Traffic Exposure Parameters
 
