@@ -27,14 +27,15 @@ Current available global Docker image parameters: imageRegistry, imagePullSecret
 
 ### Common parameters
 
-| Name                | Description                                     | Value           |
-| ------------------- | ----------------------------------------------- | --------------- |
-| `nameOverride`      | String to partially override common.names.name  | `""`            |
-| `fullnameOverride`  | String to fully override common.names.fullname  | `""`            |
-| `namespaceOverride` | String to fully override common.names.namespace | `""`            |
-| `commonLabels`      | Labels to add to all deployed objects           | `{}`            |
-| `commonAnnotations` | Annotations to add to all deployed objects      | `{}`            |
-| `clusterDomain`     | Kubernetes cluster domain name                  | `cluster.local` |
+| Name                | Description                                       | Value           |
+| ------------------- | ------------------------------------------------- | --------------- |
+| `nameOverride`      | String to partially override common.names.name    | `""`            |
+| `fullnameOverride`  | String to fully override common.names.fullname    | `""`            |
+| `namespaceOverride` | String to fully override common.names.namespace   | `""`            |
+| `commonLabels`      | Labels to add to all deployed objects             | `{}`            |
+| `commonAnnotations` | Annotations to add to all deployed objects        | `{}`            |
+| `clusterDomain`     | Kubernetes cluster domain name                    | `cluster.local` |
+| `extraDeploy`       | Array of extra objects to deploy with the release | `[]`            |
 
 ### Gateway image configuration
 
@@ -476,3 +477,18 @@ If you want to import dashboards manually, you can use the exported json files f
 > [!NOTE]  
 > Grafana Dashboard exported json files expect to have a datasource named `prometheus` and `loki` to be available in Grafana and that Conduktor Gateway run inside Kubernetes with `pod` label on metrics.
 > Dashboards are tested with Grafana **9.x** and **10.x**.
+
+
+### Extra resource to deploy
+
+You can deploy extra resources with the Gateway deployment by adding them to the `extraDeploy` field in the `values.yaml` file.
+
+```yaml
+extraDeploy:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: extra-configmap
+    data:
+      some-key: some-value
+```
