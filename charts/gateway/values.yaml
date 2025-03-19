@@ -127,6 +127,22 @@ gateway:
     ## @param gateway.jmx.jvmArgs Arguments to pass to the gateway container JVM
     jvmArgs: -Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1
 
+  # Conduktor Gateway resource requests and limits
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ## Gateway system requirements: https://docs.conduktor.io/gateway/get-started/system-requirements/
+  ##
+  resources:
+    limits:
+      ## @param gateway.resources.limits.cpu CPU limit for the platform container
+      cpu: 2000m
+      ## @param gateway.resources.limits.memory Memory limit for the container
+      memory: 4Gi
+    requests:
+      ## @param gateway.resources.requests.cpu CPU resource requests
+      cpu: 500m
+      ## @param gateway.resources.requests.memory Memory resource requests
+      memory: 500m
+
   ## @param gateway.startupProbeDelay [nullable] Optional delay in second before startup probe should be running (default 10)
   startupProbeDelay: ""
 
