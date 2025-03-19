@@ -119,6 +119,11 @@ jobs:
           make k3d-ci-up
           kubectl create ns ct || true
 
+      - name: Disable upgrade testing if breaking change
+        if: contains(github.event.pull_request.labels.*.name, 'breaking')
+        run: |
+          sed -i 's/upgrade: true/upgrade: false/' .github/ct-config.yaml
+
       - name: Run chart-testing (install)
         run: ct install --config .github/ct-config.yaml
         if: steps.list-changed.outputs.changed == 'true'

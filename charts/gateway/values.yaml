@@ -403,10 +403,6 @@ tolerations: []
 ## @param affinity Container affinity
 affinity: {}
 
-## @section Dependencies
-## @descriptionStart
-## Enable and configure chart dependencies if not available in your deployment.
-## @descriptionEnd
-kafka:
-  ## @param kafka.enabled Deploy a kafka along side gateway (This should only used for testing purpose)
+## @skip tests
+tests:
   enabled: false

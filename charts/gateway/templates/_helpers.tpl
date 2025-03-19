@@ -38,21 +38,12 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-
 {{/*
 Common labels
 */}}
 {{- define "conduktor-gateway.labels" -}}
-helm.sh/chart: {{ include "conduktor-gateway.chart" . }}
-app.kubernetes.io/name: {{ include "conduktor-gateway.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- if .Values.commonLabels }}
-{{ include "common.tplvalues.render" (dict "value" .Values.commonLabels "context" $) }}
-{{- end }}
+{{- /* Delegate to common.labels.standard for Kubernetes standard labels */ -}}
+{{ include "common.labels.standard" (dict "customLabels" .Values.commonLabels "context" $) }}
 {{- end -}}
 
 {{- define "conduktor-gateway.podSelectorLabels" -}}
@@ -72,20 +63,29 @@ Create the name of the service account to use
 {{- end -}}
 
 {{/*
-Computes the kafka bootstrap server URL. Resolves to embedded kafka by default but can be
-opt-out for a custom bootstrap server.
+Helper function to check if KAFKA_BOOTSTRAP_SERVERS exists in either gateway.env or gateway.extraSecretEnvVars.
+If it does not exist in either, or exists in both, fail the chart.
 */}}
-{{- define "conduktor-gateway.kafka-bootstrap-server" -}}
-{{-   if .Values.kafka.enabled -}}
-{{-     printf "%s-kafka.%s.svc.%s:9092" .Release.Name .Release.Namespace (default "cluster.local" .Values.clusterDomain) -}}
-{{-   else -}}
-{{-     required "value .kafka.bootstrapServers is required" .Values.kafka.bootstrapServers -}}
-{{-   end -}}
+{{- define "conduktor-gateway.validate.kafka-bootstrap-server" -}}
+  {{- $env := .Values.gateway.env }}
+  {{- $extraEnv := .Values.gateway.extraSecretEnvVars }}
+  {{- $foundInEnv := hasKey $env "KAFKA_BOOTSTRAP_SERVERS" }}
+  {{- $foundInExtraEnv := false }}
+  {{- if $extraEnv }}
+    {{- range $index, $item := $extraEnv }}
+      {{- if eq (index $item "name") "KAFKA_BOOTSTRAP_SERVERS" }}
+        {{- $foundInExtraEnv = true }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+  {{- if not (or $foundInEnv $foundInExtraEnv) }}
+    {{- fail "KAFKA_BOOTSTRAP_SERVERS is not defined in either gateway.env or gateway.extraSecretEnvVars." }}
+  {{- end }}
+  {{- if and $foundInEnv $foundInExtraEnv }}
+    {{- fail "KAFKA_BOOTSTRAP_SERVERS is defined in both gateway.env and gateway.extraSecretEnvVars, which is invalid." }}
+  {{- end }}
 {{- end -}}
 
-{{/*
-Define internal service name
-*/}}
 {{- define "conduktor-gateway.internalServiceName" -}}
 {{- printf "%s-internal" (include "conduktor-gateway.fullname" . | trunc 54) -}}
 {{- end -}}
