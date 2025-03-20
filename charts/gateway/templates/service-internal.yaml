@@ -2,10 +2,26 @@ apiVersion: v1
 kind: Service
 metadata:
   name:  {{ include "conduktor-gateway.internalServiceName" . }}
-  labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{ include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: conduktor-platform
+    {{- if .Values.service.internal.labels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.service.internal.labels "context" $) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.metrics.prometheus.enable }}
     metrics.conduktor.io/prometheus: {{ .Values.metrics.prometheus.enable | quote }}
-  {{- with .Values.service.internal.annotations }}
-  annotations: {{ toYaml . | nindent 4 }}
+    {{- end }}
+  {{- if or .Values.service.internal.annotations .Values.commonAnnotations }}
+  annotations:
+    {{- if .Values.service.internal.annotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.service.internal.annotations "context" $) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
   {{- end }}
 spec:
   type: ClusterIP

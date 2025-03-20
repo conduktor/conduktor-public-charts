@@ -107,6 +107,8 @@ install-dev-deps:  ## Install development dependencies (PostgreSQL, Minio, monit
 	@echo "	Internal : grafana-service.${MONITORING_NAMESPACE}.svc.cluster.local:3000"
 	@echo "	Access Grafana with : $ kubectl port-forward svc/grafana-service -n ${MONITORING_NAMESPACE} 3000:3000"
 	@echo "	Credentials : admin/admin"
+	@echo "Kafka:"
+	@echo "	Internal : kafka-local-dev.${NAMESPACE}.svc.cluster.local:9092"
 
 # Extended targets
 ##################

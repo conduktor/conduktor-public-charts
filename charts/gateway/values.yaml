@@ -202,6 +202,8 @@ service:
     ip: ""
     ## @param service.external.annotations
     annotations: {}
+    ## @param service.external.labels
+    labels: {}
     # LoadBalancer externaldns gke support by annotation https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/gke.md#verify-using-an-external-load-balancer
     # external-dns.alpha.kubernetes.io/hostname: "{{ required "A valid .Values.gateway.domain is required!" .Values.gateway.domain }}"
     ## @param service.external.admin Enable admin exposition on external service
@@ -215,6 +217,8 @@ service:
   internal:
     ## @param service.internal.annotations
     annotations: {}
+    ## @param service.internal.labels
+    labels: {}
 
 ## @section Gateway ingress configurations
 ## @descriptionStart
