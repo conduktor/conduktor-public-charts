@@ -113,7 +113,7 @@ This section specifies external service configuration
 | `service.external.type`        | Type of load balancer                               | `ClusterIP` |
 | `service.external.ip`          | IP to configure                                     | `""`        |
 | `service.external.annotations` |                                                     | `{}`        |
-| `service.external.labels`      |                                                     | `{}`        |
+| `service.external.labels`      | Labels to be added to Gateway internal service      | `{}`        |
 | `service.external.admin`       | Enable admin exposition on external service         | `false`     |
 | `service.external.jmx`         | Enable jmx exposition on external service           | `false`     |
 
@@ -121,10 +121,10 @@ This section specifies external service configuration
 
 This section specify internal service configuration
 
-| Name                           | Description | Value |
-| ------------------------------ | ----------- | ----- |
-| `service.internal.annotations` |             | `{}`  |
-| `service.internal.labels`      |             | `{}`  |
+| Name                           | Description                                    | Value |
+| ------------------------------ | ---------------------------------------------- | ----- |
+| `service.internal.annotations` |                                                | `{}`  |
+| `service.internal.labels`      | Labels to be added to Gateway internal service | `{}`  |
 
 ### Gateway ingress configurations
 

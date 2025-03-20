@@ -5,23 +5,20 @@ metadata:
   name:  {{ include "conduktor-gateway.externalServiceName" . }}
   namespace: {{ include "common.names.namespace" . | quote }}
   labels: {{ include "common.labels.standard" . | nindent 4 }}
-    app.kubernetes.io/component: conduktor-platform
-    {{- if .Values.service.external.labels }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.service.external.labels "context" $) | nindent 4 }}
+    app.kubernetes.io/component: conduktor-gateway
+    {{- with .Values.service.external.labels }}
+    {{- include "common.tplvalues.render" ( dict "value" . "context" $) | nindent 4 }}
     {{- end }}
-    {{- if .Values.commonLabels }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
-    {{- end }}
-    {{- if .Values.metrics.prometheus.enable }}
-    metrics.conduktor.io/prometheus: {{ .Values.metrics.prometheus.enable | quote }}
+    {{- with .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 4 }}
     {{- end }}
   {{- if or .Values.service.external.annotations .Values.commonAnnotations }}
   annotations:
-    {{- if .Values.service.external.annotations }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.service.external.annotations "context" $) | nindent 4 }}
+    {{- with .Values.service.external.annotations }}
+    {{- include "common.tplvalues.render" ( dict "value" . "context" $) | nindent 4 }}
     {{- end }}
-    {{- if .Values.commonAnnotations }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- with .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 4 }}
     {{- end }}
   {{- end }}
 spec:
