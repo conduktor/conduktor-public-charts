@@ -3,12 +3,12 @@ kind: Deployment
 metadata:
   name: {{ include "conduktor-gateway.fullname" . }}
   labels: {{- include "conduktor-gateway.labels" . | nindent 4 }}
-    {{- if .Values.commonLabels }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- with .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 4 }}
     {{- end }}
   annotations:
-    {{- if .Values.commonAnnotations }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- with .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 4 }}
     {{- end }}
 spec:
   selector:
@@ -19,11 +19,11 @@ spec:
   template:
     metadata:
       annotations:
-        {{- if .Values.commonAnnotations }}
-        {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 8 }}
+        {{- with .Values.commonAnnotations }}
+        {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 8 }}
         {{- end }}
-        {{- if .Values.gateway.podAnnotations }}
-        {{- include "common.tplvalues.render" (dict "value" .Values.gateway.podAnnotations "context" $) | nindent 8 }}
+        {{- with .Values.gateway.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" . "context" $) | nindent 8 }}
         {{- end }}
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         checksum/self-secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
@@ -31,11 +31,11 @@ spec:
         checksum/secret: {{ .Values.gateway.secretSha256sum }}
         {{- end }}
       labels: {{- include "conduktor-gateway.labels" . | nindent 8 }}
-        {{- if .Values.gateway.podLabels }}
-        {{- include "common.tplvalues.render" (dict "value" .Values.gateway.podLabels "context" $) | nindent 8 }}
+        {{- with .Values.gateway.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" . "context" $) | nindent 8 }}
         {{- end }}
-        {{- if .Values.commonLabels }}
-        {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 8 }}
+        {{- with .Values.commonLabels }}
+        {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 8 }}
         {{- end }}
     spec:
       containers:
