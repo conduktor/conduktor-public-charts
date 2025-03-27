@@ -3,6 +3,10 @@ kind: Deployment
 metadata:
   name: {{ include "conduktor-gateway.fullname" . }}
   labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
+  annotations:
+    {{- with .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 4 }}
+    {{- end }}
 spec:
   selector:
     matchLabels: {{ include "conduktor-gateway.podSelectorLabels" . | nindent 6 }}
@@ -12,18 +16,21 @@ spec:
   template:
     metadata:
       annotations:
+        {{- with .Values.commonAnnotations }}
+        {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 8 }}
+        {{- end }}
+        {{- with .Values.gateway.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" . "context" $) | nindent 8 }}
+        {{- end }}
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         checksum/self-secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
         {{- if .Values.gateway.secretSha256sum }}
         checksum/secret: {{ .Values.gateway.secretSha256sum }}
         {{- end }}
-        {{- with .Values.gateway.podAnnotations }}
-        {{- toYaml . | nindent 8 }}
+      labels: {{- include "conduktor-gateway.labels" . | nindent 8 }}
+        {{- with .Values.gateway.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" . "context" $) | nindent 8 }}
         {{- end }}
-      labels: {{ include "conduktor-gateway.labels" . | nindent 8 }}
-      {{- if .Values.gateway.podLabels }}
-      {{- toYaml .Values.gateway.podLabels | nindent 8 }}
-      {{- end }}
     spec:
       containers:
         - name: gateway
