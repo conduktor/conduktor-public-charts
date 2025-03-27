@@ -2,10 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "conduktor-gateway.fullname" . }}
-  labels: {{- include "conduktor-gateway.labels" . | nindent 4 }}
-    {{- with .Values.commonLabels }}
-    {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 4 }}
-    {{- end }}
+  labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
   annotations:
     {{- with .Values.commonAnnotations }}
     {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 4 }}
@@ -33,9 +30,6 @@ spec:
       labels: {{- include "conduktor-gateway.labels" . | nindent 8 }}
         {{- with .Values.gateway.podLabels }}
         {{- include "common.tplvalues.render" (dict "value" . "context" $) | nindent 8 }}
-        {{- end }}
-        {{- with .Values.commonLabels }}
-        {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 8 }}
         {{- end }}
     spec:
       containers:

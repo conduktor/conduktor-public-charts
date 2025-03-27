@@ -4,13 +4,10 @@ kind: Service
 metadata:
   name:  {{ include "conduktor-gateway.externalServiceName" . }}
   namespace: {{ include "common.names.namespace" . | quote }}
-  labels: {{ include "common.labels.standard" . | nindent 4 }}
+  labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
     app.kubernetes.io/component: conduktor-gateway
     {{- with .Values.service.external.labels }}
     {{- include "common.tplvalues.render" ( dict "value" . "context" $) | nindent 4 }}
-    {{- end }}
-    {{- with .Values.commonLabels }}
-    {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 4 }}
     {{- end }}
   {{- if or .Values.service.external.annotations .Values.commonAnnotations }}
   annotations:

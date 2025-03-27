@@ -4,10 +4,7 @@ kind: Ingress
 metadata:
   name: {{ template "common.names.fullname" . }}
   namespace: {{ include "common.names.namespace" . | quote }}
-  labels: {{- include "conduktor-gateway.labels" . | nindent 4 }}
-    {{- with .Values.commonLabels }}
-    {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 4 }}
-    {{- end }}
+  labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
   {{- if or .Values.ingress.annotations .Values.commonAnnotations }}
   annotations:
     {{- if .Values.ingress.annotations }}

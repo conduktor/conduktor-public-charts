@@ -8,9 +8,6 @@ metadata:
     {{- with .Values.service.internal.labels }}
     {{- include "common.tplvalues.render" ( dict "value" . "context" $) | nindent 4 }}
     {{- end }}
-    {{- with .Values.commonLabels }}
-    {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 4 }}
-    {{- end }}
     {{- if .Values.metrics.prometheus.enable }}
     metrics.conduktor.io/prometheus: {{ .Values.metrics.prometheus.enable | quote }}
     {{- end }}
