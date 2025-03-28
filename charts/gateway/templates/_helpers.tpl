@@ -146,7 +146,7 @@ Get the first admin user from the list of users
 
 {{/*
 Check if env exist in context
-
+Usage : include "conduktor-gateway.envExists" (dict "envkey" "ENV_VAR_NAME" "context" $)
 Params:
   - envKey - String - Required - Name of the env.
   - context - Context - Required - Parent context.

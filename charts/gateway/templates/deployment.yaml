@@ -54,8 +54,10 @@ spec:
             - name: JAVA_TOOL_OPTIONS
               value: {{ tpl .Values.gateway.jmx.jvmArgs . | quote }}
             {{- end}}
+            {{- if eq (include "conduktor-gateway.envExists" (dict "envkey" "GATEWAY_SECURED_METRICS" "context" $)) "false" }}
             - name: GATEWAY_SECURED_METRICS
               value: {{ .Values.gateway.admin.securedMetrics | quote }}
+            {{- end}}
             {{- if and .Values.gateway.userPool .Values.gateway.userPool.serviceAccountRequired }}
             - name: GATEWAY_USER_POOL_SERVICE_ACCOUNT_REQUIRED
               value: {{ .Values.gateway.userPool.serviceAccountRequired | quote }}
