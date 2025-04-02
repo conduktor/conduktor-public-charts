@@ -708,6 +708,26 @@ platformCortex:
     tag: nightly
 ```
 
+You can also specify the `global.imagePullSecrets` and `global.imageRegistry` parameters in the `platform` and `platformCortex` sections if you want to use different secrets and registry's for each of them.
+
+```yaml
+platform:
+  image:
+    registry: harbor.local.example
+    repository: conduktor/conduktor-console
+    tag: nightly
+    pullSecrets:
+      - platform-secret
+
+platformCortex:
+  image:
+    registry: harbor.local.example
+    repository: conduktor/conduktor-console-cortex
+    tag: nightly
+    pullSecrets:
+      - platform-cortex-secret
+```
+
 ### Store platform data into a Persistent Volume
 
 ```yaml
