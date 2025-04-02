@@ -315,6 +315,35 @@ gateway:
     secretKey: "<256bits long string>" # if empty, a random key will be generated
 ```
 
+
+#### Pulling from private registry using `global.imagePullSecrets`
+
+To use the parameter `global.imagePullSecrets` you need to create a secret with the name you want to use in the parameter. To find out more [see offical documentation](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/).
+
+We need to ensure this secret is of type `docker-registry` and contains the following keys:
+```bash
+kubectl create secret docker-registry <SECRET_NAME> \
+  --docker-server=<DOCKER_REGISTRY_SERVER> \
+  --docker-username=<DOCKER_USERNAME> \
+  --docker-password=<DOCKER_PASSWORD> \
+  --docker-email=<DOCKER_EMAIL>
+```
+
+Then in your `values.yaml` file, you can set the `global.imagePullSecrets` parameter to the name of the secret you created, you will also need to modify the `gateway.image` parameters to use the same registry as the secret you created.
+
+This example blelow shows an example of how to set the `global.imagePullSecrets` parameter and the `gateway.image` parameters to use a private harbor registry:
+```yaml
+global:
+  imagePullSecrets:
+    - name: harbor-secret
+
+gateway:
+  image:
+    registry: harbor.local.example
+    repository: conduktor/conduktor-gateway
+    tag: nightly
+```
+
 ### Ingress configuration examples
 
 #### Nginx Ingress without TLS
