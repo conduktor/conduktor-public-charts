@@ -340,7 +340,7 @@ kubectl create secret docker-registry <SECRET_NAME> \
 
 Then in your `values.yaml` file, you can set the `global.imagePullSecrets` parameter to the name of the secret you created, you will also need to modify the `gateway.image` parameters to use the same registry as the secret you created.
 
-This example blelow shows an example of how to set the `global.imagePullSecrets` parameter and the `gateway.image` parameters to use a private registry:
+The below example shows how to set the `global.imagePullSecrets` parameter and the `gateway.image` parameters to use a private registry:
 ```yaml
 global:
   imagePullSecrets:
