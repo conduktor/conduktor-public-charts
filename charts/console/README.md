@@ -54,6 +54,7 @@ Helm Chart to deploy Conduktor Console on Kubernetes.
     - [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
     - [Provide credentials configuration as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
     - [Provide monitoring configuration as a Kubernetes Secret](#provide-monitoring-configuration-as-a-kubernetes-secret)
+    - [Pulling from private registry using `global.imagePullSecrets`](#pulling-from-private-registry-using-globalimagepullsecrets)
     - [Store platform data into a Persistent Volume](#store-platform-data-into-a-persistent-volume)
     - [Install with a PodAffinity](#install-with-a-podaffinity)
     - [Provide console configuration as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
@@ -400,45 +401,26 @@ console, we recommend you to look at our
 
 ### Kubernetes configuration
 
-
-- [Conduktor Console](#conduktor-console)
-  - [TL;DR](#tldr)
-  - [Introduction](#introduction)
-  - [Prerequisites](#prerequisites)
-  - [Parameters](#parameters)
-    - [Global parameters](#global-parameters)
-    - [Common parameters](#common-parameters)
-    - [Platform product Parameters](#platform-product-parameters)
-    - [Platform Monitoring product Parameters](#platform-monitoring-product-parameters)
-    - [Platform Deployment Parameters](#platform-deployment-parameters)
-    - [Platform Metrics activation](#platform-metrics-activation)
-    - [Traffic Exposure Parameters](#traffic-exposure-parameters)
-    - [Other Parameters](#other-parameters)
-    - [Platform Cortex Parameters](#platform-cortex-parameters)
-  - [Snippets](#snippets)
-    - [Console configuration](#console-configuration)
-    - [Kubernetes configuration](#kubernetes-configuration)
-    - [Install with an enterprise license](#install-with-an-enterprise-license)
-    - [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
-    - [Install with a Kafka cluster](#install-with-a-kafka-cluster)
-    - [Install with a Confluent Cloud cluster](#install-with-a-confluent-cloud-cluster)
-    - [Install without Conduktor monitoring](#install-without-conduktor-monitoring)
-    - [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
-    - [Provide credentials configuration as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
-    - [Provide monitoring configuration as a Kubernetes Secret](#provide-monitoring-configuration-as-a-kubernetes-secret)
-    - [Pulling from private registry using `global.imagePullSecrets`](#pulling-from-private-registry-using-globalimagepullsecrets)
-    - [Store platform data into a Persistent Volume](#store-platform-data-into-a-persistent-volume)
-    - [Install with a PodAffinity](#install-with-a-podaffinity)
-    - [Provide console configuration as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
-    - [Provide additional credentials as a Kubernetes Secret](#provide-additional-credentials-as-a-kubernetes-secret)
-    - [Install with a toleration](#install-with-a-toleration)
-    - [Install with Self-Signed TLS certificate](#install-with-self-signed-tls-certificate)
-    - [Install with a custom TLS certificate on the platform Pod](#install-with-a-custom-tls-certificate-on-the-platform-pod)
-    - [Install with a custom service account](#install-with-a-custom-service-account)
-    - [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
-    - [Install with Console technical monitoring](#install-with-console-technical-monitoring)
-    - [Install with custom certificates or keytab](#install-with-custom-certificates-or-keytab)
-  - [Troubleshooting](#troubleshooting)
+- [Install with an enterprise license](#install-with-an-enterprise-license)
+- [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
+- [Install with a Kafka cluster](#install-with-a-kafka-cluster)
+- [Install with a Confluent Cloud cluster](#install-with-a-confluent-cloud-cluster)
+- [Install without Conduktor monitoring](#install-without-conduktor-monitoring)
+- [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
+- [Provide credentials configuration as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
+- [Provide monitoring configuration as a Kubernetes Secret](#provide-monitoring-configuration-as-a-kubernetes-secret)
+- [Pulling from private registry using `global.imagePullSecrets`](#pulling-from-private-registry-using-globalimagepullsecrets)
+- [Store platform data into a Persistent Volume](#store-platform-data-into-a-persistent-volume)
+- [Install with a PodAffinity](#install-with-a-podaffinity)
+- [Provide console configuration as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
+- [Provide additional credentials as a Kubernetes Secret](#provide-additional-credentials-as-a-kubernetes-secret)
+- [Install with a toleration](#install-with-a-toleration)
+- [Install with Self-Signed TLS certificate](#install-with-self-signed-tls-certificate)
+- [Install with a custom TLS certificate on the platform Pod](#install-with-a-custom-tls-certificate-on-the-platform-pod)
+- [Install with a custom service account](#install-with-a-custom-service-account)
+- [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
+- [Install with Console technical monitoring](#install-with-console-technical-monitoring)
+- [Install with custom certificates or keytab](#install-with-custom-certificates-or-keytab)
 
 ### Install with an enterprise license
 
@@ -677,6 +659,15 @@ data:
 
 ### Pulling from private registry using `global.imagePullSecrets`
 
+The method of setting up your private registry will work with the following registries:
+- Artifactory
+- Harbor
+- Nexus
+- GitHub Container Registry (GHCR)
+- Google Container Registry (GCR)
+
+**This method WILL NOT work for AWS Elastic Container Registry (ECR) due to it requiring an authentication token that expires every 12 hours**
+
 To use the parameter `global.imagePullSecrets` you need to create a secret with the name you want to use in the parameter. To find out more [see offical documentation](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/).
 
 We need to ensure this secret is of type `docker-registry` and contains the following keys:
@@ -690,12 +681,12 @@ kubectl create secret docker-registry <SECRET_NAME> \
 
 Then in your `values.yaml` file, you can set the `global.imagePullSecrets` parameter to the name of the secret you created, you will also need to modify the `global.imageRegistry` parameters to use the same registry as the secret you created.
 
-This example blelow shows an example of how to set the `global.imagePullSecrets` parameter and the `global.imageRegistry` parameters to use a private harbor registry:
+This example blelow shows an example of how to set the `global.imagePullSecrets` parameter and the `global.imageRegistry` parameters to use a private registry:
 ```yaml
 global:
-  imageRegistry: harbor.local.example
+  imageRegistry: regsitry.company.io
   imagePullSecrets:
-    - harbor-secret
+    - docker-regsitry-secret
 
 platform:
   image:
@@ -713,19 +704,19 @@ You can also specify the `global.imagePullSecrets` and `global.imageRegistry` pa
 ```yaml
 platform:
   image:
-    registry: harbor.local.example
+    registry: regsitry.company.io
     repository: conduktor/conduktor-console
     tag: nightly
     pullSecrets:
-      - platform-secret
+      - docker-regsitry-secret
 
 platformCortex:
   image:
-    registry: harbor.local.example
+    registry: regsitry.company.io
     repository: conduktor/conduktor-console-cortex
     tag: nightly
     pullSecrets:
-      - platform-cortex-secret
+      - docker-regsitry-secret-cortex
 ```
 
 ### Store platform data into a Persistent Volume

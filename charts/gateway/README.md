@@ -318,6 +318,15 @@ gateway:
 
 #### Pulling from private registry using `global.imagePullSecrets`
 
+The method of setting up your private registry will work with the following registries:
+- Artifactory
+- Harbor
+- Nexus
+- GitHub Container Registry (GHCR)
+- Google Container Registry (GCR)
+
+**This method WILL NOT work for AWS Elastic Container Registry (ECR) due to it requiring an authentication token that expires every 12 hours**
+
 To use the parameter `global.imagePullSecrets` you need to create a secret with the name you want to use in the parameter. To find out more [see offical documentation](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/).
 
 We need to ensure this secret is of type `docker-registry` and contains the following keys:
@@ -331,15 +340,15 @@ kubectl create secret docker-registry <SECRET_NAME> \
 
 Then in your `values.yaml` file, you can set the `global.imagePullSecrets` parameter to the name of the secret you created, you will also need to modify the `gateway.image` parameters to use the same registry as the secret you created.
 
-This example blelow shows an example of how to set the `global.imagePullSecrets` parameter and the `gateway.image` parameters to use a private harbor registry:
+This example blelow shows an example of how to set the `global.imagePullSecrets` parameter and the `gateway.image` parameters to use a private registry:
 ```yaml
 global:
   imagePullSecrets:
-    - name: harbor-secret
+    - name: docker-regsitry-secret
 
 gateway:
   image:
-    registry: harbor.local.example
+    registry: regsitry.company.io
     repository: conduktor/conduktor-gateway
     tag: nightly
 ```
