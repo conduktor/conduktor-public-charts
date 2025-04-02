@@ -690,7 +690,7 @@ kubectl create secret docker-registry <SECRET_NAME> \
 
 Then in your `values.yaml` file, you can set the `global.imagePullSecrets` parameter to the name of the secret you created, you will also need to modify the `global.imageRegistry` parameters to use the same registry as the secret you created.
 
-This example blelow shows an example of how to set the `global.imagePullSecrets` parameter and the `global.imageRegistry` parameters to use a private harbor registry:
+The below example shows how to set the `global.imagePullSecrets` parameter and the `global.imageRegistry` parameters to use a private harbor registry:
 ```yaml
 global:
   imageRegistry: harbor.local.example
@@ -708,7 +708,7 @@ platformCortex:
     tag: nightly
 ```
 
-You can also specify the `global.imagePullSecrets` and `global.imageRegistry` parameters in the `platform` and `platformCortex` sections if you want to use different secrets and registry's for each of them.
+You can also specify the `global.imagePullSecrets` and `global.imageRegistry` parameters in the `platform` and `platformCortex` sections if you want to use different secrets and registries for each of them.
 
 ```yaml
 platform:
