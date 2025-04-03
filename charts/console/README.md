@@ -54,6 +54,7 @@ Helm Chart to deploy Conduktor Console on Kubernetes.
     - [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
     - [Provide credentials configuration as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
     - [Provide monitoring configuration as a Kubernetes Secret](#provide-monitoring-configuration-as-a-kubernetes-secret)
+    - [Pulling from private registry using `global.imagePullSecrets`](#pulling-from-private-registry-using-globalimagepullsecrets)
     - [Store platform data into a Persistent Volume](#store-platform-data-into-a-persistent-volume)
     - [Install with a PodAffinity](#install-with-a-podaffinity)
     - [Provide console configuration as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
@@ -400,7 +401,6 @@ console, we recommend you to look at our
 
 ### Kubernetes configuration
 
-
 - [Install with an enterprise license](#install-with-an-enterprise-license)
 - [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
 - [Install with a Kafka cluster](#install-with-a-kafka-cluster)
@@ -409,6 +409,7 @@ console, we recommend you to look at our
 - [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
 - [Provide credentials configuration as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
 - [Provide monitoring configuration as a Kubernetes Secret](#provide-monitoring-configuration-as-a-kubernetes-secret)
+- [Pulling from private registry using `global.imagePullSecrets`](#pulling-from-private-registry-using-globalimagepullsecrets)
 - [Store platform data into a Persistent Volume](#store-platform-data-into-a-persistent-volume)
 - [Install with a PodAffinity](#install-with-a-podaffinity)
 - [Provide console configuration as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
@@ -653,6 +654,69 @@ type: Opaque
 data:
   CDK_MONITORING_STORAGE_S3_ACCESSKEYID: <your_s3_access_key>
   CDK_MONITORING_STORAGE_S3_SECRETACCESSKEY: <your_s3_secret_access_key>
+```
+
+
+### Pulling from private registry using `global.imagePullSecrets`
+
+The method of setting up your private registry will work with the following registries:
+- Artifactory
+- Harbor
+- Nexus
+- GitHub Container Registry (GHCR)
+- Google Container Registry (GCR)
+
+**This method WILL NOT work for AWS Elastic Container Registry (ECR) due to it requiring an authentication token that expires every 12 hours**
+
+To use the parameter `global.imagePullSecrets` you need to create a secret with the name you want to use in the parameter. To find out more [see offical documentation](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/).
+
+We need to ensure this secret is of type `docker-registry` and contains the following keys:
+```bash
+kubectl create secret docker-registry <SECRET_NAME> \
+  --docker-server=<DOCKER_REGISTRY_SERVER> \
+  --docker-username=<DOCKER_USERNAME> \
+  --docker-password=<DOCKER_PASSWORD> \
+  --docker-email=<DOCKER_EMAIL>
+```
+
+Then in your `values.yaml` file, you can set the `global.imagePullSecrets` parameter to the name of the secret you created, you will also need to modify the `global.imageRegistry` parameters to use the same registry as the secret you created.
+
+The below example shows how to set the `global.imagePullSecrets` parameter and the `global.imageRegistry` parameters to use a private registry:
+```yaml
+global:
+  imageRegistry: regsitry.company.io
+  imagePullSecrets:
+    - docker-regsitry-secret
+
+platform:
+  image:
+    repository: conduktor/conduktor-console
+    tag: nightly
+
+platformCortex:
+  image:
+    repository: conduktor/conduktor-console-cortex
+    tag: nightly
+```
+
+You can also specify the `global.imagePullSecrets` and `global.imageRegistry` parameters in the `platform` and `platformCortex` sections if you want to use different secrets and registries for each of them.
+
+```yaml
+platform:
+  image:
+    registry: regsitry.company.io
+    repository: conduktor/conduktor-console
+    tag: nightly
+    pullSecrets:
+      - docker-regsitry-secret
+
+platformCortex:
+  image:
+    registry: regsitry.company.io
+    repository: conduktor/conduktor-console-cortex
+    tag: nightly
+    pullSecrets:
+      - docker-regsitry-secret-cortex
 ```
 
 ### Store platform data into a Persistent Volume
