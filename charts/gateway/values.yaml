@@ -141,7 +141,7 @@ gateway:
       ## @param gateway.resources.requests.cpu CPU resource requests
       cpu: 500m
       ## @param gateway.resources.requests.memory Memory resource requests
-      memory: 500m
+      memory: 500Mi
 
   ## @param gateway.startupProbeDelay [nullable] Optional delay in second before startup probe should be running (default 10)
   startupProbeDelay: ""
