@@ -12,6 +12,21 @@ helm repo update
 helm install my-gateway conduktor/conduktor-gateway
 ```
 
+## Table of contents
+* [Parameters](#parameters)
+  * [Global parameters](#global-parameters)
+  * [Common parameters](#common-parameters)
+  * [Gateway image configuration](#gateway-image-configuration)
+  * [Gateway configurations](#gateway-configurations)
+  * [TLS configuration](#tls-configuration)
+  * [Gateway service configurations](#gateway-service-configurations)
+  * [Gateway external service configurations](#gateway-external-service-configurations)
+  * [Conduktor-gateway internal service configurations](#conduktor-gateway-internal-service-configurations)
+  * [Gateway ingress configurations](#gateway-ingress-configurations)
+  * [Gateway metrics activation](#gateway-metrics-activation)
+  * [Kubernetes common configuration](#kubernetes-common-configuration)
+* [Example](#example)
+
 ## Parameters
 
 ### Global parameters
@@ -186,6 +201,26 @@ Shared Kubernetes configuration of the chart.
 
 
 ## Example
+
+* [How to provide secrets](#how-to-provide-secrets)
+  * [Provide you own secret with `gateway.secretRef`](#provide-you-own-secret-with-gatewaysecretref)
+  * [Using `gateway.extraSecretEnvVars`](#using-gatewayextrasecretenvvars)
+  * [Using values and generated secrets](#using-values-and-generated-secrets)
+  * [Pulling from private registry using `global.imagePullSecrets`](#pulling-from-private-registry-using-globalimagepullsecrets)
+* [Ingress configuration examples](#ingress-configuration-examples)
+  * [Nginx Ingress without TLS](#nginx-ingress-without-tls)
+  * [Nginx Ingress with Self-signed TLS](#nginx-ingress-with-self-signed-tls)
+  * [Nginx Ingress with Let's Encrypt TLS](#nginx-ingress-with-lets-encrypt-tls)
+  * [Nginx Ingress with Custom TLS secret](#nginx-ingress-with-custom-tls-secret)
+* [Provide Extra Certificates](#provide-extra-certificates)
+* [Set Gateway Container and Pod Security Context](#set-gateway-container-and-pod-security-context)
+* [Monitoring](#monitoring)
+  * [Prometheus metrics](#prometheus-metrics)
+    * [Prometheus alerts](#prometheus-alerts)
+  * [Grafana dashboards](#grafana-dashboards)
+    * [Sidecar ConfigMap loading](#sidecar-configmap-loading)
+    * [Import dashboards manually](#import-dashboards-manually)
+* [Extra resource to deploy](#extra-resource-to-deploy)
 
 The following `values.yaml` file can be used to set up Gateway to proxy traffic to a Confluent Cloud cluster:
 
@@ -451,6 +486,25 @@ gateway:
     KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/gateway/tls/truststore/kafka.truststore.jks
 ```
 
+### Set Gateway Container and Pod Security Context
+You can set the security context for the Gateway container and pod using the `gateway.securityContext` and `podSecurityContext` parameters.
+
+```yaml
+
+gateway:
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    runAsNonRoot: true
+    runAsUser: 1000
+
+podSecurityContext:
+  runAsNonRoot: true
+```
+
+> [!NOTE]
+> If you set `gateway.securityContext.readOnlyRootFilesystem: true`, you need to add and mount an extra volume/volumeMount to `/tmp` in the Gateway container using `gateway.volumes` and `gateway.volumeMounts`.
 
 ### Monitoring
 
