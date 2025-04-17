@@ -62,6 +62,22 @@ Create the name of the service account to use
 {{- end -}}
 {{- end -}}
 
+
+{{/*
+Helper function that check if all env values are strings and warn if not
+.*/}}
+{{- define "conduktor-gateway.validate.env" -}}
+  {{ $notStringEnv := list}}
+  {{- range $key, $value := .Values.gateway.env }}
+    {{- if ne (typeOf $value) "string" }}
+      {{- $notStringEnv = append $notStringEnv $key }}
+    {{- end }}
+  {{- end }}
+  {{- if $notStringEnv }}
+    {{- fail (printf "Some gateway.env values are not typed as string : %v"  (join ", " $notStringEnv )) }}
+  {{- end }}
+{{- end -}}
+
 {{/*
 Helper function to check if KAFKA_BOOTSTRAP_SERVERS exists in either gateway.env or gateway.extraSecretEnvVars.
 If it does not exist in either, or exists in both, fail the chart.

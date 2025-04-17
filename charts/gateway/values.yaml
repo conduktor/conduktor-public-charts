@@ -78,7 +78,7 @@ gateway:
   ## @param gateway.secretSha256sum [nullable] Optional sha256sum of the referenced secret. This could be set to have a automactic restart of gateway deployment if secret change
   secretSha256sum: ""
 
-  ## @param gateway.env [object] Environment variables for Gateway deployment
+  ## @param gateway.env [object] Environment variables for Gateway deployment in the form of a map of string key/value pairs
   env: {}
 
   ## @param gateway.licenseKey License key to activate Conduktor Gateway not used if `gateway.secretRef` is set
