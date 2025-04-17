@@ -4,7 +4,8 @@ metadata:
   name: {{ include "conduktor-gateway.fullname" . }}
   labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
 data:
-  {{- if .Values.gateway.env }}
+  {{-  include "conduktor-gateway.validate.env" . }}
+  {{- if .Values.gateway.env  }}
   {{- toYaml .Values.gateway.env | nindent 2 }}
   {{- end }}
   interceptors.json: {{ .Values.gateway.interceptors | toJson | nindent 4 }}
