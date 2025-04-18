@@ -317,14 +317,14 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "avg without(pod, instance) (console_indexer_kafka_cluster_succeeded_count {namespace=\"$namespace\", service=~\"$service\"} + console_indexer_kafka_cluster_failed_count {namespace=\"$namespace\", service=~\"$service\"})",
+          "expr": "sum(count by(technical_id) (console_indexer_kafka_cluster_duration_sum{namespace=\"$namespace\", service=\"$service\"}))",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Kafka clusters",
+      "title": "Indexed Kafka clusters",
       "type": "stat"
     },
     {
@@ -2759,7 +2759,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(console_api_request_duration_seconds_sum{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])) / sum(rate(console_api_request_duration_seconds_count{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])) > 0",
+          "expr": "sum by(path, method) (rate(console_api_request_duration_seconds_sum{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])) / sum by(path, method) (rate(console_api_request_duration_seconds_count{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
           "legendFormat": "[avg]",
