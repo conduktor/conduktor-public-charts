@@ -49,12 +49,25 @@ spec:
     {{- if .Values.ingress.extraRules }}
     {{- include "common.tplvalues.render" (dict "value" .Values.ingress.extraRules "context" $) | nindent 4 }}
     {{- end }}
-  {{- if or (and .Values.ingress.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.ingress.annotations )) .Values.ingress.selfSigned)) .Values.ingress.extraTls }}
+  {{- $useCertManager := (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.ingress.annotations )) }}
+  {{- $useSelfSigned := .Values.ingress.selfSigned }}
+  {{- $useSecrets := .Values.ingress.secrets }}
+  {{- if or .Values.ingress.tls .Values.ingress.extraTls }}
   tls:
-    {{- if and .Values.ingress.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.ingress.annotations )) .Values.ingress.selfSigned) }}
+    {{- if .Values.ingress.tls }}
+    {{- $_ := required "Ingress TLS enabled require one of : \n- ingress.selfSigned \n- ingress.secrets with existing TLS secret or one to create \n- ingress.annotations for cert-manager"  (coalesce $useCertManager $useSelfSigned $useSecrets) }}
+    {{- if or $useCertManager $useSelfSigned }}
     - hosts:
         - {{ .Values.ingress.hostname | quote }}
       secretName: {{ printf "%s-tls" .Values.ingress.hostname }}
+    {{- end }}
+    {{- if $useSecrets }}
+    {{- range $secret := .Values.ingress.secrets }}
+    - hosts:
+        - {{ $.Values.ingress.hostname | quote }}
+      secretName: {{ $secret.name | quote }}
+    {{- end }}
+    {{- end }}
     {{- end }}
     {{- if .Values.ingress.extraTls }}
     {{- include "common.tplvalues.render" (dict "value" .Values.ingress.extraTls "context" $) | nindent 4 }}

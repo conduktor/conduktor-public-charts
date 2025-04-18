@@ -704,15 +704,15 @@ ingress:
   ##   secretName: platform.local-tls
   ##
   extraTls: []
-  ## @param ingress.secrets Custom TLS certificates as secrets
+  ## @param ingress.secrets Existing TLS secrets or custom TLS certificates/keys secrets to create and use
   ## NOTE: 'key' and 'certificate' are expected in PEM format
-  ## NOTE: 'name' should line up with a 'secretName' set further up
   ## If it is not set and you're using cert-manager, this is unneeded, as it will create a secret for you with valid certificates
   ## If it is not set and you're NOT using cert-manager either, self-signed certificates will be created valid for 365 days
-  ## It is also possible to create and manage the certificates outside of this helm chart
+  ## It is also possible to create and manage the certificates outside of this helm chart by just set existing secret name in secrets[].name without key and certificate values.
   ## e.g:
   ## secrets:
-  ##   - name: platform.local-tls
+  ##   - name: existing-secret-tls # existing TLS secret
+  ##   - name: platform.local-tls  # new TLS secret with key and certificate values for tls.cert and tls.key keys
   ##     key: |-
   ##       -----BEGIN RSA PRIVATE KEY-----
   ##       ...
