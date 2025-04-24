@@ -122,7 +122,7 @@ spec:
           {{- else }}
           resources: {{- toYaml .Values.gateway.resources | nindent 12 }}
           {{- end }}
-          {{- with .Values.gateway.podSecurityContext }}
+          {{- with .Values.gateway.securityContext }}
           securityContext: {{- toYaml . | nindent 12 }}
           {{- end }}
       volumes:
@@ -147,7 +147,7 @@ spec:
       {{- with .Values.global.imagePullSecrets }}
       imagePullSecrets: {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.securityContext }}
+      {{- with .Values.podSecurityContext }}
       securityContext: {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.nodeSelector }}

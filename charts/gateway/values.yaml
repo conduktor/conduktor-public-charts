@@ -152,7 +152,8 @@ gateway:
   ## @param gateway.podAnnotations Gateway pod annotations
   podAnnotations: {}
 
-  ## @param gateway.securityContext Container security context
+  ## @param gateway.securityContext Conduktor Gateway container Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
   securityContext: {}
     # capabilities:
     #   drop:
@@ -409,6 +410,12 @@ tolerations: []
 
 ## @param affinity Container affinity
 affinity: {}
+
+## @param podSecurityContext Conduktor Gateway Pod Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+##
+podSecurityContext: {}
+    # runAsNonRoot: true
 
 ## @skip tests
 tests:
