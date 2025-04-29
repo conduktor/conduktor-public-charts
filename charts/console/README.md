@@ -33,41 +33,18 @@ Helm Chart to deploy Conduktor Console on Kubernetes.
 - Kubernetes 1.19+
 - Helm 3.2.0+
 
-  - [Parameters](#parameters)
-    - [Global parameters](#global-parameters)
-    - [Common parameters](#common-parameters)
-    - [Platform product Parameters](#platform-product-parameters)
-    - [Platform Monitoring product Parameters](#platform-monitoring-product-parameters)
-    - [Platform Deployment Parameters](#platform-deployment-parameters)
-    - [Platform Metrics activation](#platform-metrics-activation)
-    - [Traffic Exposure Parameters](#traffic-exposure-parameters)
-    - [Other Parameters](#other-parameters)
-    - [Platform Cortex Parameters](#platform-cortex-parameters)
-  - [Snippets](#snippets)
-    - [Console configuration](#console-configuration)
-    - [Kubernetes configuration](#kubernetes-configuration)
-    - [Install with an enterprise license](#install-with-an-enterprise-license)
-    - [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
-    - [Install with a Kafka cluster](#install-with-a-kafka-cluster)
-    - [Install with a Confluent Cloud cluster](#install-with-a-confluent-cloud-cluster)
-    - [Install without Conduktor monitoring](#install-without-conduktor-monitoring)
-    - [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
-    - [Provide credentials configuration as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
-    - [Provide monitoring configuration as a Kubernetes Secret](#provide-monitoring-configuration-as-a-kubernetes-secret)
-    - [Pulling from private registry using `global.imagePullSecrets`](#pulling-from-private-registry-using-globalimagepullsecrets)
-    - [Store platform data into a Persistent Volume](#store-platform-data-into-a-persistent-volume)
-    - [Install with a PodAffinity](#install-with-a-podaffinity)
-    - [Provide console configuration as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
-    - [Provide additional credentials as a Kubernetes Secret](#provide-additional-credentials-as-a-kubernetes-secret)
-    - [Install with a toleration](#install-with-a-toleration)
-    - [Install with Self-Signed TLS certificate](#install-with-self-signed-tls-certificate)
-    - [Install with a custom TLS certificate on the platform Pod](#install-with-a-custom-tls-certificate-on-the-platform-pod)
-    - [Install with a custom service account](#install-with-a-custom-service-account)
-    - [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
-    - [Install with Console technical monitoring](#install-with-console-technical-monitoring)
-    - [Install with custom certificates or keytab](#install-with-custom-certificates-or-keytab)
-  - [Troubleshooting](#troubleshooting)
-
+* [Parameters](#parameters)
+  * [Global parameters](#global-parameters)
+  * [Common parameters](#common-parameters)
+  * [Platform product Parameters](#platform-product-parameters)
+  * [Platform Monitoring product Parameters](#platform-monitoring-product-parameters)
+  * [Platform Deployment Parameters](#platform-deployment-parameters)
+  * [Platform Metrics activation](#platform-metrics-activation)
+  * [Traffic Exposure Parameters](#traffic-exposure-parameters)
+  * [Other Parameters](#other-parameters)
+  * [Platform Cortex Parameters](#platform-cortex-parameters)
+* [Snippets](#snippets)
+* [Troubleshooting](#troubleshooting)
 
 ## Parameters
 
@@ -285,7 +262,7 @@ Console expose metrics that could be collected and presented if your environment
 | `ingress.extraHosts`               | An array with additional hostname(s) to be covered with the ingress record                                                       | `[]`                     |
 | `ingress.extraPaths`               | An array with additional arbitrary paths that may need to be added to the ingress under the main host                            | `[]`                     |
 | `ingress.extraTls`                 | TLS configuration for additional hostname(s) to be covered with this ingress record                                              | `[]`                     |
-| `ingress.secrets`                  | Custom TLS certificates as secrets                                                                                               | `[]`                     |
+| `ingress.secrets`                  | Existing TLS secrets or custom TLS certificates/keys secrets to create and use                                                   | `[]`                     |
 | `ingress.extraRules`               | Additional rules to be covered with this ingress record                                                                          | `[]`                     |
 
 ### Other Parameters
@@ -400,7 +377,6 @@ console, we recommend you to look at our
 - [Install without Conduktor monitoring](#install-without-conduktor-monitoring)
 
 ### Kubernetes configuration
-
 - [Install with an enterprise license](#install-with-an-enterprise-license)
 - [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
 - [Install with a Kafka cluster](#install-with-a-kafka-cluster)
@@ -415,8 +391,15 @@ console, we recommend you to look at our
 - [Provide console configuration as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
 - [Provide additional credentials as a Kubernetes Secret](#provide-additional-credentials-as-a-kubernetes-secret)
 - [Install with a toleration](#install-with-a-toleration)
-- [Install with Self-Signed TLS certificate](#install-with-self-signed-tls-certificate)
-- [Install with a custom TLS certificate on the platform Pod](#install-with-a-custom-tls-certificate-on-the-platform-pod)
+- [Ingress TLS configuration](#ingress-tls-configuration)
+  - [Using cert-manager](#using-cert-manager)
+  - [Using existing TLS secret](#using-existing-tls-secret)
+  - [Using plain PEM certificate and key](#using-plain-pem-certificate-and-key)
+  - [Using Multiple TLS secrets](#using-multiple-tls-secrets)
+  - [Using Helm generated self-signed certificates](#using-helm-generated-self-signed-certificates)
+- [Container TLS configuration](#container-tls-configuration)
+  - [Use an existing secret](#use-an-existing-secret-)
+  - [Install with Self-Signed TLS certificate](#install-with-self-signed-tls-certificate)
 - [Install with a custom service account](#install-with-a-custom-service-account)
 - [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
 - [Install with Console technical monitoring](#install-with-console-technical-monitoring)
@@ -903,32 +886,104 @@ platformCortex:
       effect: "NoSchedule"
 ```
 
-### Install with Self-Signed TLS certificate
+### Ingress TLS configuration
 
+#### Using cert-manager
+This solution leverage [cert-manager](https://cert-manager.io/docs/) to generate TLS certificates for your ingress simply using annotations.
+
+Example using a [Nginx Ingress](https://kubernetes.github.io/ingress-nginx/) and cert-manager with [Let's Encrypt](https://cert-manager.io/docs/tutorials/acme/pomerium-ingress/#configure-lets-encrypt-issuer) issuer : 
 ```yaml
-config:
-  organization:
-    name: "my-org"
-
-  admin:
-    email: "admin@my-org.com"
-    password: "admin"
-
-  database:
-    host: ""
-    port: 5432
-    name: "postgres"
-    username: ""
-    password: ""
-
-  platform:
-    external:
-      url: "https://platform.local"
-    https:
-      selfSigned: true
+ingress:
+  enabled: true
+  hostname: conduktor-console.my-domain.com
+  tls: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-issuer
+    kubernetes.io/ingress.class: nginx
 ```
 
-### Install with a custom TLS certificate on the platform Pod
+#### Using existing TLS secret
+If you already have a TLS secret of type `kubernetes.io/tls` created in your cluster, you can use it in your ingress configuration.
+
+```yaml
+ingress:
+  enabled: true
+  hostname: conduktor-console.my-domain.com
+  tls: true
+  secrets:
+    - name: my-existing-tls-secret
+```
+OR using `ingress.extraTls`
+```yaml
+ingress:
+  enabled: true
+  hostname: conduktor-console.my-domain.com
+  tls: true
+  extraTls:
+    - secretName: my-existing-tls-secret
+      hosts:
+        - conduktor-console.my-domain.com
+```
+
+#### Using plain PEM certificate and key
+
+If you have a PEM certificate and key, you can use them directly in your `values.yaml` file.
+```yaml
+ingress:
+  enabled: true
+  hostname: conduktor-console.my-domain.com
+  tls: true
+  secrets:
+    - name: my-new-tls-secret
+      certificate: |-
+        -----BEGIN CERTIFICATE-----
+        ...
+        -----END CERTIFICATE-----
+      key: |-
+        -----BEGIN PRIVATE KEY-----
+        ...
+        -----END PRIVATE KEY-----
+```
+
+#### Using Multiple TLS secrets
+
+If using multiple hostnames, you can use the `extraTls` parameter to add more TLS secrets.
+
+```yaml
+ingress:
+  enabled: true
+  hostname: conduktor-console.my-domain.com
+  tls: true
+  extraHosts:
+    - host: my-other-hostname.com
+      path: /
+      pathType: ImplementationSpecific
+  extraTls:
+    - secretName: conduktor-console.my-domain.com-tls
+      hosts:
+        - conduktor-console.my-domain.com
+    - secretName: my-other-hostname.com-tls
+      hosts:
+        - my-other-hostname.com
+```
+
+#### Using Helm generated self-signed certificates
+This solution use Helm [`genCA`](https://helm.sh/docs/chart_template_guide/function_list/#genca), [`genSignedCert`](https://helm.sh/docs/chart_template_guide/function_list/#gensignedcert) functions to generate self-signed certificates for your ingress. (Not for production use)
+```yaml
+ingress:
+  enabled: true
+  hostname: conduktor-console.my-domain.com
+  tls: true
+  selfSigned: true
+```
+It will generate a secret name `<hostname>-tls` with the certificates and key.
+
+### Container TLS configuration
+
+#### Use an existing secret 
+
+If you already have a TLS secret of type `kubernetes.io/tls` created in your cluster, you can use it in your platform configuration.
+At startup Console will look for a `tls.crt` and `tls.key` PEM inside the secret to be mounted.
 
 ```yaml
 config:
@@ -952,18 +1007,35 @@ config:
     https:
       selfSigned: false
       existingSecret: "platform-tls"
-ingress:
-  secrets:
-    - name: platform-tls
-      certificate: |-
-        -----BEGIN CERTIFICATE-----
-        ...
-        -----END CERTIFICATE-----
-      key: |-
-        -----BEGIN PRIVATE KEY-----
-        ...
-        -----END PRIVATE KEY-----
 ```
+
+#### Install with Self-Signed TLS certificate
+
+This solution use Helm[`genCA`](https://helm.sh/docs/chart_template_guide/function_list/#genca), [`genSignedCert`](https://helm.sh/docs/chart_template_guide/function_list/#gensignedcert) functions to generate self-signed certificates using `config.platform.external.url` for the certificate subject name CN. (Not for production use)
+
+```yaml
+config:
+  organization:
+    name: "my-org"
+
+  admin:
+    email: "admin@my-org.com"
+    password: "admin"
+
+  database:
+    host: ""
+    port: 5432
+    name: "postgres"
+    username: ""
+    password: ""
+
+  platform:
+    external:
+      url: "https://platform.local"
+    https:
+      selfSigned: true
+```
+Self signed secret will be stored inside a secret named `<fullname>-platform-tls`.
 
 ### Install with a custom service account
 
