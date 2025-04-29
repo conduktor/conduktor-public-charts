@@ -918,6 +918,7 @@ OR using `ingress.extraTls`
 ingress:
   enabled: true
   hostname: conduktor-console.my-domain.com
+  tls: true
   extraTls:
     - secretName: my-existing-tls-secret
       hosts:
@@ -952,11 +953,11 @@ If using multiple hostnames, you can use the `extraTls` parameter to add more TL
 ingress:
   enabled: true
   hostname: conduktor-console.my-domain.com
+  tls: true
   extraHosts:
     - host: my-other-hostname.com
       path: /
       pathType: ImplementationSpecific
-  tls: true
   extraTls:
     - secretName: conduktor-console.my-domain.com-tls
       hosts:
