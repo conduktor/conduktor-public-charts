@@ -20,6 +20,11 @@ spec:
     - port: admin-http
       path: /metrics
       scheme: http
+      {{- if .Values.metrics.prometheus.scheme }}
+      scheme: {{ .Values.metrics.prometheus.scheme }}
+      {{- else }}
+      scheme: {{ include "conduktor-gateway.adminAPIScheme" . | quote }}
+      {{- end }}
       {{- if .Values.metrics.prometheus.metricRelabelings }}
       metricRelabelings: {{- include "common.tplvalues.render" ( dict "value" .Values.metrics.prometheus.metricRelabelings "context" $) | nindent 8 }}
       {{- end }}
@@ -34,6 +39,15 @@ spec:
         password:
           name: {{ include "conduktor-gateway.secretName" . }}
           key: {{ .Values.gateway.admin.mainAdminSecretKeys.password | quote}}
+      {{- end }}
+      {{- if .Values.metrics.prometheus.tlsConfig }}
+      tlsConfig: {{- include "common.tplvalues.render" ( dict "value" .Values.metrics.prometheus.tlsConfig "context" $) | nindent 8 }}
+      {{- else }}
+      {{- if eq ( include "conduktor-gateway.adminAPIScheme" .) "https" }}
+      tlsConfig:
+        {{/* Skip TLS validation because we can't extract the CA/Cert from a JKS keystore inside helm to configure Prometheus*/}}
+        insecureSkipVerify: true
+      {{- end }}
       {{- end }}
       {{- if .Values.metrics.prometheus.extraParams }}
       {{- toYaml .Values.metrics.prometheus.extraParams | nindent 6 }}

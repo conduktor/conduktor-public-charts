@@ -1,9 +1,10 @@
+{{- $apiScheme := include "conduktor-gateway.adminAPIScheme" . -}}
 {{- $internalServiceName := include "conduktor-gateway.internalServiceName" . -}}
 {{- $internalServicePort := .Values.gateway.admin.port -}}
-{{- $internalHealthUrl := printf "http://%v:%v/health" $internalServiceName $internalServicePort -}}
+{{- $internalHealthUrl := printf "%s://%v:%v/health" $apiScheme $internalServiceName $internalServicePort -}}
 {{- $externalServiceName := include "conduktor-gateway.externalServiceName" . -}}
 {{- $externalServicePort := .Values.gateway.admin.port -}}
-{{- $externalHealthUrl := printf "http://%v:%v/health" $externalServiceName $externalServicePort -}}
+{{- $externalHealthUrl := printf "%s://%v:%v/health" $apiScheme $externalServiceName $externalServicePort -}}
 apiVersion: v1
 kind: Pod
 metadata:
@@ -22,7 +23,7 @@ spec:
       args: [ '--insecure', "--verbose" ,'{{ $externalHealthUrl }}']
 {{- end }}
 {{- if .Values.gateway.admin.users }}
-{{- $internalAdminApiVclusterUrl := printf "http://%v:%v/gateway/v2/virtual-cluster" $internalServiceName $internalServicePort }}
+{{- $internalAdminApiVclusterUrl := printf "%s://%v:%v/gateway/v2/virtual-cluster" $apiScheme $internalServiceName $internalServicePort }}
 {{- $secretName := include "conduktor-gateway.secretName" . }}
 {{- $adminLogin := include "common.secrets.lookup" (dict "secret" $secretName "key" .Values.gateway.admin.mainAdminSecretKeys.username "defaultValue" "admin" "context" $) }}
 {{- $adminPassword := include "common.secrets.lookup" (dict "secret" $secretName "key" .Values.gateway.admin.mainAdminSecretKeys.password "defaultValue" "conduktor" "context" $) }}

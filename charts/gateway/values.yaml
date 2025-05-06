@@ -341,6 +341,10 @@ metrics:
     ## @param metrics.prometheus.labels Extra labels for the ServiceMonitor
     ##
     labels: {}
+    ## @param metrics.prometheus.scheme Protocol scheme to use for scraping (http or https). By default, automatically resolved based on container TLS configuration.
+    scheme: ""
+    ## @param metrics.prometheus.tlsConfig TLS configuration for the ServiceMonitor. By default, configured to skip TLS validation.
+    tlsConfig: { }
     ## @param metrics.prometheus.jobLabel The name of the label on the target service to use as the job name in Prometheus
     ##
     jobLabel: "app.kubernetes.io/instance"

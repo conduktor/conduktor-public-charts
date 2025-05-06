@@ -74,13 +74,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "conduktor-gateway.fullname" . }}
-            {{- if .Values.gateway.secretRef }}
-            - secretRef:
-                name: {{ .Values.gateway.secretRef }}
-            {{- else }}
             - secretRef:
                 name: {{ include "conduktor-gateway.secretName" . }}
-            {{- end }}
           ports:
             {{- range untilStep (int .Values.gateway.portRange.start) (int (add .Values.gateway.portRange.start .Values.gateway.portRange.count)) 1 }}
             - containerPort: {{ . }}
@@ -109,13 +104,13 @@ spec:
             httpGet:
               path: /health
               port: {{ .Values.gateway.admin.port }}
-              scheme: {{ .Values.tls.enable | ternary "HTTPS" "HTTP" }}
+              scheme: {{ include "conduktor-gateway.adminAPIScheme" . | upper | quote }}
             periodSeconds: 5
           startupProbe:
             httpGet:
               path: /health
               port: {{ .Values.gateway.admin.port }}
-              scheme: {{ .Values.tls.enable | ternary "HTTPS" "HTTP" }}
+              scheme: {{ include "conduktor-gateway.adminAPIScheme" . | upper | quote }}
             initialDelaySeconds: {{ .Values.gateway.startupProbeDelay | default 10 }}
           {{- if .Values.resources }}
           resources: {{- toYaml .Values.resources | nindent 12 }}

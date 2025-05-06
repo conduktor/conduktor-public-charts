@@ -27,9 +27,22 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create default secret name
 */}}
-{{- define "conduktor-gateway.secretName" -}}
+{{- define "conduktor-gateway.default.secretName" -}}
 {{- printf "%s-secret" (include "conduktor-gateway.fullname" . | trunc 63 | trimSuffix "-") -}}
 {{- end -}}
+
+
+{{/*
+Create default secret name
+*/}}
+{{- define "conduktor-gateway.secretName" -}}
+  {{- if .Values.gateway.secretRef -}}
+    {{- .Values.gateway.secretRef -}}
+  {{- else -}}
+    {{- include "conduktor-gateway.default.secretName" . -}}
+  {{- end -}}
+{{- end -}}
+
 
 {{/*
 Create chart name and version as used by the chart label.
@@ -178,4 +191,15 @@ Params:
     {{- end -}}
   {{- end -}}
   {{- $exists -}}
+{{- end -}}
+
+{{/*
+Return admin api scheme http or https
+*/}}
+{{- define "conduktor-gateway.adminAPIScheme" -}}
+  {{- $scheme := "http" -}}
+  {{- if eq (include "conduktor-gateway.envExists" (dict "envkey" "GATEWAY_HTTPS_KEY_STORE_PATH" "context" $)) "true"  -}}
+    {{- $scheme = "https" -}}
+  {{- end -}}
+  {{- $scheme -}}
 {{- end -}}
