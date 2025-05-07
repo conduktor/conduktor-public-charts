@@ -227,6 +227,14 @@ Platform external url. Fallback to internal one if no external url configured or
 {{- end -}}
 {{- end -}}
 
+{{/*
+Return the external hostname of the platform without protocol and port
+*/}}
+{{- define "conduktor.platform.externalHostname" -}}
+{{- $externalUrl := include "conduktor.platform.externalUrl" . -}}
+{{- $parsedUrl := urlParse $externalUrl -}}
+{{- $parsedUrl.hostname -}}
+{{- end -}}
 
 {{/*
 Name of the platform cortex Service

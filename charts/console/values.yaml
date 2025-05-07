@@ -522,6 +522,10 @@ platform:
       ## interval: 10s
       ##
       interval: ""
+      ## @param platform.metrics.serviceMonitor.scheme Protocol scheme to use for scraping (http or https). By default, automatically resolved based on container TLS configuration.
+      scheme: ""
+      ## @param platform.metrics.serviceMonitor.tlsConfig TLS configuration for the ServiceMonitor. By default, automatically resolved based on container TLS configuration using config.platform.https config and tls.crt in secret.
+      tlsConfig: {}
       ## @param platform.metrics.serviceMonitor.scrapeTimeout Timeout after which the scrape is ended
       ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
       ## e.g:

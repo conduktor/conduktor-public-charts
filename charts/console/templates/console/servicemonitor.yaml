@@ -1,5 +1,6 @@
 {{- if .Capabilities.APIVersions.Has "monitoring.coreos.com/v1/ServiceMonitor" }}
 {{- if and .Values.platform.metrics.enabled .Values.platform.metrics.serviceMonitor.enabled }}
+{{- $isSSLEnabled := not (empty (include "conduktor.platform.tls.enabled" .)) }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -28,7 +29,11 @@ spec:
   endpoints:
     - port: http
       path: "/api/metrics"
-      scheme: http
+      {{- if .Values.platform.metrics.serviceMonitor.scheme }}
+      scheme: {{ .Values.platform.metrics.serviceMonitor.scheme }}
+      {{- else }}
+      scheme: {{ ternary "https" "http" $isSSLEnabled }}
+      {{- end }}
       {{- if .Values.platform.metrics.serviceMonitor.interval }}
       interval: {{ .Values.platform.metrics.serviceMonitor.interval }}
       {{- end }}
@@ -43,6 +48,18 @@ spec:
       {{- end }}
       {{- if .Values.platform.metrics.serviceMonitor.relabelings }}
       relabelings: {{- include "common.tplvalues.render" ( dict "value" .Values.platform.metrics.serviceMonitor.relabelings "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.platform.metrics.serviceMonitor.tlsConfig }}
+      tlsConfig: {{- include "common.tplvalues.render" ( dict "value" .Values.platform.metrics.serviceMonitor.tlsConfig "context" $) | nindent 8 }}
+      {{- else }}
+      {{- if $isSSLEnabled }}
+      tlsConfig:
+        serverName: {{ include "conduktor.platform.externalHostname" . | quote }}
+        ca:
+          secret:
+            name: {{ include "conduktor.platform.tls.secretName" . | quote}}
+            key: "tls.crt"
+      {{- end }}
       {{- end }}
       {{- if .Values.platform.metrics.serviceMonitor.extraParams }}
       {{- toYaml .Values.platform.metrics.serviceMonitor.extraParams | nindent 6 }}
