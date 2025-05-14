@@ -58,10 +58,6 @@ spec:
             - name: GATEWAY_SECURED_METRICS
               value: {{ .Values.gateway.admin.securedMetrics | quote }}
             {{- end}}
-            {{- if and .Values.gateway.userPool .Values.gateway.userPool.serviceAccountRequired }}
-            - name: GATEWAY_USER_POOL_SERVICE_ACCOUNT_REQUIRED
-              value: {{ .Values.gateway.userPool.serviceAccountRequired | quote }}
-            {{- end }}
             {{- if and .Values.tls.enable .Values.tls.secretRef}}
             - name: GATEWAY_SSL_KEY_STORE_PATH
               value: /etc/gateway/tls/{{ .Values.tls.keystoreFile }}
