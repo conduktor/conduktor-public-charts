@@ -141,9 +141,6 @@ gateway:
       ## @param gateway.resources.requests.memory Memory resource requests
       memory: 500Mi
 
-  ## @param gateway.startupProbeDelay [nullable] Optional delay in second before startup probe should be running (default 10)
-  startupProbeDelay: ""
-
   ## @param gateway.podLabels Specific labels to be added to Gateway pod by deployment
   podLabels: {}
 
@@ -161,13 +158,70 @@ gateway:
     # runAsUser: 1000
 
   ## @param gateway.volumes Define user specific volumes for Gateway deployment
-  volumes: {}
+  volumes: []
 
   ## @param gateway.volumeMounts Define user specific volumeMounts for Gateway container in deployment
-  volumeMounts: {}
+  volumeMounts: []
 
   ## @param gateway.priorityClassName Define Gateway pods' priority based on an existing ClassName
   priorityClassName: ""
+
+  ## @param gateway.customStartupProbe Custom startup probe configuration
+  customStartupProbe: {}
+  ## Configure extra options for Conduktor Gaterway containers startup probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param gateway.startupProbe.enabled Enable startupProbe on Conduktor Gaterway containers
+  ## @param gateway.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
+  ## @param gateway.startupProbe.periodSeconds Period seconds for startupProbe
+  ## @param gateway.startupProbe.timeoutSeconds Timeout seconds for startupProbe
+  ## @param gateway.startupProbe.failureThreshold Failure threshold for startupProbe
+  ## @param gateway.startupProbe.successThreshold Success threshold for startupProbe
+  ##
+  startupProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 1
+    failureThreshold: 5
+    successThreshold: 1
+
+  ## @param gateway.customLivenessProbe Custom liveness probe configuration
+  customLivenessProbe: {}
+  ## Configure extra options for Conduktor Gaterway containers liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param gateway.livenessProbe.enabled Enable livenessProbe on Conduktor Gaterway containers
+  ## @param gateway.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param gateway.livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param gateway.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param gateway.livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param gateway.livenessProbe.successThreshold Success threshold for livenessProbe
+  ##
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 0
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 3
+    successThreshold: 1
+
+  ## @param gateway.customReadinessProbe Custom readiness probe configuration
+  customReadinessProbe: {}
+  ## Configure extra options for Conduktor Gaterway containers liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param gateway.readinessProbe.enabled Enable readinessProbe on Conduktor Gaterway containers
+  ## @param gateway.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+  ## @param gateway.readinessProbe.periodSeconds Period seconds for readinessProbe
+  ## @param gateway.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+  ## @param gateway.readinessProbe.failureThreshold Failure threshold for readinessProbe
+  ## @param gateway.readinessProbe.successThreshold Success threshold for readinessProbe
+  ##
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 0
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 3
+    successThreshold: 1
 
 ## @section TLS configuration
 ## @descriptionStart

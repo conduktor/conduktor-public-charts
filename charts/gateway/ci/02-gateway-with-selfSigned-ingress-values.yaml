@@ -1,6 +1,7 @@
 nameOverride: gateway-test-02
 
 gateway:
+  replicas: 1
   admin:
     port: 8888
 

@@ -96,18 +96,42 @@ spec:
             {{- end }}
             - name: config
               mountPath: /etc/gateway/config
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: {{ .Values.gateway.admin.port }}
-              scheme: {{ include "conduktor-gateway.adminAPIScheme" . | upper | quote }}
-            periodSeconds: 5
+          {{- if .Values.gateway.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.gateway.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if (.Values.gateway.startupProbe).enabled | default true }}
           startupProbe:
+          {{- if .Values.gateway.startupProbe }}
+          {{- include "common.tplvalues.render" (dict "value" (omit .Values.gateway.startupProbe "enabled") "context" $) | nindent 12 }}
+          {{- end }}
             httpGet:
               path: /health
               port: {{ .Values.gateway.admin.port }}
               scheme: {{ include "conduktor-gateway.adminAPIScheme" . | upper | quote }}
-            initialDelaySeconds: {{ .Values.gateway.startupProbeDelay | default 10 }}
+          {{- end }}
+          {{- if .Values.gateway.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.gateway.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if (.Values.gateway.livenessProbe).enabled | default true }}
+          livenessProbe:
+          {{- if .Values.gateway.livenessProbe }}
+          {{- include "common.tplvalues.render" (dict "value" (omit .Values.gateway.livenessProbe "enabled") "context" $) | nindent 12 }}
+          {{- end }}
+            httpGet:
+              path: /health
+              port: {{ .Values.gateway.admin.port }}
+              scheme: {{ include "conduktor-gateway.adminAPIScheme" . | upper | quote }}
+          {{- end }}
+          {{- if .Values.gateway.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.gateway.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if (.Values.gateway.readinessProbe).enabled | default true }}
+          readinessProbe:
+          {{- if .Values.gateway.readinessProbe }}
+          {{- include "common.tplvalues.render" (dict "value" (omit .Values.gateway.readinessProbe "enabled") "context" $) | nindent 12 }}
+          {{- end }}
+            httpGet:
+              path: /health
+              port: {{ .Values.gateway.admin.port }}
+              scheme: {{ include "conduktor-gateway.adminAPIScheme" . | upper | quote }}
+          {{- end }}
           {{- if .Values.resources }}
           resources: {{- toYaml .Values.resources | nindent 12 }}
           {{- else }}

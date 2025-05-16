@@ -5,7 +5,8 @@
 target-branch: main
 chart-dirs:
   - charts
-debug: false
+debug: true
+skip-clean-up: false
 remote: origin
 validate-maintainers: false
 validate-yaml: true
