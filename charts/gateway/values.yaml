@@ -158,10 +158,10 @@ gateway:
     # runAsUser: 1000
 
   ## @param gateway.volumes Define user specific volumes for Gateway deployment
-  volumes: {}
+  volumes: []
 
   ## @param gateway.volumeMounts Define user specific volumeMounts for Gateway container in deployment
-  volumeMounts: {}
+  volumeMounts: []
 
   ## @param gateway.priorityClassName Define Gateway pods' priority based on an existing ClassName
   priorityClassName: ""
