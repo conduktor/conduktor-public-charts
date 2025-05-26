@@ -19,9 +19,8 @@ spec:
   endpoints:
     - port: admin-http
       path: /metrics
-      scheme: http
       {{- if .Values.metrics.prometheus.scheme }}
-      scheme: {{ .Values.metrics.prometheus.scheme }}
+      scheme: {{ .Values.metrics.prometheus.scheme | quote }}
       {{- else }}
       scheme: {{ include "conduktor-gateway.adminAPIScheme" . | quote }}
       {{- end }}
