@@ -43,7 +43,7 @@
 ## Prerequisites
 
 - Kubernetes 1.19+
-- [Helm](https://helm.sh/docs/intro/install/) 3.2.0+
+- [Helm](https://helm.sh/docs/intro/install/) 3.6.0+
 
 ## Charts
 
@@ -68,7 +68,7 @@ or to our charts `README`.
 **Requirements**:
 - [k3d](https://k3d.io/v5.6.0/#installation)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/)
-- [helm](https://helm.sh/docs/intro/install/)
+- [helm](https://helm.sh/docs/intro/install/) 3.6.0+
 
 You can have a working cluster on your local machine with docker and k3d, 
 use the Makefile target `k3d-up` to start a cluster with nginx and a postgresql
