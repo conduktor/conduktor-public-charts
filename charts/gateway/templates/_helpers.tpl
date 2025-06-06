@@ -209,6 +209,7 @@ Return admin api scheme http or https
 Patch grafana dashboard inputs
 Params :
   - dashboard - Dashboard object to patch inputs - Requred
+  - title - Dashboard title to override - Requred
   - context - Context - Required - Parent context.
 */}}
 {{- define "conduktor-gateway.patchGrafanaDashboardInputs" -}}
@@ -227,11 +228,21 @@ Params :
     {{- end -}}
   {{- end -}}
 
-
+  {{/*  Patch variables */}}
  {{- range $var_index, $variable := $.dashboard.templating.list -}}
     {{- if hasKey $patchs $variable.name -}}
       {{- $_ := set $variable "query" (index $patchs $variable.name) -}}
+
+      {{/*  Update current value */}}
+      {{- if hasKey $variable "current" -}}
+        {{- $current := $variable.current | deepCopy -}}
+        {{- $_newCurrent := set $current "value" (index $patchs $variable.name) -}}
+        {{- $_2 := set $variable "current" $current -}}
+      {{- end -}}
     {{- end -}}
   {{- end -}}
+
+  {{/*  Patch title */}}
+  {{- $_ := set $.dashboard "title" $.title -}}
 
 {{- end -}}

@@ -20,7 +20,7 @@
     },
     {
       "name": "INPUT_GATEWAY_JOB_NAME",
-      "label": "Gateway name",
+      "label": "Gateway job name (app.kubernetes.io/instance by default)",
       "description": "The name of the gateway to monitor",
       "type": "constant",
       "value": "conduktor-gateway"
@@ -325,10 +325,29 @@
     "list": [
       {
         "current": {
+          "selected": false,
+          "text": "Prometheus",
+          "value": "default"
+        },
+        "includeAll": false,
+        "label": null,
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "${INPUT_DS_PROMETHEUS}",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "selected": false,
           "text": "Loki",
           "value": "default"
         },
         "includeAll": false,
+        "label": null,
+        "multi": false,
         "name": "loki_datasource",
         "options": [],
         "query": "${INPUT_DS_LOKI}",
@@ -345,26 +364,32 @@
         "type": "constant"
       },
       {
+        "allFormat": "glob",
         "current": {},
         "datasource": {
-          "type": "loki",
-          "uid": "default"
+          "type": "prometheus",
+          "uid": "${datasource}"
         },
-        "definition": "",
+        "definition": "label_values(up{job=\"$job\"}, pod)",
+        "hide": 0,
         "includeAll": true,
         "label": "pod",
         "multi": true,
+        "multiFormat": "glob",
         "name": "pod",
         "options": [],
         "query": {
-          "label": "pod",
-          "refId": "LokiVariableQueryEditor-VariableQuery",
-          "stream": "{job=\"${job}\"}",
-          "type": 1
+          "query": "label_values(up{job=\"$job\"}, pod)",
+          "refId": "StandardVariableQuery"
         },
         "refresh": 2,
         "regex": "",
-        "type": "query"
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
       }
     ]
   },

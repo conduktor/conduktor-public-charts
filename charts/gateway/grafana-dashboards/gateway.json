@@ -11,7 +11,7 @@
     },
     {
       "name": "INPUT_GATEWAY_JOB_NAME",
-      "label": "Gateway name",
+      "label": "Gateway job name (app.kubernetes.io/instance by default)",
       "description": "The name of the gateway to monitor",
       "type": "constant",
       "value": "conduktor-gateway"
@@ -4914,10 +4914,13 @@
     "list": [
       {
         "current": {
+          "selected": false,
           "text": "Prometheus",
           "value": "default"
         },
         "includeAll": false,
+        "label": null,
+        "multi": false,
         "name": "datasource",
         "options": [],
         "query": "${INPUT_DS_PROMETHEUS}",

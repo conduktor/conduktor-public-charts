@@ -2,11 +2,11 @@
 {{- $configMapName := printf "%s-dashboards" ( include "conduktor-gateway.fullname" . | trunc 52) -}}
 {{- $gatewayNsRelease := printf "%s/%s" (include "common.names.namespace" .) .Release.Name -}}
 {{- $gatewayDashboard :=  .Files.Get "grafana-dashboards/gateway.json" | fromJson }}
-{{- $_ := set $gatewayDashboard "title" (printf "Conduktor Gateway [%s]" $gatewayNsRelease) -}}
-{{- $_1 := (include "conduktor-gateway.patchGrafanaDashboardInputs" (dict "dashboard" $gatewayDashboard "context" $)) -}}
+{{- $dashboardTitle := printf "Conduktor Gateway [%s]" $gatewayNsRelease -}}
+{{- $_1 := (include "conduktor-gateway.patchGrafanaDashboardInputs" (dict "dashboard" $gatewayDashboard "title" $dashboardTitle "context" $)) -}}
 {{- $gatewayLogsDashboard :=  .Files.Get "grafana-dashboards/gateway-logs.json" | fromJson }}
-{{- $_2 := set $gatewayLogsDashboard "title" (printf "Conduktor Gateway logs [%s]" $gatewayNsRelease) -}}
-{{- $_3 := (include "conduktor-gateway.patchGrafanaDashboardInputs" (dict "dashboard" $gatewayLogsDashboard "context" $)) -}}
+{{- $logDashboardTitle := printf "Conduktor Gateway logs [%s]" $gatewayNsRelease -}}
+{{- $_3 := (include "conduktor-gateway.patchGrafanaDashboardInputs" (dict "dashboard" $gatewayLogsDashboard "title" $logDashboardTitle "context" $)) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
