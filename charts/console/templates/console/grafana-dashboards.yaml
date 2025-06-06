@@ -1,6 +1,25 @@
 {{- if and .Values.platform.metrics.enabled .Values.platform.metrics.grafana.enabled }}
+{{- $configMapName := printf "%s-dashboards" ( include "common.names.fullname" . | trunc 52) -}}
 {{- $consoleDashboard :=  .Files.Get "grafana-dashboards/console.json" | fromJson }}
-{{- $_ := set $consoleDashboard "title" (printf "Conduktor Console [%s]" (include "common.names.namespace" .)) -}}
+{{- $dashboardTitle := printf "Conduktor Console [%s]" (include "common.names.namespace" .) -}}
+{{- $_1 := (include "conduktor.platform.dashboard.patchInputs" (dict "dashboard" $consoleDashboard "title" $dashboardTitle "context" $)) -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $configMapName | quote }}
+  namespace: {{ include "conduktor.platform.dashboard.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    "conduktor.io/dashboard": "true"
+     {{- if .Values.commonLabels }}
+     {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+     {{- end }}
+     {{- if .Values.platform.metrics.grafana.labels }}
+     {{- include "common.tplvalues.render" ( dict "value" .Values.platform.metrics.grafana.labels "context" $ ) | nindent 4 }}
+     {{- end }}
+data:
+  console.json: >
+{{ toPrettyJson $consoleDashboard | indent 4 }}
+---
 {{- if .Values.platform.metrics.grafana.folder }}
 {{- if .Capabilities.APIVersions.Has "grafana.integreatly.org/v1beta1/GrafanaFolder" }}
 {{- $consoleFolderName := printf "%s-%s" (include "common.names.fullname" .) "folder" | trunc 63 | trimSuffix "-" -}}
@@ -47,13 +66,14 @@ spec:
   {{- if .Values.platform.metrics.grafana.folder }}
   folder: {{ .Values.platform.metrics.grafana.folder | quote }}
   {{- end }}
+  configMapRef:
+    name: {{ $configMapName | quote }}
+    key: console.json
   datasources:
-    - inputName: "DS_PROMETHEUS"
+    - inputName: "INPUT_DS_PROMETHEUS"
       datasourceName: {{ .Values.platform.metrics.grafana.datasources.prometheus | quote }}
-    - inputName: "VAR_NAMESPACE"
+    - inputName: "INPUT_NAMESPACE"
       datasourceName: {{ include "common.names.namespace" . | quote }}
-  json: |
-{{ toPrettyJson $consoleDashboard | indent 4 }}
 {{- end }}
 ---
 {{/* Support for v4 of Grafana operator */}}
@@ -76,12 +96,16 @@ spec:
   {{- if .Values.platform.metrics.grafana.folder }}
   customFolderName: {{ .Values.platform.metrics.grafana.folder | quote }}
   {{- end }}
+  configMapRef:
+    name: {{ $configMapName | quote }}
+    key: console.json
   datasources:
-    - inputName: "DS_PROMETHEUS"
+    - inputName: "INPUT_DS_PROMETHEUS"
       datasourceName: {{ .Values.platform.metrics.grafana.datasources.prometheus | quote }}
-    - inputName: "VAR_NAMESPACE"
+    - inputName: "INPUT_NAMESPACE"
       datasourceName: {{ include "common.names.namespace" . | quote }}
-  json: |
-{{ toPrettyJson $consoleDashboard | indent 4 }}
+  configMapRef:
+    name:  {{ $configMapName | quote }}
+    key: console.json
 {{- end }}
 {{- end }}
