@@ -1,24 +1,26 @@
 {
   "__inputs": [
     {
-      "name": "DS_LOKI",
+      "name": "INPUT_DS_LOKI",
       "label": "loki",
       "description": "",
       "type": "datasource",
+      "value": "loki",
       "pluginId": "loki",
       "pluginName": "Loki"
     },
     {
-      "name": "DS_PROMETHEUS",
+      "name": "INPUT_DS_PROMETHEUS",
       "label": "prometheus",
       "description": "",
       "type": "datasource",
+      "value": "prometheus",
       "pluginId": "prometheus",
       "pluginName": "Prometheus"
     },
     {
-      "name": "GATEWAY_NAME",
-      "label": "Gateway name",
+      "name": "INPUT_GATEWAY_JOB_NAME",
+      "label": "Gateway job name (app.kubernetes.io/instance by default)",
       "description": "The name of the gateway to monitor",
       "type": "constant",
       "value": "conduktor-gateway"
@@ -95,7 +97,7 @@
     {
       "datasource": {
         "type": "loki",
-        "uid": "${DS_LOKI}"
+        "uid": "${loki_datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -141,10 +143,10 @@
         {
           "datasource": {
             "type": "loki",
-            "uid": "${DS_LOKI}"
+            "uid": "${loki_datasource}"
           },
           "editorMode": "builder",
-          "expr": "sum by(pod) (count_over_time({app=\"${GATEWAY_NAME}\"} | pod =~ `$pod` [$__range]))",
+          "expr": "sum by(pod) (count_over_time({pod=~\"${pod}\"} | pod =~ `$pod` [$__range]))",
           "legendFormat": "{{pod}}",
           "queryType": "range",
           "refId": "A"
@@ -156,7 +158,7 @@
     {
       "datasource": {
         "type": "loki",
-        "uid": "${DS_LOKI}"
+        "uid": "${loki_datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -263,10 +265,10 @@
         {
           "datasource": {
             "type": "loki",
-            "uid": "${DS_LOKI}"
+            "uid": "${loki_datasource}"
           },
           "editorMode": "builder",
-          "expr": "sum by(pod, level) (count_over_time({app=\"${GATEWAY_NAME}\"} | pod =~ `$pod` | json level=\"level\" | __error__=`` | level =~ `ERROR|WARN` [$__range]))",
+          "expr": "sum by(pod, level) (count_over_time({pod=~\"${pod}\"} | pod =~ `$pod` | json level=\"level\" | __error__=`` | level =~ `ERROR|WARN` [$__range]))",
           "legendFormat": "{{level}}",
           "queryType": "range",
           "refId": "A"
@@ -279,7 +281,7 @@
     {
       "datasource": {
         "type": "loki",
-        "uid": "${DS_LOKI}"
+        "uid": "${loki_datasource}"
       },
       "gridPos": {
         "h": 18,
@@ -302,10 +304,10 @@
         {
           "datasource": {
             "type": "loki",
-            "uid": "${DS_LOKI}"
+            "uid": "${loki_datasource}"
           },
           "editorMode": "builder",
-          "expr": "{app=\"${GATEWAY_NAME}\"} | pod =~ `$pod` | json level=\"level\", message=\"message\", thread=\"thread\", logger=\"loggerName\", pod=\"pod\" | __error__=`` | line_format `{{.message}}`",
+          "expr": "{pod=~\"${pod}\"} | pod =~ `$pod` | json level=\"level\", message=\"message\", thread=\"thread\", logger=\"loggerName\", pod=\"pod\" | __error__=`` | line_format `{{.message}}`",
           "legendFormat": "{{level}}",
           "queryType": "range",
           "refId": "A"
@@ -323,38 +325,57 @@
     "list": [
       {
         "current": {
-          "selected": true,
-          "text": "${GATEWAY_NAME}",
-          "value": "${GATEWAY_NAME}"
+          "selected": false,
+          "text": "Prometheus",
+          "value": "default"
         },
         "hide": 2,
         "includeAll": false,
-        "label": "Job",
+        "label": "Datasource",
         "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "${INPUT_DS_PROMETHEUS}",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "Loki",
+          "value": "default"
+        },
+        "hide": 2,
+        "includeAll": false,
+        "label": "Loki Datasource",
+        "multi": false,
+        "name": "loki_datasource",
+        "options": [],
+        "query": "${INPUT_DS_LOKI}",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
+        "hide": 2,
+        "label": "job",
         "name": "job",
-        "options": [
-          {
-            "selected": true,
-            "text": "${GATEWAY_NAME}",
-            "value": "${GATEWAY_NAME}"
-          }
-        ],
-        "query": "${GATEWAY_NAME}",
-        "queryValue": "",
+        "query": "${INPUT_GATEWAY_JOB_NAME}",
         "skipUrlSync": false,
-        "type": "custom"
+        "type": "constant"
       },
       {
         "allFormat": "glob",
         "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
+          "uid": "${datasource}"
         },
         "definition": "label_values(up{job=\"$job\"}, pod)",
         "hide": 0,
         "includeAll": true,
-        "label": "pod",
+        "label": "Pod",
         "multi": true,
         "multiFormat": "glob",
         "name": "pod",
