@@ -35,10 +35,11 @@ Global Docker image parameters
 Please, note that this will override the image parameters, including dependencies, configured to use the global value
 Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
 
-| Name                      | Description                              | Value |
-| ------------------------- | ---------------------------------------- | ----- |
-| `global.imagePullSecrets` | Docker login secrets name for image pull | `[]`  |
-| `global.env`              | The environment name                     | `""`  |
+| Name                      | Description                                | Value |
+| ------------------------- | ------------------------------------------ | ----- |
+| `global.imageRegistry`    | Global Docker image registry               | `""`  |
+| `global.imagePullSecrets` | Docker login secrets name for image pull   | `[]`  |
+| `global.env`              | The environment name (deprecated not used) | `""`  |
 
 ### Common parameters
 
@@ -98,6 +99,8 @@ This section contains configuration of the Conduktor Gateway.
 | `gateway.securityContext`                    | Conduktor Gateway container Security Context                                                                                                                                                                                           | `{}`                                                                                                                                                                                                                                                                                                                        |
 | `gateway.volumes`                            | Define user specific volumes for Gateway deployment                                                                                                                                                                                    | `[]`                                                                                                                                                                                                                                                                                                                        |
 | `gateway.volumeMounts`                       | Define user specific volumeMounts for Gateway container in deployment                                                                                                                                                                  | `[]`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.sidecars`                           | Add additional sidecar containers to run into the Conduktor Gateway pod(s)                                                                                                                                                             | `[]`                                                                                                                                                                                                                                                                                                                        |
+| `gateway.initContainers`                     | Add additional init containers to the Conduktor Gateway pod(s). ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/                                                                                               | `[]`                                                                                                                                                                                                                                                                                                                        |
 | `gateway.priorityClassName`                  | Define Gateway pods' priority based on an existing ClassName                                                                                                                                                                           | `""`                                                                                                                                                                                                                                                                                                                        |
 | `gateway.customStartupProbe`                 | Custom startup probe configuration                                                                                                                                                                                                     | `{}`                                                                                                                                                                                                                                                                                                                        |
 | `gateway.startupProbe.enabled`               | Enable startupProbe on Conduktor Gaterway containers                                                                                                                                                                                   | `true`                                                                                                                                                                                                                                                                                                                      |
@@ -611,4 +614,39 @@ extraDeploy:
       name: extra-configmap
     data:
       some-key: some-value
+```
+
+### With init container
+
+You can use an init container to perform some actions before the Gateway container starts. This can be useful to prepare the environment or to run some scripts.
+
+```yaml
+gateway:
+  volumes:
+    - name: init-volume
+      emptyDir: {}
+  initContainers:
+    - name: init-container
+      image: busybox
+      command: ["sh", "-c", "echo 'Init container running'"]
+      volumeMounts:
+        - name: init-volume
+          mountPath: /mnt/init
+```
+
+### With sidecar container
+You can add a sidecar container to the Gateway deployment to run additional processes alongside the Gateway container. This can be useful for logging, monitoring, or other purposes.
+
+```yaml
+gateway:
+  volumes:
+    - name: sidecar-volume
+      emptyDir: {}
+  sidecars:
+    - name: sidecar-container
+      image: busybox
+      command: ["sh", "-c", "while true; do echo 'Sidecar container running'; sleep 10; done"]
+      volumeMounts:
+        - name: sidecar-volume
+          mountPath: /mnt/sidecar
 ```

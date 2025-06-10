@@ -32,9 +32,13 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" . "context" $) | nindent 8 }}
         {{- end }}
     spec:
+      initContainers:
+        {{- if .Values.gateway.initContainers }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.gateway.initContainers "context" $) | nindent 8 }}
+        {{- end }}
       containers:
         - name: gateway
-          image: {{ .Values.gateway.image.registry }}/{{ .Values.gateway.image.repository }}:{{ .Values.gateway.image.tag }}
+          image: {{ include "common.images.image" (dict "imageRoot" .Values.gateway.image "global" .Values.global "chart" .Chart) }}
           imagePullPolicy: {{ .Values.gateway.image.pullPolicy }}
           env:
             # Static env var to be reconsidered if we offer env way to configure them
@@ -140,6 +144,9 @@ spec:
           {{- with .Values.gateway.securityContext }}
           securityContext: {{- toYaml . | nindent 12 }}
           {{- end }}
+        {{- if .Values.gateway.sidecars }}
+        {{- include "common.tplvalues.render" ( dict "value" .Values.gateway.sidecars "context" $) | nindent 8 }}
+        {{- end }}
       volumes:
         {{- with .Values.gateway.volumes }}
         {{- toYaml . | nindent 8 }}
