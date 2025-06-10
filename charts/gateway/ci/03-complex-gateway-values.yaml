@@ -1,4 +1,4 @@
-nameOverride: gateway-test-01
+nameOverride: gateway-test-03
 
 gateway:
   replicas: 1
@@ -28,14 +28,28 @@ gateway:
       volumeMounts:
         - name: tmp
           mountPath: /tmp
+      securityContext:
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1000
 
   sidecars:
     - name: sidecar-example
       image: busybox
-      command: ["sh", "-c", "echo 'Running sidecar'"]
+      command: ["sh", "-c", "while true; do echo 'Sidecar container running'; sleep 10; done"]
       volumeMounts:
         - name: tmp
           mountPath: /tmp
+      securityContext:
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1000
 
 podSecurityContext:
   runAsNonRoot: true
