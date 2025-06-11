@@ -7,9 +7,11 @@
 ## Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
 ## @descriptionEnd
 global:
+  ## @param global.imageRegistry Global Docker image registry
+  imageRegistry: ""
   ## @param global.imagePullSecrets [array, nullable] Docker login secrets name for image pull
   imagePullSecrets: []
-  ## @param global.env The environment name
+  ## @param global.env The environment name (deprecated not used)
   env: ""
 
 ## @section Common parameters
@@ -162,6 +164,27 @@ gateway:
 
   ## @param gateway.volumeMounts Define user specific volumeMounts for Gateway container in deployment
   volumeMounts: []
+
+  ## @param gateway.sidecars Add additional sidecar containers to run into the Conduktor Gateway pod(s)
+  ## e.g:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  sidecars: []
+  ## @param gateway.initContainers Add additional init containers to the Conduktor Gateway pod(s). ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+  ## e.g:
+  ## initContainers:
+  ##  - name: your-image-name
+  ##    image: your-image
+  ##    imagePullPolicy: Always
+  ##    command: ['sh', '-c', 'echo "hello world"']
+  ##
+  initContainers: []
 
   ## @param gateway.priorityClassName Define Gateway pods' priority based on an existing ClassName
   priorityClassName: ""

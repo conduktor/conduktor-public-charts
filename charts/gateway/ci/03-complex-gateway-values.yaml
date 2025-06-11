@@ -1,0 +1,58 @@
+nameOverride: gateway-test-03
+
+gateway:
+  replicas: 1
+  env:
+    KAFKA_BOOTSTRAP_SERVERS: kafka.default.svc.cluster.local:9092
+
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+
+  # Add volume on /tmp because of readOnlyRootFilesystem=true security constraint
+  volumes:
+    - name: tmp
+      emptyDir: {}
+  volumeMounts:
+    - name: tmp
+      mountPath: /tmp
+
+  initContainers:
+    - name: init-gw
+      image: busybox
+      command: ["sh", "-c", "echo 'Initializing Gateway'"]
+      volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+      securityContext:
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1000
+
+  sidecars:
+    - name: sidecar-example
+      image: busybox
+      command: ["sh", "-c", "while true; do echo 'Sidecar container running'; sleep 10; done"]
+      volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+      securityContext:
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1000
+
+podSecurityContext:
+  runAsNonRoot: true
+
+tests:
+  enabled: true
