@@ -203,3 +203,46 @@ Return admin api scheme http or https
   {{- end -}}
   {{- $scheme -}}
 {{- end -}}
+
+
+{{/*
+Patch grafana dashboard inputs
+Params :
+  - dashboard - Dashboard object to patch inputs - Requred
+  - title - Dashboard title to override - Requred
+  - context - Context - Required - Parent context.
+*/}}
+{{- define "conduktor-gateway.patchGrafanaDashboardInputs" -}}
+  {{- $patchs := dict "INPUT_DS_PROMETHEUS" ($.context.Values.metrics.grafana.datasources.prometheus | default "prometheus") -}}
+  {{- $patchs = merge $patchs (dict "INPUT_DS_LOKI" ($.context.Values.metrics.grafana.datasources.loki | default "loki")) -}}
+  {{- $patchs = merge $patchs (dict "INPUT_GATEWAY_JOB_NAME" $.context.Release.Name) -}}
+
+  {{- $patchs = merge $patchs (dict "datasource" ($.context.Values.metrics.grafana.datasources.prometheus | default "prometheus")) -}}
+  {{- $patchs = merge $patchs (dict "loki_datasource" ($.context.Values.metrics.grafana.datasources.loki | default "loki")) -}}
+  {{- $patchs = merge $patchs (dict "job" $.context.Release.Name) -}}
+
+  {{/*  Patch inputs */}}
+  {{- range $input_index, $input := $.dashboard.__inputs -}}
+    {{- if hasKey $patchs $input.name -}}
+      {{- $_ := set $input "value" (index $patchs $input.name) -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{/*  Patch variables */}}
+ {{- range $var_index, $variable := $.dashboard.templating.list -}}
+    {{- if hasKey $patchs $variable.name -}}
+      {{- $_ := set $variable "query" (index $patchs $variable.name) -}}
+
+      {{/*  Update current value */}}
+      {{- if hasKey $variable "current" -}}
+        {{- $current := $variable.current | deepCopy -}}
+        {{- $_newCurrent := set $current "value" (index $patchs $variable.name) -}}
+        {{- $_2 := set $variable "current" $current -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{/*  Patch title */}}
+  {{- $_ := set $.dashboard "title" $.title -}}
+
+{{- end -}}

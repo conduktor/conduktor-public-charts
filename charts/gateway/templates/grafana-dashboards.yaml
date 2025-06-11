@@ -2,9 +2,11 @@
 {{- $configMapName := printf "%s-dashboards" ( include "conduktor-gateway.fullname" . | trunc 52) -}}
 {{- $gatewayNsRelease := printf "%s/%s" (include "common.names.namespace" .) .Release.Name -}}
 {{- $gatewayDashboard :=  .Files.Get "grafana-dashboards/gateway.json" | fromJson }}
-{{- $_ := set $gatewayDashboard "title" (printf "Conduktor Gateway [%s]" $gatewayNsRelease) -}}
+{{- $dashboardTitle := printf "Conduktor Gateway [%s]" $gatewayNsRelease -}}
+{{- $_1 := (include "conduktor-gateway.patchGrafanaDashboardInputs" (dict "dashboard" $gatewayDashboard "title" $dashboardTitle "context" $)) -}}
 {{- $gatewayLogsDashboard :=  .Files.Get "grafana-dashboards/gateway-logs.json" | fromJson }}
-{{- $_2 := set $gatewayLogsDashboard "title" (printf "Conduktor Gateway logs [%s]" $gatewayNsRelease) -}}
+{{- $logDashboardTitle := printf "Conduktor Gateway logs [%s]" $gatewayNsRelease -}}
+{{- $_3 := (include "conduktor-gateway.patchGrafanaDashboardInputs" (dict "dashboard" $gatewayLogsDashboard "title" $logDashboardTitle "context" $)) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -97,9 +99,9 @@ spec:
     name:  {{ $configMapName | quote }}
     key: gateway.json
   datasources:
-    - inputName: "DS_PROMETHEUS"
+    - inputName: "INPUT_DS_PROMETHEUS"
       datasourceName: {{ .Values.metrics.grafana.datasources.prometheus | quote }}
-    - inputName: "GATEWAY_NAME"
+    - inputName: "INPUT_GATEWAY_JOB_NAME"
       datasourceName: {{ .Release.Name | quote }}
 ---
 apiVersion: integreatly.org/v1alpha1
@@ -120,11 +122,11 @@ spec:
     name:  {{ $configMapName | quote }}
     key: gateway-logs.json
   datasources:
-    - inputName: "DS_LOKI"
+    - inputName: "INPUT_DS_LOKI"
       datasourceName: {{ .Values.metrics.grafana.datasources.loki | quote }}
-    - inputName: "DS_PROMETHEUS"
+    - inputName: "INPUT_DS_PROMETHEUS"
       datasourceName: {{ .Values.metrics.grafana.datasources.prometheus | quote }}
-    - inputName: "GATEWAY_NAME"
+    - inputName: "INPUT_GATEWAY_JOB_NAME"
       datasourceName: {{ .Release.Name | quote }}
 {{- end }}
 {{- end }}
