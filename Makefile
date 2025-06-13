@@ -1,3 +1,7 @@
+export SHELL := /bin/sh
+export SHELLOPTS:=$(if $(SHELLOPTS),$(SHELLOPTS):)pipefail:errexit
+
+.ONESHELL:
 # Global Vars
 #############
 
