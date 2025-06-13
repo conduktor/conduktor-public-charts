@@ -31,7 +31,7 @@ spec:
       {{- if .Values.schedulerName }}
       schedulerName: {{ .Values.schedulerName }}
       {{- end }}
-      restartPolicy: OnFailure
+      restartPolicy: {{ .Values.restartPolicy }}
       {{- if .Values.priorityClassName }}
       priorityClassName: {{ .Values.priorityClassName }}
       {{- end }}
@@ -46,7 +46,9 @@ spec:
       securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ template "provisioner.serviceAccountName" . }}
-      initContainers: [] # TODO
+      {{- if .Values.initContainers }}
+      initContainers: {{- include "common.tplvalues.render" (dict "value" .Values.initContainers "context" $) | nindent 8 }}
+      {{- end }}
       containers:
       {{- if .Values.console.enabled }}
         - name: conduktor-ctl-console
@@ -73,7 +75,7 @@ spec:
           {{- end }}
           env:
             - name: CDK_DEBUG
-              value: "true"
+              value: {{ .Values.console.debug | quote }}
             - name: CDK_INSECURE
               value: {{ .Values.console.insecure | quote }}
             - name: CDK_AUTH_MODE
@@ -108,14 +110,97 @@ spec:
           resources: {{- toYaml .Values.console.resources | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - name: empty-dir
+            - name: tmp-dir
               mountPath: /tmp
               subPath: tmp-dir
             - name: config
-              mountPath: /conf
+              mountPath: /conf/{{ .Values.console.manifestsConfigMapKey }}
+              subPath: {{ .Values.console.manifestsConfigMapKey }}
+            {{- if .Values.console.extraManifestsConfigMapRef }}
+            {{- range $index, $ref := .Values.console.extraManifestsConfigMapRef }}
+            - name: {{ printf "console-%s-%d" $ref.name $index }}
+              mountPath: /conf/{{ $ref.key }}
+              subPath: {{ $ref.key }}
+            {{- end }}
+            {{- end }}
             {{- if .Values.console.extraVolumeMounts }}
             {{- include "common.tplvalues.render" (dict "value" .Values.console.extraVolumeMounts "context" $) | nindent 12 }}
             {{- end }}
+      {{- end }}
+      {{- if .Values.gateway.enabled }}
+        - name: conduktor-ctl-gateway
+          image: {{ include "common.images.image" (dict "imageRoot" .Values.image "global" .Values.global) }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        {{- if .Values.gateway.containerSecurityContext }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.console.containerSecurityContext "context" $) | nindent 12 }}
+        {{- end }}
+        {{- if .Values.diagnosticMode.enabled }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.command "context" $) | nindent 12 }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.args "context" $) | nindent 12 }}
+        {{- else }}
+        {{- if .Values.gateway.command }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.gateway.command "context" $) | nindent 12 }}
+        {{- end }}
+        {{- if .Values.gateway.args }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.gateway.args "context" $) | nindent 12 }}
+        {{- else }}
+          args:
+            - apply
+            - -f
+            - /conf/{{ .Values.gateway.manifestsConfigMapKey }}
+        {{- end }}
+        {{- end }}
+          env:
+            - name: CDK_DEBUG
+              value: {{ .Values.gateway.debug | quote }}
+            - name: CDK_INSECURE
+              value: {{ .Values.gateway.insecure | quote }}
+          {{- if .Values.gateway.url}}
+            - name: CDK_GATEWAY_BASE_URL
+              value: {{ .Values.gateway.url | quote }}
+          {{- end }}
+          {{- if .Values.gateway.caCert }}
+            - name: CDK_CACERT
+              value: {{ .Values.gateway.caCert | quote }}
+          {{- end }}
+          {{- if .Values.gateway.username }}
+            - name: CDK_GATEWAY_USER
+              value: {{ .Values.gateway.username | quote }}
+          {{- end }}
+          {{- if .Values.gateway.extraEnvVars }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.gateway.extraEnvVars "context" $) | nindent 12 }}
+          {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ include "provisioner.config.secrets" . }}
+          {{- if .Values.gateway.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.gateway.extraEnvVarsCM "context" $) }}
+          {{- end }}
+          {{- if .Values.gateway.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.gateway.extraEnvVarsSecret "context" $) }}
+          {{- end }}
+        {{- if .Values.gateway.resources }}
+          resources: {{- toYaml .Values.gateway.resources | nindent 12 }}
+        {{- end }}
+          volumeMounts:
+            - name: tmp-dir
+              mountPath: /tmp
+              subPath: tmp-dir
+            - name: config
+              mountPath: /conf/{{ .Values.gateway.manifestsConfigMapKey }}
+              subPath: {{ .Values.gateway.manifestsConfigMapKey }}
+          {{- if .Values.gateway.extraManifestsConfigMapRef }}
+          {{- range $index, $ref := .Values.gateway.extraManifestsConfigMapRef }}
+            - name: {{ printf "gateway-%s-%d" $ref.name $index }}
+              mountPath: /conf/{{ $ref.key }}
+              subPath: {{ $ref.key }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.gateway.extraVolumeMounts }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.gateway.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
       {{- end }}
       {{- if .Values.tolerations }}
       tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.tolerations "context" $) | nindent 8 }}
@@ -124,11 +209,25 @@ spec:
       nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.nodeSelector "context" $) | nindent 8 }}
       {{- end }}
       volumes:
-        - name: empty-dir
+        - name: tmp-dir
           emptyDir: {}
         - name: config
           configMap:
             name: {{ include "provisioner.manifests.configMapName" . }}
+        {{- if and .Values.console.enabled .Values.console.extraManifestsConfigMapRef }}
+        {{- range $index, $ref := .Values.console.extraManifestsConfigMapRef }}
+        - name: {{ printf "console-%s-%d" $ref.name $index }}
+          configMap:
+            name: {{ $ref.name }}
+        {{- end }}
+        {{- end }}
+        {{- if and .Values.gateway.enabled .Values.gateway.extraManifestsConfigMapRef }}
+        {{- range $index, $ref := .Values.gateway.extraManifestsConfigMapRef }}
+        - name: {{ printf "gateway-%s-%d" $ref.name $index }}
+          configMap:
+            name: {{ $ref.name }}
+        {{- end }}
+        {{- end }}
         {{- if .Values.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
         {{- end }}

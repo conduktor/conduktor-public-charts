@@ -13,7 +13,7 @@ global:
   ## imagePullSecrets:
   ##   - myRegistryKeySecretName
   ##
-  imagePullSecrets: [ ]
+  imagePullSecrets: []
   ## Security parameters
   ##
   security:
@@ -46,16 +46,16 @@ fullnameOverride: ""
 namespaceOverride: ""
 ## @param commonLabels Labels to add to all deployed objects
 ##
-commonLabels: { }
+commonLabels: {}
 ## @param commonAnnotations Annotations to add to all deployed objects
 ##
-commonAnnotations: { }
+commonAnnotations: {}
 ## @param clusterDomain Kubernetes cluster domain name
 ##
 clusterDomain: cluster.local
 ## @param extraDeploy Array of extra objects to deploy with the release
 ##
-extraDeploy: [ ]
+extraDeploy: []
 ## Diagnostic mode
 ## @param diagnosticMode.enabled Enable diagnostic mode (all probes will be disabled and the command will be overridden)
 ## @param diagnosticMode.command Command to override all containers in the chart release
@@ -84,7 +84,7 @@ diagnosticMode:
 image:
   registry: docker.io
   repository: conduktor/conduktor-ctl
-  tag: "v0.4.0"
+  tag: "v0.5.1"
   digest: ""
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -98,7 +98,7 @@ image:
   ## pullSecrets:
   ##   - myRegistryKeySecretName
   ##
-  pullSecrets: [ ]
+  pullSecrets: []
   debug: false
 
 ## @param cleanupAfterFinished.enabled Enable cleanup of Job after it's finished
@@ -106,6 +106,10 @@ image:
 cleanupAfterFinished:
   enabled: false
   seconds: 600
+
+## @param restartPolicy Restart policy for conduktor-provisioner jobs
+restartPolicy: "OnFailure"
+
 ## @param podSecurityContext conduktor-provisioner Pod Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
 ## default:
@@ -113,15 +117,15 @@ cleanupAfterFinished:
 ##   readOnlyRootFilesystem: true
 ##   runAsNonRoot: true
 ##
-podSecurityContext: { }
+podSecurityContext: {}
 ## @param podLabels Extra labels for conduktor-provisioner pods
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 ##
-podLabels: { }
+podLabels: {}
 ## @param podAnnotations Annotations for conduktor-provisioner pods
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
 ##
-podAnnotations: { }
+podAnnotations: {}
 ## @param podAffinityPreset Pod affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`
 ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
 ##
@@ -146,7 +150,7 @@ nodeAffinityPreset:
   ##   - e2e-az1
   ##   - e2e-az2
   ##
-  values: [ ]
+  values: []
 ## @param priorityClassName conduktor-provisioner pods' priorityClassName
 ##
 priorityClassName: ""
@@ -154,15 +158,15 @@ priorityClassName: ""
 ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 ## NOTE: `podAffinityPreset`, `podAntiAffinityPreset`, and `nodeAffinityPreset` will be ignored when it's set
 ##
-affinity: { }
+affinity: {}
 ## @param nodeSelector Node labels for conduktor-provisioner pods assignment
 ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
 ##
-nodeSelector: { }
+nodeSelector: {}
 ## @param tolerations Tolerations for conduktor-provisioner pods assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 ##
-tolerations: [ ]
+tolerations: []
 ## @param schedulerName Name of the k8s scheduler (other than default) for conduktor-provisioner pods
 ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
 ##
@@ -174,8 +178,17 @@ terminationGracePeriodSeconds: ""
 ## @param topologySpreadConstraints Topology Spread Constraints for conduktor-provisioner pod assignment spread across your cluster among failure-domains
 ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/#spread-constraints-for-pods
 ##
-topologySpreadConstraints: [ ]
+topologySpreadConstraints: []
 
+## @param initContainers List of init containers to add to the conduktor-provisioner job pod
+## e.g:
+## initContainers:
+##   - name: my-init-container
+##     image: my-init-container-image:latest
+##     command: ["/bin/sh", "-c"]
+##     args: ["echo Hello World"]
+##
+initContainers: []
 
 ## @section Console provisioning configuration
 ##
@@ -197,12 +210,51 @@ console:
   caCert: ""
   ## @param console.insecure Skip TLS verification
   insecure: false
+  ## @param console.debug Enable verbose debug mode
+  debug: false
   ## @param console.manifests Manifests YAML to apply on the Console
   manifests: []
   ## @param console.manifestsConfigMap Manifests YAML to apply on the Console
   manifestsConfigMap: ""
   ## @param console.manifestConfigMapKey Manifests YAML to apply on the Console
-  manifestsConfigMapKey: "console-resources.yaml"
+  manifestsConfigMapKey: "00-console-resources.yaml"
+  ## @param console.extraManifestsConfigMapRef List of ConfigMaps references with extra manifests to apply on the Console
+  ## e.g:
+  ## extraManifestsConfigMapRef:
+  ##  - name: my-custom-manifests
+  ##    key: my-custom-manifests.yaml
+  extraManifestsConfigMapRef: []
+
+  ## @param console.command Override default conduktor-provisioner container command (useful when using custom images)
+  ##
+  command:
+    - /bin/conduktor
+  ## @param console.args Override default conduktor-provisioner container args (useful when using custom images)
+  ##
+  args:
+    - apply
+    - -f
+    - /conf
+
+  ## @param console.extraEnvVars Array with extra environment variables to add to conduktor-provisioner containers
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param console.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for conduktor-provisioner containers
+  ##
+  extraEnvVarsCM: ""
+  ## @param console.extraEnvVarsSecret Name of existing Secret containing extra env vars for conduktor-provisioner containers
+  ##
+  extraEnvVarsSecret: ""
+  ## @param console.extraVolumes Optionally specify extra list of additional volumes for the conduktor-provisioner pods
+  ##
+  extraVolumes: []
+  ## @param console.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the conduktor-provisioner containers
+  ##
+  extraVolumeMounts: []
 
   resources:
     requests:
@@ -215,6 +267,7 @@ console:
       cpu: 500m
       ## @param console.resources.limits.memory Memory limit for the container
       memory: 128Mi
+
   ## @param console.containerSecurityContext conduktor-provisioner containers' Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
   ## default:
@@ -222,58 +275,98 @@ console:
   ##   readOnlyRootFilesystem: true
   ##   runAsNonRoot: true
   ##
-  containerSecurityContext: { }
-  ## @param console.existingConfigmap The name of an existing ConfigMap with your custom configuration for conduktor-provisioner
-  ##
-  existingConfigmap:
-  ## @param console.command Override default conduktor-provisioner container command (useful when using custom images)
-  ##
-  command: [ ]
-  ## @param console.args Override default conduktor-provisioner container args (useful when using custom images)
-  ##
-  args: [ ]
+  containerSecurityContext: {}
+
   ## @param console.lifecycleHooks for conduktor-provisioner containers to automate configuration before or after startup
   ##
-  lifecycleHooks: { }
-  ## @param console.extraEnvVars Array with extra environment variables to add to conduktor-provisioner containers
-  ## e.g:
-  ## extraEnvVars:
-  ##   - name: FOO
-  ##     value: "bar"
-  ##
-  extraEnvVars: [ ]
-  ## @param console.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for conduktor-provisioner containers
-  ##
-  extraEnvVarsCM: ""
-  ## @param console.extraEnvVarsSecret Name of existing Secret containing extra env vars for conduktor-provisioner containers
-  ##
-  extraEnvVarsSecret: ""
-  ## @param console.extraVolumes Optionally specify extra list of additional volumes for the conduktor-provisioner pods
-  ##
-  extraVolumes: [ ]
-  ## @param console.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the conduktor-provisioner containers
-  ##
-  extraVolumeMounts: [ ]
+  lifecycleHooks: {}
 
 
 gateway:
   ## @param gateway.enable Enable Gateway provisioning
   enabled: true
-  ## @param gateway.url URL of the Console
+  ## @param gateway.url URL of the Gateway
   url: ""
-  ## @param gateway.username Username to authenticate on the Console
+  ## @param gateway.username Username to authenticate on the Gateway
   username: ""
-  ## @param gateway.password Password to authenticate on the Console
+  ## @param gateway.password Password to authenticate on the Gateway
   password: ""
-
-
-  ## @param console.manifests Manifests YAML to apply on the Console
-  manifests: {}
-  ## @param console.manifestsConfigMap Manifests YAML to apply on the Console
+  ## @param gateway.apiToken API Token to authenticate on the Gateway
+  apiToken: ""
+  ## @param gateway.caCert CA certificate of Gateway
+  caCert: ""
+  ## @param gateway.insecure Skip TLS verification
+  insecure: false
+  ## @param gateway.debug Enable verbose debug mode
+  debug: false
+  ## @param gateway.manifests Manifests YAML to apply on the Gateway
+  manifests: []
+  ## @param gateway.manifestsConfigMap Manifests YAML to apply on the Gateway
   manifestsConfigMap: ""
-  ## @param console.manifestConfigMapKey Manifests YAML to apply on the Console
-  manifestsConfigMapKey: "console-resources.yaml"
+  ## @param gateway.manifestConfigMapKey Manifests YAML to apply on the Gateway
+  manifestsConfigMapKey: "00-gateway-resources.yaml"
+  ## @param gateway.extraManifestsConfigMapRef List of ConfigMaps references with extra manifests to apply on the Gateway
+  ## e.g:
+  ## extraManifestsConfigMapRef:
+  ##  - name: my-custom-manifests
+  ##    key: my-custom-manifests.yaml
+  extraManifestsConfigMapRef: []
 
+  ## @param gateway.command Override default conduktor-provisioner container command (useful when using custom images)
+  ##
+  command:
+    - /bin/conduktor
+  ## @param gateway.args Override default conduktor-provisioner container args (useful when using custom images)
+  ##
+  args:
+    - apply
+    - -f
+    - /conf
+
+  ## @param gateway.extraEnvVars Array with extra environment variables to add to conduktor-provisioner containers
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param gateway.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for conduktor-provisioner containers
+  ##
+  extraEnvVarsCM: ""
+  ## @param gateway.extraEnvVarsSecret Name of existing Secret containing extra env vars for conduktor-provisioner containers
+  ##
+  extraEnvVarsSecret: ""
+  ## @param gateway.extraVolumes Optionally specify extra list of additional volumes for the conduktor-provisioner pods
+  ##
+  extraVolumes: []
+  ## @param gateway.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the conduktor-provisioner containers
+  ##
+  extraVolumeMounts: []
+
+  resources:
+    requests:
+      ## @param gateway.resources.requests.cpu CPU resource requests
+      cpu: 100m
+      ## @param gateway.resources.requests.memory Memory resource requests
+      memory: 50Mi
+    limits:
+      ## @param gateway.resources.limits.cpu CPU limit for the platform container
+      cpu: 500m
+      ## @param gateway.resources.limits.memory Memory limit for the container
+      memory: 128Mi
+
+  ## @param gateway.containerSecurityContext conduktor-provisioner containers' Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  ## default:
+  ## securityContext:
+  ##   readOnlyRootFilesystem: true
+  ##   runAsNonRoot: true
+  ##
+  containerSecurityContext: {}
+
+  ## @param gateway.lifecycleHooks for conduktor-provisioner containers to automate configuration before or after startup
+  ##
+  lifecycleHooks: {}
 
 
 ## @section Other Parameters
@@ -291,7 +384,7 @@ serviceAccount:
   name: ""
   ## @param serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
   ##
-  annotations: { }
+  annotations: {}
   ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
   ##
   automountServiceAccountToken: true
