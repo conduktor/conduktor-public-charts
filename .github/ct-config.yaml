@@ -11,7 +11,7 @@ remote: origin
 validate-maintainers: false
 validate-yaml: true
 # Hardcoded timeout when attempting to install a chart in kind
-helm-extra-args: "--timeout 600s"
+helm-extra-args: "--timeout 900s"
 # We need to explicitly login to external repos for external dependencies
 chart-repos:
   - bitnami=https://charts.bitnami.com/bitnami
