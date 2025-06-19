@@ -104,8 +104,5 @@ spec:
       datasourceName: {{ .Values.platform.metrics.grafana.datasources.prometheus | quote }}
     - inputName: "INPUT_NAMESPACE"
       datasourceName: {{ include "common.names.namespace" . | quote }}
-  configMapRef:
-    name:  {{ $configMapName | quote }}
-    key: console.json
 {{- end }}
 {{- end }}
