@@ -17,7 +17,3 @@ dependencies:
     tags:
       - bitnami-common
     version: 2.x.x
-#  - name: provisioner
-#    condition: provisioning.enabled
-#    version: 0.1.0
-#    repository: file://../provisioner
