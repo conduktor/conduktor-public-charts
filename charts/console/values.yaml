@@ -17,7 +17,6 @@ global:
   ##
   imagePullSecrets: []
   storageClass: ""
-
 ## @section Common parameters
 ##
 
@@ -42,7 +41,6 @@ clusterDomain: cluster.local
 ## @param extraDeploy Array of extra objects to deploy with the release
 ##
 extraDeploy: []
-
 ## Enable diagnostic mode in the deployment
 ##
 diagnosticMode:
@@ -57,7 +55,6 @@ diagnosticMode:
   ##
   args:
     - infinity
-
 ## @section Platform product Parameters
 ## @descriptionStart
 ## You can paste here your Conduktor Console Configuration.
@@ -66,13 +63,11 @@ diagnosticMode:
 ##
 ## A list of Kafka clusters can be configured by adding them under the `config.clusters` key. See [Install with a Kafka cluster](#install-with-a-kafka-cluster) below. Alternatively, clusters can be added in the Console UI.
 ## @descriptionEnd
-
 config:
   ## @param config.organization.name Your Conduktor Console Organization. Default is `Conduktor` if not set.
   ## Could be provided via an existing secret with `config.existingSecret` using the key `CDK_ORGANIZATION_NAME`.
   organization:
     name: "Conduktor"
-
   admin:
     ## @param config.admin.email Your Conduktor Console Admin email. If changed a new admin user will be created with this email and previous admin user will still be available
     ## Could be provided via an existing secret with `config.existingSecret` using the key `CDK_ADMIN_EMAIL`.
@@ -80,7 +75,6 @@ config:
     ## @param config.admin.password Your Conduktor Console Admin password. If change current admin user password will be updated.
     ## Could be provided via an existing secret with `config.existingSecret` using the key `CDK_ADMIN_PASSWORD`.
     password: ""
-
   ## @param config.database.host Your Conduktor Console Database host
   ## @param config.database.port Your Conduktor Console Database port
   ## @param config.database.name Your Conduktor Console Database name
@@ -94,16 +88,13 @@ config:
     name: "postgres"
     password: ""
     username: ""
-
   ## @param config.license Conduktor Console Enterprise license, if none given, the product will run in free tier
   license: ""
-
   ## @param config.existingLicenseSecret Name of an existing secret containing the license
   ##
   ## Secret should just contain key "CDK_LICENSE" with the license as value
   ## NOTE: 'config.license' will be ignored
   existingLicenseSecret: ""
-
   ## @param config.existingSecret Name of an existing secret containing sensitive configuration
   ##
   ## Secret should contain below keys:
@@ -116,7 +107,6 @@ config:
   ## NOTE: 'config.organization.name', 'config.admin.email', 'config.admin.password',
   ## 'config.database.username', 'config.database.password' will be ignored
   existingSecret: ""
-
   platform:
     ## @param config.platform.external.url Force the platform to redirect and use this URL (useful when behind a proxy to fix SSO issues)
     external:
@@ -131,14 +121,12 @@ config:
       ## NOTE: 'config.platform.https.cert.path', 'config.platform.https.key.path'
       ## and 'config.platform.https.selfSigned' will be ignored
       existingSecret: ""
-
 ## @section Platform Monitoring product Parameters
 ## @descriptionStart
 ## You can paste here your Conduktor Console Cortex Configuration.
 ##
 ## Refer to our [documentation](https://docs.conduktor.io/platform/configuration/cortex/) for the full list of product configuration properties.
 ## @descriptionEnd
-
 monitoringConfig:
   ## @param monitoringConfig.existingSecret The name of an existing Secret with your custom configuration for Conduktor Console Cortex
   ##
@@ -219,7 +207,6 @@ monitoringConfig:
     ##  domainName: ""
     ##  projectId: ""
     ##  regionName: ""
-
 ## @section Platform Deployment Parameters
 ##
 
@@ -239,7 +226,7 @@ platform:
   image:
     registry: docker.io
     repository: conduktor/conduktor-console
-    tag: 1.35.2
+    tag: 1.36.0
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -347,7 +334,6 @@ platform:
   ##   runAsNonRoot: true
   ##
   containerSecurityContext: {}
-
   ## @param platform.existingConfigmap The name of an existing ConfigMap with your custom configuration for Conduktor Console
   ##
   ## ConfigMap must contain a key named `platform-config.yaml` with the configuration as yaml
@@ -416,7 +402,6 @@ platform:
     ## Can be set to RollingUpdate, OnDelete or Recreate
     ##
     type: RollingUpdate
-
   ## @param platform.priorityClassName Conduktor Console pods' priorityClassName
   ##
   priorityClassName: ""
@@ -486,7 +471,6 @@ platform:
   ##    command: ['sh', '-c', 'echo "hello world"']
   ##
   initContainers: []
-
   ## @section Platform Metrics activation
   ## @descriptionStart
   ## Console expose metrics that could be collected and presented if your environment have the necessary components (Prometheus and Grafana operators)
@@ -555,7 +539,6 @@ platform:
       ##        key: username
       ##
       extraParams: {}
-
     ## Grafana dashboard (need grafana operator or sidecar to be enabled on namespace)
     ## refs:
     ##  - Grafana sidecar : https://github.com/grafana/helm-charts/tree/main/charts/grafana#sidecar-for-dashboards
@@ -581,7 +564,6 @@ platform:
         ## @param platform.metrics.grafana.datasources.prometheus Prometheus datasource to use for metric dashboard
         ##
         prometheus: prometheus
-
 ## @section Traffic Exposure Parameters
 ##
 
@@ -638,7 +620,6 @@ service:
   ##     timeoutSeconds: 300
   ##
   sessionAffinityConfig: {}
-
 ## Conduktor Console ingress parameters
 ## ref: http://kubernetes.io/docs/user-guide/ingress/
 ##
@@ -741,7 +722,6 @@ ingress:
   ##             name: http
   ##
   extraRules: []
-
 ## @section Other Parameters
 ##
 
@@ -761,7 +741,6 @@ serviceAccount:
   ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
   ##
   automountServiceAccountToken: true
-
 ## @section Platform Cortex Parameters
 ##
 ## Conduktor Console Cortex container configuration
@@ -783,7 +762,7 @@ platformCortex:
   image:
     registry: docker.io
     repository: conduktor/conduktor-console-cortex
-    tag: 1.35.2
+    tag: 1.36.0
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -801,13 +780,11 @@ platformCortex:
     ## Enable debug mode
     ##
     debug: false
-
   ## This is an EXPERIMENTAL parameter as the behavior of multiple Cortex instances is not yet fully defined.
   ## We recommend keeping replicaCount set to 1 to prevent potential issues or instability.
   ## @param platformCortex.replicaCount Number of Conduktor Console Cortex replicas to deploy
   ##
   replicaCount: 1
-
   ## @param platformCortex.containerPorts.cortex Conduktor Console Cortex HTTP (or HTTPS if configured) container port
   ## @param platformCortex.containerPorts.alertmanager Conduktor Console AlertManager HTTP (or HTTPS if configured) container port
   ## @param platformCortex.containerPorts.prometheus Conduktor Console Prometheus HTTP (or HTTPS if configured) container port
@@ -816,7 +793,6 @@ platformCortex:
     cortex: 9009
     alertmanager: 9010
     prometheus: 9090
-
   ## Configure extra options for Conduktor Console Cortex containers' liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
   ## @param platformCortex.livenessProbe.enabled Enable livenessProbe on Conduktor Console Cortex containers
@@ -900,11 +876,9 @@ platformCortex:
   ##   runAsNonRoot: true
   ##
   containerSecurityContext: {}
-
   ## @param platformCortex.existingConfigmap The name of an existing ConfigMap with your custom configuration for Conduktor Console Cortex
   ##
   existingConfigmap: ""
-
   ## @param platformCortex.command Override default container command (useful when using custom images)
   ##
   command: []
@@ -969,7 +943,6 @@ platformCortex:
     ## Can be set to RollingUpdate, OnDelete or Recreate
     ##
     type: RollingUpdate
-
   ## @param platformCortex.priorityClassName Conduktor Console Cortex pods' priorityClassName
   ##
   priorityClassName: ""
@@ -1036,7 +1009,6 @@ platformCortex:
   ##    command: ['sh', '-c', 'echo "hello world"']
   ##
   initContainers: []
-
   ## Conduktor Console Cortex service parameters
   ##
   service:
@@ -1098,7 +1070,6 @@ platformCortex:
     ##     timeoutSeconds: 300
     ##
     sessionAffinityConfig: {}
-
 ## @skip tests
 tests:
   enabled: false
