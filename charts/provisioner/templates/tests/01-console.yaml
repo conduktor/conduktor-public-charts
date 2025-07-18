@@ -1,0 +1,507 @@
+{{- if and .Values.tests.enabled .Values.tests.console.enabled }}
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: console
+  namespace: default
+  annotations:
+      helm.sh/hook: pre-install
+      helm.sh/hook-weight: "-50"
+spec:
+  repo: https://helm.conduktor.io
+  chart: console
+  targetNamespace: default
+  set:
+    config.admin.email: "test@test.io"
+    config.admin.password: "testP4ss!"
+    config.database.host: "main-postgresql.default.svc.cluster.local"
+    config.database.port: 5432
+    config.database.name: "postgres"
+    config.database.username: "postgres"
+    config.database.password: "conduktor123"
+    config.clusters[0].id: "kafka"
+    config.clusters[0].name: "Kafka"
+    config.clusters[0].bootstrapServers: "kafka.default.svc.cluster.local:9092"
+    config.clusters[0].properties: "sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username='kafka-admin' password='kafka-admin-password';\nsasl.mechanism=PLAIN\nsecurity.protocol=SASL_PLAINTEXT"
+---
+# Source: console/templates/console/secret-credentials.yaml
+{{/*apiVersion: v1*/}}
+{{/*kind: Secret*/}}
+{{/*metadata:*/}}
+{{/*  name: test-console-platform*/}}
+{{/*  namespace: "default"*/}}
+{{/*  labels:*/}}
+{{/*    app.kubernetes.io/name: console*/}}
+{{/*    helm.sh/chart: console-1.20.1*/}}
+{{/*    app.kubernetes.io/instance: test-console*/}}
+{{/*    app.kubernetes.io/managed-by: Helm*/}}
+{{/*    app.kubernetes.io/component: conduktor-platform*/}}
+{{/*  annotations:*/}}
+{{/*    helm.sh/hook: pre-install*/}}
+{{/*    helm.sh/hook-weight: "-99"*/}}
+{{/*type: Opaque*/}}
+{{/*data:*/}}
+{{/*  CDK_ORGANIZATION_NAME: Q29uZHVrdG9y*/}}
+{{/*  CDK_ADMIN_EMAIL: YWRtaW5AY29uZHVrdG9yLmlv*/}}
+{{/*  CDK_ADMIN_PASSWORD: QWRtaW4xMjMh*/}}
+{{/*  CDK_DATABASE_PASSWORD: Y29uZHVrdG9yMTIz*/}}
+{{/*  CDK_DATABASE_USERNAME: cG9zdGdyZXM=*/}}
+{{/*---*/}}
+{{/*# Source: console/templates/cortex/secrets.yaml*/}}
+{{/*apiVersion: v1*/}}
+{{/*kind: Secret*/}}
+{{/*metadata:*/}}
+{{/*  name: test-console-cortex*/}}
+{{/*  namespace: "default"*/}}
+{{/*  labels:*/}}
+{{/*    app.kubernetes.io/name: console*/}}
+{{/*    helm.sh/chart: console-1.20.1*/}}
+{{/*    app.kubernetes.io/instance: test-console*/}}
+{{/*    app.kubernetes.io/managed-by: Helm*/}}
+{{/*    app.kubernetes.io/component: conduktor-platform-cortex*/}}
+{{/*  annotations:*/}}
+{{/*    helm.sh/hook: pre-install*/}}
+{{/*    helm.sh/hook-weight: "-99"*/}}
+{{/*type: Opaque*/}}
+{{/*data:*/}}
+{{/*---*/}}
+{{/*# Source: console/templates/console/configmap.yaml*/}}
+{{/*apiVersion: v1*/}}
+{{/*kind: ConfigMap*/}}
+{{/*metadata:*/}}
+{{/*  name: test-console-platform*/}}
+{{/*  namespace: "default"*/}}
+{{/*  labels:*/}}
+{{/*    app.kubernetes.io/name: console*/}}
+{{/*    helm.sh/chart: console-1.20.1*/}}
+{{/*    app.kubernetes.io/instance: test-console*/}}
+{{/*    app.kubernetes.io/managed-by: Helm*/}}
+{{/*    app.kubernetes.io/component: conduktor-platform*/}}
+{{/*  annotations:*/}}
+{{/*    helm.sh/hook: pre-install*/}}
+{{/*    helm.sh/hook-weight: "-99"*/}}
+{{/*data:*/}}
+{{/*  platform-config.yaml: |*/}}
+{{/*    database:*/}}
+{{/*      host: main-postgresql.default.svc.cluster.local*/}}
+{{/*      name: postgres*/}}
+{{/*      port: 5432*/}}
+{{/*    existingSecret: ""*/}}
+{{/*    platform: {}*/}}
+{{/*    clusters:*/}}
+{{/*      - id: kafka*/}}
+{{/*        name: Kafka*/}}
+{{/*        bootstrapServers: kafka.default.svc.cluster.local:9092*/}}
+{{/*---*/}}
+{{/*# Source: console/templates/cortex/configmap.yaml*/}}
+{{/*apiVersion: v1*/}}
+{{/*kind: ConfigMap*/}}
+{{/*metadata:*/}}
+{{/*  name: test-console-cortex*/}}
+{{/*  namespace: "default"*/}}
+{{/*  labels:*/}}
+{{/*    app.kubernetes.io/name: console*/}}
+{{/*    helm.sh/chart: console-1.20.1*/}}
+{{/*    app.kubernetes.io/instance: test-console*/}}
+{{/*    app.kubernetes.io/managed-by: Helm*/}}
+{{/*    app.kubernetes.io/component: conduktor-platform-cortex*/}}
+{{/*  annotations:*/}}
+{{/*    helm.sh/hook: pre-install*/}}
+{{/*    helm.sh/hook-weight: "-99"*/}}
+{{/*data:*/}}
+{{/*  CDK_CONSOLE-URL: "http://test-console.default.svc.cluster.local:80"*/}}
+{{/*---*/}}
+{{/*# Source: console/templates/console/service.yaml*/}}
+{{/*apiVersion: v1*/}}
+{{/*kind: Service*/}}
+{{/*metadata:*/}}
+{{/*  name: test-console*/}}
+{{/*  namespace: "default"*/}}
+{{/*  labels:*/}}
+{{/*    app.kubernetes.io/name: console*/}}
+{{/*    helm.sh/chart: console-1.20.1*/}}
+{{/*    app.kubernetes.io/instance: test-console*/}}
+{{/*    app.kubernetes.io/managed-by: Helm*/}}
+{{/*    app.kubernetes.io/component: conduktor-platform*/}}
+{{/*  annotations:*/}}
+{{/*    helm.sh/hook: pre-install*/}}
+{{/*    helm.sh/hook-weight: "-99"*/}}
+{{/*spec:*/}}
+{{/*  type: ClusterIP*/}}
+{{/*  sessionAffinity: None*/}}
+{{/*  ports:*/}}
+{{/*    - name: http*/}}
+{{/*      port: 80*/}}
+{{/*      protocol: TCP*/}}
+{{/*      targetPort: http*/}}
+{{/*      nodePort: null*/}}
+{{/*  selector:*/}}
+{{/*    app.kubernetes.io/name: console*/}}
+{{/*    app.kubernetes.io/instance: test-console*/}}
+{{/*    app.kubernetes.io/component: conduktor-platform*/}}
+{{/*---*/}}
+{{/*# Source: console/templates/cortex/service.yaml*/}}
+{{/*apiVersion: v1*/}}
+{{/*kind: Service*/}}
+{{/*metadata:*/}}
+{{/*  name: test-console-cortex*/}}
+{{/*  namespace: "default"*/}}
+{{/*  labels:*/}}
+{{/*    app.kubernetes.io/name: console*/}}
+{{/*    helm.sh/chart: console-1.20.1*/}}
+{{/*    app.kubernetes.io/instance: test-console*/}}
+{{/*    app.kubernetes.io/managed-by: Helm*/}}
+{{/*    app.kubernetes.io/component: conduktor-platform-cortex*/}}
+{{/*  annotations:*/}}
+{{/*    helm.sh/hook: pre-install*/}}
+{{/*    helm.sh/hook-weight: "-99"*/}}
+{{/*spec:*/}}
+{{/*  type: ClusterIP*/}}
+{{/*  sessionAffinity: None*/}}
+{{/*  ports:*/}}
+{{/*    - name: cortex*/}}
+{{/*      port: 9009*/}}
+{{/*      protocol: TCP*/}}
+{{/*      targetPort: cortex*/}}
+{{/*      nodePort: null*/}}
+
+{{/*    - name: alertmanager*/}}
+{{/*      port: 9010*/}}
+{{/*      protocol: TCP*/}}
+{{/*      targetPort: alertmanager*/}}
+{{/*      nodePort: null*/}}
+
+{{/*    - name: prometheus*/}}
+{{/*      port: 9090*/}}
+{{/*      protocol: TCP*/}}
+{{/*      targetPort: prometheus*/}}
+{{/*      nodePort: null*/}}
+{{/*  selector:*/}}
+{{/*    app.kubernetes.io/name: console*/}}
+{{/*    app.kubernetes.io/instance: test-console*/}}
+{{/*    app.kubernetes.io/component: conduktor-platform-cortex*/}}
+{{/*---*/}}
+{{/*# Source: console/templates/tests/03-platform-healthy.yaml*/}}
+{{/*apiVersion: v1*/}}
+{{/*kind: Pod*/}}
+{{/*metadata:*/}}
+{{/*  name: "test-console-test-console"*/}}
+{{/*  annotations:*/}}
+{{/*    "helm.sh/hook": test*/}}
+{{/*    "helm.sh/hook-delete-policy": hook-succeeded*/}}
+{{/*spec:*/}}
+{{/*  containers:*/}}
+{{/*    - name: curl-platform*/}}
+{{/*      image: curlimages/curl:8.1.2*/}}
+{{/*      args: [ '--insecure', "--verbose" ,'http://test-console:80/platform/api/modules/health/ready']*/}}
+{{/*  restartPolicy: Never*/}}
+{{/*---*/}}
+{{/*# Source: console/templates/tests/04-platform-cortex-healthy.yaml*/}}
+{{/*apiVersion: v1*/}}
+{{/*kind: Pod*/}}
+{{/*metadata:*/}}
+{{/*  name: "test-console-test-cortex"*/}}
+{{/*  annotations:*/}}
+{{/*    "helm.sh/hook": test*/}}
+{{/*    "helm.sh/hook-delete-policy": hook-succeeded*/}}
+{{/*spec:*/}}
+{{/*  containers:*/}}
+{{/*    - name: curl-cortex*/}}
+{{/*      image: curlimages/curl:8.1.2*/}}
+{{/*      args: [ '--insecure', "--verbose" ,'http://test-console-cortex:9009/ready']*/}}
+{{/*    - name: curl-alertmanager*/}}
+{{/*      image: curlimages/curl:8.1.2*/}}
+{{/*      args: [ '--insecure', "--verbose" ,'http://test-console-cortex:9010/ready']*/}}
+{{/*    - name: curl-prometheus*/}}
+{{/*      image: curlimages/curl:8.1.2*/}}
+{{/*      args: [ '--insecure', "--verbose" ,'http://test-console-cortex:9090/-/healthy']*/}}
+{{/*    - name: curl-prometheus-targets*/}}
+{{/*      image: nicolaka/netshoot*/}}
+{{/*      command:*/}}
+{{/*        - "/bin/sh"*/}}
+{{/*        - "-c"*/}}
+{{/*        - |*/}}
+{{/*          retries=0*/}}
+{{/*          max_retries=10*/}}
+{{/*          retry_interval=5*/}}
+
+{{/*          while [ $retries -lt $max_retries ]; do*/}}
+{{/*            if curl -sv http://test-console-cortex:9090/api/v1/targets | jq -e '.data.activeTargets[0].health == "up" | if . then true else false end'; then*/}}
+{{/*              exit 0*/}}
+{{/*            else*/}}
+{{/*              echo "Retry $((retries+1)) of $max_retries. Retrying in $retry_interval seconds..."*/}}
+{{/*              sleep $retry_interval*/}}
+{{/*              retries=$((retries+1))*/}}
+{{/*            fi*/}}
+{{/*          done*/}}
+
+{{/*          echo "Exceeded maximum retry attempts. Exiting with failure status."*/}}
+{{/*          exit 1*/}}
+{{/*  restartPolicy: Never*/}}
+{{/*---*/}}
+{{/*# Source: console/templates/console/deployment.yaml*/}}
+{{/*apiVersion: apps/v1*/}}
+{{/*kind: Deployment*/}}
+{{/*metadata:*/}}
+{{/*  name: test-console*/}}
+{{/*  namespace: "default"*/}}
+{{/*  labels:*/}}
+{{/*    app.kubernetes.io/name: console*/}}
+{{/*    helm.sh/chart: console-1.20.1*/}}
+{{/*    app.kubernetes.io/instance: test-console*/}}
+{{/*    app.kubernetes.io/managed-by: Helm*/}}
+{{/*    app.kubernetes.io/component: conduktor-platform*/}}
+{{/*  annotations:*/}}
+{{/*    helm.sh/hook: pre-install*/}}
+{{/*    helm.sh/hook-weight: "-99"*/}}
+{{/*spec:*/}}
+{{/*  replicas: 1*/}}
+{{/*  strategy:*/}}
+{{/*    type: RollingUpdate*/}}
+{{/*  selector:*/}}
+{{/*    matchLabels:*/}}
+{{/*      app.kubernetes.io/name: console*/}}
+{{/*      app.kubernetes.io/instance: test-console*/}}
+{{/*      app.kubernetes.io/component: conduktor-platform*/}}
+{{/*  template:*/}}
+{{/*    metadata:*/}}
+{{/*      annotations:*/}}
+{{/*        helm.sh/hook: pre-install*/}}
+{{/*        helm.sh/hook-weight: "-99"*/}}
+{{/*        checksum/config: ca43f7295bedd0aeb0258410ce6d4840e4ed50dbd8e736f93bfa136f24af04ce*/}}
+{{/*        checksum/credentials: 4c08713ef453546f4cf8c313d98083f89f6b67b899c49c5ea68f8202b8c1ebdf*/}}
+{{/*      labels:*/}}
+{{/*        app.kubernetes.io/name: console*/}}
+{{/*        helm.sh/chart: console-1.20.1*/}}
+{{/*        app.kubernetes.io/instance: test-console*/}}
+{{/*        app.kubernetes.io/managed-by: Helm*/}}
+{{/*        app.kubernetes.io/component: conduktor-platform*/}}
+{{/*    spec:*/}}
+{{/*      serviceAccountName: default*/}}
+{{/*      */}}
+{{/*      affinity:*/}}
+{{/*        podAffinity:*/}}
+{{/*          */}}
+{{/*        podAntiAffinity:*/}}
+{{/*          preferredDuringSchedulingIgnoredDuringExecution:*/}}
+{{/*            - podAffinityTerm:*/}}
+{{/*                labelSelector:*/}}
+{{/*                  matchLabels:*/}}
+{{/*                    app.kubernetes.io/instance: test-console*/}}
+{{/*                    app.kubernetes.io/name: console*/}}
+{{/*                    app.kubernetes.io/component: conduktor-platform*/}}
+{{/*                topologyKey: kubernetes.io/hostname*/}}
+{{/*              weight: 1*/}}
+{{/*        nodeAffinity:*/}}
+{{/*          */}}
+{{/*      securityContext:*/}}
+{{/*        runAsNonRoot: true*/}}
+{{/*      initContainers:*/}}
+{{/*      containers:*/}}
+{{/*        - name: conduktor-platform*/}}
+{{/*          image: docker.io/conduktor/conduktor-console:1.35.0*/}}
+{{/*          imagePullPolicy: IfNotPresent*/}}
+{{/*          securityContext:*/}}
+{{/*            readOnlyRootFilesystem: true*/}}
+{{/*            runAsNonRoot: true*/}}
+{{/*          env:*/}}
+{{/*            - name: CDK_DEBUG*/}}
+{{/*              value: "true"*/}}
+{{/*            - name: CDK_IN_CONF_FILE*/}}
+{{/*              value: /conduktor/config/platform-config.yaml*/}}
+{{/*            - name: CDK_ONBOARDING_MODE*/}}
+{{/*              value: never*/}}
+{{/*            - name: DEPLOYED_BY*/}}
+{{/*              value: HelmChart/1.20.1*/}}
+{{/*            - name: CDK_LISTENING_PORT*/}}
+{{/*              value: "8080"*/}}
+{{/*            - name: CDK_MONITORING_CLUSTERS-REFRESH-INTERVAL*/}}
+{{/*              value: "60"*/}}
+{{/*            - name: CDK_MONITORING_CORTEX-URL*/}}
+{{/*              value: "http://test-console-cortex.default.svc.cluster.local:9009/"*/}}
+{{/*            - name: CDK_MONITORING_ALERT-MANAGER-URL*/}}
+{{/*              value: "http://test-console-cortex.default.svc.cluster.local:9010/"*/}}
+{{/*            - name: CDK_MONITORING_CALLBACK-URL*/}}
+{{/*              value: "http://test-console.default.svc.cluster.local:80/monitoring/api/"*/}}
+{{/*            - name: CDK_MONITORING_NOTIFICATIONS-CALLBACK-URL*/}}
+{{/*              value: "http://test-console.default.svc.cluster.local:80"*/}}
+{{/*          envFrom:*/}}
+{{/*            - secretRef:*/}}
+{{/*                name: test-console-platform*/}}
+{{/*          resources:*/}}
+{{/*            limits:*/}}
+{{/*              cpu: 3000m*/}}
+{{/*              memory: 4Gi*/}}
+{{/*            requests:*/}}
+{{/*              cpu: 1000m*/}}
+{{/*              memory: 2Gi*/}}
+{{/*          ports:*/}}
+{{/*            - name: http*/}}
+{{/*              containerPort: 8080*/}}
+{{/*          livenessProbe:*/}}
+{{/*            failureThreshold: 3*/}}
+{{/*            initialDelaySeconds: 60*/}}
+{{/*            periodSeconds: 10*/}}
+{{/*            successThreshold: 1*/}}
+{{/*            timeoutSeconds: 5*/}}
+{{/*            httpGet:*/}}
+{{/*              scheme: "HTTP"*/}}
+{{/*              path: /api/health/live*/}}
+{{/*              port: http*/}}
+{{/*          readinessProbe:*/}}
+{{/*            failureThreshold: 3*/}}
+{{/*            initialDelaySeconds: 60*/}}
+{{/*            periodSeconds: 10*/}}
+{{/*            successThreshold: 1*/}}
+{{/*            timeoutSeconds: 5*/}}
+{{/*            httpGet:*/}}
+{{/*              scheme: "HTTP"*/}}
+{{/*              path: /api/health/ready*/}}
+{{/*              port: http*/}}
+{{/*          startupProbe:*/}}
+{{/*            failureThreshold: 10*/}}
+{{/*            initialDelaySeconds: 10*/}}
+{{/*            periodSeconds: 10*/}}
+{{/*            successThreshold: 1*/}}
+{{/*            timeoutSeconds: 5*/}}
+{{/*            httpGet:*/}}
+{{/*              scheme: "HTTP"*/}}
+{{/*              path: /api/health/live*/}}
+{{/*              port: http*/}}
+{{/*          volumeMounts:*/}}
+{{/*            - name: data*/}}
+{{/*              mountPath: /var/conduktor*/}}
+{{/*            - name: tmp*/}}
+{{/*              mountPath: /tmp*/}}
+{{/*            - name: config*/}}
+{{/*              mountPath: /conduktor/config/*/}}
+{{/*      volumes:*/}}
+{{/*        - name: data*/}}
+{{/*          emptyDir: {}*/}}
+{{/*        - name: tmp*/}}
+{{/*          emptyDir: {}*/}}
+{{/*        - name: config*/}}
+{{/*          configMap:*/}}
+{{/*            name: test-console-platform*/}}
+{{/*        - name: platform-https*/}}
+{{/*          secret:*/}}
+{{/*            secretName: test-console-platform-tls*/}}
+{{/*---*/}}
+{{/*# Source: console/templates/cortex/deployment.yaml*/}}
+{{/*apiVersion: apps/v1*/}}
+{{/*kind: Deployment*/}}
+{{/*metadata:*/}}
+{{/*  name: test-console-cortex*/}}
+{{/*  namespace: "default"*/}}
+{{/*  labels:*/}}
+{{/*    app.kubernetes.io/name: console*/}}
+{{/*    helm.sh/chart: console-1.20.1*/}}
+{{/*    app.kubernetes.io/instance: test-console*/}}
+{{/*    app.kubernetes.io/managed-by: Helm*/}}
+{{/*    app.kubernetes.io/component: conduktor-platform-cortex*/}}
+{{/*  annotations:*/}}
+{{/*    helm.sh/hook: pre-install*/}}
+{{/*    helm.sh/hook-weight: "-99"*/}}
+{{/*spec:*/}}
+{{/*  replicas: 1*/}}
+{{/*  strategy:*/}}
+{{/*    type: RollingUpdate*/}}
+{{/*  selector:*/}}
+{{/*    matchLabels:*/}}
+{{/*      app.kubernetes.io/name: console*/}}
+{{/*      app.kubernetes.io/instance: test-console*/}}
+{{/*      app.kubernetes.io/component: conduktor-platform-cortex*/}}
+{{/*  template:*/}}
+{{/*    metadata:*/}}
+{{/*      annotations:*/}}
+{{/*        helm.sh/hook: pre-install*/}}
+{{/*        helm.sh/hook-weight: "-99"*/}}
+{{/*        checksum/config: e2aee01655fac248e0a0567b9ca19dc05875c4d538d2ea7b369d1eca15a95979*/}}
+{{/*        checksum/credentials: 4a1e3c72470cbab4fc81679e819cf61d4759a32c2a42c57f95e10391c034d027*/}}
+{{/*      labels:*/}}
+{{/*        app.kubernetes.io/name: console*/}}
+{{/*        helm.sh/chart: console-1.20.1*/}}
+{{/*        app.kubernetes.io/instance: test-console*/}}
+{{/*        app.kubernetes.io/managed-by: Helm*/}}
+{{/*        app.kubernetes.io/component: conduktor-platform-cortex*/}}
+{{/*    spec:*/}}
+{{/*      serviceAccountName: default*/}}
+{{/*      */}}
+{{/*      affinity:*/}}
+{{/*        podAffinity:*/}}
+{{/*          */}}
+{{/*        podAntiAffinity:*/}}
+{{/*          preferredDuringSchedulingIgnoredDuringExecution:*/}}
+{{/*            - podAffinityTerm:*/}}
+{{/*                labelSelector:*/}}
+{{/*                  matchLabels:*/}}
+{{/*                    app.kubernetes.io/instance: test-console*/}}
+{{/*                    app.kubernetes.io/name: console*/}}
+{{/*                    app.kubernetes.io/component: conduktor-platform*/}}
+{{/*                topologyKey: kubernetes.io/hostname*/}}
+{{/*              weight: 1*/}}
+{{/*        nodeAffinity:*/}}
+{{/*          */}}
+{{/*      securityContext:*/}}
+{{/*        runAsNonRoot: true*/}}
+{{/*      initContainers:*/}}
+{{/*      containers:*/}}
+{{/*        - name: conduktor-platform-cortex*/}}
+{{/*          image: docker.io/conduktor/conduktor-console-cortex:1.35.0*/}}
+{{/*          imagePullPolicy: IfNotPresent*/}}
+{{/*          securityContext:*/}}
+{{/*            readOnlyRootFilesystem: true*/}}
+{{/*            runAsNonRoot: true*/}}
+{{/*          env:*/}}
+{{/*            - name: CDK_DEBUG*/}}
+{{/*              value: "false"*/}}
+{{/*            - name: CDK_SCRAPER_SKIPSSLCHECK*/}}
+{{/*              value: "false"*/}}
+{{/*          envFrom:*/}}
+{{/*            - configMapRef:*/}}
+{{/*                name: test-console-cortex*/}}
+{{/*            - secretRef:*/}}
+{{/*                name: test-console-cortex*/}}
+{{/*          resources:*/}}
+{{/*            limits:*/}}
+{{/*              cpu: 2000m*/}}
+{{/*              memory: 2Gi*/}}
+{{/*            requests:*/}}
+{{/*              cpu: 500m*/}}
+{{/*              memory: 500Mi*/}}
+{{/*          ports:*/}}
+{{/*            - name: cortex*/}}
+{{/*              containerPort: 9009*/}}
+{{/*            - name: alertmanager*/}}
+{{/*              containerPort: 9010*/}}
+{{/*            - name: prometheus*/}}
+{{/*              containerPort: 9090*/}}
+{{/*          livenessProbe:*/}}
+{{/*            failureThreshold: 3*/}}
+{{/*            initialDelaySeconds: 30*/}}
+{{/*            periodSeconds: 10*/}}
+{{/*            successThreshold: 1*/}}
+{{/*            timeoutSeconds: 5*/}}
+{{/*            httpGet:*/}}
+{{/*              path: /ready*/}}
+{{/*              port: cortex*/}}
+{{/*          readinessProbe:*/}}
+{{/*            failureThreshold: 3*/}}
+{{/*            initialDelaySeconds: 30*/}}
+{{/*            periodSeconds: 10*/}}
+{{/*            successThreshold: 1*/}}
+{{/*            timeoutSeconds: 5*/}}
+{{/*            httpGet:*/}}
+{{/*              path: /ready*/}}
+{{/*              port: cortex*/}}
+{{/*          volumeMounts:*/}}
+{{/*            - name: data*/}}
+{{/*              mountPath: /var/conduktor*/}}
+{{/*            - name: tmp*/}}
+{{/*              mountPath: /tmp*/}}
+{{/*      volumes:*/}}
+{{/*        - name: data*/}}
+{{/*          emptyDir: {}*/}}
+{{/*        - name: tmp*/}}
+{{/*          emptyDir: {}*/}}
+{{- end }}

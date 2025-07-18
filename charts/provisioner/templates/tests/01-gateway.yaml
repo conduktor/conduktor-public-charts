@@ -1,0 +1,280 @@
+{{- if and .Values.tests.enabled .Values.tests.gateway.enabled }}
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: gateway
+  namespace: default
+  annotations:
+      helm.sh/hook: pre-install
+      helm.sh/hook-weight: "-75"
+spec:
+  repo: https://helm.conduktor.io
+  chart: conduktor-gateway
+  version: 3.8.0
+  targetNamespace: default
+  set:
+    gateway.replicas: 1
+    gateway.env.KAFKA_BOOTSTRAP_SERVERS: "kafka.default.svc.cluster.local:9092"
+    gateway.env.KAFKA_SECURITY_PROTOCOL: "SASL_PLAINTEXT"
+    gateway.env.KAFKA_SASL_MECHANISM: "PLAIN"
+    gateway.env.KAFKA_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required username='kafka-admin' password='kafka-admin-password';"
+    gateway.env.GATEWAY_SECURITY_MODE: "GATEWAY_MANAGED"
+    gateway.env.GATEWAY_SECURITY_PROTOCOL: "SASL_PLAINTEXT"
+    gateway.env.GATEWAY_ACL_ENABLED: "\"true\""
+    gateway.env.GATEWAY_SUPER_USERS: "admin"
+    gateway.admin.users[0].username: "admin"
+    gateway.admin.users[0].password: "Admin123!"
+    gateway.admin.users[0].admin: "true"
+    gateway.startupProbe.initialDelaySeconds: 60
+{{/*---*/}}
+{{/*# Source: conduktor-gateway/templates/configmap.yaml*/}}
+{{/*apiVersion: v1*/}}
+{{/*kind: ConfigMap*/}}
+{{/*metadata:*/}}
+{{/*  name: test-console-conduktor-gateway*/}}
+{{/*  namespace: "default"*/}}
+{{/*  labels: */}}
+{{/*    app.kubernetes.io/instance: test-gateway*/}}
+{{/*    app.kubernetes.io/managed-by: Helm*/}}
+{{/*    app.kubernetes.io/name: conduktor-gateway*/}}
+{{/*    app.kubernetes.io/version: 3.10.0*/}}
+{{/*    helm.sh/chart: conduktor-gateway-3.10.0*/}}
+{{/*data:*/}}
+{{/*  KAFKA_BOOTSTRAP_SERVERS: kafka.default.svc.cluster.local:9092*/}}
+{{/*  GATEWAY_SECURITY_MODE: GATEWAY_MANAGED*/}}
+{{/*  GATEWAY_SECURITY_PROTOCOL: PLAINTEXT*/}}
+{{/*  GATEWAY_ACL_ENABLED: "false"*/}}
+{{/*  interceptors.json: */}}
+{{/*    "[]"*/}}
+{{/*---*/}}
+{{/*# Source: conduktor-gateway/templates/secrets.yaml*/}}
+{{/*apiVersion: v1*/}}
+{{/*kind: Secret*/}}
+{{/*metadata:*/}}
+{{/*  name: "test-console-conduktor-gateway-secret"*/}}
+{{/*  namespace: "default"*/}}
+{{/*  labels: */}}
+{{/*    app.kubernetes.io/instance: test-gateway*/}}
+{{/*    app.kubernetes.io/managed-by: Helm*/}}
+{{/*    app.kubernetes.io/name: conduktor-gateway*/}}
+{{/*    app.kubernetes.io/version: 3.10.0*/}}
+{{/*    helm.sh/chart: conduktor-gateway-3.10.0*/}}
+{{/*  annotations:*/}}
+{{/*    helm.sh/hook: pre-install*/}}
+{{/*    helm.sh/hook-weight: "-99"*/}}
+{{/*type: Opaque*/}}
+{{/*data:*/}}
+{{/*  GATEWAY_USER_POOL_SECRET_KEY: T1RrMFlrZDZkRTFHTWxocE5VbENNMjFLVWtoMlluUTRWR3hSWTBSdGVUVT0=*/}}
+{{/*  GATEWAY_ADMIN_API_USERS: W3siYWRtaW4iOnRydWUsInBhc3N3b3JkIjoiQWRtaW4xMjMhIiwidXNlcm5hbWUiOiJhZG1pbiJ9XQ==*/}}
+{{/*  GATEWAY_ADMIN_USERNAME: YWRtaW4=*/}}
+{{/*  GATEWAY_ADMIN_PASSWORD: QWRtaW4xMjMh*/}}
+{{/*  GATEWAY_ADMIN_API_USER_0_USERNAME: YWRtaW4=*/}}
+{{/*  GATEWAY_ADMIN_API_USER_0_ADMIN: InRydWUi*/}}
+{{/*  GATEWAY_ADMIN_API_USER_0_PASSWORD: QWRtaW4xMjMh*/}}
+{{/*---*/}}
+{{/*# Source: conduktor-gateway/templates/service-internal.yaml*/}}
+{{/*apiVersion: v1*/}}
+{{/*kind: Service*/}}
+{{/*metadata:*/}}
+{{/*  name:  test-console-conduktor-gateway-internal*/}}
+{{/*  namespace: "default"*/}}
+{{/*  labels: */}}
+{{/*    app.kubernetes.io/name: conduktor-gateway*/}}
+{{/*    helm.sh/chart: conduktor-gateway-3.10.0*/}}
+{{/*    app.kubernetes.io/instance: test-gateway*/}}
+{{/*    app.kubernetes.io/managed-by: Helm*/}}
+{{/*    app.kubernetes.io/version: "3.10.0"*/}}
+{{/*    app.kubernetes.io/component: conduktor-gateway*/}}
+{{/*  annotations:*/}}
+{{/*    helm.sh/hook: pre-install*/}}
+{{/*    helm.sh/hook-weight: "-99"*/}}
+{{/*spec:*/}}
+{{/*  type: ClusterIP*/}}
+{{/*  ports:*/}}
+{{/*    - name: broker-gateway-9092*/}}
+{{/*      port: 9092*/}}
+{{/*      targetPort: 9092*/}}
+{{/*      protocol: TCP*/}}
+{{/*    - name: broker-gateway-9093*/}}
+{{/*      port: 9093*/}}
+{{/*      targetPort: 9093*/}}
+{{/*      protocol: TCP*/}}
+{{/*    - name: broker-gateway-9094*/}}
+{{/*      port: 9094*/}}
+{{/*      targetPort: 9094*/}}
+{{/*      protocol: TCP*/}}
+{{/*    - name: broker-gateway-9095*/}}
+{{/*      port: 9095*/}}
+{{/*      targetPort: 9095*/}}
+{{/*      protocol: TCP*/}}
+{{/*    - name: broker-gateway-9096*/}}
+{{/*      port: 9096*/}}
+{{/*      targetPort: 9096*/}}
+{{/*      protocol: TCP*/}}
+{{/*    - name: broker-gateway-9097*/}}
+{{/*      port: 9097*/}}
+{{/*      targetPort: 9097*/}}
+{{/*      protocol: TCP*/}}
+{{/*    - name: broker-gateway-9098*/}}
+{{/*      port: 9098*/}}
+{{/*      targetPort: 9098*/}}
+{{/*      protocol: TCP*/}}
+{{/*    - name: admin-http*/}}
+{{/*      port: 8888*/}}
+{{/*      targetPort: 8888*/}}
+{{/*      protocol: TCP*/}}
+{{/*  selector: */}}
+{{/*    app.kubernetes.io/name: conduktor-gateway*/}}
+{{/*    app.kubernetes.io/instance: test-gateway*/}}
+{{/*---*/}}
+{{/*# Source: conduktor-gateway/templates/tests/02-gateway-healthy.yaml*/}}
+{{/*apiVersion: v1*/}}
+{{/*kind: Pod*/}}
+{{/*metadata:*/}}
+{{/*  name: "test-console-conduktor-gateway-test-gateway"*/}}
+{{/*  namespace: "default"*/}}
+{{/*  annotations:*/}}
+{{/*    "helm.sh/hook": test*/}}
+{{/*    "helm.sh/hook-delete-policy": hook-succeeded*/}}
+{{/*spec:*/}}
+{{/*  containers:*/}}
+{{/*    - name: curl-gateway-internal*/}}
+{{/*      image: curlimages/curl:8.1.2*/}}
+{{/*      args: [ '--insecure', "--verbose" ,'http://test-console-conduktor-gateway-internal:8888/health']*/}}
+{{/*    - name: curl-gateway-admin-api*/}}
+{{/*      image: curlimages/curl:8.1.2*/}}
+{{/*      args: [ '--insecure', "--verbose" ,'http://test-console-conduktor-gateway-internal:8888/gateway/v2/virtual-cluster',*/}}
+{{/*              '--header', 'accept: application/json',*/}}
+{{/*              '--user', 'YWRtaW4=:Y29uZHVrdG9y']*/}}
+{{/*  restartPolicy: Never*/}}
+{{/*---*/}}
+{{/*# Source: conduktor-gateway/templates/deployment.yaml*/}}
+{{/*apiVersion: apps/v1*/}}
+{{/*kind: Deployment*/}}
+{{/*metadata:*/}}
+{{/*  name: test-console-conduktor-gateway*/}}
+{{/*  namespace: "default"*/}}
+{{/*  labels: */}}
+{{/*    app.kubernetes.io/instance: test-gateway*/}}
+{{/*    app.kubernetes.io/managed-by: Helm*/}}
+{{/*    app.kubernetes.io/name: conduktor-gateway*/}}
+{{/*    app.kubernetes.io/version: 3.10.0*/}}
+{{/*    helm.sh/chart: conduktor-gateway-3.10.0*/}}
+{{/*  annotations:*/}}
+{{/*    helm.sh/hook: pre-install*/}}
+{{/*    helm.sh/hook-weight: "-99"*/}}
+{{/*spec:*/}}
+{{/*  selector:*/}}
+{{/*    matchLabels: */}}
+{{/*      app.kubernetes.io/name: conduktor-gateway*/}}
+{{/*      app.kubernetes.io/instance: test-gateway*/}}
+{{/*  replicas: 1*/}}
+{{/*  strategy:*/}}
+{{/*    type: RollingUpdate*/}}
+{{/*  template:*/}}
+{{/*    metadata:*/}}
+{{/*      annotations:*/}}
+{{/*        helm.sh/hook: pre-install*/}}
+{{/*        helm.sh/hook-weight: "-99"*/}}
+{{/*        checksum/config: ee932ded3a7353618af23d92a7923ff0cfe21360675e0ad30cabc4d9c3482424*/}}
+{{/*        checksum/self-secrets: db86667c7904e215250b5c30a692016eb1b51758a5466b9740cd22937f6179d6*/}}
+{{/*      labels:*/}}
+{{/*        app.kubernetes.io/instance: test-gateway*/}}
+{{/*        app.kubernetes.io/managed-by: Helm*/}}
+{{/*        app.kubernetes.io/name: conduktor-gateway*/}}
+{{/*        app.kubernetes.io/version: 3.10.0*/}}
+{{/*        helm.sh/chart: conduktor-gateway-3.10.0*/}}
+{{/*    spec:*/}}
+{{/*      initContainers:*/}}
+{{/*      containers:*/}}
+{{/*        - name: gateway*/}}
+{{/*          image: docker.io/conduktor/conduktor-gateway:3.10.0*/}}
+{{/*          imagePullPolicy: IfNotPresent*/}}
+{{/*          env:*/}}
+{{/*            # Static env var to be reconsidered if we offer env way to configure them*/}}
+{{/*            - name: GATEWAY_INTERCEPTOR_CONFIG_LOCATION*/}}
+{{/*              value: /etc/gateway/config/interceptors.json*/}}
+{{/*            - name: GATEWAY_ADVERTISED_HOST*/}}
+{{/*              value: test-console-conduktor-gateway-internal*/}}
+{{/*            - name: GATEWAY_PORT_START*/}}
+{{/*              value: "9092"*/}}
+{{/*            - name: GATEWAY_PORT_COUNT*/}}
+{{/*              value: "7"*/}}
+{{/*            - name: GATEWAY_HTTP_PORT*/}}
+{{/*              value: "8888"*/}}
+{{/*            - name: GATEWAY_SECURED_METRICS*/}}
+{{/*              value: "true"*/}}
+{{/*            - name: DEPLOYED_BY*/}}
+{{/*              value: HelmChart/3.10.0*/}}
+{{/*          envFrom:*/}}
+{{/*            - configMapRef:*/}}
+{{/*                name: test-console-conduktor-gateway*/}}
+{{/*            - secretRef:*/}}
+{{/*                name: test-console-conduktor-gateway-secret*/}}
+{{/*          ports:*/}}
+{{/*            - containerPort: 9092*/}}
+{{/*              protocol: TCP*/}}
+{{/*            - containerPort: 9093*/}}
+{{/*              protocol: TCP*/}}
+{{/*            - containerPort: 9094*/}}
+{{/*              protocol: TCP*/}}
+{{/*            - containerPort: 9095*/}}
+{{/*              protocol: TCP*/}}
+{{/*            - containerPort: 9096*/}}
+{{/*              protocol: TCP*/}}
+{{/*            - containerPort: 9097*/}}
+{{/*              protocol: TCP*/}}
+{{/*            - containerPort: 9098*/}}
+{{/*              protocol: TCP*/}}
+{{/*            - name: admin-http*/}}
+{{/*              containerPort: 8888*/}}
+{{/*              protocol: TCP*/}}
+{{/*          volumeMounts:*/}}
+{{/*            - name: config*/}}
+{{/*              mountPath: /etc/gateway/config*/}}
+{{/*          startupProbe:*/}}
+{{/*            failureThreshold: 5*/}}
+{{/*            initialDelaySeconds: 60*/}}
+{{/*            periodSeconds: 10*/}}
+{{/*            successThreshold: 1*/}}
+{{/*            timeoutSeconds: 1*/}}
+{{/*            httpGet:*/}}
+{{/*              path: /health*/}}
+{{/*              port: 8888*/}}
+{{/*              scheme: "HTTP"*/}}
+{{/*          livenessProbe:*/}}
+{{/*            failureThreshold: 3*/}}
+{{/*            initialDelaySeconds: 0*/}}
+{{/*            periodSeconds: 5*/}}
+{{/*            successThreshold: 1*/}}
+{{/*            timeoutSeconds: 1*/}}
+{{/*            httpGet:*/}}
+{{/*              path: /health*/}}
+{{/*              port: 8888*/}}
+{{/*              scheme: "HTTP"*/}}
+{{/*          readinessProbe:*/}}
+{{/*            failureThreshold: 3*/}}
+{{/*            initialDelaySeconds: 0*/}}
+{{/*            periodSeconds: 5*/}}
+{{/*            successThreshold: 1*/}}
+{{/*            timeoutSeconds: 1*/}}
+{{/*            httpGet:*/}}
+{{/*              path: /health*/}}
+{{/*              port: 8888*/}}
+{{/*              scheme: "HTTP"*/}}
+{{/*          resources:*/}}
+{{/*            limits:*/}}
+{{/*              cpu: 2000m*/}}
+{{/*              memory: 4Gi*/}}
+{{/*            requests:*/}}
+{{/*              cpu: 500m*/}}
+{{/*              memory: 500Mi*/}}
+{{/*      volumes:*/}}
+{{/*        - name: config*/}}
+{{/*          configMap:*/}}
+{{/*            name: test-console-conduktor-gateway*/}}
+{{/*            items:*/}}
+{{/*            - key: interceptors.json*/}}
+{{/*              path: interceptors.json*/}}
+{{/*      serviceAccountName: test-console-conduktor-gateway*/}}
+{{- end }}
