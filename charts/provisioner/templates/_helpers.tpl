@@ -20,6 +20,13 @@ Default fully qualified manifest config map name
 {{- end }}
 
 {{/*
+Default fully qualified init-scipts config map name
+*/}}
+{{- define "provisioner.initScript.configMapName" -}}
+{{- include "common.names.fullname" . }}-init-script
+{{- end }}
+
+{{/*
 Default fully qualified secret name
 */}}
 {{- define "provisioner.config.secrets" -}}

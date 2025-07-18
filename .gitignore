@@ -37,3 +37,6 @@ charts/**/charts
 
 .history
 .cr-release-packages
+
+# Chart testing files
+ct-previous*/**
