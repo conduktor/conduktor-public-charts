@@ -110,6 +110,9 @@ cleanupAfterFinished:
 ## @param restartPolicy Restart policy for conduktor-provisioner jobs
 restartPolicy: "OnFailure"
 
+## @param backoffLimit Number of retries before the job is considered failed
+backoffLimit: 10
+
 ## @param podSecurityContext conduktor-provisioner Pod Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
 ## default:
@@ -193,7 +196,7 @@ initContainers: []
 ## @section Console provisioning configuration
 ##
 console:
-  ## @param console.enable Enable Console provisioning
+  ## @param console.enabled Enable Console provisioning
   enabled: false
   ## @param console.authMode Authentication mode on Console for Conduktor CLI, either "conduktor" or "external" if using API Gateway in front of Console.
   authMode: "conduktor"
@@ -216,7 +219,7 @@ console:
   manifests: []
   ## @param console.manifestsConfigMap Manifests YAML to apply on the Console
   manifestsConfigMap: ""
-  ## @param console.manifestConfigMapKey Manifests YAML to apply on the Console
+  ## @param console.manifestsConfigMapKey Manifests YAML to apply on the Console
   manifestsConfigMapKey: "00-console-resources.yaml"
   ## @param console.extraManifestsConfigMapRef List of ConfigMaps references with extra manifests to apply on the Console
   ## e.g:
@@ -283,7 +286,7 @@ console:
 
 
 gateway:
-  ## @param gateway.enable Enable Gateway provisioning
+  ## @param gateway.enabled Enable Gateway provisioning
   enabled: true
   ## @param gateway.url URL of the Gateway
   url: ""
@@ -303,7 +306,7 @@ gateway:
   manifests: []
   ## @param gateway.manifestsConfigMap Manifests YAML to apply on the Gateway
   manifestsConfigMap: ""
-  ## @param gateway.manifestConfigMapKey Manifests YAML to apply on the Gateway
+  ## @param gateway.manifestsConfigMapKey Manifests YAML to apply on the Gateway
   manifestsConfigMapKey: "00-gateway-resources.yaml"
   ## @param gateway.extraManifestsConfigMapRef List of ConfigMaps references with extra manifests to apply on the Gateway
   ## e.g:
@@ -388,3 +391,13 @@ serviceAccount:
   ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
   ##
   automountServiceAccountToken: true
+
+
+
+## @skip tests
+tests:
+  enabled: false
+  console:
+    enabled: false
+  gateway:
+    enabled: false

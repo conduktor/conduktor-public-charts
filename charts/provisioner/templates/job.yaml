@@ -17,6 +17,8 @@ spec:
   ttlSecondsAfterFinished: {{ .Values.cleanupAfterFinished.seconds }}
   {{- end }}
   parallelism: 1
+  completions: 1
+  backoffLimit: {{ .Values.backoffLimit | default 10 }}
   template:
     metadata:
       labels: {{- include "provisioner.labels" . | nindent 8 }}
