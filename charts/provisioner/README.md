@@ -103,8 +103,9 @@ Configuration of the conduktor-ctl image used to run the Conduktor CLI commands.
 
 | Name                            | Description                                                                                                                                              | Value                     |
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| `image.registry`                | conduktor-ctl image registry                                                                                                                             | `REGISTRY_NAME`           |
+| `image.registry`                | conduktor-ctl image registry                                                                                                                             | `docker.io`               |
 | `image.repository`              | conduktor-ctl image repository                                                                                                                           | `conduktor/conduktor-ctl` |
+| `image.tag`                     | conduktor-ctl image tag (immutable tags are recommended)                                                                                                 | `v0.5.1`                  |
 | `image.digest`                  | conduktor-ctl image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`                      |
 | `image.pullPolicy`              | conduktor-ctl image pull policy                                                                                                                          | `IfNotPresent`            |
 | `image.pullSecrets`             | conduktor-ctl image pull secrets                                                                                                                         | `[]`                      |
@@ -138,6 +139,7 @@ Configures the wait-for scripts and image used to wait for the services to be re
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
 | `waitFor.image.registry`    | registry for wait-for curl image                                                                                                                         | `docker.io`       |
 | `waitFor.image.repository`  | wait-for curl image repository                                                                                                                           | `curlimages/curl` |
+| `waitFor.image.tag`         | wait-for curl image tag (immutable tags are recommended)                                                                                                 | `8.15.0`          |
 | `waitFor.image.digest`      | wait-for curl image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`              |
 | `waitFor.image.pullPolicy`  | wait-for image pull policy                                                                                                                               | `IfNotPresent`    |
 | `waitFor.image.pullSecrets` | wait-for image pull secrets                                                                                                                              | `[]`              |

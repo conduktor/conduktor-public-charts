@@ -79,9 +79,9 @@ diagnosticMode:
 
 ## Conduktor conduktor-ctl image
 ## ref: https://hub.docker.com/r/conduktor/conduktor-ctl/tags/
-## @param image.registry [default: REGISTRY_NAME] conduktor-ctl image registry
-## @param image.repository [default: conduktor/conduktor-ctl] conduktor-ctl image repository
-## @skip image.tag conduktor-ctl image tag (immutable tags are recommended)
+## @param image.registry conduktor-ctl image registry
+## @param image.repository conduktor-ctl image repository
+## @param image.tag conduktor-ctl image tag (immutable tags are recommended)
 ## @param image.digest conduktor-ctl image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
 ## @param image.pullPolicy conduktor-ctl image pull policy
 ## @param image.pullSecrets conduktor-ctl image pull secrets
@@ -205,18 +205,19 @@ initContainers: []
 ## @descriptionEnd
 ##
 waitFor:
+  ## Curl official image used to wait for the services to be ready before running the provisioner jobs
+  ## @param waitFor.image.registry registry for wait-for curl image
+  ## @param waitFor.image.repository wait-for curl image repository
+  ## @param waitFor.image.tag wait-for curl image tag (immutable tags are recommended)
+  ## @param waitFor.image.digest wait-for curl image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param waitFor.image.pullPolicy wait-for image pull policy
+  ## @param waitFor.image.pullSecrets wait-for image pull secrets
   image:
-    ## @param waitFor.image.registry registry for wait-for curl image
     registry: docker.io
-    ## @param waitFor.image.repository wait-for curl image repository
     repository: curlimages/curl
-    ## @skip waitFor.image.tag wait-for curl image tag (immutable tags are recommended)
     tag: "8.15.0"
-    ## @param waitFor.image.digest wait-for curl image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
     digest: ""
-    ## @param waitFor.image.pullPolicy wait-for image pull policy
     pullPolicy: IfNotPresent
-    ## @param waitFor.image.pullSecrets wait-for image pull secrets
     pullSecrets: []
 
   ## @param waitFor.retries Number of retries to wait for the service to be ready
