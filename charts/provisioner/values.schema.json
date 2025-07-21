@@ -469,11 +469,6 @@
                     "type": "object",
                     "description": "conduktor-provisioner containers' Security Context",
                     "default": {}
-                },
-                "lifecycleHooks": {
-                    "type": "object",
-                    "description": "for conduktor-provisioner containers to automate configuration before or after startup",
-                    "default": {}
                 }
             }
         },
@@ -483,7 +478,7 @@
                 "enabled": {
                     "type": "boolean",
                     "description": "Enable Gateway provisioning",
-                    "default": true
+                    "default": false
                 },
                 "url": {
                     "type": "string",
@@ -544,7 +539,7 @@
                 },
                 "command": {
                     "type": "array",
-                    "description": "Override default conduktor-provisioner container command (useful when using custom images)",
+                    "description": "Override default conduktor-provisioner container command",
                     "default": [
                         "/bin/conduktor"
                     ],
@@ -554,7 +549,7 @@
                 },
                 "args": {
                     "type": "array",
-                    "description": "Override default conduktor-provisioner container args (useful when using custom images)",
+                    "description": "Override default conduktor-provisioner container args",
                     "default": [
                         "apply",
                         "-f",
@@ -630,11 +625,6 @@
                 "containerSecurityContext": {
                     "type": "object",
                     "description": "conduktor-provisioner containers' Security Context",
-                    "default": {}
-                },
-                "lifecycleHooks": {
-                    "type": "object",
-                    "description": "for conduktor-provisioner containers to automate configuration before or after startup",
                     "default": {}
                 }
             }

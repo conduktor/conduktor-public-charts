@@ -33,6 +33,9 @@ global:
     omitEmptySeLinuxOptions: false
 
 ## @section Common parameters
+## @descriptionStart
+## Configuration provisioning job and other common parameters.
+## @descriptionEnd
 ##
 
 ## @param nameOverride String to partially override common.names.name
@@ -69,6 +72,9 @@ diagnosticMode:
     - infinity
 
 ## @section conduktor-ctl Parameters
+## @descriptionStart
+## Configuration of the conduktor-ctl image used to run the Conduktor CLI commands.
+## @descriptionEnd
 ##
 
 ## Conduktor conduktor-ctl image
@@ -194,6 +200,9 @@ topologySpreadConstraints: []
 initContainers: []
 
 ## @section Init wait-for script configuration
+## @descriptionStart
+## Configures the wait-for scripts and image used to wait for the services to be ready before running the provisioner jobs.
+## @descriptionEnd
 ##
 waitFor:
   image:
@@ -215,7 +224,10 @@ waitFor:
   ## @param waitFor.retryInterval Interval in seconds between retries
   retryInterval: 5
 
-## @section Console provisioning configuration
+## @section Conduktor Console provisioning configuration
+## @descriptionStart
+## Configuration of Conduktor Console provisioning container using Conduktor CLI.
+## @descriptionEnd
 ##
 console:
   ## @param console.enabled Enable Console provisioning
@@ -302,14 +314,15 @@ console:
   ##
   containerSecurityContext: {}
 
-  ## @param console.lifecycleHooks for conduktor-provisioner containers to automate configuration before or after startup
-  ##
-  lifecycleHooks: {}
 
-
+## @section Conduktor Gateway provisioning configuration
+## @descriptionStart
+## Configuration of Conduktor Gateway provisioning container using Conduktor CLI.
+## @descriptionEnd
+##
 gateway:
   ## @param gateway.enabled Enable Gateway provisioning
-  enabled: true
+  enabled: false
   ## @param gateway.url URL of the Gateway
   url: ""
   ## @param gateway.username Username to authenticate on the Gateway
@@ -337,11 +350,11 @@ gateway:
   ##    key: my-custom-manifests.yaml
   extraManifestsConfigMapRef: []
 
-  ## @param gateway.command Override default conduktor-provisioner container command (useful when using custom images)
+  ## @param gateway.command Override default conduktor-provisioner container command
   ##
   command:
     - /bin/conduktor
-  ## @param gateway.args Override default conduktor-provisioner container args (useful when using custom images)
+  ## @param gateway.args Override default conduktor-provisioner container args
   ##
   args:
     - apply
@@ -389,12 +402,11 @@ gateway:
   ##
   containerSecurityContext: {}
 
-  ## @param gateway.lifecycleHooks for conduktor-provisioner containers to automate configuration before or after startup
-  ##
-  lifecycleHooks: {}
-
 
 ## @section Other Parameters
+## @descriptionStart
+## Other parameters for the provisioner job.
+## @descriptionEnd
 ##
 
 ## ServiceAccount configuration
@@ -413,7 +425,6 @@ serviceAccount:
   ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
   ##
   automountServiceAccountToken: true
-
 
 
 ## @skip tests
