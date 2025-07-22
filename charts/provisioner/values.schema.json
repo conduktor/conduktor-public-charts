@@ -155,6 +155,46 @@
                 }
             }
         },
+        "cronJob": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Configure conduktor-provisioner job as a CronJob",
+                    "default": false
+                },
+                "schedule": {
+                    "type": "string",
+                    "description": "Schedule for the CronJob, by default empty string (no schedule)",
+                    "default": ""
+                },
+                "timezone": {
+                    "type": "string",
+                    "description": "Timezone for the CronJob, by default empty string (no timezone)",
+                    "default": ""
+                },
+                "concurrencyPolicy": {
+                    "type": "string",
+                    "description": "Concurrency policy for the CronJob, by default \"Replace\"",
+                    "default": "Replace"
+                },
+                "suspend": {
+                    "type": "boolean",
+                    "description": "Suspend the CronJob, by default false (not suspended)",
+                    "default": false
+                },
+                "successfulJobsHistoryLimit": {
+                    "type": "number",
+                    "description": "Number of successful jobs to keep in history",
+                    "default": 3
+                },
+                "failedJobsHistoryLimit": {
+                    "type": "number",
+                    "description": "Number of failed jobs to keep in history",
+                    "default": 1
+                }
+            }
+        },
         "cleanupAfterFinished": {
             "type": "object",
             "properties": {

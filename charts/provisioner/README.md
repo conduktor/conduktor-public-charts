@@ -21,7 +21,8 @@
   * [Provision Console and Gateway](#provision-console-and-gateway)
   * [Use secrets and configmaps for configuration](#use-secrets-and-configmaps-for-configuration)
   * [Provide manifests from a ConfigMap](#provide-manifests-from-a-configmap)
-* [Using different CLI commands](#using-different-cli-commands)
+  * [Using different CLI commands](#using-different-cli-commands)
+  * [Using CronJob to run the provisioner](#using-cronjob-to-run-the-provisioner)
 * [Troubleshooting](#troubleshooting)
 
 ## Introduction
@@ -101,35 +102,42 @@ Configuration provisioning job and other common parameters.
 
 Configuration of the conduktor-ctl image used to run the Conduktor CLI commands.
 
-| Name                            | Description                                                                                                                                              | Value                     |
-| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| `image.registry`                | conduktor-ctl image registry                                                                                                                             | `docker.io`               |
-| `image.repository`              | conduktor-ctl image repository                                                                                                                           | `conduktor/conduktor-ctl` |
-| `image.tag`                     | conduktor-ctl image tag (immutable tags are recommended)                                                                                                 | `v0.5.1`                  |
-| `image.digest`                  | conduktor-ctl image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`                      |
-| `image.pullPolicy`              | conduktor-ctl image pull policy                                                                                                                          | `IfNotPresent`            |
-| `image.pullSecrets`             | conduktor-ctl image pull secrets                                                                                                                         | `[]`                      |
-| `image.debug`                   | Enable conduktor-ctl image debug mode                                                                                                                    | `false`                   |
-| `cleanupAfterFinished.enabled`  | Enable cleanup of Job after it's finished                                                                                                                | `false`                   |
-| `cleanupAfterFinished.seconds`  | TTL to cleanup the Job after it's finished                                                                                                               | `600`                     |
-| `restartPolicy`                 | Restart policy for conduktor-provisioner jobs                                                                                                            | `OnFailure`               |
-| `backoffLimit`                  | Number of retries before the job is considered failed                                                                                                    | `10`                      |
-| `podSecurityContext`            | conduktor-provisioner Pod Security Context                                                                                                               | `{}`                      |
-| `podLabels`                     | Extra labels for conduktor-provisioner pods                                                                                                              | `{}`                      |
-| `podAnnotations`                | Annotations for conduktor-provisioner pods                                                                                                               | `{}`                      |
-| `podAffinityPreset`             | Pod affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`                                                                      | `""`                      |
-| `podAntiAffinityPreset`         | Pod anti-affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`                                                                 | `soft`                    |
-| `nodeAffinityPreset.type`       | Node affinity preset type. Ignored if `affinity` is set. Allowed values: `soft` or `hard`                                                                | `""`                      |
-| `nodeAffinityPreset.key`        | Node label key to match. Ignored if `affinity` is set                                                                                                    | `""`                      |
-| `nodeAffinityPreset.values`     | Node label values to match. Ignored if `affinity` is set                                                                                                 | `[]`                      |
-| `priorityClassName`             | conduktor-provisioner pods' priorityClassName                                                                                                            | `""`                      |
-| `affinity`                      | Affinity for conduktor-provisioner pods assignment                                                                                                       | `{}`                      |
-| `nodeSelector`                  | Node labels for conduktor-provisioner pods assignment                                                                                                    | `{}`                      |
-| `tolerations`                   | Tolerations for conduktor-provisioner pods assignment                                                                                                    | `[]`                      |
-| `schedulerName`                 | Name of the k8s scheduler (other than default) for conduktor-provisioner pods                                                                            | `""`                      |
-| `terminationGracePeriodSeconds` | Seconds conduktor-provisioner pods need to terminate gracefully                                                                                          | `""`                      |
-| `topologySpreadConstraints`     | Topology Spread Constraints for conduktor-provisioner pod assignment spread across your cluster among failure-domains                                    | `[]`                      |
-| `initContainers`                | List of init containers to add to the conduktor-provisioner job pod                                                                                      | `[]`                      |
+| Name                                 | Description                                                                                                                                              | Value                     |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `image.registry`                     | conduktor-ctl image registry                                                                                                                             | `docker.io`               |
+| `image.repository`                   | conduktor-ctl image repository                                                                                                                           | `conduktor/conduktor-ctl` |
+| `image.tag`                          | conduktor-ctl image tag (immutable tags are recommended)                                                                                                 | `v0.5.1`                  |
+| `image.digest`                       | conduktor-ctl image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`                      |
+| `image.pullPolicy`                   | conduktor-ctl image pull policy                                                                                                                          | `IfNotPresent`            |
+| `image.pullSecrets`                  | conduktor-ctl image pull secrets                                                                                                                         | `[]`                      |
+| `image.debug`                        | Enable conduktor-ctl image debug mode                                                                                                                    | `false`                   |
+| `cronJob.enabled`                    | Configure conduktor-provisioner job as a CronJob                                                                                                         | `false`                   |
+| `cronJob.schedule`                   | Schedule for the CronJob, by default empty string (no schedule)                                                                                          | `""`                      |
+| `cronJob.timezone`                   | Timezone for the CronJob, by default empty string (no timezone)                                                                                          | `""`                      |
+| `cronJob.concurrencyPolicy`          | Concurrency policy for the CronJob, by default "Replace"                                                                                                 | `Replace`                 |
+| `cronJob.suspend`                    | Suspend the CronJob, by default false (not suspended)                                                                                                    | `false`                   |
+| `cronJob.successfulJobsHistoryLimit` | Number of successful jobs to keep in history                                                                                                             | `3`                       |
+| `cronJob.failedJobsHistoryLimit`     | Number of failed jobs to keep in history                                                                                                                 | `1`                       |
+| `cleanupAfterFinished.enabled`       | Enable cleanup of Job after it's finished                                                                                                                | `false`                   |
+| `cleanupAfterFinished.seconds`       | TTL to cleanup the Job after it's finished                                                                                                               | `600`                     |
+| `restartPolicy`                      | Restart policy for conduktor-provisioner jobs                                                                                                            | `OnFailure`               |
+| `backoffLimit`                       | Number of retries before the job is considered failed                                                                                                    | `10`                      |
+| `podSecurityContext`                 | conduktor-provisioner Pod Security Context                                                                                                               | `{}`                      |
+| `podLabels`                          | Extra labels for conduktor-provisioner pods                                                                                                              | `{}`                      |
+| `podAnnotations`                     | Annotations for conduktor-provisioner pods                                                                                                               | `{}`                      |
+| `podAffinityPreset`                  | Pod affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`                                                                      | `""`                      |
+| `podAntiAffinityPreset`              | Pod anti-affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`                                                                 | `soft`                    |
+| `nodeAffinityPreset.type`            | Node affinity preset type. Ignored if `affinity` is set. Allowed values: `soft` or `hard`                                                                | `""`                      |
+| `nodeAffinityPreset.key`             | Node label key to match. Ignored if `affinity` is set                                                                                                    | `""`                      |
+| `nodeAffinityPreset.values`          | Node label values to match. Ignored if `affinity` is set                                                                                                 | `[]`                      |
+| `priorityClassName`                  | conduktor-provisioner pods' priorityClassName                                                                                                            | `""`                      |
+| `affinity`                           | Affinity for conduktor-provisioner pods assignment                                                                                                       | `{}`                      |
+| `nodeSelector`                       | Node labels for conduktor-provisioner pods assignment                                                                                                    | `{}`                      |
+| `tolerations`                        | Tolerations for conduktor-provisioner pods assignment                                                                                                    | `[]`                      |
+| `schedulerName`                      | Name of the k8s scheduler (other than default) for conduktor-provisioner pods                                                                            | `""`                      |
+| `terminationGracePeriodSeconds`      | Seconds conduktor-provisioner pods need to terminate gracefully                                                                                          | `""`                      |
+| `topologySpreadConstraints`          | Topology Spread Constraints for conduktor-provisioner pod assignment spread across your cluster among failure-domains                                    | `[]`                      |
+| `initContainers`                     | List of init containers to add to the conduktor-provisioner job pod                                                                                      | `[]`                      |
 
 ### Init wait-for script configuration
 
@@ -400,7 +408,7 @@ extraDeploy:
 > Note: The `${EXTRA_USER_EMAIL}` and `${EXTRA_USER_FIRSTNAME}` variables will be replaced container environment variables. 
 > In this case by the values provided in the `extraEnvVars` section for `EXTRA_USER_EMAIL` and default value "Default Name" for missing `EXTRA_USER_FIRSTNAME`.
 
-## Using different CLI commands
+### Using different CLI commands
 
 You can use different CLI commands by overriding the default command and args of the conduktor-provisioner container.
 
@@ -421,6 +429,24 @@ console:
         lastName: "Doe"
 ```
 Will delete the user `john.doe@company.org`. 
+
+### Using CronJob to run the provisioner
+You can configure the provisioner to run as a [CronJob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) by setting `cronJob.enabled` to `true` and a cron pattern in `cronJob.schedule`.
+
+```yaml
+cronJob:
+  enabled: true
+  schedule: "0 0 * * *" # Run daily at midnight
+  timezone: "UTC" # Optional, set the timezone for the cron job
+
+console:
+  enabled: true
+  url: "http://console"
+  username:  "<user_email>" 
+  password: "<password>" 
+  # Embedded manifests to apply on the Console
+  manifests: []
+```
 
 ## Troubleshooting
 

@@ -85,7 +85,7 @@ extraDeploy:
       name: console-provisioner-config
     data:
       CDK_USER: "test@test.io"
-      TEST_USER: "test-env@user.io" # This will be replaced in the extra-manifests-1.yaml
+      TEST_USER: "test-env@user.io"  # This will be replaced in the extra-manifests-1.yaml
   - apiVersion: v1
     kind: Secret
     metadata:

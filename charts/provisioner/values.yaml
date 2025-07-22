@@ -107,6 +107,22 @@ image:
   pullSecrets: []
   debug: false
 
+cronJob:
+  ## @param cronJob.enabled Configure conduktor-provisioner job as a CronJob
+  enabled: false
+  ## @param cronJob.schedule Schedule for the CronJob, by default empty string (no schedule)
+  schedule: ""
+  ## @param cronJob.timezone Timezone for the CronJob, by default empty string (no timezone)
+  timezone: ""
+  ## @param cronJob.concurrencyPolicy Concurrency policy for the CronJob, by default "Replace"
+  concurrencyPolicy: "Replace"
+  ## @param cronJob.suspend Suspend the CronJob, by default false (not suspended)
+  suspend: false
+  ## @param cronJob.successfulJobsHistoryLimit Number of successful jobs to keep in history
+  successfulJobsHistoryLimit: 3
+  ## @param cronJob.failedJobsHistoryLimit Number of failed jobs to keep in history
+  failedJobsHistoryLimit: 1
+
 ## @param cleanupAfterFinished.enabled Enable cleanup of Job after it's finished
 ## @param cleanupAfterFinished.seconds TTL to cleanup the Job after it's finished
 cleanupAfterFinished:
