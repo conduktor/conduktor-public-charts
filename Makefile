@@ -1,3 +1,7 @@
+export SHELL := /bin/sh
+export SHELLOPTS:=$(if $(SHELLOPTS),$(SHELLOPTS):)pipefail:errexit
+
+.ONESHELL:
 # Global Vars
 #############
 
@@ -50,6 +54,9 @@ generate-readme: ## Re-generate charts README
 	@echo "Updating README.md for gateway chart"
 	readme-generator --values "./charts/gateway/values.yaml" --readme "./charts/gateway/README.md"
 
+	@echo
+	@echo "Updating README.md for provisioner chart"
+	readme-generator --values "./charts/provisioner/values.yaml" --readme "./charts/provisioner/README.md" --schema "./charts/provisioner/values.schema.json"
 
 .PHONY: helm-deps
 helm-deps: ## Install helm dependencies
@@ -109,6 +116,13 @@ install-dev-deps:  ## Install development dependencies (PostgreSQL, Minio, monit
 	@echo "	Credentials : admin/admin"
 	@echo "Kafka:"
 	@echo "	Internal : kafka-local-dev.${NAMESPACE}.svc.cluster.local:9092"
+
+# Alias for development environment
+.PHONY: start-dev-env
+start-dev-env: k3d-up install-dev-deps  ## Start development environment with k3d cluster and install dependencies (PostgreSQL, Minio, monitoring stack)
+
+.PHONY: stop-dev-env
+stop-dev-env: k3d-down ## Stop development environment and delete k3d cluster
 
 # Extended targets
 ##################
