@@ -357,13 +357,16 @@ console:
   url: "http://console"
   username: "<user_email>"
   password: "<password>"
+  extraEnvVars:
+    - name: EXTRA_USER_EMAIL
+      value: "extra-user@company.org"
   extraManifestsConfigMapRef:
       - name: extra-manifests
         key: console-setup.yaml
         
 gateway:
     enabled: true
-    url: "http://gateway
+    url: "http://gateway"
     username: "<user_email>"
     password: "<password>"
     extraManifestsConfigMapRef:
@@ -380,9 +383,9 @@ extraDeploy:
         apiVersion: iam/v2
         kind: User
         metadata:
-          name: extra-user@company.org
+          name: "${EXTRA_USER_EMAIL}"
         spec:
-          firstName: "Extra"
+          firstName: "${EXTRA_USER_FIRSTNAME:-Default Name}"
           lastName: "User"
       gateway-setup.yaml: |
         apiVersion: gateway/v2
@@ -393,6 +396,9 @@ extraDeploy:
         spec:
           type: LOCAL
 ```
+
+> Note: The `${EXTRA_USER_EMAIL}` and `${EXTRA_USER_FIRSTNAME}` variables will be replaced container environment variables. 
+> In this case by the values provided in the `extraEnvVars` section for `EXTRA_USER_EMAIL` and default value "Default Name" for missing `EXTRA_USER_FIRSTNAME`.
 
 ## Using different CLI commands
 

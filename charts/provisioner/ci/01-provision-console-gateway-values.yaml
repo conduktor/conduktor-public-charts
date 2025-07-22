@@ -1,5 +1,8 @@
 nameOverride: provision-test-01
 
+cleanupAfterFinished:
+  enabled: true
+
 console:
   enabled: true
   extraEnvVarsSecret: "console-provisioner-secrets"
@@ -82,6 +85,7 @@ extraDeploy:
       name: console-provisioner-config
     data:
       CDK_USER: "test@test.io"
+      TEST_USER: "test-env@user.io" # This will be replaced in the extra-manifests-1.yaml
   - apiVersion: v1
     kind: Secret
     metadata:
@@ -102,6 +106,15 @@ extraDeploy:
         spec:
           firstName: "Extra"
           lastName: "User"
+        ---
+        apiVersion: iam/v2
+        kind: User
+        metadata:
+          name: ${TEST_USER}
+        spec:
+          firstName: "Test env"
+          lastName: "User"
+
       extra-manifests-2.yaml: |
         apiVersion: iam/v2
         kind: User
