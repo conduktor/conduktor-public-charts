@@ -7,6 +7,7 @@
 * [Introduction](#introduction)
 * [Prerequisites](#prerequisites)
 * [Usage](#usage)
+* [Limitations](#limitations)
 * [Parameters](#parameters)
   * [Global parameters](#global-parameters)
   * [Common parameters](#common-parameters)
@@ -68,6 +69,13 @@ helm install setup conduktor/provisioner \
 ```
 
 More examples can be found in the [Examples values](#examples-values) section.
+
+## Limitations
+
+As a job using Conduktor CLI, the provisioner **does not keep track of the resources** it creates.
+So if you remove a resource from the manifests, it will **not be removed from target API**.
+If you want to manage resources lifecycle, you should use [Conduktor Terraform provider](https://registry.terraform.io/providers/conduktor/conduktor/latest) instead.
+
 
 ## Parameters
 
