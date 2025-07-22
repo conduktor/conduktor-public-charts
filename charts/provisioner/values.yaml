@@ -90,7 +90,7 @@ diagnosticMode:
 image:
   registry: docker.io
   repository: conduktor/conduktor-ctl
-  tag: "v0.5.1"
+  tag: "v0.6.2"
   digest: ""
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
