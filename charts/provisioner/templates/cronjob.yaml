@@ -8,8 +8,7 @@ metadata:
   labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
     app.kubernetes.io/component: conduktor-provisioning
   annotations:
-    {{- if and .Values.tests.enabled }}
-    {{/* Add Hooks for test because chart-testing can't only use --wait-for-job helm arg with install command */}}
+    {{- if .Values.useHooks }}
     helm.sh/hook: post-install,post-upgrade
     helm.sh/hook-delete-policy: before-hook-creation
     {{- end }}
@@ -72,22 +71,6 @@ spec:
                - "/wait-for.sh"
               args:
                 - "{{ .Values.console.url }}/api/v1/health/ready"
-              env:
-                {{- if .Values.console.url}}
-                - name: CDK_BASE_URL
-                  value: {{ .Values.console.url | quote }}
-                {{- end }}
-              envFrom:
-                - secretRef:
-                    name: {{ include "provisioner.config.secrets" . }}
-                {{- if .Values.console.extraEnvVarsCM }}
-                - configMapRef:
-                    name: {{ include "common.tplvalues.render" (dict "value" .Values.console.extraEnvVarsCM "context" $) }}
-                {{- end }}
-                {{- if .Values.console.extraEnvVarsSecret }}
-                - secretRef:
-                    name: {{ include "common.tplvalues.render" (dict "value" .Values.console.extraEnvVarsSecret "context" $) }}
-                {{- end }}
               volumeMounts:
                 - name: init-script
                   mountPath: /wait-for.sh
@@ -103,22 +86,6 @@ spec:
                 - "/wait-for.sh"
               args:
                 - "{{ .Values.gateway.url }}/health"
-              env:
-                {{- if .Values.gateway.url}}
-                - name: CDK_GATEWAY_BASE_URL
-                  value: {{ .Values.gateway.url | quote }}
-                {{- end }}
-              envFrom:
-                - secretRef:
-                    name: {{ include "provisioner.config.secrets" . }}
-                {{- if .Values.gateway.extraEnvVarsCM }}
-                - configMapRef:
-                    name: {{ include "common.tplvalues.render" (dict "value" .Values.gateway.extraEnvVarsCM "context" $) }}
-                {{- end }}
-                {{- if .Values.gateway.extraEnvVarsSecret }}
-                - secretRef:
-                    name: {{ include "common.tplvalues.render" (dict "value" .Values.gateway.extraEnvVarsSecret "context" $) }}
-                {{- end }}
               volumeMounts:
                 - name: init-script
                   mountPath: /wait-for.sh
@@ -167,6 +134,10 @@ spec:
                 - name: CDK_CACERT
                   value: {{ .Values.console.caCert | quote }}
                 {{- end }}
+                {{- if .Values.console.cert }}
+                - name: CDK_CERT
+                  value: {{ .Values.console.cert | quote }}
+                {{- end }}
                 {{- if .Values.console.username }}
                 - name: CDK_USER
                   value: {{ .Values.console.username | quote }}
@@ -176,7 +147,7 @@ spec:
                 {{- end }}
               envFrom:
                 - secretRef:
-                    name: {{ include "provisioner.config.secrets" . }}
+                    name: {{ include "provisioner.console.config.secrets" . }}
                 {{- if .Values.console.extraEnvVarsCM }}
                 - configMapRef:
                     name: {{ include "common.tplvalues.render" (dict "value" .Values.console.extraEnvVarsCM "context" $) }}
@@ -243,6 +214,10 @@ spec:
                 - name: CDK_CACERT
                   value: {{ .Values.gateway.caCert | quote }}
               {{- end }}
+              {{- if .Values.gateway.cert }}
+                - name: CDK_CERT
+                  value: {{ .Values.gateway.cert | quote }}
+              {{- end }}
               {{- if .Values.gateway.username }}
                 - name: CDK_GATEWAY_USER
                   value: {{ .Values.gateway.username | quote }}
@@ -252,7 +227,7 @@ spec:
               {{- end }}
               envFrom:
                 - secretRef:
-                    name: {{ include "provisioner.config.secrets" . }}
+                    name: {{ include "provisioner.gateway.config.secrets" . }}
               {{- if .Values.gateway.extraEnvVarsCM }}
                 - configMapRef:
                     name: {{ include "common.tplvalues.render" (dict "value" .Values.gateway.extraEnvVarsCM "context" $) }}

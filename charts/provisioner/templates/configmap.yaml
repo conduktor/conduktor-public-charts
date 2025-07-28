@@ -48,12 +48,13 @@ data:
     retry_interval={{ .Values.waitFor.retryInterval | default 5 }}
     echo "Max retries: $max_retries, Retry interval: $retry_interval seconds"
 
+    if [ $# -eq 0 ]; then
+      echo "Service URL is required as the first argument."
+      exit 1
+    fi
+
     endpoint="$1"
     echo "Waiting for service to be ready at $endpoint..."
-    if [ "$endpoint" = "" ]; then
-        echo "Service URL is required as the first argument."
-        exit 1
-    fi
     while [ $retries -lt $max_retries ]; do
       if curl -s --head --insecure --request GET "$endpoint" | grep "200 OK" > /dev/null; then
         echo "Service is ready: $endpoint"

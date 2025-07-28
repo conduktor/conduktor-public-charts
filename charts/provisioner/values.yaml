@@ -53,6 +53,8 @@ commonLabels: {}
 ## @param commonAnnotations Annotations to add to all deployed objects
 ##
 commonAnnotations: {}
+## @param useHooks Enable Helm hooks for the conduktor-provisioner Job and CronJob
+useHooks: true
 ## @param clusterDomain Kubernetes cluster domain name
 ##
 clusterDomain: cluster.local
@@ -252,16 +254,20 @@ console:
   ## @param console.authMode Authentication mode on Console for Conduktor CLI, either "conduktor" or "external" if using API Gateway in front of Console.
   authMode: "conduktor"
 
-  ## @param console.url URL of the Console
+  ## @param console.url URL of the Console (mandatory)
   url: ""
-  ## @param console.username Username to authenticate on the Console
+  ## @param console.username Username to authenticate on the Console. Can be passed as an environment variable `CDK_USER`
   username: ""
-  ## @param console.password Password to authenticate on the Console
+  ## @param console.password Password to authenticate on the Console. Can be passed as an environment variable `CDK_PASSWORD`
   password: ""
-  ## @param console.apiToken API Token to authenticate on the Console
+  ## @param console.apiToken API Token to authenticate on the Console. Can be passed as an environment variable `CDK_API_KEY`
   apiToken: ""
-  ## @param console.caCert CA certificate of Console
+  ## @param console.caCert CA certificate of Console. Can be passed as an environment variable `CDK_CACERT`
   caCert: ""
+  ## @param console.cert Authentication certificate to access Console. Can be passed as an environment variable `CDK_CERT`
+  cert: ""
+  ## @param console.key Authentication certificate key to access Console. Can be passed as an environment variable `CDK_KEY`
+  key: ""
   ## @param console.insecure Skip TLS verification
   insecure: false
   ## @param console.debug Enable verbose debug mode
@@ -340,16 +346,18 @@ console:
 gateway:
   ## @param gateway.enabled Enable Gateway provisioning
   enabled: false
-  ## @param gateway.url URL of the Gateway
+  ## @param gateway.url URL of the Gateway (mandatory).
   url: ""
-  ## @param gateway.username Username to authenticate on the Gateway
+  ## @param gateway.username Username to authenticate on the Gateway (mandatory). Can be passed as an environment variable `CDK_GATEWAY_USER`
   username: ""
-  ## @param gateway.password Password to authenticate on the Gateway
+  ## @param gateway.password Password to authenticate on the Gateway (mandatory). Can be passed as an environment variable `CDK_GATEWAY_PASSWORD`
   password: ""
-  ## @param gateway.apiToken API Token to authenticate on the Gateway
-  apiToken: ""
-  ## @param gateway.caCert CA certificate of Gateway
+  ## @param gateway.caCert CA certificate of Gateway. Can be passed as an environment variable `CDK_CACERT`
   caCert: ""
+  ## @param gateway.cert Authentication certificate to access Gateway. Can be passed as an environment variable `CDK_CERT`
+  cert: ""
+  ## @param gateway.key Authentication certificate key to access Gateway. Can be passed as an environment variable `CDK_KEY`
+  key: ""
   ## @param gateway.insecure Skip TLS verification
   insecure: false
   ## @param gateway.debug Enable verbose debug mode

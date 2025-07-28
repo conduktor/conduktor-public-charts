@@ -1,5 +1,8 @@
 nameOverride: provision-test-01
 
+# Force the use of hooks in the provisioner to wait job completion during tests
+useHooks: true
+
 cleanupAfterFinished:
   enabled: true
 

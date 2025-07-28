@@ -29,8 +29,15 @@ Default fully qualified init-scipts config map name
 {{/*
 Default fully qualified secret name
 */}}
-{{- define "provisioner.config.secrets" -}}
-{{- include "common.names.fullname" . }}-config-secret
+{{- define "provisioner.console.config.secrets" -}}
+{{- include "common.names.fullname" . }}-console-config-secret
+{{- end }}
+
+{{/*
+Default fully qualified secret name
+*/}}
+{{- define "provisioner.gateway.config.secrets" -}}
+{{- include "common.names.fullname" . }}-gateway-config-secret
 {{- end }}
 
 {{/*

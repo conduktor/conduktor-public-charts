@@ -1,0 +1,27 @@
+CHART NAME: {{ .Chart.Name  }}
+CHART VERSION: {{ .Chart.Version  }}
+APP VERSION: {{ .Chart.AppVersion  }}
+
+
+{{- if .Values.console.enabled }}
+
+Console provisioning job has been deployed targeting Console {{ .Values.console.url | quote }}.
+
+  You can check the status and result of the job by executing:
+    kubectl get -n {{ .Release.Namespace }} job/{{ include "provisioner.fullname" . }}
+
+  For job logs, execute:
+    kubectl logs -n {{ .Release.Namespace }} job/{{ include "provisioner.fullname" . }} -c conduktor-ctl-console
+{{- end }}
+
+
+{{- if .Values.gateway.enabled }}
+
+Gateway provisioning job has been deployed targeting Gateway {{ .Values.gateway.url | quote }}.
+
+  You can check the status and result of the job by executing:
+    kubectl get -n {{ .Release.Namespace }} job/{{ include "provisioner.fullname" . }}
+
+  For job logs, execute:
+    kubectl logs -n {{ .Release.Namespace }} job/{{ include "provisioner.fullname" . }} -c conduktor-ctl-gateway
+{{- end }}

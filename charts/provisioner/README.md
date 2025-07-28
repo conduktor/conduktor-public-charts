@@ -100,6 +100,7 @@ Configuration provisioning job and other common parameters.
 | `namespaceOverride`      | String to fully override common.names.namespace                                         | `""`            |
 | `commonLabels`           | Labels to add to all deployed objects                                                   | `{}`            |
 | `commonAnnotations`      | Annotations to add to all deployed objects                                              | `{}`            |
+| `useHooks`               | Enable Helm hooks for the conduktor-provisioner Job and CronJob                         | `true`          |
 | `clusterDomain`          | Kubernetes cluster domain name                                                          | `cluster.local` |
 | `extraDeploy`            | Array of extra objects to deploy with the release                                       | `[]`            |
 | `diagnosticMode.enabled` | Enable diagnostic mode (all probes will be disabled and the command will be overridden) | `false`         |
@@ -170,11 +171,13 @@ Configuration of Conduktor Console provisioning container using Conduktor CLI.
 | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
 | `console.enabled`                    | Enable Console provisioning                                                                                                  | `false`                     |
 | `console.authMode`                   | Authentication mode on Console for Conduktor CLI, either "conduktor" or "external" if using API Gateway in front of Console. | `conduktor`                 |
-| `console.url`                        | URL of the Console                                                                                                           | `""`                        |
-| `console.username`                   | Username to authenticate on the Console                                                                                      | `""`                        |
-| `console.password`                   | Password to authenticate on the Console                                                                                      | `""`                        |
-| `console.apiToken`                   | API Token to authenticate on the Console                                                                                     | `""`                        |
-| `console.caCert`                     | CA certificate of Console                                                                                                    | `""`                        |
+| `console.url`                        | URL of the Console (mandatory)                                                                                               | `""`                        |
+| `console.username`                   | Username to authenticate on the Console. Can be passed as an environment variable `CDK_USER`                                 | `""`                        |
+| `console.password`                   | Password to authenticate on the Console. Can be passed as an environment variable `CDK_PASSWORD`                             | `""`                        |
+| `console.apiToken`                   | API Token to authenticate on the Console. Can be passed as an environment variable `CDK_API_KEY`                             | `""`                        |
+| `console.caCert`                     | CA certificate of Console. Can be passed as an environment variable `CDK_CACERT`                                             | `""`                        |
+| `console.cert`                       | Authentication certificate to access Console. Can be passed as an environment variable `CDK_CERT`                            | `""`                        |
+| `console.key`                        | Authentication certificate key to access Console. Can be passed as an environment variable `CDK_KEY`                         | `""`                        |
 | `console.insecure`                   | Skip TLS verification                                                                                                        | `false`                     |
 | `console.debug`                      | Enable verbose debug mode                                                                                                    | `false`                     |
 | `console.manifests`                  | Manifests YAML to apply on the Console                                                                                       | `[]`                        |
@@ -198,32 +201,33 @@ Configuration of Conduktor Console provisioning container using Conduktor CLI.
 
 Configuration of Conduktor Gateway provisioning container using Conduktor CLI.
 
-| Name                                 | Description                                                                                       | Value                       |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------- | --------------------------- |
-| `gateway.enabled`                    | Enable Gateway provisioning                                                                       | `false`                     |
-| `gateway.url`                        | URL of the Gateway                                                                                | `""`                        |
-| `gateway.username`                   | Username to authenticate on the Gateway                                                           | `""`                        |
-| `gateway.password`                   | Password to authenticate on the Gateway                                                           | `""`                        |
-| `gateway.apiToken`                   | API Token to authenticate on the Gateway                                                          | `""`                        |
-| `gateway.caCert`                     | CA certificate of Gateway                                                                         | `""`                        |
-| `gateway.insecure`                   | Skip TLS verification                                                                             | `false`                     |
-| `gateway.debug`                      | Enable verbose debug mode                                                                         | `false`                     |
-| `gateway.manifests`                  | Manifests YAML to apply on the Gateway                                                            | `[]`                        |
-| `gateway.manifestsConfigMap`         | Manifests YAML to apply on the Gateway                                                            | `""`                        |
-| `gateway.manifestsConfigMapKey`      | Manifests YAML to apply on the Gateway                                                            | `00-gateway-resources.yaml` |
-| `gateway.extraManifestsConfigMapRef` | List of ConfigMaps references with extra manifests to apply on the Gateway                        | `[]`                        |
-| `gateway.command`                    | Override default conduktor-provisioner container command                                          | `["/bin/conduktor"]`        |
-| `gateway.args`                       | Override default conduktor-provisioner container args                                             | `["apply","-f","/conf"]`    |
-| `gateway.extraEnvVars`               | Array with extra environment variables to add to conduktor-provisioner containers                 | `[]`                        |
-| `gateway.extraEnvVarsCM`             | Name of existing ConfigMap containing extra env vars for conduktor-provisioner containers         | `""`                        |
-| `gateway.extraEnvVarsSecret`         | Name of existing Secret containing extra env vars for conduktor-provisioner containers            | `""`                        |
-| `gateway.extraVolumes`               | Optionally specify extra list of additional volumes for the conduktor-provisioner pods            | `[]`                        |
-| `gateway.extraVolumeMounts`          | Optionally specify extra list of additional volumeMounts for the conduktor-provisioner containers | `[]`                        |
-| `gateway.resources.requests.cpu`     | CPU resource requests                                                                             | `100m`                      |
-| `gateway.resources.requests.memory`  | Memory resource requests                                                                          | `50Mi`                      |
-| `gateway.resources.limits.cpu`       | CPU limit for the platform container                                                              | `500m`                      |
-| `gateway.resources.limits.memory`    | Memory limit for the container                                                                    | `128Mi`                     |
-| `gateway.containerSecurityContext`   | conduktor-provisioner containers' Security Context                                                | `{}`                        |
+| Name                                 | Description                                                                                                          | Value                       |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| `gateway.enabled`                    | Enable Gateway provisioning                                                                                          | `false`                     |
+| `gateway.url`                        | URL of the Gateway (mandatory).                                                                                      | `""`                        |
+| `gateway.username`                   | Username to authenticate on the Gateway (mandatory). Can be passed as an environment variable `CDK_GATEWAY_USER`     | `""`                        |
+| `gateway.password`                   | Password to authenticate on the Gateway (mandatory). Can be passed as an environment variable `CDK_GATEWAY_PASSWORD` | `""`                        |
+| `gateway.caCert`                     | CA certificate of Gateway. Can be passed as an environment variable `CDK_CACERT`                                     | `""`                        |
+| `gateway.cert`                       | Authentication certificate to access Gateway. Can be passed as an environment variable `CDK_CERT`                    | `""`                        |
+| `gateway.key`                        | Authentication certificate key to access Gateway. Can be passed as an environment variable `CDK_KEY`                 | `""`                        |
+| `gateway.insecure`                   | Skip TLS verification                                                                                                | `false`                     |
+| `gateway.debug`                      | Enable verbose debug mode                                                                                            | `false`                     |
+| `gateway.manifests`                  | Manifests YAML to apply on the Gateway                                                                               | `[]`                        |
+| `gateway.manifestsConfigMap`         | Manifests YAML to apply on the Gateway                                                                               | `""`                        |
+| `gateway.manifestsConfigMapKey`      | Manifests YAML to apply on the Gateway                                                                               | `00-gateway-resources.yaml` |
+| `gateway.extraManifestsConfigMapRef` | List of ConfigMaps references with extra manifests to apply on the Gateway                                           | `[]`                        |
+| `gateway.command`                    | Override default conduktor-provisioner container command                                                             | `["/bin/conduktor"]`        |
+| `gateway.args`                       | Override default conduktor-provisioner container args                                                                | `["apply","-f","/conf"]`    |
+| `gateway.extraEnvVars`               | Array with extra environment variables to add to conduktor-provisioner containers                                    | `[]`                        |
+| `gateway.extraEnvVarsCM`             | Name of existing ConfigMap containing extra env vars for conduktor-provisioner containers                            | `""`                        |
+| `gateway.extraEnvVarsSecret`         | Name of existing Secret containing extra env vars for conduktor-provisioner containers                               | `""`                        |
+| `gateway.extraVolumes`               | Optionally specify extra list of additional volumes for the conduktor-provisioner pods                               | `[]`                        |
+| `gateway.extraVolumeMounts`          | Optionally specify extra list of additional volumeMounts for the conduktor-provisioner containers                    | `[]`                        |
+| `gateway.resources.requests.cpu`     | CPU resource requests                                                                                                | `100m`                      |
+| `gateway.resources.requests.memory`  | Memory resource requests                                                                                             | `50Mi`                      |
+| `gateway.resources.limits.cpu`       | CPU limit for the platform container                                                                                 | `500m`                      |
+| `gateway.resources.limits.memory`    | Memory limit for the container                                                                                       | `128Mi`                     |
+| `gateway.containerSecurityContext`   | conduktor-provisioner containers' Security Context                                                                   | `{}`                        |
 
 ### Other Parameters
 
@@ -457,6 +461,27 @@ console:
 ```
 
 ## Troubleshooting
+
+### Immutable job error
+If you encounter an error like `Job.batch "conduktor-provisioner" is invalid: spec.template: Invalid value: core.PodTemplateSpec{...}: field is immutable`, it means that the job already exists and you are trying to change its template.
+
+By default, the provisioner job use [Helm hooks](https://helm.sh/docs/topics/charts_hooks/) (`useHooks: true`) to recreate the job on each Helm release upgrade.
+Try to enable it or use custom annotations to force the job recreation on each upgrade.
+
+```yaml
+useHooks: true
+# or
+commonAnnotations:
+  helm.sh/hook: pre-install,pre-upgrade
+  helm.sh/hook-delete-policy: before-hook-creation
+```
+
+You can also manually delete the existing release and job using:
+
+```shell
+helm delete <release_name> --namespace <namespace>
+kubectl delete job <release_name>-provisioner --namespace <namespace>
+```
 
 For guides and advanced help, please refer to our
 [documentation](https://docs.conduktor.io/platform/installation/get-started/kubernetes),

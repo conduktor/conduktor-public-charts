@@ -73,6 +73,11 @@
             "description": "Annotations to add to all deployed objects",
             "default": {}
         },
+        "useHooks": {
+            "type": "boolean",
+            "description": "Enable Helm hooks for the conduktor-provisioner Job and CronJob",
+            "default": true
+        },
         "clusterDomain": {
             "type": "string",
             "description": "Kubernetes cluster domain name",
@@ -375,27 +380,37 @@
                 },
                 "url": {
                     "type": "string",
-                    "description": "URL of the Console",
+                    "description": "URL of the Console (mandatory)",
                     "default": ""
                 },
                 "username": {
                     "type": "string",
-                    "description": "Username to authenticate on the Console",
+                    "description": "Username to authenticate on the Console. Can be passed as an environment variable `CDK_USER`",
                     "default": ""
                 },
                 "password": {
                     "type": "string",
-                    "description": "Password to authenticate on the Console",
+                    "description": "Password to authenticate on the Console. Can be passed as an environment variable `CDK_PASSWORD`",
                     "default": ""
                 },
                 "apiToken": {
                     "type": "string",
-                    "description": "API Token to authenticate on the Console",
+                    "description": "API Token to authenticate on the Console. Can be passed as an environment variable `CDK_API_KEY`",
                     "default": ""
                 },
                 "caCert": {
                     "type": "string",
-                    "description": "CA certificate of Console",
+                    "description": "CA certificate of Console. Can be passed as an environment variable `CDK_CACERT`",
+                    "default": ""
+                },
+                "cert": {
+                    "type": "string",
+                    "description": "Authentication certificate to access Console. Can be passed as an environment variable `CDK_CERT`",
+                    "default": ""
+                },
+                "key": {
+                    "type": "string",
+                    "description": "Authentication certificate key to access Console. Can be passed as an environment variable `CDK_KEY`",
                     "default": ""
                 },
                 "insecure": {
@@ -532,27 +547,32 @@
                 },
                 "url": {
                     "type": "string",
-                    "description": "URL of the Gateway",
+                    "description": "URL of the Gateway (mandatory).",
                     "default": ""
                 },
                 "username": {
                     "type": "string",
-                    "description": "Username to authenticate on the Gateway",
+                    "description": "Username to authenticate on the Gateway (mandatory). Can be passed as an environment variable `CDK_GATEWAY_USER`",
                     "default": ""
                 },
                 "password": {
                     "type": "string",
-                    "description": "Password to authenticate on the Gateway",
-                    "default": ""
-                },
-                "apiToken": {
-                    "type": "string",
-                    "description": "API Token to authenticate on the Gateway",
+                    "description": "Password to authenticate on the Gateway (mandatory). Can be passed as an environment variable `CDK_GATEWAY_PASSWORD`",
                     "default": ""
                 },
                 "caCert": {
                     "type": "string",
-                    "description": "CA certificate of Gateway",
+                    "description": "CA certificate of Gateway. Can be passed as an environment variable `CDK_CACERT`",
+                    "default": ""
+                },
+                "cert": {
+                    "type": "string",
+                    "description": "Authentication certificate to access Gateway. Can be passed as an environment variable `CDK_CERT`",
+                    "default": ""
+                },
+                "key": {
+                    "type": "string",
+                    "description": "Authentication certificate key to access Gateway. Can be passed as an environment variable `CDK_KEY`",
                     "default": ""
                 },
                 "insecure": {
