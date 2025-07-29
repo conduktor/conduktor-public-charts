@@ -1,0 +1,171 @@
+nameOverride: provision-test-01
+
+# Force the use of hooks in the provisioner to wait job completion during tests
+useHooks: true
+
+cleanupAfterFinished:
+  enabled: true
+
+console:
+  enabled: true
+  extraEnvVarsSecret: "console-provisioner-secrets"
+  extraEnvVarsCM: "console-provisioner-config"
+
+  url: "http://console"
+#  username: "" Provided by extraEnvVarsCM
+#  password: "" Provided by extraEnvVarsSecret
+  insecure: true
+  debug: false
+  extraManifestsConfigMapRef:
+    - name: extra-manifests
+      key: extra-manifests-1.yaml
+    - name: extra-manifests
+      key: extra-manifests-2.yaml
+  manifests:
+    - apiVersion: iam/v2
+      kind: User
+      metadata:
+        name: john.doe@company.org
+      spec:
+        firstName: "John"
+        lastName: "Doe"
+    - apiVersion: iam/v2
+      kind: User
+      metadata:
+        name: bob@company.org
+      spec:
+        firstName: "Bob"
+        lastName: "Smith"
+    - apiVersion: iam/v2
+      kind: Group
+      metadata:
+        name: developers-a
+      spec:
+        displayName: "Developers Team A"
+        description: "Members of the Team A - Developers"
+        externalGroups:
+          - "LDAP-GRP-A-DEV"
+        members:
+          - john.doe@company.org
+          - bob@company.org
+
+gateway:
+  enabled: true
+  extraEnvVarsSecret: "gateway-provisioner-secrets"
+  extraEnvVarsCM: "gateway-provisioner-config"
+
+  url: "http://gateway-conduktor-gateway-internal:8888"
+  #  username: "" Provided by extraEnvVarsCM
+  #  password: "" Provided by extraEnvVarsSecret
+  insecure: true
+  debug: false
+  extraManifestsConfigMapRef:
+    - name: gateway-extra-manifests
+      key: extra-manifests-1.yaml
+    - name: gateway-extra-manifests
+      key: extra-manifests-2.yaml
+  manifests:
+    - apiVersion: gateway/v2
+      kind: GatewayServiceAccount
+      metadata:
+        vCluster: passthrough
+        name: user-sa
+      spec:
+        type: LOCAL
+    - apiVersion: gateway/v2
+      kind: VirtualCluster
+      metadata:
+        name: "my-app-A"
+      spec:
+        aclEnabled: false
+        superUsers:
+          - admin
+
+extraDeploy:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: console-provisioner-config
+    data:
+      CDK_USER: "test@test.io"
+      TEST_USER: "test-env@user.io"  # This will be replaced in the extra-manifests-1.yaml
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: console-provisioner-secrets
+    data:
+      CDK_PASSWORD: dGVzdFA0c3Mh  # base64 of "testP4ss!"
+
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: extra-manifests
+    data:
+      extra-manifests-1.yaml: |
+        apiVersion: iam/v2
+        kind: User
+        metadata:
+          name: extra-user@company.org
+        spec:
+          firstName: "Extra"
+          lastName: "User"
+        ---
+        apiVersion: iam/v2
+        kind: User
+        metadata:
+          name: ${TEST_USER}
+        spec:
+          firstName: "Test env"
+          lastName: "User"
+
+      extra-manifests-2.yaml: |
+        apiVersion: iam/v2
+        kind: User
+        metadata:
+          name: extra-user2@company.org
+        spec:
+          firstName: "Extra"
+          lastName: "User2"
+
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: gateway-provisioner-config
+    data:
+      CDK_GATEWAY_USER: admin
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: gateway-provisioner-secrets
+    data:
+      CDK_GATEWAY_PASSWORD: QWRtaW4xMjMh  # base64 of "Admin123!"
+
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: gateway-extra-manifests
+    data:
+      extra-manifests-1.yaml: |
+        apiVersion: gateway/v2
+        kind: GatewayServiceAccount
+        metadata:
+          vCluster: passthrough
+          name: extra-user
+        spec:
+          type: LOCAL
+      extra-manifests-2.yaml: |
+        apiVersion: gateway/v2
+        kind: VirtualCluster
+        metadata:
+          name: "my-app-B"
+        spec:
+          aclEnabled: false
+          superUsers:
+            - admin
+
+tests:
+  enabled: true
+  console:
+    enabled: true
+  gateway:
+    enabled: true

@@ -20,6 +20,7 @@ on:
         options: #charts directories name supported
           - console
           - gateway
+          - provisioner
       version:
         type: string
         description: Chart version to release
@@ -55,19 +56,12 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.CONDUKTORBOT_REPO_WRITE }}
-      
-      # :puke:
-      - name: Gateway PACKAGE_NAME ugly patch
+
+      - name: Gateway env patch
         if: ${{ inputs.chart == 'gateway' }}
-        run: 
+        run: |
           echo "PACKAGE_NAME=conduktor-gateway-${{ inputs.version }}.tgz" >> "${GITHUB_ENV}"
-      - name: Gateway RELEASE_TAG ugly patch
-        if: ${{ inputs.chart == 'gateway' }}
-        run: 
           echo "RELEASE_TAG=conduktor-gateway-${{ inputs.version }}" >> "${GITHUB_ENV}"
-      - name: Gateway RELEASE_NAME ugly patch
-        if: ${{ inputs.chart == 'gateway' }}
-        run: 
           echo "RELEASE_NAME=conduktor-gateway-${{ inputs.version }}" >> "${GITHUB_ENV}"
 
       - name: Install Helm

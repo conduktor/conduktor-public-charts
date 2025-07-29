@@ -1,0 +1,728 @@
+{
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "global": {
+            "type": "object",
+            "properties": {
+                "imageRegistry": {
+                    "type": "string",
+                    "description": "Global Docker image registry",
+                    "default": ""
+                },
+                "imagePullSecrets": {
+                    "type": "array",
+                    "description": "Global Docker registry secret names as an array",
+                    "default": [],
+                    "items": {}
+                },
+                "security": {
+                    "type": "object",
+                    "properties": {
+                        "allowInsecureImages": {
+                            "type": "boolean",
+                            "description": "Allows skipping image verification",
+                            "default": false
+                        }
+                    }
+                },
+                "compatibility": {
+                    "type": "object",
+                    "properties": {
+                        "openshift": {
+                            "type": "object",
+                            "properties": {
+                                "adaptSecurityContext": {
+                                    "type": "string",
+                                    "description": "Adapt the securityContext sections of the deployment to make them compatible with Openshift restricted-v2 SCC: remove runAsUser, runAsGroup and fsGroup and let the platform use their allowed default IDs. Possible values: auto (apply if the detected running cluster is Openshift), force (perform the adaptation always), disabled (do not perform adaptation)",
+                                    "default": "auto"
+                                }
+                            }
+                        },
+                        "omitEmptySeLinuxOptions": {
+                            "type": "boolean",
+                            "description": "If set to true, removes the seLinuxOptions from the securityContexts when it is set to an empty object",
+                            "default": false
+                        }
+                    }
+                }
+            }
+        },
+        "nameOverride": {
+            "type": "string",
+            "description": "String to partially override common.names.name",
+            "default": ""
+        },
+        "fullnameOverride": {
+            "type": "string",
+            "description": "String to fully override common.names.fullname",
+            "default": ""
+        },
+        "namespaceOverride": {
+            "type": "string",
+            "description": "String to fully override common.names.namespace",
+            "default": ""
+        },
+        "commonLabels": {
+            "type": "object",
+            "description": "Labels to add to all deployed objects",
+            "default": {}
+        },
+        "commonAnnotations": {
+            "type": "object",
+            "description": "Annotations to add to all deployed objects",
+            "default": {}
+        },
+        "useHooks": {
+            "type": "boolean",
+            "description": "Enable Helm hooks for the conduktor-provisioner Job and CronJob",
+            "default": true
+        },
+        "clusterDomain": {
+            "type": "string",
+            "description": "Kubernetes cluster domain name",
+            "default": "cluster.local"
+        },
+        "extraDeploy": {
+            "type": "array",
+            "description": "Array of extra objects to deploy with the release",
+            "default": [],
+            "items": {}
+        },
+        "diagnosticMode": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable diagnostic mode (all probes will be disabled and the command will be overridden)",
+                    "default": false
+                },
+                "command": {
+                    "type": "array",
+                    "description": "Command to override all containers in the chart release",
+                    "default": [
+                        "sleep"
+                    ],
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "args": {
+                    "type": "array",
+                    "description": "Args to override all containers in the chart release",
+                    "default": [
+                        "infinity"
+                    ],
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "image": {
+            "type": "object",
+            "properties": {
+                "registry": {
+                    "type": "string",
+                    "description": "conduktor-ctl image registry",
+                    "default": "docker.io"
+                },
+                "repository": {
+                    "type": "string",
+                    "description": "conduktor-ctl image repository",
+                    "default": "conduktor/conduktor-ctl"
+                },
+                "tag": {
+                    "type": "string",
+                    "description": "conduktor-ctl image tag (immutable tags are recommended)",
+                    "default": "v0.6.2"
+                },
+                "digest": {
+                    "type": "string",
+                    "description": "conduktor-ctl image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)",
+                    "default": ""
+                },
+                "pullPolicy": {
+                    "type": "string",
+                    "description": "conduktor-ctl image pull policy",
+                    "default": "IfNotPresent"
+                },
+                "pullSecrets": {
+                    "type": "array",
+                    "description": "conduktor-ctl image pull secrets",
+                    "default": [],
+                    "items": {}
+                },
+                "debug": {
+                    "type": "boolean",
+                    "description": "Enable conduktor-ctl image debug mode",
+                    "default": false
+                }
+            }
+        },
+        "cronJob": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Configure conduktor-provisioner job as a CronJob",
+                    "default": false
+                },
+                "schedule": {
+                    "type": "string",
+                    "description": "Schedule for the CronJob, by default empty string (no schedule)",
+                    "default": ""
+                },
+                "timezone": {
+                    "type": "string",
+                    "description": "Timezone for the CronJob, by default empty string (no timezone)",
+                    "default": ""
+                },
+                "concurrencyPolicy": {
+                    "type": "string",
+                    "description": "Concurrency policy for the CronJob, by default \"Replace\"",
+                    "default": "Replace"
+                },
+                "suspend": {
+                    "type": "boolean",
+                    "description": "Suspend the CronJob, by default false (not suspended)",
+                    "default": false
+                },
+                "successfulJobsHistoryLimit": {
+                    "type": "number",
+                    "description": "Number of successful jobs to keep in history",
+                    "default": 3
+                },
+                "failedJobsHistoryLimit": {
+                    "type": "number",
+                    "description": "Number of failed jobs to keep in history",
+                    "default": 1
+                }
+            }
+        },
+        "cleanupAfterFinished": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable cleanup of Job after it's finished",
+                    "default": false
+                },
+                "seconds": {
+                    "type": "number",
+                    "description": "TTL to cleanup the Job after it's finished",
+                    "default": 600
+                }
+            }
+        },
+        "restartPolicy": {
+            "type": "string",
+            "description": "Restart policy for conduktor-provisioner jobs",
+            "default": "OnFailure"
+        },
+        "backoffLimit": {
+            "type": "number",
+            "description": "Number of retries before the job is considered failed",
+            "default": 10
+        },
+        "podSecurityContext": {
+            "type": "object",
+            "description": "conduktor-provisioner Pod Security Context",
+            "default": {}
+        },
+        "podLabels": {
+            "type": "object",
+            "description": "Extra labels for conduktor-provisioner pods",
+            "default": {}
+        },
+        "podAnnotations": {
+            "type": "object",
+            "description": "Annotations for conduktor-provisioner pods",
+            "default": {}
+        },
+        "podAffinityPreset": {
+            "type": "string",
+            "description": "Pod affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`",
+            "default": ""
+        },
+        "podAntiAffinityPreset": {
+            "type": "string",
+            "description": "Pod anti-affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard`",
+            "default": "soft"
+        },
+        "nodeAffinityPreset": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "description": "Node affinity preset type. Ignored if `affinity` is set. Allowed values: `soft` or `hard`",
+                    "default": ""
+                },
+                "key": {
+                    "type": "string",
+                    "description": "Node label key to match. Ignored if `affinity` is set",
+                    "default": ""
+                },
+                "values": {
+                    "type": "array",
+                    "description": "Node label values to match. Ignored if `affinity` is set",
+                    "default": [],
+                    "items": {}
+                }
+            }
+        },
+        "priorityClassName": {
+            "type": "string",
+            "description": "conduktor-provisioner pods' priorityClassName",
+            "default": ""
+        },
+        "affinity": {
+            "type": "object",
+            "description": "Affinity for conduktor-provisioner pods assignment",
+            "default": {}
+        },
+        "nodeSelector": {
+            "type": "object",
+            "description": "Node labels for conduktor-provisioner pods assignment",
+            "default": {}
+        },
+        "tolerations": {
+            "type": "array",
+            "description": "Tolerations for conduktor-provisioner pods assignment",
+            "default": [],
+            "items": {}
+        },
+        "schedulerName": {
+            "type": "string",
+            "description": "Name of the k8s scheduler (other than default) for conduktor-provisioner pods",
+            "default": ""
+        },
+        "terminationGracePeriodSeconds": {
+            "type": "string",
+            "description": "Seconds conduktor-provisioner pods need to terminate gracefully",
+            "default": ""
+        },
+        "topologySpreadConstraints": {
+            "type": "array",
+            "description": "Topology Spread Constraints for conduktor-provisioner pod assignment spread across your cluster among failure-domains",
+            "default": [],
+            "items": {}
+        },
+        "initContainers": {
+            "type": "array",
+            "description": "List of init containers to add to the conduktor-provisioner job pod",
+            "default": [],
+            "items": {}
+        },
+        "waitFor": {
+            "type": "object",
+            "properties": {
+                "image": {
+                    "type": "object",
+                    "properties": {
+                        "registry": {
+                            "type": "string",
+                            "description": "registry for wait-for curl image",
+                            "default": "docker.io"
+                        },
+                        "repository": {
+                            "type": "string",
+                            "description": "wait-for curl image repository",
+                            "default": "curlimages/curl"
+                        },
+                        "tag": {
+                            "type": "string",
+                            "description": "wait-for curl image tag (immutable tags are recommended)",
+                            "default": "8.15.0"
+                        },
+                        "digest": {
+                            "type": "string",
+                            "description": "wait-for curl image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)",
+                            "default": ""
+                        },
+                        "pullPolicy": {
+                            "type": "string",
+                            "description": "wait-for image pull policy",
+                            "default": "IfNotPresent"
+                        },
+                        "pullSecrets": {
+                            "type": "array",
+                            "description": "wait-for image pull secrets",
+                            "default": [],
+                            "items": {}
+                        }
+                    }
+                },
+                "retries": {
+                    "type": "number",
+                    "description": "Number of retries to wait for the service to be ready",
+                    "default": 10
+                },
+                "retryInterval": {
+                    "type": "number",
+                    "description": "Interval in seconds between retries",
+                    "default": 5
+                }
+            }
+        },
+        "console": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable Console provisioning",
+                    "default": false
+                },
+                "authMode": {
+                    "type": "string",
+                    "description": "Authentication mode on Console for Conduktor CLI, either \"conduktor\" or \"external\" if using API Gateway in front of Console.",
+                    "default": "conduktor"
+                },
+                "url": {
+                    "type": "string",
+                    "description": "URL of the Console (mandatory)",
+                    "default": ""
+                },
+                "username": {
+                    "type": "string",
+                    "description": "Username to authenticate on the Console. Can be passed as an environment variable `CDK_USER`",
+                    "default": ""
+                },
+                "password": {
+                    "type": "string",
+                    "description": "Password to authenticate on the Console. Can be passed as an environment variable `CDK_PASSWORD`",
+                    "default": ""
+                },
+                "apiToken": {
+                    "type": "string",
+                    "description": "API Token to authenticate on the Console. Can be passed as an environment variable `CDK_API_KEY`",
+                    "default": ""
+                },
+                "caCert": {
+                    "type": "string",
+                    "description": "CA certificate of Console. Can be passed as an environment variable `CDK_CACERT`",
+                    "default": ""
+                },
+                "cert": {
+                    "type": "string",
+                    "description": "Authentication certificate to access Console. Can be passed as an environment variable `CDK_CERT`",
+                    "default": ""
+                },
+                "key": {
+                    "type": "string",
+                    "description": "Authentication certificate key to access Console. Can be passed as an environment variable `CDK_KEY`",
+                    "default": ""
+                },
+                "insecure": {
+                    "type": "boolean",
+                    "description": "Skip TLS verification",
+                    "default": false
+                },
+                "debug": {
+                    "type": "boolean",
+                    "description": "Enable verbose debug mode",
+                    "default": false
+                },
+                "manifests": {
+                    "type": "array",
+                    "description": "Manifests YAML to apply on the Console",
+                    "default": [],
+                    "items": {}
+                },
+                "manifestsConfigMap": {
+                    "type": "string",
+                    "description": "Manifests YAML to apply on the Console",
+                    "default": ""
+                },
+                "manifestsConfigMapKey": {
+                    "type": "string",
+                    "description": "Manifests YAML to apply on the Console",
+                    "default": "00-console-resources.yaml"
+                },
+                "extraManifestsConfigMapRef": {
+                    "type": "array",
+                    "description": "List of ConfigMaps references with extra manifests to apply on the Console",
+                    "default": [],
+                    "items": {}
+                },
+                "command": {
+                    "type": "array",
+                    "description": "Override default conduktor-provisioner container command (useful when using custom images)",
+                    "default": [
+                        "/bin/conduktor"
+                    ],
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "args": {
+                    "type": "array",
+                    "description": "Override default conduktor-provisioner container args (useful when using custom images)",
+                    "default": [
+                        "apply",
+                        "-f",
+                        "/conf"
+                    ],
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "extraEnvVars": {
+                    "type": "array",
+                    "description": "Array with extra environment variables to add to conduktor-provisioner containers",
+                    "default": [],
+                    "items": {}
+                },
+                "extraEnvVarsCM": {
+                    "type": "string",
+                    "description": "Name of existing ConfigMap containing extra env vars for conduktor-provisioner containers",
+                    "default": ""
+                },
+                "extraEnvVarsSecret": {
+                    "type": "string",
+                    "description": "Name of existing Secret containing extra env vars for conduktor-provisioner containers",
+                    "default": ""
+                },
+                "extraVolumes": {
+                    "type": "array",
+                    "description": "Optionally specify extra list of additional volumes for the conduktor-provisioner pods",
+                    "default": [],
+                    "items": {}
+                },
+                "extraVolumeMounts": {
+                    "type": "array",
+                    "description": "Optionally specify extra list of additional volumeMounts for the conduktor-provisioner containers",
+                    "default": [],
+                    "items": {}
+                },
+                "resources": {
+                    "type": "object",
+                    "properties": {
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": "string",
+                                    "description": "CPU resource requests",
+                                    "default": "100m"
+                                },
+                                "memory": {
+                                    "type": "string",
+                                    "description": "Memory resource requests",
+                                    "default": "50Mi"
+                                }
+                            }
+                        },
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": "string",
+                                    "description": "CPU limit for the platform container",
+                                    "default": "500m"
+                                },
+                                "memory": {
+                                    "type": "string",
+                                    "description": "Memory limit for the container",
+                                    "default": "128Mi"
+                                }
+                            }
+                        }
+                    }
+                },
+                "containerSecurityContext": {
+                    "type": "object",
+                    "description": "conduktor-provisioner containers' Security Context",
+                    "default": {}
+                }
+            }
+        },
+        "gateway": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable Gateway provisioning",
+                    "default": false
+                },
+                "url": {
+                    "type": "string",
+                    "description": "URL of the Gateway (mandatory).",
+                    "default": ""
+                },
+                "username": {
+                    "type": "string",
+                    "description": "Username to authenticate on the Gateway (mandatory). Can be passed as an environment variable `CDK_GATEWAY_USER`",
+                    "default": ""
+                },
+                "password": {
+                    "type": "string",
+                    "description": "Password to authenticate on the Gateway (mandatory). Can be passed as an environment variable `CDK_GATEWAY_PASSWORD`",
+                    "default": ""
+                },
+                "caCert": {
+                    "type": "string",
+                    "description": "CA certificate of Gateway. Can be passed as an environment variable `CDK_CACERT`",
+                    "default": ""
+                },
+                "cert": {
+                    "type": "string",
+                    "description": "Authentication certificate to access Gateway. Can be passed as an environment variable `CDK_CERT`",
+                    "default": ""
+                },
+                "key": {
+                    "type": "string",
+                    "description": "Authentication certificate key to access Gateway. Can be passed as an environment variable `CDK_KEY`",
+                    "default": ""
+                },
+                "insecure": {
+                    "type": "boolean",
+                    "description": "Skip TLS verification",
+                    "default": false
+                },
+                "debug": {
+                    "type": "boolean",
+                    "description": "Enable verbose debug mode",
+                    "default": false
+                },
+                "manifests": {
+                    "type": "array",
+                    "description": "Manifests YAML to apply on the Gateway",
+                    "default": [],
+                    "items": {}
+                },
+                "manifestsConfigMap": {
+                    "type": "string",
+                    "description": "Manifests YAML to apply on the Gateway",
+                    "default": ""
+                },
+                "manifestsConfigMapKey": {
+                    "type": "string",
+                    "description": "Manifests YAML to apply on the Gateway",
+                    "default": "00-gateway-resources.yaml"
+                },
+                "extraManifestsConfigMapRef": {
+                    "type": "array",
+                    "description": "List of ConfigMaps references with extra manifests to apply on the Gateway",
+                    "default": [],
+                    "items": {}
+                },
+                "command": {
+                    "type": "array",
+                    "description": "Override default conduktor-provisioner container command",
+                    "default": [
+                        "/bin/conduktor"
+                    ],
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "args": {
+                    "type": "array",
+                    "description": "Override default conduktor-provisioner container args",
+                    "default": [
+                        "apply",
+                        "-f",
+                        "/conf"
+                    ],
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "extraEnvVars": {
+                    "type": "array",
+                    "description": "Array with extra environment variables to add to conduktor-provisioner containers",
+                    "default": [],
+                    "items": {}
+                },
+                "extraEnvVarsCM": {
+                    "type": "string",
+                    "description": "Name of existing ConfigMap containing extra env vars for conduktor-provisioner containers",
+                    "default": ""
+                },
+                "extraEnvVarsSecret": {
+                    "type": "string",
+                    "description": "Name of existing Secret containing extra env vars for conduktor-provisioner containers",
+                    "default": ""
+                },
+                "extraVolumes": {
+                    "type": "array",
+                    "description": "Optionally specify extra list of additional volumes for the conduktor-provisioner pods",
+                    "default": [],
+                    "items": {}
+                },
+                "extraVolumeMounts": {
+                    "type": "array",
+                    "description": "Optionally specify extra list of additional volumeMounts for the conduktor-provisioner containers",
+                    "default": [],
+                    "items": {}
+                },
+                "resources": {
+                    "type": "object",
+                    "properties": {
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": "string",
+                                    "description": "CPU resource requests",
+                                    "default": "100m"
+                                },
+                                "memory": {
+                                    "type": "string",
+                                    "description": "Memory resource requests",
+                                    "default": "50Mi"
+                                }
+                            }
+                        },
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": "string",
+                                    "description": "CPU limit for the platform container",
+                                    "default": "500m"
+                                },
+                                "memory": {
+                                    "type": "string",
+                                    "description": "Memory limit for the container",
+                                    "default": "128Mi"
+                                }
+                            }
+                        }
+                    }
+                },
+                "containerSecurityContext": {
+                    "type": "object",
+                    "description": "conduktor-provisioner containers' Security Context",
+                    "default": {}
+                }
+            }
+        },
+        "serviceAccount": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean",
+                    "description": "Specifies whether a ServiceAccount should be created",
+                    "default": true
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The name of the ServiceAccount to use.",
+                    "default": ""
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Additional Service Account annotations (evaluated as a template)",
+                    "default": {}
+                },
+                "automountServiceAccountToken": {
+                    "type": "boolean",
+                    "description": "Automount service account token for the server service account",
+                    "default": true
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,70 @@
+
+{{- if or .Values.console.enabled .Values.gateway.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "provisioner.manifests.configMapName" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: conduktor-provisioning
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+data:
+  {{- if and .Values.console.manifests (not .Values.console.manifestsConfigMap) }}
+  {{ .Values.console.manifestsConfigMapKey }}: |
+    {{- range .Values.console.manifests }}
+    ---
+    {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+
+  {{- if and .Values.gateway.manifests (not .Values.gateway.manifestsConfigMap) }}
+  {{ .Values.gateway.manifestsConfigMapKey }}: |
+    {{ range .Values.gateway.manifests }}
+    ---
+    {{- include "common.tplvalues.render" ( dict "value" . "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "provisioner.initScript.configMapName" . | quote }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: conduktor-provisioning
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+data:
+  wait-for.sh: |
+    #!/usr/bin/env sh
+    set -e
+    # Wait for the service to be ready
+    retries=0
+    max_retries={{ .Values.waitFor.retries | default 10 }}
+    retry_interval={{ .Values.waitFor.retryInterval | default 5 }}
+    echo "Max retries: $max_retries, Retry interval: $retry_interval seconds"
+
+    if [ $# -eq 0 ]; then
+      echo "Service URL is required as the first argument."
+      exit 1
+    fi
+
+    endpoint="$1"
+    echo "Waiting for service to be ready at $endpoint..."
+    while [ $retries -lt $max_retries ]; do
+      if curl -s --head --insecure --request GET "$endpoint" | grep "200 OK" > /dev/null; then
+        echo "Service is ready: $endpoint"
+        exit 0
+      else
+        echo "Retry $((retries+1)) of $max_retries. Retrying in $retry_interval seconds..."
+        sleep $retry_interval
+        retries=$((retries+1))
+      fi
+    done
+
+    echo "Exceeded maximum retry attempts. Exiting with failure status."
+    exit 1
