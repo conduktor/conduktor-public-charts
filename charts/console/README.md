@@ -1187,6 +1187,35 @@ ssl.truststore.location=/etc/kafka/my-truststore.jks
 ssl.truststore.password=conduktor
 ```
 
+Alternatively, to extend the global default (JVM) truststore (see also [Define Console environment variables](https://docs.conduktor.io/guide/conduktor-in-production/deploy-artifacts/deploy-console/env-variables#docker-image-environment-variables)):
+
+```shell
+kubectl create secret generic tls-truststore \
+   --from-file=truststore.jks=$TLSDIR/truststore.jks \
+   --dry-run=client \
+   -o json | kubectl apply -f -
+```
+
+```yaml
+platform:
+  extraEnvVars:
+    - name: CDK_SSL_TRUSTSTORE_PATH
+      value: '/mnt/truststore/truststore.jks'
+    - name: CDK_SSL_TRUSTSTORE_PASSWORD
+      value: 'changeit'
+    - name: CDK_SSL_TRUSTSTORE_TYPE
+      value: 'jks'
+  extraVolumes:
+    - name: truststore
+      secret:
+        secretName: tls-truststore
+  extraVolumeMounts:
+    - name: truststore
+      readonly: true
+      mountPath: /mnt/truststore
+```
+
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Troubleshooting
