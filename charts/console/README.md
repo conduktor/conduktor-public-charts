@@ -1161,7 +1161,7 @@ platform:
     - name: kafka-keytab
       secret:
         secretName: conduktor-console-keytab
-  extraVolumesMounts:
+  extraVolumeMounts:
     - name: kafka-keytab
       readonly: true
       mountPath: /etc/kafka
