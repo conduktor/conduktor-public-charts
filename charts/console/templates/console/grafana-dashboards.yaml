@@ -70,8 +70,6 @@ spec:
     name: {{ $configMapName | quote }}
     key: console.json
   datasources:
-    - inputName: "INPUT_DS_PROMETHEUS"
-      datasourceName: {{ .Values.platform.metrics.grafana.datasources.prometheus | quote }}
     - inputName: "INPUT_NAMESPACE"
       datasourceName: {{ include "common.names.namespace" . | quote }}
 {{- end }}
@@ -100,8 +98,6 @@ spec:
     name: {{ $configMapName | quote }}
     key: console.json
   datasources:
-    - inputName: "INPUT_DS_PROMETHEUS"
-      datasourceName: {{ .Values.platform.metrics.grafana.datasources.prometheus | quote }}
     - inputName: "INPUT_NAMESPACE"
       datasourceName: {{ include "common.names.namespace" . | quote }}
 {{- end }}

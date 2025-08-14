@@ -141,10 +141,7 @@ Params :
 */}}
 {{- define "conduktor.platform.dashboard.patchInputs" -}}
 
-  {{- $patchs := dict "INPUT_DS_PROMETHEUS" ($.context.Values.platform.metrics.grafana.datasources.prometheus | default "prometheus") -}}
-  {{- $patchs = merge $patchs (dict "INPUT_NAMESPACE" (include "common.names.namespace" $.context)) -}}
-
-  {{- $patchs = merge $patchs (dict "datasource" ($.context.Values.platform.metrics.grafana.datasources.prometheus | default "prometheus") ) -}}
+  {{- $patchs := dict "INPUT_NAMESPACE" (include "common.names.namespace" $.context) -}}
   {{- $patchs = merge $patchs (dict "namespace" (include "common.names.namespace" $.context)) -}}
 
   {{/*  Patch inputs */}}

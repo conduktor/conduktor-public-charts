@@ -1,14 +1,6 @@
 {
   "__inputs": [
     {
-      "name": "INPUT_DS_PROMETHEUS",
-      "label": "Prometheus",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "prometheus",
-      "pluginName": "Prometheus"
-    },
-    {
       "name": "INPUT_NAMESPACE",
       "type": "constant",
       "label": "Namespace",
@@ -95,7 +87,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "$datasource"
       },
       "fieldConfig": {
         "defaults": {
@@ -173,7 +165,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "up{namespace=\"$namespace\", service=~\"$service\"}",
@@ -189,7 +181,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "$datasource"
       },
       "fieldConfig": {
         "defaults": {
@@ -252,7 +244,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "time() - process_start_time_seconds{namespace=\"$namespace\",pod=~\"$pod\"}",
@@ -269,7 +261,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "$datasource"
       },
       "fieldConfig": {
         "defaults": {
@@ -314,7 +306,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "sum(count by(technical_id) (console_indexer_kafka_cluster_duration_sum{namespace=\"$namespace\", service=\"$service\"}))",
@@ -343,7 +335,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "$datasource"
       },
       "fieldConfig": {
         "defaults": {
@@ -502,7 +494,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace=\"$namespace\",  pod=~\"$pod\"})",
@@ -516,7 +508,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests{namespace=\"$namespace\", pod=~\"$pod\"})",
@@ -529,7 +521,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits{namespace=\"$namespace\", pod=~\"$pod\"})",
@@ -546,7 +538,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "$datasource"
       },
       "fieldConfig": {
         "defaults": {
@@ -705,7 +697,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\",  pod=~\"$pod\"})",
@@ -719,7 +711,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_requests{namespace=\"$namespace\", pod=~\"$pod\"})",
@@ -732,7 +724,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{namespace=\"$namespace\", pod=~\"$pod\"})",
@@ -762,7 +754,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "$datasource"
       },
       "fieldConfig": {
         "defaults": {
@@ -891,7 +883,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "jvm_memory_used_bytes{area=\"$memarea\",namespace=\"$namespace\",pod=~\"$pod\"}",
@@ -904,7 +896,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": " jvm_memory_max_bytes{area=\"$memarea\",namespace=\"$namespace\",pod=~\"$pod\"}",
@@ -917,7 +909,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "jvm_memory_used_bytes{area=\"$memarea\",namespace=\"$namespace\",pod=~\"$pod\"} / jvm_memory_max_bytes >= 0",
@@ -935,7 +927,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "$datasource"
       },
       "fieldConfig": {
         "defaults": {
@@ -1020,7 +1012,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -1041,7 +1033,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "jvm_buffer_pool_used_bytes{namespace=\"$namespace\",pod=~\"$pod\",pool=~\"$bufferpool\"}",
@@ -1057,7 +1049,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -1081,7 +1073,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "$datasource"
       },
       "fieldConfig": {
         "defaults": {
@@ -1166,7 +1158,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "jvm_memory_pool_max_bytes{namespace=\"$namespace\",pod=~\"$pod\",pool=~\"$meta_mempool\"}",
@@ -1183,7 +1175,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "jvm_memory_pool_used_bytes{namespace=\"$namespace\",pod=~\"$pod\",pool=~\"$meta_mempool\"}",
@@ -1199,7 +1191,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "jvm_memory_pool_committed_bytes{namespace=\"$namespace\",pod=~\"$pod\",pool=~\"$meta_mempool\"}",
@@ -1219,7 +1211,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "$datasource"
       },
       "fieldConfig": {
         "defaults": {
@@ -1304,7 +1296,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "jvm_memory_pool_max_bytes{namespace=\"$namespace\",pod=~\"$pod\",pool=~\"$gc_mempool\"}",
@@ -1321,7 +1313,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "jvm_memory_pool_used_bytes{namespace=\"$namespace\",pod=~\"$pod\",pool=~\"$gc_mempool\"}",
@@ -1337,7 +1329,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "jvm_memory_pool_committed_bytes{namespace=\"$namespace\",pod=~\"$pod\",pool=~\"$gc_mempool\"}",
@@ -1370,7 +1362,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "$datasource"
       },
       "fieldConfig": {
         "defaults": {
@@ -1473,7 +1465,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "jvm_threads_current{namespace=\"$namespace\",pod=~\"$pod\"}",
@@ -1488,7 +1480,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "jvm_threads_daemon{namespace=\"$namespace\",pod=~\"$pod\"}",
@@ -1503,7 +1495,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "jvm_threads_deadlocked{namespace=\"$namespace\",pod=~\"$pod\"}",
@@ -1520,7 +1512,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "$datasource"
       },
       "fieldConfig": {
         "defaults": {
@@ -1602,7 +1594,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "jvm_classes_loaded{namespace=\"$namespace\",pod=~\"$pod\"}",
@@ -1635,7 +1627,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "$datasource"
       },
       "description": "Status of Kafka clusters indexing tasks",
       "fieldConfig": {
@@ -1745,7 +1737,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -1763,7 +1755,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1778,7 +1770,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "avg without(pod, instance) (console_indexer_kafka_cluster_failed_count{namespace=\"$namespace\", service=~\"$service\"})",
@@ -1791,7 +1783,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "avg without(pod, instance) (console_indexer_kafka_cluster_timeout_count{namespace=\"$namespace\", service=~\"$service\"})",
@@ -1809,7 +1801,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "$datasource"
       },
       "description": "Status of Schema registry servers indexing tasks",
       "fieldConfig": {
@@ -1919,7 +1911,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "avg without(pod, instance) (console_indexer_schema_registry_cluster_succeeded_count{namespace=\"$namespace\",service=~\"$service\"})",
@@ -1933,7 +1925,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1948,7 +1940,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "avg without(pod, instance) (console_indexer_schema_registry_cluster_failed_count{namespace=\"$namespace\", service=~\"$service\"})",
@@ -1961,7 +1953,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "avg without(pod, instance) (console_indexer_schema_registry_cluster_timeout_count{namespace=\"$namespace\", service=~\"$service\"})",
@@ -1979,7 +1971,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "$datasource"
       },
       "description": "Status of Kafka Connect servers indexing tasks",
       "fieldConfig": {
@@ -2089,7 +2081,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "avg without(pod, instance) (console_indexer_kafka_connect_cluster_succeeded_count{namespace=\"$namespace\", service=~\"$service\"})",
@@ -2103,7 +2095,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -2118,7 +2110,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "avg without(pod, instance) (console_indexer_kafka_connect_cluster_failed_count{namespace=\"$namespace\", service=~\"$service\"})",
@@ -2131,7 +2123,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "avg without(pod, instance) (console_indexer_kafka_connect_cluster_timeout_count{namespace=\"$namespace\", pod=~\"$pod\"})",
@@ -2149,7 +2141,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "$datasource"
       },
       "description": "Latency of indexing tasks",
       "fieldConfig": {
@@ -2228,7 +2220,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -2246,7 +2238,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -2264,7 +2256,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -2286,7 +2278,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "$datasource"
       },
       "fieldConfig": {
         "defaults": {
@@ -2368,7 +2360,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -2386,7 +2378,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -2404,7 +2396,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -2422,7 +2414,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -2440,7 +2432,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -2458,7 +2450,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -2476,7 +2468,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -2494,7 +2486,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -2530,7 +2522,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "$datasource"
       },
       "fieldConfig": {
         "defaults": {
@@ -2611,7 +2603,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -2632,7 +2624,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasource}"
+        "uid": "$datasource"
       },
       "fieldConfig": {
         "defaults": {
@@ -2756,7 +2748,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "sum by(path, method) (rate(console_api_request_duration_seconds_sum{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])) / sum by(path, method) (rate(console_api_request_duration_seconds_count{namespace=\"$namespace\", pod=~\"$pod\"}[$__rate_interval])) > 0",
@@ -2769,7 +2761,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.3, sum(rate(console_api_request_duration_seconds_bucket{namespace=\"$namespace\", pod=~\"$pod\"}[$__range])) by (le)) > 0",
@@ -2782,7 +2774,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.5, sum(rate(console_api_request_duration_seconds_bucket{namespace=\"$namespace\", pod=~\"$pod\"}[$__range])) by (le)) > 0",
@@ -2795,7 +2787,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.95, sum(rate(console_api_request_duration_seconds_bucket{namespace=\"$namespace\", pod=~\"$pod\"}[$__range])) by (le)) > 0",
@@ -2808,7 +2800,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.99, sum(rate(console_api_request_duration_seconds_bucket{namespace=\"$namespace\", pod=~\"$pod\"}[$__range])) by (le)) > 0",
@@ -2828,22 +2820,23 @@
   "tags": ["conduktor-console", "JVM", "Pod", "Indexer"],
   "templating": {
     "list": [
-
       {
         "current": {
           "selected": false,
           "text": "Prometheus",
           "value": "default"
         },
-        "hide": 2,
+        "hide": 0,
         "includeAll": false,
-        "label": null,
+        "label": "Datasource",
         "multi": false,
         "name": "datasource",
         "options": [],
-        "query": "${INPUT_DS_PROMETHEUS}",
+        "query": "prometheus",
+        "queryValue": "",
         "refresh": 1,
         "regex": "",
+        "skipUrlSync": false,
         "type": "datasource"
       },
       {
@@ -2858,7 +2851,7 @@
         "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "${datasource}"
+          "uid": "$datasource"
         },
         "definition": "label_values(up{namespace=\"$namespace\", job=\"console\"},service)",
         "hide": 2,
@@ -2882,7 +2875,7 @@
         "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "${datasource}"
+          "uid": "$datasource"
         },
         "definition": "label_values(up{namespace=\"$namespace\", job=\"console\"},pod)",
         "hide": 0,
@@ -2905,7 +2898,7 @@
         "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "${datasource}"
+          "uid": "$datasource"
         },
         "definition": "label_values(jvm_memory_used_bytes{namespace=\"$namespace\", pod=~\"$pod\"},area)",
         "hide": 2,
@@ -2928,7 +2921,7 @@
         "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "${datasource}"
+          "uid": "$datasource"
         },
         "definition": "label_values(jvm_buffer_pool_used_bytes{namespace=\"$namespace\", pod=~\"$pod\"},pool)",
         "hide": 2,
@@ -2951,7 +2944,7 @@
         "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "${datasource}"
+          "uid": "$datasource"
         },
         "definition": "label_values(jvm_memory_pool_max_bytes{namespace=\"$namespace\", pod=~\"$pod\"},pool)",
         "hide": 2,
@@ -2974,7 +2967,7 @@
         "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "${datasource}"
+          "uid": "$datasource"
         },
         "definition": "label_values(jvm_memory_pool_max_bytes{namespace=\"$namespace\", pod=~\"$pod\"},pool)",
         "hide": 2,
@@ -2997,7 +2990,7 @@
         "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "${datasource}"
+          "uid": "$datasource"
         },
         "definition": "label_values(console_indexer_kafka_cluster_duration_sum{pod=~\"$pod\"},technical_id)",
         "description": "Cluster technical identifier",
