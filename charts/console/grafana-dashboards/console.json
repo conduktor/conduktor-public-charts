@@ -894,7 +894,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_bytes_used{area=\"$memarea\",namespace=\"$namespace\",pod=~\"$pod\"}",
+          "expr": "jvm_memory_used_bytes{area=\"$memarea\",namespace=\"$namespace\",pod=~\"$pod\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Used",
@@ -907,7 +907,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": " jvm_memory_bytes_max{area=\"$memarea\",namespace=\"$namespace\",pod=~\"$pod\"}",
+          "expr": " jvm_memory_max_bytes{area=\"$memarea\",namespace=\"$namespace\",pod=~\"$pod\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Upper limit",
@@ -920,7 +920,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_bytes_used{area=\"$memarea\",namespace=\"$namespace\",pod=~\"$pod\"} / jvm_memory_bytes_max >= 0",
+          "expr": "jvm_memory_used_bytes{area=\"$memarea\",namespace=\"$namespace\",pod=~\"$pod\"} / jvm_memory_max_bytes >= 0",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 1,
@@ -1032,7 +1032,7 @@
           "interval": "",
           "intervalFactor": 1,
           "legendFormat": "Capacity",
-          "metric": "jvm_memory_bytes_used",
+          "metric": "jvm_memory_used_bytes",
           "range": true,
           "refId": "B",
           "step": 5,
@@ -1049,7 +1049,7 @@
           "interval": "",
           "intervalFactor": 1,
           "legendFormat": "Used",
-          "metric": "jvm_memory_bytes_used",
+          "metric": "jvm_memory_used_bytes",
           "range": true,
           "refId": "A",
           "step": 5
@@ -1068,7 +1068,7 @@
           "interval": "",
           "intervalFactor": 1,
           "legendFormat": "Used buffer",
-          "metric": "jvm_memory_bytes_used",
+          "metric": "jvm_memory_used_bytes",
           "range": true,
           "refId": "C",
           "step": 5,
@@ -1169,13 +1169,13 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pool_bytes_max{namespace=\"$namespace\",pod=~\"$pod\",pool=~\"$meta_mempool\"}",
+          "expr": "jvm_memory_pool_max_bytes{namespace=\"$namespace\",pod=~\"$pod\",pool=~\"$meta_mempool\"}",
           "format": "time_series",
           "hide": false,
           "interval": "",
           "intervalFactor": 1,
           "legendFormat": "Max ",
-          "metric": "jvm_memory_bytes_used",
+          "metric": "jvm_memory_used_bytes",
           "range": true,
           "refId": "B",
           "step": 5
@@ -1186,12 +1186,12 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pool_bytes_used{namespace=\"$namespace\",pod=~\"$pod\",pool=~\"$meta_mempool\"}",
+          "expr": "jvm_memory_pool_used_bytes{namespace=\"$namespace\",pod=~\"$pod\",pool=~\"$meta_mempool\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
           "legendFormat": "Used",
-          "metric": "jvm_memory_bytes_used",
+          "metric": "jvm_memory_used_bytes",
           "range": true,
           "refId": "A",
           "step": 5
@@ -1202,12 +1202,12 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pool_bytes_committed{namespace=\"$namespace\",pod=~\"$pod\",pool=~\"$meta_mempool\"}",
+          "expr": "jvm_memory_pool_committed_bytes{namespace=\"$namespace\",pod=~\"$pod\",pool=~\"$meta_mempool\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
           "legendFormat": "Committed",
-          "metric": "jvm_memory_bytes_used",
+          "metric": "jvm_memory_used_bytes",
           "range": true,
           "refId": "C",
           "step": 5
@@ -1307,13 +1307,13 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pool_bytes_max{namespace=\"$namespace\",pod=~\"$pod\",pool=~\"$gc_mempool\"}",
+          "expr": "jvm_memory_pool_max_bytes{namespace=\"$namespace\",pod=~\"$pod\",pool=~\"$gc_mempool\"}",
           "format": "time_series",
           "hide": false,
           "interval": "",
           "intervalFactor": 1,
           "legendFormat": "Max ",
-          "metric": "jvm_memory_bytes_used",
+          "metric": "jvm_memory_used_bytes",
           "range": true,
           "refId": "B",
           "step": 5
@@ -1324,12 +1324,12 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pool_bytes_used{namespace=\"$namespace\",pod=~\"$pod\",pool=~\"$gc_mempool\"}",
+          "expr": "jvm_memory_pool_used_bytes{namespace=\"$namespace\",pod=~\"$pod\",pool=~\"$gc_mempool\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
           "legendFormat": "Used",
-          "metric": "jvm_memory_bytes_used",
+          "metric": "jvm_memory_used_bytes",
           "range": true,
           "refId": "A",
           "step": 5
@@ -1340,12 +1340,12 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pool_bytes_committed{namespace=\"$namespace\",pod=~\"$pod\",pool=~\"$gc_mempool\"}",
+          "expr": "jvm_memory_pool_committed_bytes{namespace=\"$namespace\",pod=~\"$pod\",pool=~\"$gc_mempool\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
           "legendFormat": "Committed",
-          "metric": "jvm_memory_bytes_used",
+          "metric": "jvm_memory_used_bytes",
           "range": true,
           "refId": "C",
           "step": 5
@@ -2907,7 +2907,7 @@
           "type": "prometheus",
           "uid": "${datasource}"
         },
-        "definition": "label_values(jvm_memory_bytes_used{namespace=\"$namespace\", pod=~\"$pod\"},area)",
+        "definition": "label_values(jvm_memory_used_bytes{namespace=\"$namespace\", pod=~\"$pod\"},area)",
         "hide": 2,
         "includeAll": true,
         "label": "JVM mem area",
@@ -2915,7 +2915,7 @@
         "name": "memarea",
         "options": [],
         "query": {
-          "query": "label_values(jvm_memory_bytes_used{namespace=\"$namespace\", pod=~\"$pod\"},area)",
+          "query": "label_values(jvm_memory_used_bytes{namespace=\"$namespace\", pod=~\"$pod\"},area)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
@@ -2953,7 +2953,7 @@
           "type": "prometheus",
           "uid": "${datasource}"
         },
-        "definition": "label_values(jvm_memory_pool_bytes_max{namespace=\"$namespace\", pod=~\"$pod\"},pool)",
+        "definition": "label_values(jvm_memory_pool_max_bytes{namespace=\"$namespace\", pod=~\"$pod\"},pool)",
         "hide": 2,
         "includeAll": true,
         "label": "JVM meta mem pool",
@@ -2961,7 +2961,7 @@
         "name": "meta_mempool",
         "options": [],
         "query": {
-          "query": "label_values(jvm_memory_pool_bytes_max{namespace=\"$namespace\", pod=~\"$pod\"},pool)",
+          "query": "label_values(jvm_memory_pool_max_bytes{namespace=\"$namespace\", pod=~\"$pod\"},pool)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
@@ -2976,7 +2976,7 @@
           "type": "prometheus",
           "uid": "${datasource}"
         },
-        "definition": "label_values(jvm_memory_pool_bytes_max{namespace=\"$namespace\", pod=~\"$pod\"},pool)",
+        "definition": "label_values(jvm_memory_pool_max_bytes{namespace=\"$namespace\", pod=~\"$pod\"},pool)",
         "hide": 2,
         "includeAll": true,
         "label": "JVM GC mem pool",
@@ -2984,7 +2984,7 @@
         "name": "gc_mempool",
         "options": [],
         "query": {
-          "query": "label_values(jvm_memory_pool_bytes_max{namespace=\"$namespace\", pod=~\"$pod\"},pool)",
+          "query": "label_values(jvm_memory_pool_max_bytes{namespace=\"$namespace\", pod=~\"$pod\"},pool)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
