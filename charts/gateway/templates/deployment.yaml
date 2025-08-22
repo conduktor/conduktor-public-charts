@@ -111,7 +111,7 @@ spec:
           {{- include "common.tplvalues.render" (dict "value" (omit .Values.gateway.startupProbe "enabled") "context" $) | nindent 12 }}
           {{- end }}
             httpGet:
-              path: /health
+              path: /health/live
               port: {{ .Values.gateway.admin.port }}
               scheme: {{ include "conduktor-gateway.adminAPIScheme" . | upper | quote }}
           {{- end }}
