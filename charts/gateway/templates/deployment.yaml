@@ -111,7 +111,7 @@ spec:
           {{- include "common.tplvalues.render" (dict "value" (omit .Values.gateway.startupProbe "enabled") "context" $) | nindent 12 }}
           {{- end }}
             httpGet:
-              path: /health
+              path: /health/live
               port: {{ .Values.gateway.admin.port }}
               scheme: {{ include "conduktor-gateway.adminAPIScheme" . | upper | quote }}
           {{- end }}
@@ -123,7 +123,7 @@ spec:
           {{- include "common.tplvalues.render" (dict "value" (omit .Values.gateway.livenessProbe "enabled") "context" $) | nindent 12 }}
           {{- end }}
             httpGet:
-              path: /health
+              path: /health/live
               port: {{ .Values.gateway.admin.port }}
               scheme: {{ include "conduktor-gateway.adminAPIScheme" . | upper | quote }}
           {{- end }}
@@ -135,7 +135,7 @@ spec:
           {{- include "common.tplvalues.render" (dict "value" (omit .Values.gateway.readinessProbe "enabled") "context" $) | nindent 12 }}
           {{- end }}
             httpGet:
-              path: /health
+              path: /health/ready
               port: {{ .Values.gateway.admin.port }}
               scheme: {{ include "conduktor-gateway.adminAPIScheme" . | upper | quote }}
           {{- end }}
