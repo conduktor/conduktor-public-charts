@@ -50,6 +50,10 @@
 - console ([doc](charts/console/README.md), [values](charts/console/values.yaml))
 - conduktor-gateway ([doc](charts/gateway/README.md), [values](charts/gateway/gateway/values.yaml))
 
+## Chart dependencies
+
+All charts within this repository have one dependency which is `bitnami-common`. You can find the chart here: https://github.com/bitnami/charts/tree/main/bitnami/common
+
 ## Usage
 
 ```shell
