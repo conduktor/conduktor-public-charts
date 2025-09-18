@@ -226,7 +226,7 @@ platform:
   image:
     registry: docker.io
     repository: conduktor/conduktor-console
-    tag: 1.37.0
+    tag: 1.37.1
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -762,7 +762,7 @@ platformCortex:
   image:
     registry: docker.io
     repository: conduktor/conduktor-console-cortex
-    tag: 1.37.0
+    tag: 1.37.1
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
