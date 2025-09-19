@@ -694,6 +694,29 @@ entries:
     version: 1.0.0
   console:
   - apiVersion: v2
+    appVersion: 1.37.1
+    created: "2025-09-19T09:09:16.617865029Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-common
+      version: 2.x.x
+    description: Helm chart to deploy Conduktor Console on Kubernetes
+    digest: 967adc16bd2c9875c9300f01fc0a4222b73e6d724d616ecae389f6b325ad247f
+    home: https://www.conduktor.io
+    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    maintainers:
+    - email: support@conduktor.io
+      name: Conduktor
+      url: https://docs.conduktor.io/platform
+    name: console
+    sources:
+    - https://github.com/conduktor/conduktor-public-charts/tree/main/charts/console
+    urls:
+    - https://github.com/conduktor/conduktor-public-charts/releases/download/console-1.22.1/console-1.22.1.tgz
+    version: 1.22.1
+  - apiVersion: v2
     appVersion: 1.37.0
     created: "2025-08-21T15:20:35.209085034Z"
     dependencies:
@@ -2989,4 +3012,4 @@ entries:
     urls:
     - https://github.com/conduktor/conduktor-public-charts/releases/download/provisioner-0.1.0/provisioner-0.1.0.tgz
     version: 0.1.0
-generated: "2025-08-22T12:32:46.058882291Z"
+generated: "2025-09-19T09:09:16.618114215Z"
