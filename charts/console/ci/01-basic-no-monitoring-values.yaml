@@ -1,6 +1,7 @@
 # Test is checking:
 # - basic usage of the chart is working without monitoring pod
 # - usage of a persistent volume instead of emptyDir volume for dataVolume
+# - use legacy databae host/port configuration
 nameOverride: cdkt-test-01
 config:
   organization:
@@ -12,9 +13,10 @@ config:
   database:
     name: platform
     host: postgresql-hl
-    password: conduktor123
     port: 5432
+    password: conduktor123
     username: postgres
+
 platform:
   startupProbe:
     initialDelaySeconds: 60  # extra delay because of limited cpu resources
@@ -50,6 +52,10 @@ extraDeploy:
       name: pv001
       labels:
         type: local
+      annotations:
+        "helm.sh/hook": pre-install
+        "helm.sh/hook-weight": "-99"
+        "helm.sh/hook-delete-policy": before-hook-creation
     spec:
       capacity:
         storage: 1Gi
@@ -61,6 +67,10 @@ extraDeploy:
     kind: PersistentVolumeClaim
     metadata:
       name: pv-claim
+      annotations:
+        "helm.sh/hook": pre-install
+        "helm.sh/hook-weight": "-99"
+        "helm.sh/hook-delete-policy": before-hook-creation
     spec:
       accessModes:
         - ReadWriteOnce

@@ -39,14 +39,46 @@ Return the full configuration for the platform ConfigMap
 {{- $_ := unset $platform "https" -}}
 {{- $_ := set $config "platform" $platform -}}
 
-{{/* Delete database password/username from ConfigMap */}}
+{{/* Sanitize database object */}}
 {{- $database := .Values.config.database | deepCopy -}}
-{{- $_ := unset $database "password" -}}
-{{- $_ := unset $database "username" -}}
+{{- include "conduktor.sanitize.database" (dict "database" $database) -}}
 {{- $_ := set $config "database" $database -}}
 
+{{/* Sanitize kafka sql database object if exist */}}
+{{- if and (hasKey $config "kafkasql") (hasKey $config "kafkasql" "database") -}}
+  {{- $kafkaSqlDb := index $config "kafkasql" "database" | deepCopy -}}
+  {{- include "conduktor.sanitize.database" (dict "database" $kafkaSqlDb) -}}
+  {{- $_ := set $config "kafkasql" (merge (index $config "kafkasql") (dict "database" $kafkaSqlDb)) -}}
+{{- end -}}
+
+{{/* Render templates in values */}}
 {{ include "common.tplvalues.render" (dict "value" $config "context" $) }}
 {{- end -}}
+
+{{- define "conduktor.sanitize.database"}}
+{{/* Move deprecated host/port to hosts list*/}}
+{{- if and $.database.host $.database.port }}
+{{- $host_1 := dict "host" $.database.host "port" $.database.port -}}
+{{- $hosts := list $host_1 -}}
+{{- $_ := set $.database "hosts" $hosts -}}
+{{- end }}
+{{ $_ := unset $.database "host" -}}
+{{ $_ := unset $.database "port" -}}
+
+{{/* Remove empty values */}}
+{{- if empty $.database.hosts }}
+{{- $_ := unset $.database "hosts" -}}
+{{- end }}
+
+{{- if empty $.database.name }}
+{{- $_ := unset $.database "name" -}}
+{{- end }}
+
+{{/* Remove values that are put as secrets */}}
+{{- $_ := unset $.database "url" -}}
+{{- $_ := unset $.database "password" -}}
+{{- $_ := unset $.database "username" -}}
+{{- end }}
 
 {{/*
 Return the proper Condutkor Platform fullname
@@ -337,7 +369,7 @@ Those are warnings and not errors, they are only output in NOTES.txt
 */}}
 {{- define "conduktor.validateValues" -}}
 {{- $messages := list -}}
-{{- $messages := append $messages (include "conduktor.validateValues.database" .) -}}
+{{/*{{- $messages := append $messages (include "conduktor.validateValues.database" .) -}}*/}}
 {{- $messages := append $messages (include "conduktor.validateValues.monitoring" .) -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
