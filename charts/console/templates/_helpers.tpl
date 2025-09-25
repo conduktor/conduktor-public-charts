@@ -343,18 +343,6 @@ Ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
 {{- end -}}
 {{- end -}}
 
-{{- define "conduktor.validateValues.database" -}}
-{{- if not .Values.config.existingSecret -}}
-    {{- if not .Values.config.database.host -}}
-conduktor: invalid database configuration
-           config.database.host MUST be set in values
-    {{- else if not .Values.config.database.name -}}
-conduktor: invalid database configuration
-           config.database.name MUST be set in values
-    {{- end -}}
-{{- end -}}
-{{- end -}}
-
 {{- define "conduktor.validateValues.monitoring" -}}
 {{- if (.Values.config.monitoring).storage -}}
 conduktor: invalid monitoring storage configuration
@@ -369,7 +357,6 @@ Those are warnings and not errors, they are only output in NOTES.txt
 */}}
 {{- define "conduktor.validateValues" -}}
 {{- $messages := list -}}
-{{/*{{- $messages := append $messages (include "conduktor.validateValues.database" .) -}}*/}}
 {{- $messages := append $messages (include "conduktor.validateValues.monitoring" .) -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
