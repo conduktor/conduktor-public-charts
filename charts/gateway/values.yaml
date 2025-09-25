@@ -291,6 +291,11 @@ service:
     admin: false
     ## @param service.external.jmx Enable jmx exposition on external service
     jmx: false
+    ## @param service.external.extraSpecs Extra specs for the service to be added under `spec` key
+    ## ref https://kubernetes.io/docs/reference/kubernetes-api/service-resources/service-v1/#ServiceSpec
+    ## extraSpecs:
+    ##   externalTrafficPolicy: Local
+    extraSpecs: {}
   ## @section Conduktor-gateway internal service configurations
   ## @descriptionStart
   ## This section specify internal service configuration
@@ -300,6 +305,11 @@ service:
     annotations: {}
     ## @param service.internal.labels Labels to be added to Gateway internal service
     labels: {}
+    ## @param service.internal.extraSpecs Extra specs for the service to be added under `spec` key
+    ## ref https://kubernetes.io/docs/reference/kubernetes-api/service-resources/service-v1/#ServiceSpec
+    ## extraSpecs:
+    ##   trafficDistribution: "PreferClose"
+    extraSpecs: {}
 
 ## @section Gateway ingress configurations
 ## @descriptionStart

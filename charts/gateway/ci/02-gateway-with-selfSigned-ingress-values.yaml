@@ -8,6 +8,17 @@ gateway:
   env:
     KAFKA_BOOTSTRAP_SERVERS: kafka.default.svc.cluster.local:9092
 
+service:
+  external:
+    enable: true
+    type: LoadBalancer
+    admin: true
+    extraSpecs:
+      externalTrafficPolicy: Local
+
+  internal:
+    extraSpecs:
+      trafficDistribution: PreferClose
 
 ingress:
   enabled: true
