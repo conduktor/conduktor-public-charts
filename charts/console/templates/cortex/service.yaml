@@ -38,6 +38,9 @@ spec:
   {{- if and (eq .Values.platformCortex.service.type "LoadBalancer") (not (empty .Values.platformCortex.service.loadBalancerSourceRanges)) }}
   loadBalancerSourceRanges: {{ .Values.platformCortex.service.loadBalancerSourceRanges }}
   {{- end }}
+  {{- if .Values.platformCortex.service.extraSpecs }}
+  {{- include "common.tplvalues.render" (dict "value" .Values.platformCortex.service.extraSpecs "context" $) | nindent 2 }}
+  {{- end }}
   ports:
     - name: cortex
       port: {{ .Values.platformCortex.service.ports.cortex }}

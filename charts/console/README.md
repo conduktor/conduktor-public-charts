@@ -197,7 +197,7 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/co
 | `platform.priorityClassName`                  | Conduktor Console pods' priorityClassName                                                                                                                    | `""`                          |
 | `platform.topologySpreadConstraints`          | Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template                                     | `[]`                          |
 | `platform.schedulerName`                      | Name of the k8s scheduler (other than default) for Conduktor Console pods                                                                                    | `""`                          |
-| `platform.terminationGracePeriodSeconds`      | Seconds Redmine pod needs to terminate gracefully                                                                                                            | `""`                          |
+| `platform.terminationGracePeriodSeconds`      | Seconds Redmine pod needs to terminate gracefully                                                                                                            | `30`                          |
 | `platform.lifecycleHooks`                     | for the Conduktor Console container(s) to automate configuration before or after startup                                                                     | `{}`                          |
 | `platform.dataVolume`                         | Configure the data volume to store Conduktor Console data                                                                                                    | `{}`                          |
 | `platform.tmpVolume`                          | Configure the /tmp volume which store various data related to running services                                                                               | `{}`                          |
@@ -252,6 +252,7 @@ Console expose metrics that could be collected and presented if your environment
 | `service.extraPorts`               | Extra ports to expose in Conduktor Console service (normally used with the `sidecars` value)                                     | `[]`                     |
 | `service.sessionAffinity`          | Control where client requests go, to the same pod or round-robin                                                                 | `None`                   |
 | `service.sessionAffinityConfig`    | Additional settings for the sessionAffinity                                                                                      | `{}`                     |
+| `service.extraSpecs`               | Extra specs for the service to be added under `spec` key                                                                         | `{}`                     |
 | `ingress.enabled`                  | Enable ingress record generation for Conduktor Console                                                                           | `false`                  |
 | `ingress.pathType`                 | Ingress path type                                                                                                                | `ImplementationSpecific` |
 | `ingress.apiVersion`               | Force Ingress API version (automatically detected if not set)                                                                    | `""`                     |
@@ -363,6 +364,7 @@ Console expose metrics that could be collected and presented if your environment
 | `platformCortex.service.extraPorts`                 | Extra ports to expose in Conduktor Console Cortex service (normally used with the `sidecars` value)                                                                 | `[]`                                 |
 | `platformCortex.service.sessionAffinity`            | Control where client requests go, to the same pod or round-robin                                                                                                    | `None`                               |
 | `platformCortex.service.sessionAffinityConfig`      | Additional settings for the sessionAffinity                                                                                                                         | `{}`                                 |
+| `platformCortex.service.extraSpecs`                 | Extra specs for the service to be added under `spec` key                                                                                                            | `{}`                                 |
 
 ## Snippets
 
