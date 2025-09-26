@@ -22,6 +22,9 @@ metadata:
   {{- end }}
 spec:
   type: ClusterIP
+  {{- if .Values.service.internal.extraSpecs }}
+  {{- include "common.tplvalues.render" (dict "value" .Values.service.internal.extraSpecs "context" $) | nindent 2 }}
+  {{- end }}
   ports:
     {{- range untilStep (int .Values.gateway.portRange.start) (int (add .Values.gateway.portRange.start .Values.gateway.portRange.count)) 1 }}
     - name: broker-gateway-{{ . }}

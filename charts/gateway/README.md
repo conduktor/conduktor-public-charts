@@ -145,24 +145,26 @@ This section contains Kubernetes services configuration.
 
 This section specifies external service configuration
 
-| Name                           | Description                                         | Value       |
-| ------------------------------ | --------------------------------------------------- | ----------- |
-| `service.external.enable`      | Enable a service for external connection to Gateway | `false`     |
-| `service.external.type`        | Type of load balancer                               | `ClusterIP` |
-| `service.external.ip`          | IP to configure                                     | `""`        |
-| `service.external.annotations` |                                                     | `{}`        |
-| `service.external.labels`      | Labels to be added to Gateway internal service      | `{}`        |
-| `service.external.admin`       | Enable admin exposition on external service         | `false`     |
-| `service.external.jmx`         | Enable jmx exposition on external service           | `false`     |
+| Name                           | Description                                              | Value       |
+| ------------------------------ | -------------------------------------------------------- | ----------- |
+| `service.external.enable`      | Enable a service for external connection to Gateway      | `false`     |
+| `service.external.type`        | Type of load balancer                                    | `ClusterIP` |
+| `service.external.ip`          | IP to configure                                          | `""`        |
+| `service.external.annotations` |                                                          | `{}`        |
+| `service.external.labels`      | Labels to be added to Gateway internal service           | `{}`        |
+| `service.external.admin`       | Enable admin exposition on external service              | `false`     |
+| `service.external.jmx`         | Enable jmx exposition on external service                | `false`     |
+| `service.external.extraSpecs`  | Extra specs for the service to be added under `spec` key | `{}`        |
 
 ### Conduktor-gateway internal service configurations
 
 This section specify internal service configuration
 
-| Name                           | Description                                    | Value |
-| ------------------------------ | ---------------------------------------------- | ----- |
-| `service.internal.annotations` |                                                | `{}`  |
-| `service.internal.labels`      | Labels to be added to Gateway internal service | `{}`  |
+| Name                           | Description                                              | Value |
+| ------------------------------ | -------------------------------------------------------- | ----- |
+| `service.internal.annotations` |                                                          | `{}`  |
+| `service.internal.labels`      | Labels to be added to Gateway internal service           | `{}`  |
+| `service.internal.extraSpecs`  | Extra specs for the service to be added under `spec` key | `{}`  |
 
 ### Gateway ingress configurations
 
