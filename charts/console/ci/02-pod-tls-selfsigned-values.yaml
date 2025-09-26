@@ -1,6 +1,7 @@
 # Test is checking:
 # - generate a self-signed certificate for the platform
 # - connectivity between the platform and the monitoring pod using self-signed certificate
+# - use hosts list for database configuration
 nameOverride: cdkt-test-02
 config:
   organization:
@@ -11,9 +12,10 @@ config:
 
   database:
     name: platform
-    host: postgresql-hl
+    hosts:
+      - host: postgresql-hl
+        port: 5432
     password: conduktor123
-    port: 5432
     username: postgres
 
   platform:

@@ -1,18 +1,13 @@
 # Test is checking:
 # - generate a self-signed certificate for the platform
 # - connectivity between the platform and the monitoring pod using self-signed certificate
+# - Set use secret for database url only configuration
 nameOverride: cdkt-test-06
 config:
+  existingSecret: cdkt-test-06-console-config
   admin:
     email: admin@conduktor.io
     password: testP4ss!
-
-  database:
-    name: platform
-    host: postgresql-hl
-    password: conduktor123
-    port: 5432
-    username: postgres
 
 platform:
   startupProbe:
@@ -40,6 +35,20 @@ ingress:
   hostname: platform.cluster.local
   tls: true
   selfSigned: true
+
+extraDeploy:
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: cdkt-test-06-console-config
+      namespace: ct
+      annotations:
+        "helm.sh/hook": pre-install
+        "helm.sh/hook-weight": "-99"
+        "helm.sh/hook-delete-policy": before-hook-creation
+    type: Opaque
+    stringData:
+      CDK_DATABASE_URL: "postgresql://postgres:conduktor123@postgresql-hl:5432/platform"
 
 tests:
   enabled: true

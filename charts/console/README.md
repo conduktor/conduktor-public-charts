@@ -15,10 +15,7 @@ $ helm install my-platform conduktor/console \
     --set config.organization.name="my-org" \
     --set config.admin.email="admin@conduktor.io" \
     --set config.admin.password="Admin123!" \
-    --set config.database.password="postgres" \
-    --set config.database.username="postgres" \
-    --set config.database.host="postgresql" \
-    --set config.database.name="postgres" \
+    --set config.database.url="jdbc:postgresql://postgres:password@postgresql:5432/postgres" \
     --set config.license="${LICENSE}"
 ```
 
@@ -88,9 +85,13 @@ A list of Kafka clusters can be configured by adding them under the `config.clus
 | `config.organization.name`             | Your Conduktor Console Organization. Default is `Conduktor` if not set.                                                                         | `Conduktor` |
 | `config.admin.email`                   | Your Conduktor Console Admin email. If changed a new admin user will be created with this email and previous admin user will still be available | `""`        |
 | `config.admin.password`                | Your Conduktor Console Admin password. If change current admin user password will be updated.                                                   | `""`        |
-| `config.database.host`                 | Your Conduktor Console Database host                                                                                                            | `""`        |
-| `config.database.port`                 | Your Conduktor Console Database port                                                                                                            | `5432`      |
-| `config.database.name`                 | Your Conduktor Console Database name                                                                                                            | `postgres`  |
+| `config.database.url`                  | Your Conduktor Console Database URL (postgresql or jdbc format)                                                                                 | `""`        |
+| `config.database.hosts`                | List of Conduktor Console Database hosts (host and port)                                                                                        | `[]`        |
+| `config.database.hosts[].host`         | Conduktor Console Database host                                                                                                                 |             |
+| `config.database.hosts[].port`         | Conduktor Console Database port                                                                                                                 |             |
+| `config.database.host`                 | **Deprecated** Conduktor Console Database host. Automatically fallback to `config.database.hosts[0].host` if set                                |             |
+| `config.database.port`                 | **Deprecated** Conduktor Console Database port. Automatically fallback to `config.database.hosts[0].port` if set                                |             |
+| `config.database.name`                 | Your Conduktor Console Database name                                                                                                            | `""`        |
 | `config.database.username`             | Your Conduktor Console Database username                                                                                                        | `""`        |
 | `config.database.password`             | Your Conduktor Console Database password                                                                                                        | `""`        |
 | `config.license`                       | Conduktor Console Enterprise license, if none given, the product will run in free tier                                                          | `""`        |
@@ -197,7 +198,7 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/co
 | `platform.priorityClassName`                  | Conduktor Console pods' priorityClassName                                                                                                                    | `""`                          |
 | `platform.topologySpreadConstraints`          | Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template                                     | `[]`                          |
 | `platform.schedulerName`                      | Name of the k8s scheduler (other than default) for Conduktor Console pods                                                                                    | `""`                          |
-| `platform.terminationGracePeriodSeconds`      | Seconds Redmine pod needs to terminate gracefully                                                                                                            | `""`                          |
+| `platform.terminationGracePeriodSeconds`      | Seconds Redmine pod needs to terminate gracefully                                                                                                            | `30`                          |
 | `platform.lifecycleHooks`                     | for the Conduktor Console container(s) to automate configuration before or after startup                                                                     | `{}`                          |
 | `platform.dataVolume`                         | Configure the data volume to store Conduktor Console data                                                                                                    | `{}`                          |
 | `platform.tmpVolume`                          | Configure the /tmp volume which store various data related to running services                                                                               | `{}`                          |
@@ -415,18 +416,22 @@ config:
     name: "my-org"
 
   admin:
-    email: "admin@my-org.com"
-    password: "admin"
+    email: "<admin_email>"
+    password: "<admin_password>"
 
   database:
-    host: ""
-    port: 5432
-    name: "postgres"
-    username: ""
-    password: ""
+    hosts:
+      - host: "<postgres_host>"
+        port: 5432
+    name: "<postgres_database>"
+    username: "<postgres_username>"
+    password: "<postgres_password>"
+    # or you can provide a full database URL
+    # url: "jdbc:postgresql://<user>:<password>@<server1>:<port>/<dbname>"
 
-  license: "${ENTERPRISE_LICENSE}"
+  license: "<ENTERPRISE_LICENSE>"
 ```
+License can also be passed as environment variable named `CDK_LICENSE` from a secret using either `existingLicenseSecret` that expect a key named `CDK_LICENSE` or `extraEnvVars` or `extraEnvVarsSecret`. 
 
 ### Install with a basic SSO configuration
 
@@ -436,27 +441,30 @@ config:
     name: "my-org"
 
   admin:
-    email: "admin@my-org.com"
-    password: "admin"
+    email: "<admin_email>"
+    password: "<admin_password>"
 
   database:
-    host: ""
-    port: 5432
-    name: "postgres"
-    username: ""
-    password: ""
+    hosts:
+      - host: "<postgres_host>"
+        port: 5432
+    name: "<postgres_database>"
+    username: "<postgres_username>"
+    password: "<postgres_password>"
+    
   sso:
     oauth2:
-      - name: "auth0"
+      - name: "<idp-id>"
         default: true
-        client-id: <client_id>
-        client-secret: <client_secret>
-        callback-uri: http://localhost/auth/oauth/callback/auth0
+        client-id: "<client_id>"
+        client-secret: "<client_secret>"
+        callback-uri: "http://localhost/auth/oauth/callback/<idp-id>"
         openid:
-          issuer: https://conduktor-staging.eu.auth0.com/
+          issuer: "https://idp-host.com/"
 
   license: "<license_key>"
 ```
+More details on SSO configuration can be found in our [documentation](https://docs.conduktor.io/guide/conduktor-in-production/deploy-artifacts/deploy-console/env-variables#sso-properties).
 
 ### Install with a Kafka cluster
 
@@ -466,15 +474,17 @@ config:
     name: "my-org"
 
   admin:
-    email: "admin@my-org.com"
-    password: "admin"
+    email: "<admin_email>"
+    password: "<admin_password>"
 
   database:
-    host: ""
-    port: 5432
-    name: "postgres"
-    username: ""
-    password: ""
+    hosts:
+      - host: "<postgres_host>"
+        port: 5432
+    name: "<postgres_database>"
+    username: "<postgres_username>"
+    password: "<postgres_password>"
+    
   clusters:
     - id: my-local-kafka-cluster
       name: My Local Kafka Cluster
@@ -493,15 +503,17 @@ config:
     name: "my-org"
 
   admin:
-    email: "admin@my-org.com"
-    password: "admin"
+    email: "<admin_email>"
+    password: "<admin_password>"
 
   database:
-    host: ""
-    port: 5432
-    name: "postgres"
-    username: ""
-    password: ""
+    hosts:
+      - host: "<postgres_host>"
+        port: 5432
+    name: "<postgres_database>"
+    username: "<postgres_username>"
+    password: "<postgres_password>"
+    
   clusters:
     - id: confluent-cloud-cluster
       name: Confluent Cloud Cluster
@@ -512,14 +524,12 @@ config:
         security.protocol=SASL_SSL
         sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="YOUR_API_KEY" password="YOUR_API_SECRET";
       schemaRegistry:
-      id: confluent-cloud-sr
-      url: https://psrc-xxxxx.region.provider.confluent.cloud
-      properties: |
-        basic.auth.credentials.source=USER_INFO
-        basic.auth.user.info=SR_API_KEY:SR_API_SECRET
+        id: confluent-cloud-sr
+        url: https://psrc-xxxxx.region.provider.confluent.cloud
+        properties: |
+          basic.auth.credentials.source=USER_INFO
+          basic.auth.user.info=SR_API_KEY:SR_API_SECRET
 ```
-
-
 
 ### Install without Conduktor monitoring
 
@@ -529,15 +539,16 @@ config:
     name: "my-org"
 
   admin:
-    email: "admin@my-org.com"
-    password: "admin"
+    email: "<admin_email>"
+    password: "<admin_password>"
 
   database:
-    host: ""
-    port: 5432
-    name: "postgres"
-    username: ""
-    password: ""
+    hosts:
+      - host: "<postgres_host>"
+        port: 5432
+    name: "<postgres_database>"
+    username: "<postgres_username>"
+    password: "<postgres_password>"
 
 platformCortex:
   enabled: false
@@ -572,11 +583,12 @@ config:
 
 We expect the secret to contain the following keys:
 
-- "CDK_ORGANIZATION_NAME": name of the organization
-- "CDK_ADMIN_EMAIL" : email of the admin user
-- "CDK_ADMIN_PASSWORD" : password of the admin user
-- "CDK_DATABASE_PASSWORD": password of the database
-- "CDK_DATABASE_USERNAME": username of the database
+- "`CDK_ORGANIZATION_NAME`": name of the organization
+- "`CDK_ADMIN_EMAIL`" : email of the admin user
+- "`CDK_ADMIN_PASSWORD`" : password of the admin user
+- "`CDK_DATABASE_PASSWORD`": password of the database
+- "`CDK_DATABASE_USERNAME`": username of the database
+- Optional: "`CDK_DATABASE_URL`": full database URL, if not provided we will build it using the other parameters. If you provide this parameter, the `CDK_DATABASE_HOST`, `CDK_DATABASE_PORT` and `CDK_DATABASE_NAME` parameters will be ignored.
 
 ```yaml
 # values.yaml
@@ -601,6 +613,7 @@ data:
   CDK_ADMIN_PASSWORD: <your_admin_password>
   CDK_DATABASE_PASSWORD: <your_database_password>
   CDK_DATABASE_USERNAME: <your_database_username>
+  # CDK_DATABASE_URL: jdbc:postgresql://<user>:<password>@<server1>:<port>/<dbname>  # Optional
 ```
 
 ### Provide monitoring configuration as a Kubernetes Secret

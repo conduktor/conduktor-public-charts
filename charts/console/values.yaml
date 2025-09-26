@@ -75,17 +75,21 @@ config:
     ## @param config.admin.password Your Conduktor Console Admin password. If change current admin user password will be updated.
     ## Could be provided via an existing secret with `config.existingSecret` using the key `CDK_ADMIN_PASSWORD`.
     password: ""
-  ## @param config.database.host Your Conduktor Console Database host
-  ## @param config.database.port Your Conduktor Console Database port
+  ## @param config.database.url Your Conduktor Console Database URL (postgresql or jdbc format)
+  ## @param config.database.hosts List of Conduktor Console Database hosts (host and port)
+  ## @extra config.database.hosts[].host [string: ""] Conduktor Console Database host
+  ## @extra config.database.hosts[].port [number: 5432] Conduktor Console Database port
+  ## @extra config.database.host [string: ""] **Deprecated** Conduktor Console Database host. Automatically fallback to `config.database.hosts[0].host` if set
+  ## @extra config.database.port [number: 5432] **Deprecated** Conduktor Console Database port. Automatically fallback to `config.database.hosts[0].port` if set
   ## @param config.database.name Your Conduktor Console Database name
   ## @param config.database.username Your Conduktor Console Database username
   ## Could be provided via an existing secret with `config.existingSecret` using the key `CDK_DATABASE_PASSWORD`.
   ## @param config.database.password Your Conduktor Console Database password
   ## Could be provided via an existing secret with `config.existingSecret` using the key `CDK_DATABASE_USERNAME`.
   database:
-    host: ""
-    port: 5432
-    name: "postgres"
+    url: ""
+    hosts: []
+    name: ""
     password: ""
     username: ""
   ## @param config.license Conduktor Console Enterprise license, if none given, the product will run in free tier
@@ -101,11 +105,13 @@ config:
   ## - "CDK_ORGANIZATION_NAME": name of the organization
   ## - "CDK_ADMIN_EMAIL"      : email of the admin user
   ## - "CDK_ADMIN_PASSWORD"   : password of the admin user
+  ## - "CDK_DATABASE_URL": postgresql/jdbc url of the database
+  ## or
   ## - "CDK_DATABASE_PASSWORD": password of the database
   ## - "CDK_DATABASE_USERNAME": username of the database
   ##
   ## NOTE: 'config.organization.name', 'config.admin.email', 'config.admin.password',
-  ## 'config.database.username', 'config.database.password' will be ignored
+  ##  'config.database.url', 'config.database.username', 'config.database.password' will be ignored
   existingSecret: ""
   platform:
     ## @param config.platform.external.url Force the platform to redirect and use this URL (useful when behind a proxy to fix SSO issues)
@@ -416,7 +422,7 @@ platform:
   ## @param platform.terminationGracePeriodSeconds Seconds Redmine pod needs to terminate gracefully
   ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods
   ##
-  terminationGracePeriodSeconds: ""
+  terminationGracePeriodSeconds: 30
   ## @param platform.lifecycleHooks for the Conduktor Console container(s) to automate configuration before or after startup
   ##
   lifecycleHooks: {}
