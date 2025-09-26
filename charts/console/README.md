@@ -253,6 +253,7 @@ Console expose metrics that could be collected and presented if your environment
 | `service.extraPorts`               | Extra ports to expose in Conduktor Console service (normally used with the `sidecars` value)                                     | `[]`                     |
 | `service.sessionAffinity`          | Control where client requests go, to the same pod or round-robin                                                                 | `None`                   |
 | `service.sessionAffinityConfig`    | Additional settings for the sessionAffinity                                                                                      | `{}`                     |
+| `service.extraSpecs`               | Extra specs for the service to be added under `spec` key                                                                         | `{}`                     |
 | `ingress.enabled`                  | Enable ingress record generation for Conduktor Console                                                                           | `false`                  |
 | `ingress.pathType`                 | Ingress path type                                                                                                                | `ImplementationSpecific` |
 | `ingress.apiVersion`               | Force Ingress API version (automatically detected if not set)                                                                    | `""`                     |
@@ -364,6 +365,7 @@ Console expose metrics that could be collected and presented if your environment
 | `platformCortex.service.extraPorts`                 | Extra ports to expose in Conduktor Console Cortex service (normally used with the `sidecars` value)                                                                 | `[]`                                 |
 | `platformCortex.service.sessionAffinity`            | Control where client requests go, to the same pod or round-robin                                                                                                    | `None`                               |
 | `platformCortex.service.sessionAffinityConfig`      | Additional settings for the sessionAffinity                                                                                                                         | `{}`                                 |
+| `platformCortex.service.extraSpecs`                 | Extra specs for the service to be added under `spec` key                                                                                                            | `{}`                                 |
 
 ## Snippets
 

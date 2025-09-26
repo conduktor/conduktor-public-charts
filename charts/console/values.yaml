@@ -626,6 +626,12 @@ service:
   ##     timeoutSeconds: 300
   ##
   sessionAffinityConfig: {}
+  ## @param service.extraSpecs Extra specs for the service to be added under `spec` key
+  ## ref https://kubernetes.io/docs/reference/kubernetes-api/service-resources/service-v1/#ServiceSpec
+  ## extraSpecs:
+  ##   loadBalancerIP: "10.10.10.10"
+  extraSpecs: {}
+
 ## Conduktor Console ingress parameters
 ## ref: http://kubernetes.io/docs/user-guide/ingress/
 ##
@@ -1076,6 +1082,11 @@ platformCortex:
     ##     timeoutSeconds: 300
     ##
     sessionAffinityConfig: {}
+    ## @param platformCortex.service.extraSpecs Extra specs for the service to be added under `spec` key
+    ## ref https://kubernetes.io/docs/reference/kubernetes-api/service-resources/service-v1/#ServiceSpec
+    ## extraSpecs:
+    ##   loadBalancerIP: "10.10.10.10"
+    extraSpecs: {}
 ## @skip tests
 tests:
   enabled: false

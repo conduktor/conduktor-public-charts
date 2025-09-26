@@ -40,6 +40,9 @@ spec:
   {{- if and (eq .Values.service.type "LoadBalancer") (not (empty .Values.service.loadBalancerSourceRanges)) }}
   loadBalancerSourceRanges: {{ .Values.service.loadBalancerSourceRanges }}
   {{- end }}
+  {{- if .Values.service.extraSpecs }}
+  {{- include "common.tplvalues.render" (dict "value" .Values.service.extraSpecs "context" $) | nindent 2 }}
+  {{- end }}
   ports:
     - name: http
       port: {{ .Values.service.ports.http }}
