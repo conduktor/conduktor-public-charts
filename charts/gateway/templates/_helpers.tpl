@@ -246,3 +246,30 @@ Params :
   {{- $_ := set $.dashboard "title" $.title -}}
 
 {{- end -}}
+
+
+{{- define "conduktor-gateway.nodeAffinity" -}}
+{{- if .Values.affinity.nodeAffinity }}
+{{- include "common.tplvalues.render" (dict "value" .Values.affinity.nodeAffinity "context" $) }}
+{{- end -}}
+{{- end -}}
+
+{{- define "conduktor-gateway.podAffinity" -}}
+{{- if .Values.affinity.podAffinity }}
+{{- include "common.tplvalues.render" (dict "value" .Values.affinity.podAffinity "context" $) }}
+{{- end -}}
+{{- end -}}
+
+{{- define "conduktor-gateway.podAntiAffinity" -}}
+{{- if .Values.affinity.podAntiAffinity }}
+{{- include "common.tplvalues.render" (dict "value" .Values.affinity.podAntiAffinity "context" $) }}
+{{- else if and .Values.affinity.podAntiAffinityPreset .Values.affinity.podAntiAffinityPreset.enable -}}
+preferredDuringSchedulingIgnoredDuringExecution:
+  - podAffinityTerm:
+      topologyKey: {{ .Values.affinity.podAntiAffinityPreset.topologyKey | default "kubernetes.io/hostname" | quote }}
+      labelSelector:
+        matchLabels:
+          {{- include "conduktor-gateway.podSelectorLabels" . | nindent 10 }}
+    weight: 1
+{{- end -}}
+{{- end -}}

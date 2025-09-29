@@ -502,8 +502,41 @@ nodeSelector: {}
 ## @param tolerations Container tolerations
 tolerations: []
 
-## @param affinity Container affinity
-affinity: {}
+## Affinity settings for Gateway pods
+##
+affinity:
+  ## @param affinity.nodeAffinity Gateway pods node affinity configuration
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
+  nodeAffinity: {}
+  # requiredDuringSchedulingIgnoredDuringExecution:
+  #   nodeSelectorTerms:
+  #     - matchExpressions:
+  #         - key: node-role.kubernetes.io/worker # node label key
+  #           operator: In
+  #           values:
+  #             - "data" # node label values
+
+  ## @param affinity.podAffinity Gateway pods affinity configuration
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  podAffinity: {}
+  # requiredDuringSchedulingIgnoredDuringExecution:
+  #      - labelSelector:
+  #          matchExpressions:
+  #          - key: app.kubernetes.io/name # pod label key to colocate with
+  #            operator: In
+  #            values:
+  #            - kafka # label values of the pods to colocate with
+  #        topologyKey: topology.kubernetes.io/zone
+
+  ## @param affinity.podAntiAffinity Gateway pods anti-affinity configuration
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  podAntiAffinity: {}
+
+  podAntiAffinityPreset:
+    ## @param affinity.podAntiAffinityPreset.enable Enable predefined pod anti-affinity presets that spread pods across nodes. If `affinity.podAntiAffinity` is set, this will be ignored. If both `affinity.podAntiAffinityPreset.enable` is `false` and `affinity.podAntiAffinity` is empty, no pod anti-affinity will be applied.
+    enable: true
+    ## @param affinity.podAntiAffinityPreset.topologyKey Topology key to use for pod anti-affinity preset (default: "kubernetes.io/hostname"). If `affinity.podAntiAffinity` is set, this will be ignored.
+    topologyKey: "kubernetes.io/hostname"
 
 ## @param podSecurityContext Conduktor Gateway Pod Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
