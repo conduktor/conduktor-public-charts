@@ -1,0 +1,1454 @@
+{
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "global": {
+            "type": "object",
+            "properties": {
+                "imageRegistry": {
+                    "type": "string",
+                    "description": "Global Docker image registry",
+                    "default": ""
+                },
+                "imagePullSecrets": {
+                    "type": "array",
+                    "description": "Global Docker registry secret names as an array",
+                    "default": [],
+                    "items": {}
+                },
+                "storageClass": {
+                    "type": "string",
+                    "description": "Global StorageClass for Persistent Volume(s)",
+                    "default": ""
+                }
+            }
+        },
+        "nameOverride": {
+            "type": "string",
+            "description": "String to partially override common.names.name",
+            "default": ""
+        },
+        "fullnameOverride": {
+            "type": "string",
+            "description": "String to fully override common.names.fullname",
+            "default": ""
+        },
+        "namespaceOverride": {
+            "type": "string",
+            "description": "String to fully override common.names.namespace",
+            "default": ""
+        },
+        "commonLabels": {
+            "type": "object",
+            "description": "Labels to add to all deployed objects",
+            "default": {}
+        },
+        "commonAnnotations": {
+            "type": "object",
+            "description": "Annotations to add to all deployed objects",
+            "default": {}
+        },
+        "clusterDomain": {
+            "type": "string",
+            "description": "Kubernetes cluster domain name",
+            "default": "cluster.local"
+        },
+        "extraDeploy": {
+            "type": "array",
+            "description": "Array of extra objects to deploy with the release",
+            "default": [],
+            "items": {}
+        },
+        "diagnosticMode": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable diagnostic mode (all probes will be disabled and the command will be overridden)",
+                    "default": false
+                },
+                "command": {
+                    "type": "array",
+                    "description": "Command to override all containers in the deployment",
+                    "default": [
+                        "sleep"
+                    ],
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "args": {
+                    "type": "array",
+                    "description": "Args to override all containers in the deployment",
+                    "default": [
+                        "infinity"
+                    ],
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "config": {
+            "type": "object",
+            "properties": {
+                "organization": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "Your Conduktor Console Organization. Default is `Conduktor` if not set.",
+                            "default": "Conduktor"
+                        }
+                    }
+                },
+                "admin": {
+                    "type": "object",
+                    "properties": {
+                        "email": {
+                            "type": "string",
+                            "description": "Your Conduktor Console Admin email. If changed a new admin user will be created with this email and previous admin user will still be available",
+                            "default": ""
+                        },
+                        "password": {
+                            "type": "string",
+                            "description": "Your Conduktor Console Admin password. If change current admin user password will be updated.",
+                            "default": ""
+                        }
+                    }
+                },
+                "database": {
+                    "type": "object",
+                    "properties": {
+                        "url": {
+                            "type": "string",
+                            "description": "Your Conduktor Console Database URL (postgresql or jdbc format)",
+                            "default": ""
+                        },
+                        "hosts": {
+                            "type": "array",
+                            "description": "List of Conduktor Console Database hosts (host and port)",
+                            "default": [],
+                            "items": {}
+                        },
+                        "name": {
+                            "type": "string",
+                            "description": "Your Conduktor Console Database name",
+                            "default": ""
+                        },
+                        "username": {
+                            "type": "string",
+                            "description": "Your Conduktor Console Database username",
+                            "default": ""
+                        },
+                        "password": {
+                            "type": "string",
+                            "description": "Your Conduktor Console Database password",
+                            "default": ""
+                        }
+                    }
+                },
+                "license": {
+                    "type": "string",
+                    "description": "Conduktor Console Enterprise license, if none given, the product will run in free tier",
+                    "default": ""
+                },
+                "existingLicenseSecret": {
+                    "type": "string",
+                    "description": "Name of an existing secret containing the license",
+                    "default": ""
+                },
+                "existingSecret": {
+                    "type": "string",
+                    "description": "Name of an existing secret containing sensitive configuration",
+                    "default": ""
+                },
+                "platform": {
+                    "type": "object",
+                    "properties": {
+                        "external": {
+                            "type": "object",
+                            "properties": {
+                                "url": {
+                                    "type": "string",
+                                    "description": "Force the platform to redirect and use this URL (useful when behind a proxy to fix SSO issues)",
+                                    "default": ""
+                                }
+                            }
+                        },
+                        "https": {
+                            "type": "object",
+                            "properties": {
+                                "selfSigned": {
+                                    "type": "boolean",
+                                    "description": "Enable HTTPS with a self-signed certificate (not recommended for production) based on 'config.platform.external.url' (required).",
+                                    "default": false
+                                },
+                                "existingSecret": {
+                                    "type": "string",
+                                    "description": "Enable HTTPS with an existing secret containing the tls.crt and tls.key (required).",
+                                    "default": ""
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "monitoringConfig": {
+            "type": "object",
+            "properties": {
+                "existingSecret": {
+                    "type": "string",
+                    "description": "The name of an existing Secret with your custom configuration for Conduktor Console Cortex",
+                    "default": ""
+                },
+                "scraper": {
+                    "type": "object",
+                    "properties": {
+                        "skipSSLCheck": {
+                            "type": "boolean",
+                            "description": "Skip TLS verification when scraping Platform metrics",
+                            "default": false
+                        },
+                        "caFile": {
+                            "type": "string",
+                            "description": "Skip TLS verification when scraping Platform metrics",
+                            "default": ""
+                        }
+                    }
+                },
+                "storage": {
+                    "type": "object",
+                    "properties": {
+                        "s3": {
+                            "type": "object",
+                            "description": "S3 storage configuration",
+                            "default": {}
+                        },
+                        "gcs": {
+                            "type": "object",
+                            "description": "GCS storage configuration",
+                            "default": {}
+                        },
+                        "azure": {
+                            "type": "object",
+                            "description": "Azure storage configuration",
+                            "default": {}
+                        },
+                        "swift": {
+                            "type": "object",
+                            "description": "Swift storage configuration",
+                            "default": {}
+                        }
+                    }
+                }
+            }
+        },
+        "platform": {
+            "type": "object",
+            "properties": {
+                "image": {
+                    "type": "object",
+                    "properties": {
+                        "registry": {
+                            "type": "string",
+                            "description": "Conduktor Console image registry",
+                            "default": "docker.io"
+                        },
+                        "repository": {
+                            "type": "string",
+                            "description": "Conduktor Console image repository",
+                            "default": "conduktor/conduktor-console"
+                        },
+                        "tag": {
+                            "type": "string",
+                            "description": "Conduktor Console image tag (immutable tags are recommended)",
+                            "default": "1.37.1"
+                        },
+                        "digest": {
+                            "type": "string",
+                            "description": "Conduktor Console image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)",
+                            "default": ""
+                        },
+                        "pullPolicy": {
+                            "type": "string",
+                            "description": "Conduktor Console image pull policy",
+                            "default": "IfNotPresent"
+                        },
+                        "pullSecrets": {
+                            "type": "array",
+                            "description": "Conduktor Console image pull secrets",
+                            "default": [],
+                            "items": {}
+                        },
+                        "debug": {
+                            "type": "boolean",
+                            "description": "Enable Conduktor Console image debug mode",
+                            "default": false
+                        }
+                    }
+                },
+                "replicaCount": {
+                    "type": "number",
+                    "description": "Number of Conduktor Console replicas to deploy",
+                    "default": 1
+                },
+                "containerPorts": {
+                    "type": "object",
+                    "properties": {
+                        "http": {
+                            "type": "number",
+                            "description": "Conduktor Console HTTP (or HTTPS if configured) container port",
+                            "default": 8080
+                        }
+                    }
+                },
+                "livenessProbe": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enable livenessProbe on Conduktor Console containers",
+                            "default": true
+                        },
+                        "initialDelaySeconds": {
+                            "type": "number",
+                            "description": "Initial delay seconds for livenessProbe",
+                            "default": 60
+                        },
+                        "periodSeconds": {
+                            "type": "number",
+                            "description": "Period seconds for livenessProbe",
+                            "default": 10
+                        },
+                        "timeoutSeconds": {
+                            "type": "number",
+                            "description": "Timeout seconds for livenessProbe",
+                            "default": 5
+                        },
+                        "failureThreshold": {
+                            "type": "number",
+                            "description": "Failure threshold for livenessProbe",
+                            "default": 3
+                        },
+                        "successThreshold": {
+                            "type": "number",
+                            "description": "Success threshold for livenessProbe",
+                            "default": 1
+                        }
+                    }
+                },
+                "readinessProbe": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enable readinessProbe on Conduktor Console containers",
+                            "default": true
+                        },
+                        "initialDelaySeconds": {
+                            "type": "number",
+                            "description": "Initial delay seconds for readinessProbe",
+                            "default": 60
+                        },
+                        "periodSeconds": {
+                            "type": "number",
+                            "description": "Period seconds for readinessProbe",
+                            "default": 10
+                        },
+                        "timeoutSeconds": {
+                            "type": "number",
+                            "description": "Timeout seconds for readinessProbe",
+                            "default": 5
+                        },
+                        "failureThreshold": {
+                            "type": "number",
+                            "description": "Failure threshold for readinessProbe",
+                            "default": 3
+                        },
+                        "successThreshold": {
+                            "type": "number",
+                            "description": "Success threshold for readinessProbe",
+                            "default": 1
+                        }
+                    }
+                },
+                "startupProbe": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enable startupProbe on Conduktor Console containers",
+                            "default": true
+                        },
+                        "initialDelaySeconds": {
+                            "type": "number",
+                            "description": "Initial delay seconds for startupProbe",
+                            "default": 10
+                        },
+                        "periodSeconds": {
+                            "type": "number",
+                            "description": "Period seconds for startupProbe",
+                            "default": 10
+                        },
+                        "timeoutSeconds": {
+                            "type": "number",
+                            "description": "Timeout seconds for startupProbe",
+                            "default": 5
+                        },
+                        "failureThreshold": {
+                            "type": "number",
+                            "description": "Failure threshold for startupProbe",
+                            "default": 10
+                        },
+                        "successThreshold": {
+                            "type": "number",
+                            "description": "Success threshold for startupProbe",
+                            "default": 1
+                        }
+                    }
+                },
+                "customLivenessProbe": {
+                    "type": "object",
+                    "description": "Custom livenessProbe that overrides the default one",
+                    "default": {}
+                },
+                "customReadinessProbe": {
+                    "type": "object",
+                    "description": "Custom readinessProbe that overrides the default one",
+                    "default": {}
+                },
+                "customStartupProbe": {
+                    "type": "object",
+                    "description": "Custom startupProbe that overrides the default one",
+                    "default": {}
+                },
+                "resources": {
+                    "type": "object",
+                    "properties": {
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": "string",
+                                    "description": "CPU limit for the platform container",
+                                    "default": "3000m"
+                                },
+                                "memory": {
+                                    "type": "string",
+                                    "description": "Memory limit for the container",
+                                    "default": "4Gi"
+                                }
+                            }
+                        },
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": "string",
+                                    "description": "CPU resource requests",
+                                    "default": "1000m"
+                                },
+                                "memory": {
+                                    "type": "string",
+                                    "description": "Memory resource requests",
+                                    "default": "2Gi"
+                                }
+                            }
+                        }
+                    }
+                },
+                "podSecurityContext": {
+                    "type": "object",
+                    "description": "Conduktor Console Pod Security Context",
+                    "default": {}
+                },
+                "containerSecurityContext": {
+                    "type": "object",
+                    "description": "Conduktor Console containers' Security Context",
+                    "default": {}
+                },
+                "existingConfigmap": {
+                    "type": "string",
+                    "description": "The name of an existing ConfigMap with your custom configuration for Conduktor Console",
+                    "default": ""
+                },
+                "command": {
+                    "type": "array",
+                    "description": "Override default container command (useful when using custom images)",
+                    "default": [],
+                    "items": {}
+                },
+                "args": {
+                    "type": "array",
+                    "description": "Override default container args (useful when using custom images)",
+                    "default": [],
+                    "items": {}
+                },
+                "hostAliases": {
+                    "type": "array",
+                    "description": "Conduktor Console pods host aliases",
+                    "default": [],
+                    "items": {}
+                },
+                "podLabels": {
+                    "type": "object",
+                    "description": "Extra labels for Conduktor Console pods",
+                    "default": {}
+                },
+                "podAnnotations": {
+                    "type": "object",
+                    "description": "Annotations for Conduktor Console pods",
+                    "default": {}
+                },
+                "podAffinityPreset": {
+                    "type": "string",
+                    "description": "Pod affinity preset. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`",
+                    "default": ""
+                },
+                "podAntiAffinityPreset": {
+                    "type": "string",
+                    "description": "Pod anti-affinity preset. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`",
+                    "default": "soft"
+                },
+                "nodeAffinityPreset": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "description": "Node affinity preset type. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`",
+                            "default": ""
+                        },
+                        "key": {
+                            "type": "string",
+                            "description": "Node label key to match. Ignored if `platform.affinity` is set",
+                            "default": ""
+                        },
+                        "values": {
+                            "type": "array",
+                            "description": "Node label values to match. Ignored if `platform.affinity` is set",
+                            "default": [],
+                            "items": {}
+                        }
+                    }
+                },
+                "affinity": {
+                    "type": "object",
+                    "description": "Affinity for Conduktor Console pods assignment",
+                    "default": {}
+                },
+                "nodeSelector": {
+                    "type": "object",
+                    "description": "Node labels for Conduktor Console pods assignment",
+                    "default": {}
+                },
+                "tolerations": {
+                    "type": "array",
+                    "description": "Tolerations for Conduktor Console pods assignment",
+                    "default": [],
+                    "items": {}
+                },
+                "updateStrategy": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "description": "Conduktor Console statefulset strategy type",
+                            "default": "RollingUpdate"
+                        }
+                    }
+                },
+                "priorityClassName": {
+                    "type": "string",
+                    "description": "Conduktor Console pods' priorityClassName",
+                    "default": ""
+                },
+                "topologySpreadConstraints": {
+                    "type": "array",
+                    "description": "Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template",
+                    "default": [],
+                    "items": {}
+                },
+                "schedulerName": {
+                    "type": "string",
+                    "description": "Name of the k8s scheduler (other than default) for Conduktor Console pods",
+                    "default": ""
+                },
+                "terminationGracePeriodSeconds": {
+                    "type": "number",
+                    "description": "Seconds Redmine pod needs to terminate gracefully",
+                    "default": 30
+                },
+                "lifecycleHooks": {
+                    "type": "object",
+                    "description": "for the Conduktor Console container(s) to automate configuration before or after startup",
+                    "default": {}
+                },
+                "dataVolume": {
+                    "type": "object",
+                    "description": "Configure the data volume to store Conduktor Console data",
+                    "default": {}
+                },
+                "tmpVolume": {
+                    "type": "object",
+                    "description": "Configure the /tmp volume which store various data related to running services",
+                    "default": {}
+                },
+                "extraEnvVars": {
+                    "type": "array",
+                    "description": "Array with extra environment variables to add to Conduktor Console nodes",
+                    "default": [],
+                    "items": {}
+                },
+                "extraEnvVarsCM": {
+                    "type": "string",
+                    "description": "Name of existing ConfigMap containing extra env vars for Conduktor Console nodes",
+                    "default": ""
+                },
+                "extraEnvVarsSecret": {
+                    "type": "string",
+                    "description": "Name of existing Secret containing extra env vars for Conduktor Console nodes",
+                    "default": ""
+                },
+                "extraVolumes": {
+                    "type": "array",
+                    "description": "Optionally specify extra list of additional volumes for the Conduktor Console pod(s).",
+                    "default": [],
+                    "items": {}
+                },
+                "extraVolumeMounts": {
+                    "type": "array",
+                    "description": "Optionally specify extra list of additional volumeMounts for the Conduktor Console container(s).",
+                    "default": [],
+                    "items": {}
+                },
+                "sidecars": {
+                    "type": "array",
+                    "description": "Add additional sidecar containers to the Conduktor Console pod(s)",
+                    "default": [],
+                    "items": {}
+                },
+                "initContainers": {
+                    "type": "array",
+                    "description": "Add additional init containers to the Conduktor Console pod(s)",
+                    "default": [],
+                    "items": {}
+                },
+                "metrics": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enable the export of Prometheus metrics",
+                            "default": false
+                        },
+                        "serviceMonitor": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "if `true`, creates a Prometheus Operator ServiceMonitor (also requires `metrics.enabled` to be `true`)",
+                                    "default": false
+                                },
+                                "namespace": {
+                                    "type": "string",
+                                    "description": "Namespace in which Prometheus is running",
+                                    "default": ""
+                                },
+                                "annotations": {
+                                    "type": "object",
+                                    "description": "Additional custom annotations for the ServiceMonitor",
+                                    "default": {}
+                                },
+                                "labels": {
+                                    "type": "object",
+                                    "description": "Extra labels for the ServiceMonitor",
+                                    "default": {}
+                                },
+                                "jobLabel": {
+                                    "type": "string",
+                                    "description": "The name of the label on the target service to use as the job name in Prometheus",
+                                    "default": "app.kubernetes.io/name"
+                                },
+                                "honorLabels": {
+                                    "type": "boolean",
+                                    "description": "honorLabels chooses the metric's labels on collisions with target labels",
+                                    "default": false
+                                },
+                                "interval": {
+                                    "type": "string",
+                                    "description": "Interval at which metrics should be scraped.",
+                                    "default": ""
+                                },
+                                "scheme": {
+                                    "type": "string",
+                                    "description": "Protocol scheme to use for scraping (http or https). By default, automatically resolved based on container TLS configuration.",
+                                    "default": ""
+                                },
+                                "tlsConfig": {
+                                    "type": "object",
+                                    "description": "TLS configuration for the ServiceMonitor. By default, automatically resolved based on container TLS configuration using config.platform.https config and tls.crt in secret.",
+                                    "default": {}
+                                },
+                                "scrapeTimeout": {
+                                    "type": "string",
+                                    "description": "Timeout after which the scrape is ended",
+                                    "default": ""
+                                },
+                                "metricRelabelings": {
+                                    "type": "array",
+                                    "description": "Specify additional relabeling of metrics",
+                                    "default": [],
+                                    "items": {}
+                                },
+                                "relabelings": {
+                                    "type": "array",
+                                    "description": "Specify general relabeling",
+                                    "default": [],
+                                    "items": {}
+                                },
+                                "selector": {
+                                    "type": "object",
+                                    "description": "Prometheus instance selector labels",
+                                    "default": {}
+                                },
+                                "extraParams": {
+                                    "type": "object",
+                                    "description": "Extra parameters for the ServiceMonitor",
+                                    "default": {}
+                                }
+                            }
+                        },
+                        "grafana": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "Enable grafana dashboards to installation",
+                                    "default": false
+                                },
+                                "namespace": {
+                                    "type": "string",
+                                    "description": "Namespace used to deploy Grafana dashboards by default use the same namespace as Conduktor Csonsole",
+                                    "default": ""
+                                },
+                                "matchLabels": {
+                                    "type": "object",
+                                    "description": "Label selector for Grafana instance",
+                                    "default": {}
+                                },
+                                "labels": {
+                                    "type": "object",
+                                    "description": "Additional custom labels for Grafana dashboard ConfigMap",
+                                    "default": {}
+                                },
+                                "folder": {
+                                    "type": "string",
+                                    "description": "Grafana dashboard folder name",
+                                    "default": ""
+                                },
+                                "datasources": {
+                                    "type": "object",
+                                    "properties": {
+                                        "prometheus": {
+                                            "type": "string",
+                                            "description": "Prometheus datasource to use for metric dashboard",
+                                            "default": "prometheus"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "service": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "description": "Conduktor Console service type",
+                    "default": "ClusterIP"
+                },
+                "ports": {
+                    "type": "object",
+                    "properties": {
+                        "http": {
+                            "type": "number",
+                            "description": "Conduktor Console service HTTP port",
+                            "default": 80
+                        }
+                    }
+                },
+                "nodePorts": {
+                    "type": "object",
+                    "properties": {
+                        "http": {
+                            "type": "string",
+                            "description": "Node port for HTTP",
+                            "default": ""
+                        }
+                    }
+                },
+                "clusterIP": {
+                    "type": "string",
+                    "description": "Conduktor Console service Cluster IP",
+                    "default": ""
+                },
+                "loadBalancerSourceRanges": {
+                    "type": "array",
+                    "description": "Conduktor Console service Load Balancer sources",
+                    "default": [],
+                    "items": {}
+                },
+                "externalTrafficPolicy": {
+                    "type": "string",
+                    "description": "Conduktor Console service external traffic policy",
+                    "default": "Cluster"
+                },
+                "labels": {
+                    "type": "object",
+                    "description": "Additional custom labels for Conduktor Console service",
+                    "default": {}
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Additional custom annotations for Conduktor Console service",
+                    "default": {}
+                },
+                "extraPorts": {
+                    "type": "array",
+                    "description": "Extra ports to expose in Conduktor Console service (normally used with the `sidecars` value)",
+                    "default": [],
+                    "items": {}
+                },
+                "sessionAffinity": {
+                    "type": "string",
+                    "description": "Control where client requests go, to the same pod or round-robin",
+                    "default": "None"
+                },
+                "sessionAffinityConfig": {
+                    "type": "object",
+                    "description": "Additional settings for the sessionAffinity",
+                    "default": {}
+                },
+                "extraSpecs": {
+                    "type": "object",
+                    "description": "Extra specs for the service to be added under `spec` key",
+                    "default": {}
+                }
+            }
+        },
+        "ingress": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable ingress record generation for Conduktor Console",
+                    "default": false
+                },
+                "pathType": {
+                    "type": "string",
+                    "description": "Ingress path type",
+                    "default": "ImplementationSpecific"
+                },
+                "apiVersion": {
+                    "type": "string",
+                    "description": "Force Ingress API version (automatically detected if not set)",
+                    "default": ""
+                },
+                "hostname": {
+                    "type": "string",
+                    "description": "Default host for the ingress record",
+                    "default": "platform.local"
+                },
+                "ingressClassName": {
+                    "type": "string",
+                    "description": "IngressClass that will be used to implement the Ingress (Kubernetes 1.18+)",
+                    "default": ""
+                },
+                "path": {
+                    "type": "string",
+                    "description": "Default path for the ingress record",
+                    "default": "/"
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.",
+                    "default": {}
+                },
+                "tls": {
+                    "type": "boolean",
+                    "description": "Enable TLS configuration for the host defined at `ingress.hostname` parameter",
+                    "default": false
+                },
+                "selfSigned": {
+                    "type": "boolean",
+                    "description": "Create a TLS secret for this ingress record using self-signed certificates generated by Helm",
+                    "default": false
+                },
+                "extraHosts": {
+                    "type": "array",
+                    "description": "An array with additional hostname(s) to be covered with the ingress record",
+                    "default": [],
+                    "items": {}
+                },
+                "extraPaths": {
+                    "type": "array",
+                    "description": "An array with additional arbitrary paths that may need to be added to the ingress under the main host",
+                    "default": [],
+                    "items": {}
+                },
+                "extraTls": {
+                    "type": "array",
+                    "description": "TLS configuration for additional hostname(s) to be covered with this ingress record",
+                    "default": [],
+                    "items": {}
+                },
+                "secrets": {
+                    "type": "array",
+                    "description": "Existing TLS secrets or custom TLS certificates/keys secrets to create and use",
+                    "default": [],
+                    "items": {}
+                },
+                "extraRules": {
+                    "type": "array",
+                    "description": "Additional rules to be covered with this ingress record",
+                    "default": [],
+                    "items": {}
+                }
+            }
+        },
+        "serviceAccount": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean",
+                    "description": "Specifies whether a ServiceAccount should be created",
+                    "default": true
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The name of the ServiceAccount to use.",
+                    "default": ""
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Additional Service Account annotations (evaluated as a template)",
+                    "default": {}
+                },
+                "automountServiceAccountToken": {
+                    "type": "boolean",
+                    "description": "Automount service account token for the server service account",
+                    "default": true
+                }
+            }
+        },
+        "platformCortex": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable Conduktor Console Cortex",
+                    "default": true
+                },
+                "image": {
+                    "type": "object",
+                    "properties": {
+                        "registry": {
+                            "type": "string",
+                            "description": "Conduktor Console Cortex image registry",
+                            "default": "docker.io"
+                        },
+                        "repository": {
+                            "type": "string",
+                            "description": "Conduktor Console Cortex image repository",
+                            "default": "conduktor/conduktor-console-cortex"
+                        },
+                        "tag": {
+                            "type": "string",
+                            "description": "Conduktor Console Cortex image tag (immutable tags are recommended)",
+                            "default": "1.37.1"
+                        },
+                        "digest": {
+                            "type": "string",
+                            "description": "Conduktor Console Cortex image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)",
+                            "default": ""
+                        },
+                        "pullPolicy": {
+                            "type": "string",
+                            "description": "Conduktor Console Cortex image pull policy",
+                            "default": "IfNotPresent"
+                        },
+                        "pullSecrets": {
+                            "type": "array",
+                            "description": "Conduktor Console Cortex image pull secrets",
+                            "default": [],
+                            "items": {}
+                        },
+                        "debug": {
+                            "type": "boolean",
+                            "description": "Enable Conduktor Console Cortex image debug mode",
+                            "default": false
+                        }
+                    }
+                },
+                "replicaCount": {
+                    "type": "number",
+                    "description": "Number of Conduktor Console Cortex replicas to deploy",
+                    "default": 1
+                },
+                "containerPorts": {
+                    "type": "object",
+                    "properties": {
+                        "cortex": {
+                            "type": "number",
+                            "description": "Conduktor Console Cortex HTTP (or HTTPS if configured) container port",
+                            "default": 9009
+                        },
+                        "alertmanager": {
+                            "type": "number",
+                            "description": "Conduktor Console AlertManager HTTP (or HTTPS if configured) container port",
+                            "default": 9010
+                        },
+                        "prometheus": {
+                            "type": "number",
+                            "description": "Conduktor Console Prometheus HTTP (or HTTPS if configured) container port",
+                            "default": 9090
+                        }
+                    }
+                },
+                "livenessProbe": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enable livenessProbe on Conduktor Console Cortex containers",
+                            "default": true
+                        },
+                        "initialDelaySeconds": {
+                            "type": "number",
+                            "description": "Initial delay seconds for livenessProbe",
+                            "default": 30
+                        },
+                        "periodSeconds": {
+                            "type": "number",
+                            "description": "Period seconds for livenessProbe",
+                            "default": 10
+                        },
+                        "timeoutSeconds": {
+                            "type": "number",
+                            "description": "Timeout seconds for livenessProbe",
+                            "default": 5
+                        },
+                        "failureThreshold": {
+                            "type": "number",
+                            "description": "Failure threshold for livenessProbe",
+                            "default": 3
+                        },
+                        "successThreshold": {
+                            "type": "number",
+                            "description": "Success threshold for livenessProbe",
+                            "default": 1
+                        }
+                    }
+                },
+                "readinessProbe": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enable readinessProbe on Conduktor Console Cortex containers",
+                            "default": true
+                        },
+                        "initialDelaySeconds": {
+                            "type": "number",
+                            "description": "Initial delay seconds for readinessProbe",
+                            "default": 30
+                        },
+                        "periodSeconds": {
+                            "type": "number",
+                            "description": "Period seconds for readinessProbe",
+                            "default": 10
+                        },
+                        "timeoutSeconds": {
+                            "type": "number",
+                            "description": "Timeout seconds for readinessProbe",
+                            "default": 5
+                        },
+                        "failureThreshold": {
+                            "type": "number",
+                            "description": "Failure threshold for readinessProbe",
+                            "default": 3
+                        },
+                        "successThreshold": {
+                            "type": "number",
+                            "description": "Success threshold for readinessProbe",
+                            "default": 1
+                        }
+                    }
+                },
+                "startupProbe": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enable startupProbe on Conduktor Console Cortex containers",
+                            "default": false
+                        },
+                        "initialDelaySeconds": {
+                            "type": "number",
+                            "description": "Initial delay seconds for startupProbe",
+                            "default": 10
+                        },
+                        "periodSeconds": {
+                            "type": "number",
+                            "description": "Period seconds for startupProbe",
+                            "default": 10
+                        },
+                        "timeoutSeconds": {
+                            "type": "number",
+                            "description": "Timeout seconds for startupProbe",
+                            "default": 5
+                        },
+                        "failureThreshold": {
+                            "type": "number",
+                            "description": "Failure threshold for startupProbe",
+                            "default": 10
+                        },
+                        "successThreshold": {
+                            "type": "number",
+                            "description": "Success threshold for startupProbe",
+                            "default": 1
+                        }
+                    }
+                },
+                "customLivenessProbe": {
+                    "type": "object",
+                    "description": "Custom livenessProbe that overrides the default one",
+                    "default": {}
+                },
+                "customReadinessProbe": {
+                    "type": "object",
+                    "description": "Custom readinessProbe that overrides the default one",
+                    "default": {}
+                },
+                "customStartupProbe": {
+                    "type": "object",
+                    "description": "Custom startupProbe that overrides the default one",
+                    "default": {}
+                },
+                "resources": {
+                    "type": "object",
+                    "properties": {
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": "string",
+                                    "description": "CPU limit for the platform cortex container",
+                                    "default": "2000m"
+                                },
+                                "memory": {
+                                    "type": "string",
+                                    "description": "Memory limit for the container",
+                                    "default": "2Gi"
+                                }
+                            }
+                        },
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": "string",
+                                    "description": "CPU resource requests",
+                                    "default": "500m"
+                                },
+                                "memory": {
+                                    "type": "string",
+                                    "description": "Memory resource requests",
+                                    "default": "500Mi"
+                                }
+                            }
+                        }
+                    }
+                },
+                "podSecurityContext": {
+                    "type": "object",
+                    "description": "Conduktor Console Cortex Pod Security Context",
+                    "default": {}
+                },
+                "containerSecurityContext": {
+                    "type": "object",
+                    "description": "Conduktor Console Cortex containers' Security Context",
+                    "default": {}
+                },
+                "existingConfigmap": {
+                    "type": "string",
+                    "description": "The name of an existing ConfigMap with your custom configuration for Conduktor Console Cortex",
+                    "default": ""
+                },
+                "command": {
+                    "type": "array",
+                    "description": "Override default container command (useful when using custom images)",
+                    "default": [],
+                    "items": {}
+                },
+                "args": {
+                    "type": "array",
+                    "description": "Override default container args (useful when using custom images)",
+                    "default": [],
+                    "items": {}
+                },
+                "hostAliases": {
+                    "type": "array",
+                    "description": "Conduktor Console Cortex pods host aliases",
+                    "default": [],
+                    "items": {}
+                },
+                "podLabels": {
+                    "type": "object",
+                    "description": "Extra labels for Conduktor Console Cortex pods",
+                    "default": {}
+                },
+                "podAnnotations": {
+                    "type": "object",
+                    "description": "Annotations for Conduktor Console Cortex pods",
+                    "default": {}
+                },
+                "podAffinityPreset": {
+                    "type": "string",
+                    "description": "Pod affinity preset. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`",
+                    "default": ""
+                },
+                "podAntiAffinityPreset": {
+                    "type": "string",
+                    "description": "Pod anti-affinity preset. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`",
+                    "default": "soft"
+                },
+                "nodeAffinityPreset": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "description": "Node affinity preset type. Ignored if `platform.affinity` is set. Allowed values: `soft` or `hard`",
+                            "default": ""
+                        },
+                        "key": {
+                            "type": "string",
+                            "description": "Node label key to match. Ignored if `platform.affinity` is set",
+                            "default": ""
+                        },
+                        "values": {
+                            "type": "array",
+                            "description": "Node label values to match. Ignored if `platform.affinity` is set",
+                            "default": [],
+                            "items": {}
+                        }
+                    }
+                },
+                "affinity": {
+                    "type": "object",
+                    "description": "Affinity for Conduktor Console cortex pods assignment",
+                    "default": {}
+                },
+                "nodeSelector": {
+                    "type": "object",
+                    "description": "Node labels for Conduktor Console Cortex pods assignment",
+                    "default": {}
+                },
+                "tolerations": {
+                    "type": "array",
+                    "description": "Tolerations for Conduktor Console Cortex pods assignment",
+                    "default": [],
+                    "items": {}
+                },
+                "updateStrategy": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "description": "Conduktor Console Cortex statefulset strategy type",
+                            "default": "RollingUpdate"
+                        }
+                    }
+                },
+                "priorityClassName": {
+                    "type": "string",
+                    "description": "Conduktor Console Cortex pods' priorityClassName",
+                    "default": ""
+                },
+                "topologySpreadConstraints": {
+                    "type": "array",
+                    "description": "Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template",
+                    "default": [],
+                    "items": {}
+                },
+                "schedulerName": {
+                    "type": "string",
+                    "description": "Name of the k8s scheduler (other than default) for Conduktor Console Cortex pods",
+                    "default": ""
+                },
+                "terminationGracePeriodSeconds": {
+                    "type": "string",
+                    "description": "Seconds Redmine pod needs to terminate gracefully",
+                    "default": ""
+                },
+                "lifecycleHooks": {
+                    "type": "object",
+                    "description": "for the Conduktor Console Cortex container(s) to automate configuration before or after startup",
+                    "default": {}
+                },
+                "extraEnvVars": {
+                    "type": "array",
+                    "description": "Array with extra environment variables to add to Conduktor Console Cortex nodes",
+                    "default": [],
+                    "items": {}
+                },
+                "extraEnvVarsCM": {
+                    "type": "string",
+                    "description": "Name of existing ConfigMap containing extra env vars for Conduktor Console Cortex nodes",
+                    "default": ""
+                },
+                "extraEnvVarsSecret": {
+                    "type": "string",
+                    "description": "Name of existing Secret containing extra env vars for Conduktor Console Cortex nodes",
+                    "default": ""
+                },
+                "dataVolume": {
+                    "type": "object",
+                    "description": "Configure the data volume to store Conduktor Console Cortex data",
+                    "default": {}
+                },
+                "tmpVolume": {
+                    "type": "object",
+                    "description": "Configure the /tmp volume which store various data related to running services",
+                    "default": {}
+                },
+                "extraVolumes": {
+                    "type": "array",
+                    "description": "Optionally specify extra list of additional volumes for the Conduktor Console Cortex pod(s)",
+                    "default": [],
+                    "items": {}
+                },
+                "extraVolumeMounts": {
+                    "type": "array",
+                    "description": "Optionally specify extra list of additional volumeMounts for the Conduktor Console Cortex container(s)",
+                    "default": [],
+                    "items": {}
+                },
+                "sidecars": {
+                    "type": "array",
+                    "description": "Add additional sidecar containers to the Conduktor Console Cortex pod(s)",
+                    "default": [],
+                    "items": {}
+                },
+                "initContainers": {
+                    "type": "array",
+                    "description": "Add additional init containers to the Conduktor Console Cortex pod(s)",
+                    "default": [],
+                    "items": {}
+                },
+                "service": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "description": "Conduktor Console Cortex service type",
+                            "default": "ClusterIP"
+                        },
+                        "ports": {
+                            "type": "object",
+                            "properties": {
+                                "cortex": {
+                                    "type": "number",
+                                    "description": "Conduktor Console Cortex service HTTP port",
+                                    "default": 9009
+                                },
+                                "alertmanager": {
+                                    "type": "number",
+                                    "description": "Conduktor Console Cortex AlertManager service HTTP port",
+                                    "default": 9010
+                                },
+                                "prometheus": {
+                                    "type": "number",
+                                    "description": "Conduktor Console Cortex Prometheus service HTTP port",
+                                    "default": 9090
+                                }
+                            }
+                        },
+                        "nodePorts": {
+                            "type": "object",
+                            "properties": {
+                                "cortex": {
+                                    "type": "string",
+                                    "description": "Node port for Cortex HTTP",
+                                    "default": ""
+                                },
+                                "alertmanager": {
+                                    "type": "string",
+                                    "description": "Node port for AlertManager HTTP",
+                                    "default": ""
+                                },
+                                "prometheus": {
+                                    "type": "string",
+                                    "description": "Node port for Prometheus HTTP",
+                                    "default": ""
+                                }
+                            }
+                        },
+                        "clusterIP": {
+                            "type": "string",
+                            "description": "Conduktor Console Cortex service Cluster IP",
+                            "default": ""
+                        },
+                        "loadBalancerSourceRanges": {
+                            "type": "array",
+                            "description": "Conduktor Console Cortex service Load Balancer sources",
+                            "default": [],
+                            "items": {}
+                        },
+                        "externalTrafficPolicy": {
+                            "type": "string",
+                            "description": "Conduktor Console Cortex service external traffic policy",
+                            "default": "Cluster"
+                        },
+                        "labels": {
+                            "type": "object",
+                            "description": "Additional custom labels for Conduktor Console Cortex service",
+                            "default": {}
+                        },
+                        "annotations": {
+                            "type": "object",
+                            "description": "Additional custom annotations for Conduktor Console Cortex service",
+                            "default": {}
+                        },
+                        "extraPorts": {
+                            "type": "array",
+                            "description": "Extra ports to expose in Conduktor Console Cortex service (normally used with the `sidecars` value)",
+                            "default": [],
+                            "items": {}
+                        },
+                        "sessionAffinity": {
+                            "type": "string",
+                            "description": "Control where client requests go, to the same pod or round-robin",
+                            "default": "None"
+                        },
+                        "sessionAffinityConfig": {
+                            "type": "object",
+                            "description": "Additional settings for the sessionAffinity",
+                            "default": {}
+                        },
+                        "extraSpecs": {
+                            "type": "object",
+                            "description": "Extra specs for the service to be added under `spec` key",
+                            "default": {}
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

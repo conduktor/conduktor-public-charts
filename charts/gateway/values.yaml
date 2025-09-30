@@ -189,7 +189,7 @@ gateway:
   ## @param gateway.terminationGracePeriodSeconds Duration in seconds the pod needs to terminate gracefully.
   ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination
   ##
-  terminationGracePeriodSeconds: ""
+  terminationGracePeriodSeconds: 30
 
   ## @param gateway.priorityClassName Define Gateway pods' priority based on an existing ClassName
   priorityClassName: ""
