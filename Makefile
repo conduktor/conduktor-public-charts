@@ -169,6 +169,9 @@ helm-postgresql: ## Install postgresql helm chart from bitnami
 	helm upgrade --install postgresql bitnami/postgresql \
 		--namespace ${NAMESPACE} --create-namespace \
 		--version 12.5.8 \
+		--set image.repository=bitnamilegacy/postgresql \
+		--set volumePermissions.image.repository=bitnamilegacy/os-shell \
+		--set metrics.image.repository=bitnamilegacy/postgres-exporter \
 		--set global.postgresql.auth.database=${postgresql_default_database} \
 		--set global.postgresql.auth.postgresPassword=${postgresql_password} \
 		--set auth.postgresPassword=${postgresql_password} \
@@ -185,6 +188,9 @@ helm-minio: ## Install minio helm chart from bitnami
 	helm upgrade --install minio bitnami/minio \
 		--namespace ${NAMESPACE} --create-namespace \
 		--version 12.8.0 \
+		--set image.repository=bitnamilegacy/minio \
+		--set clientImage.repository=bitnamilegacy/minio-client \
+		--set volumePermissions.image.repository=bitnamilegacy/os-shell \
 	    --set auth.rootPassword=${minio_password} \
 	    --set defaultBuckets=${minio_default_bucket} \
 	    --set disableWebUI=false \
@@ -200,6 +206,10 @@ helm-kafka: ## Install kafka helm chart from bitnami
 	helm upgrade --install kafka-local-dev bitnami/kafka \
 		--namespace ${NAMESPACE} --create-namespace \
 		--version 31.0.0 \
+		--set image.repository=bitnamilegacy/kafka \
+		--set externalAccess.autoDiscovery.image.repository=bitnamilegacy/kubectl \
+		--set volumePermissions.image.repository=bitnamilegacy/os-shell \
+		--set metrics.jmx.image.repository=bitnamilegacy/jmx-exporter \
 		--set listeners.overrideListeners="" \
 		--set listeners.client.protocol=PLAINTEXT \
 		--set listeners.client.port=9092 \
@@ -234,6 +244,14 @@ helm-monitoring-stack: ## Install monitoring stack prometheus and grafana
 	@echo "Install loki"
 	helm upgrade --install loki bitnami/grafana-loki \
 		--namespace ${MONITORING_NAMESPACE} --create-namespace \
+		--set loki.image.repository=bitnamilegacy/grafana-loki \
+		--set gateway.image.repository=bitnamilegacy/nginx \
+		--set promtail.image.repository=bitnamilegacy/promtail \
+		--set volumePermissions.image.repository=bitnamilegacy/os-shell \
+		--set memcachedchunks.image.repository=bitnamilegacy/memcached \
+		--set memcachedfrontend.image.repository=bitnamilegacy/memcached \
+		--set memcachedindexqueries.image.repository=bitnamilegacy/memcached \
+		--set memcachedindexwrites.image.repository=bitnamilegacy/memcached \
 		--set compactor.persistence.size=1Gi \
 		--set ingester.persistence.size=1Gi \
 		--set querier.persistence.size=1Gi \
@@ -246,6 +264,8 @@ helm-monitoring-stack: ## Install monitoring stack prometheus and grafana
 	@echo "Install grafana operator"
 	helm upgrade --install grafana-operator bitnami/grafana-operator \
 		--namespace ${MONITORING_NAMESPACE} --create-namespace \
+		--set operator.image.repository=bitnamilegacy/grafana-operator \
+		--set grafana.image.repository=bitnamilegacy/grafana \
 		--set operator.namespaceScope=false \
 		--set operator.watchNamespace="" \
 		--set grafana.enabled=false
@@ -273,6 +293,8 @@ helm-grafana-alpha: ## Replace latest grafana operator with version 2.9.3 with v
 	@echo "Install grafana operator 2.9.3"
 	helm upgrade --install grafana-operator bitnami/grafana-operator \
 		--namespace ${MONITORING_NAMESPACE} --create-namespace \
+		--set operator.image.repository=bitnamilegacy/grafana-operator \
+		--set grafana.image.repository=bitnamilegacy/grafana \
 		--set operator.scanAllNamespaces=true \
 		--set operator.watchNamespace="" \
 		--set operator.watchNamespaces="" \
