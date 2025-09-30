@@ -215,16 +215,20 @@ Gateway embed metrics to be installed within you cluster if your have the correc
 
 Shared Kubernetes configuration of the chart.
 
-| Name                                          | Description                                                      | Value  |
-| --------------------------------------------- | ---------------------------------------------------------------- | ------ |
-| `serviceAccount.create`                       | Specifies whether a ServiceAccount should be created             | `true` |
-| `serviceAccount.name`                         | The name of the ServiceAccount to use.                           | `""`   |
-| `serviceAccount.annotations`                  | Additional Service Account annotations (evaluated as a template) | `{}`   |
-| `serviceAccount.automountServiceAccountToken` | Automount service account token for the server service account   | `true` |
-| `nodeSelector`                                | Container node selector                                          | `{}`   |
-| `tolerations`                                 | Container tolerations                                            | `[]`   |
-| `affinity`                                    | Container affinity                                               | `{}`   |
-| `podSecurityContext`                          | Conduktor Gateway Pod Security Context                           | `{}`   |
+| Name                                          | Description                                                                                                                                                                                                                                                                      | Value                    |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| `serviceAccount.create`                       | Specifies whether a ServiceAccount should be created                                                                                                                                                                                                                             | `true`                   |
+| `serviceAccount.name`                         | The name of the ServiceAccount to use.                                                                                                                                                                                                                                           | `""`                     |
+| `serviceAccount.annotations`                  | Additional Service Account annotations (evaluated as a template)                                                                                                                                                                                                                 | `{}`                     |
+| `serviceAccount.automountServiceAccountToken` | Automount service account token for the server service account                                                                                                                                                                                                                   | `true`                   |
+| `nodeSelector`                                | Container node selector                                                                                                                                                                                                                                                          | `{}`                     |
+| `tolerations`                                 | Container tolerations                                                                                                                                                                                                                                                            | `[]`                     |
+| `affinity.nodeAffinity`                       | Gateway pods node affinity configuration                                                                                                                                                                                                                                         | `{}`                     |
+| `affinity.podAffinity`                        | Gateway pods affinity configuration                                                                                                                                                                                                                                              | `{}`                     |
+| `affinity.podAntiAffinity`                    | Gateway pods anti-affinity configuration                                                                                                                                                                                                                                         | `{}`                     |
+| `affinity.podAntiAffinityPreset.enable`       | Enable predefined pod anti-affinity presets that spread pods across nodes. If `affinity.podAntiAffinity` is set, this will be ignored. If both `affinity.podAntiAffinityPreset.enable` is `false` and `affinity.podAntiAffinity` is empty, no pod anti-affinity will be applied. | `true`                   |
+| `affinity.podAntiAffinityPreset.topologyKey`  | Topology key to use for pod anti-affinity preset (default: "kubernetes.io/hostname"). If `affinity.podAntiAffinity` is set, this will be ignored.                                                                                                                                | `kubernetes.io/hostname` |
+| `podSecurityContext`                          | Conduktor Gateway Pod Security Context                                                                                                                                                                                                                                           | `{}`                     |
 
 
 ## Example
@@ -532,6 +536,18 @@ podSecurityContext:
 
 > [!NOTE]
 > If you set `gateway.securityContext.readOnlyRootFilesystem: true`, you need to add and mount an extra volume/volumeMount to `/tmp` in the Gateway container using `gateway.volumes` and `gateway.volumeMounts`.
+
+### Node affinity
+
+By default, Gateway pods are configured with a pod anti-affinity that spread pods across nodes using `kubernetes.io/hostname` node label. 
+You can disable this behavior by setting `affinity.podAntiAffinityPreset.enable` to `false` and not setting `affinity.podAntiAffinity`.
+
+```yaml
+affinity:
+  podAntiAffinityPreset: # preset ignored if affinity.podAntiAffinity is set
+    enable: false
+    topologyKey: "kubernetes.io/hostname"
+```
 
 ### Monitoring
 

@@ -178,9 +178,10 @@ spec:
       {{- with .Values.nodeSelector }}
       nodeSelector: {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.affinity }}
-      affinity: {{- toYaml . | nindent 8 }}
-      {{- end }}
+      affinity:
+        nodeAffinity: {{- include "conduktor-gateway.nodeAffinity" . | nindent 10 }}
+        podAffinity: {{- include "conduktor-gateway.podAffinity" . | nindent 10 }}
+        podAntiAffinity: {{- include "conduktor-gateway.podAntiAffinity" . | nindent 10 }}
       {{- with .Values.tolerations }}
       tolerations: {{- toYaml . | nindent 8 }}
       {{- end }}
