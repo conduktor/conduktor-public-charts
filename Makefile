@@ -48,11 +48,11 @@ generate-readme: ## Re-generate charts README
 	
 	@echo
 	@echo "Updating README.md for console chart"
-	readme-generator --values "./charts/console/values.yaml" --readme "./charts/console/README.md"
+	readme-generator --values "./charts/console/values.yaml" --readme "./charts/console/README.md" --schema "./charts/console/values.schema.json"
 
 	@echo
 	@echo "Updating README.md for gateway chart"
-	readme-generator --values "./charts/gateway/values.yaml" --readme "./charts/gateway/README.md"
+	readme-generator --values "./charts/gateway/values.yaml" --readme "./charts/gateway/README.md" --schema "./charts/gateway/values.schema.json"
 
 	@echo
 	@echo "Updating README.md for provisioner chart"
