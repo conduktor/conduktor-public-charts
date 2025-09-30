@@ -291,9 +291,9 @@
                     "items": {}
                 },
                 "terminationGracePeriodSeconds": {
-                    "type": "string",
+                    "type": "number",
                     "description": "Duration in seconds the pod needs to terminate gracefully.",
-                    "default": ""
+                    "default": 30
                 },
                 "priorityClassName": {
                     "type": "string",
