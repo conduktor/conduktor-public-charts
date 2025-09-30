@@ -537,6 +537,18 @@ podSecurityContext:
 > [!NOTE]
 > If you set `gateway.securityContext.readOnlyRootFilesystem: true`, you need to add and mount an extra volume/volumeMount to `/tmp` in the Gateway container using `gateway.volumes` and `gateway.volumeMounts`.
 
+### Node affinity
+
+By default, Gateway pods are configured with a pod anti-affinity that spread pods across nodes using `kubernetes.io/hostname` node label. 
+You can disable this behavior by setting `affinity.podAntiAffinityPreset.enable` to `false` and not setting `affinity.podAntiAffinity`.
+
+```yaml
+affinity:
+  podAntiAffinityPreset: # preset ignored if affinity.podAntiAffinity is set
+    enable: false
+    topologyKey: "kubernetes.io/hostname"
+```
+
 ### Monitoring
 
 #### Prometheus metrics
