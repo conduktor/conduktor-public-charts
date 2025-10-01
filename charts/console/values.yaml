@@ -232,7 +232,7 @@ platform:
   image:
     registry: docker.io
     repository: conduktor/conduktor-console
-    tag: 1.37.1
+    tag: \1.38.0
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -631,7 +631,6 @@ service:
   ## extraSpecs:
   ##   loadBalancerIP: "10.10.10.10"
   extraSpecs: {}
-
 ## Conduktor Console ingress parameters
 ## ref: http://kubernetes.io/docs/user-guide/ingress/
 ##
@@ -774,7 +773,7 @@ platformCortex:
   image:
     registry: docker.io
     repository: conduktor/conduktor-console-cortex
-    tag: 1.37.1
+    tag: \1.38.0
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
