@@ -13,7 +13,6 @@ global:
   imagePullSecrets: []
   ## @param global.env The environment name (deprecated not used)
   env: ""
-
 ## @section Common parameters
 ##
 
@@ -38,7 +37,6 @@ clusterDomain: cluster.local
 ## @param extraDeploy Array of extra objects to deploy with the release
 ##
 extraDeploy: []
-
 gateway:
   ## @section Gateway image configuration
   ## @descriptionStart
@@ -50,10 +48,9 @@ gateway:
     ## @param gateway.image.repository Image in repository format (conduktor/conduktor-gateway)
     repository: conduktor/conduktor-gateway
     ## @param gateway.image.tag Image tag
-    tag: 3.12.0
+    tag: 3.13.0
     ## @param gateway.image.pullPolicy Kubernetes image pull policy
     pullPolicy: IfNotPresent
-
   ## @section Gateway configurations
   ## @descriptionStart
   ## This section contains configuration of the Conduktor Gateway.
@@ -79,26 +76,20 @@ gateway:
   extraSecretEnvVars: []
   ## @param gateway.secretSha256sum [nullable] Optional sha256sum of the referenced secret. This could be set to have a automactic restart of gateway deployment if secret change
   secretSha256sum: ""
-
   ## @param gateway.env [object] Environment variables for Gateway deployment in the form of a map of string key/value pairs
   env: {}
-
   ## @param gateway.licenseKey License key to activate Conduktor Gateway not used if `gateway.secretRef` is set
   licenseKey: ""
-
   userPool:
     ## @param gateway.userPool.secretKey Secret key (256bits) encoded in base64 to sign service accounts credentials when `SASL_PLAIN` or `SASL_SSL` is used for `GATEWAY_SECURITY_PROTOCOL`. If empty, a random key will be generated. Not used if `gateway.secretRef` is set.
     secretKey: ""
-
   ## @param gateway.interceptors Json configuration for interceptors to be loaded at startup by Gateway
   interceptors: "[]"
-
   portRange:
     ## @param gateway.portRange.start Start port of the gateway port range
     start: 9092
     ## @param gateway.portRange.count Max number of broker to expose
     count: 7
-
   admin:
     ## @param gateway.admin.port Admin HTTP server port
     port: 8888
@@ -109,16 +100,13 @@ gateway:
       - username: "admin"
         password: ""
         admin: true
-
     ## @param gateway.admin.mainAdminSecretKeys.username Secret key used to store the username of the main admin user from `gateway.admin.users` (first with admin role)
     ## @param gateway.admin.mainAdminSecretKeys.password Secret key used to store the password of the main admin user from `gateway.admin.users` (first with admin role)
     mainAdminSecretKeys:
       username: "GATEWAY_ADMIN_USERNAME"
       password: "GATEWAY_ADMIN_PASSWORD"
-
     ## @param gateway.admin.securedMetrics Enable secured metrics using api users credentials. If `gateway.secretRef` is set, this can't be used by `metrics.prometheus` to automatically configure basic auth on scrapping.
     securedMetrics: true
-
   jmx:
     ## @param gateway.jmx.enable Enable JMX JVM options
     enable: false
@@ -126,7 +114,6 @@ gateway:
     port: 9999
     ## @param gateway.jmx.jvmArgs Arguments to pass to the gateway container JVM
     jvmArgs: -Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1
-
   # Conduktor Gateway resource requests and limits
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ## Gateway system requirements: https://docs.conduktor.io/gateway/get-started/system-requirements/
@@ -142,29 +129,24 @@ gateway:
       cpu: 500m
       ## @param gateway.resources.requests.memory Memory resource requests
       memory: 500Mi
-
   ## @param gateway.podLabels Specific labels to be added to Gateway pod by deployment
   podLabels: {}
-
   ## @param gateway.podAnnotations Gateway pod annotations
   podAnnotations: {}
-
   ## @param gateway.securityContext Conduktor Gateway container Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
   securityContext: {}
-    # capabilities:
-    #   drop:
-    #   - ALL
-    # readOnlyRootFilesystem: true
-    # runAsNonRoot: true
-    # runAsUser: 1000
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
 
   ## @param gateway.volumes Define user specific volumes for Gateway deployment
   volumes: []
-
   ## @param gateway.volumeMounts Define user specific volumeMounts for Gateway container in deployment
   volumeMounts: []
-
   ## @param gateway.sidecars Add additional sidecar containers to run into the Conduktor Gateway pod(s)
   ## e.g:
   ## sidecars:
@@ -185,15 +167,12 @@ gateway:
   ##    command: ['sh', '-c', 'echo "hello world"']
   ##
   initContainers: []
-
   ## @param gateway.terminationGracePeriodSeconds Duration in seconds the pod needs to terminate gracefully.
   ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination
   ##
   terminationGracePeriodSeconds: 30
-
   ## @param gateway.priorityClassName Define Gateway pods' priority based on an existing ClassName
   priorityClassName: ""
-
   ## @param gateway.customStartupProbe Custom startup probe configuration
   customStartupProbe: {}
   ## Configure extra options for Conduktor Gaterway containers startup probes
@@ -212,7 +191,6 @@ gateway:
     timeoutSeconds: 1
     failureThreshold: 5
     successThreshold: 1
-
   ## @param gateway.customLivenessProbe Custom liveness probe configuration
   customLivenessProbe: {}
   ## Configure extra options for Conduktor Gaterway containers liveness and readiness probes
@@ -231,7 +209,6 @@ gateway:
     timeoutSeconds: 1
     failureThreshold: 3
     successThreshold: 1
-
   ## @param gateway.customReadinessProbe Custom readiness probe configuration
   customReadinessProbe: {}
   ## Configure extra options for Conduktor Gaterway containers liveness and readiness probes
@@ -250,7 +227,6 @@ gateway:
     timeoutSeconds: 1
     failureThreshold: 3
     successThreshold: 1
-
 ## @section TLS configuration
 ## @descriptionStart
 ## This section is for configuring Gateway to handle certificate to manage TLS endpoint inside Gateway deployment.
@@ -264,7 +240,6 @@ tls:
   keystoreKey: keystore.jks
   ## @param tls.keystoreFile File name to mount keystore as
   keystoreFile: keystore.jks
-
 ## @section Gateway service configurations
 ## @descriptionStart
 ## This section contains Kubernetes services configuration.
@@ -310,7 +285,6 @@ service:
     ## extraSpecs:
     ##   trafficDistribution: "PreferClose"
     extraSpecs: {}
-
 ## @section Gateway ingress configurations
 ## @descriptionStart
 ## This section contains Kubernetes ingress configuration.
@@ -413,7 +387,6 @@ ingress:
   ##             name: http
   ##
   extraRules: []
-
 ## @section Gateway metrics activation
 ## @descriptionStart
 ## Gateway embed metrics to be installed within you cluster if your have the correct capabilities (Prometheus and Grafana operators).
@@ -444,13 +417,13 @@ metrics:
     relabelings: {}
     ## @param metrics.prometheus.extraParams Extra parameters in ServiceMonitor. See https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.Endpoint
     extraParams: {}
-      # basicAuth:
-      #   password:
-      #     name: conduktor-admin-user # secret name
-      #     key: password
-      #   username:
-      #     name: conduktor-admin-user # secret name
-      #     key: username
+    # basicAuth:
+    #   password:
+    #     name: conduktor-admin-user # secret name
+    #     key: password
+    #   username:
+    #     name: conduktor-admin-user # secret name
+    #     key: username
   grafana:
     ## @param metrics.grafana.enable Enable Grafana dashboards to installation. Dashboards can be installed as Sidecar ConfigMap or using Grafana operator CRDs (v4 or v5)
     enable: false
@@ -472,8 +445,6 @@ metrics:
       prometheus: prometheus
       ## @param metrics.grafana.datasources.loki Loki datasource to use for log dashboard
       loki: loki
-
-
 ## @section Kubernetes common configuration
 ## @descriptionStart
 ## Shared Kubernetes configuration of the chart.
@@ -495,13 +466,10 @@ serviceAccount:
   ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
   ##
   automountServiceAccountToken: true
-
 ## @param nodeSelector Container node selector
 nodeSelector: {}
-
 ## @param tolerations Container tolerations
 tolerations: []
-
 ## Affinity settings for Gateway pods
 ##
 affinity:
@@ -531,18 +499,16 @@ affinity:
   ## @param affinity.podAntiAffinity Gateway pods anti-affinity configuration
   ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
   podAntiAffinity: {}
-
   podAntiAffinityPreset:
     ## @param affinity.podAntiAffinityPreset.enable Enable predefined pod anti-affinity presets that spread pods across nodes. If `affinity.podAntiAffinity` is set, this will be ignored. If both `affinity.podAntiAffinityPreset.enable` is `false` and `affinity.podAntiAffinity` is empty, no pod anti-affinity will be applied.
     enable: true
     ## @param affinity.podAntiAffinityPreset.topologyKey Topology key to use for pod anti-affinity preset (default: "kubernetes.io/hostname"). If `affinity.podAntiAffinity` is set, this will be ignored.
     topologyKey: "kubernetes.io/hostname"
-
 ## @param podSecurityContext Conduktor Gateway Pod Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
 ##
 podSecurityContext: {}
-    # runAsNonRoot: true
+# runAsNonRoot: true
 
 ## @skip tests
 tests:
