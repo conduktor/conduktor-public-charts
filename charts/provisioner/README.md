@@ -229,6 +229,23 @@ Configuration of Conduktor Gateway provisioning container using Conduktor CLI.
 | `gateway.resources.limits.memory`    | Memory limit for the container                                                                                       | `128Mi`                     |
 | `gateway.containerSecurityContext`   | conduktor-provisioner containers' Security Context                                                                   | `{}`                        |
 
+### State management configuration
+
+Configuration for CLI provisioner state persistence of manged resources.
+Enabled by default, it allows provisioner to track the resources it has created and manage them properly.
+
+| Name                      | Description                                            | Value                  |
+| ------------------------- | ------------------------------------------------------ | ---------------------- |
+| `state.enabled`           | Enable state persistence                               | `true`                 |
+| `state.backend`           | State backend type. Currently only "file" is supported | `file`                 |
+| `state.file.labels`       | Labels for the PersistentVolumeClaim                   | `{}`                   |
+| `state.file.annotations`  | Annotations for the PersistentVolumeClaim              | `{}`                   |
+| `state.file.mountPath`    | Mount path for the state volume                        | `/var/conduktor/state` |
+| `state.file.storageClass` | Storage class for the PersistentVolumeClaim            | `""`                   |
+| `state.file.storageSize`  | Size of the PersistentVolumeClaim                      | `1Gi`                  |
+| `state.file.accessModes`  | Access modes for the PersistentVolumeClaim             | `["ReadWriteOnce"]`    |
+| `state.file.selector`     | Selector for the PersistentVolumeClaim                 | `{}`                   |
+
 ### Other Parameters
 
 Other parameters for the provisioner job.

@@ -699,6 +699,66 @@
                 }
             }
         },
+        "state": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable state persistence",
+                    "default": true
+                },
+                "backend": {
+                    "type": "string",
+                    "description": "State backend type. Currently only \"file\" is supported",
+                    "default": "file"
+                },
+                "file": {
+                    "type": "object",
+                    "properties": {
+                        "labels": {
+                            "type": "object",
+                            "description": "Labels for the PersistentVolumeClaim",
+                            "default": {}
+                        },
+                        "annotations": {
+                            "type": "object",
+                            "description": "Annotations for the PersistentVolumeClaim",
+                            "default": {}
+                        },
+                        "mountPath": {
+                            "type": "string",
+                            "description": "Mount path for the state volume",
+                            "default": "/var/conduktor/state"
+                        },
+                        "storageClass": {
+                            "type": "string",
+                            "description": "Storage class for the PersistentVolumeClaim",
+                            "default": ""
+                        },
+                        "storageSize": {
+                            "type": "string",
+                            "description": "Size of the PersistentVolumeClaim",
+                            "default": "1Gi"
+                        },
+                        "accessModes": {
+                            "type": "array",
+                            "description": "Access modes for the PersistentVolumeClaim",
+                            "default": [
+                                "ReadWriteOnce"
+                            ],
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "selector": {
+                            "type": "object",
+                            "description": "Selector for the PersistentVolumeClaim",
+                            "default": {}
+                        }
+                    }
+                }
+            }
+        },
         "serviceAccount": {
             "type": "object",
             "properties": {

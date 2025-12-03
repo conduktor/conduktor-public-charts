@@ -41,6 +41,13 @@ Default fully qualified secret name
 {{- end }}
 
 {{/*
+Default persistent volume claim name for stateful provisioner
+*/}}
+{{- define "provisioner.stateful.pvcName" -}}
+{{- printf "%s-stateful-pvc" (include "provisioner.fullname" .) -}}
+{{- end }}
+
+{{/*
 Return the proper Docker Image Registry Secret Names
 */}}
 {{- define "provisioner.imagePullSecrets" -}}
@@ -82,3 +89,71 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Generate command for provisioner
+Parameters:
+  config - provisioner configuration
+  context - helm chart context
+*/}}
+{{- define "provisioner.command" -}}
+  {{- if .context.Values.diagnosticMode.enabled -}}
+  {{- toJson .context.Values.diagnosticMode.command}}
+  {{- else -}}
+  {{- toJson .config.command -}}
+  {{- end -}}
+{{- end }}
+
+{{/*
+Generate arguments for console provisioner
+Parameters:
+  config - provisioner configuration
+  context - helm chart context
+Usage:
+{{- $args := include "provisioner.args" (dict "config" .Values.gateway "context" $) | fromJsonArray }}
+*/}}
+{{- define "provisioner.args" -}}
+  {{- $args := list -}}
+  {{- if .context.Values.diagnosticMode.enabled -}}
+    {{- $args = .context.Values.diagnosticMode.args -}}
+  {{- else -}}
+    {{- if .config.args -}}
+      {{- $args = .config.args -}}
+    {{- else -}}
+      {{- if .config.extraManifestsConfigMapRef -}}
+        {{- $args = (list "apply" "-f" "/conf") -}}
+      {{- else -}}
+        {{- $args = (list "apply" "-f" (printf "/conf/%s" .config.manifestsConfigMapKey)) -}}
+      {{- end -}}
+    {{- end -}}
+
+    {{- if .config.debug -}}
+      {{- $args = append $args "-v" -}}
+    {{- end -}}
+  {{- end -}}
+
+{{- toJson $args -}}
+{{- end -}}
+
+
+{{/*
+Generate environment variables for stateful provisioner
+Parameters:
+  prefix - prefix for the state file name
+  context - helm chart context
+*/}}
+{{- define "provisioner.stateful.env" -}}
+  {{- $fileName := printf "%s-state.json" .prefix -}}
+  {{- $env := dict -}}
+  {{- if .context.Values.state.enabled -}}
+    {{- $env = merge $env (dict "CDK_STATE_ENABLED" "true") -}}
+    {{- if eq .context.Values.state.backend "file" -}}
+      {{- $filePath := printf "%s/%s" .context.Values.state.file.mountPath $fileName -}}
+      {{- $env = merge $env (dict "CDK_STATE_FILE" $filePath) -}}
+    {{- end -}}
+  {{- end -}}
+{{- range $key, $value := $env }}
+- name: {{ $key }}
+  value: "{{ $value }}"
+{{- end -}}
+{{- end -}}
