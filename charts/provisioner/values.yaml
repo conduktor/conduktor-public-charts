@@ -427,6 +427,35 @@ gateway:
   ##
   containerSecurityContext: {}
 
+## @section State management configuration
+## @descriptionStart
+## Configuration for CLI provisioner state persistence of manged resources.
+## Enabled by default, it allows provisioner to track the resources it has created and manage them properly.
+## @descriptionEnd
+##
+state:
+  ## @param state.enabled Enable state persistence
+  enabled: true
+  ## @param state.backend State backend type. Currently only "file" is supported
+  backend: "file"
+  ## File backend configuration
+  ##
+  file:
+    ## @param state.file.labels Labels for the PersistentVolumeClaim
+    labels: {}
+    ## @param state.file.annotations Annotations for the PersistentVolumeClaim
+    annotations: {}
+    ## @param state.file.mountPath Mount path for the state volume
+    mountPath: "/var/conduktor/state"
+    ## @param state.file.storageClass Storage class for the PersistentVolumeClaim
+    storageClass: ""
+    ## @param state.file.storageSize Size of the PersistentVolumeClaim
+    storageSize: "1Gi"
+    ## @param state.file.accessModes Access modes for the PersistentVolumeClaim
+    accessModes:
+      - ReadWriteOnce
+    ## @param state.file.selector Selector for the PersistentVolumeClaim
+    selector: {}
 
 ## @section Other Parameters
 ## @descriptionStart

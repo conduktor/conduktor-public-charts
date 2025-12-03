@@ -1,0 +1,39 @@
+{{- if and .Values.state.enabled (eq .Values.state.backend "file") }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "provisioner.stateful.pvcName" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+  {{- if .Values.commonLabels }}
+  {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+  {{- end }}
+  {{- if .Values.state.file.labels }}
+  {{- include "common.tplvalues.render" ( dict "value" .Values.state.file.labels "context" $ ) | nindent 4 }}
+  {{- end }}
+  {{- if or .Values.state.file.annotations .Values.commonAnnotations }}
+  annotations:
+  {{- if .Values.commonAnnotations }}
+  {{ include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+  {{- if .Values.state.file.annotations }}
+  {{ include "common.tplvalues.render" (dict "value" .Values.state.file.annotations "context" $) | nindent 4 }}
+  {{- end }}
+  {{- end }}
+spec:
+  accessModes: {{ toYaml .Values.state.file.accessModes| nindent 4 }}
+  {{- if .Values.state.file.storageClass }}
+  {{- if (eq "-" .Values.state.file.storageClass) }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: {{ .Values.state.file.storageClass }}
+  {{- end }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.state.file.storageSize }}
+  {{- with .Values.state.file.selector }}
+  selector:
+    {{ toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
