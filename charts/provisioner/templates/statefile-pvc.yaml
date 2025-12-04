@@ -1,4 +1,4 @@
-{{- if and .Values.state.enabled (eq .Values.state.backend "file") }}
+{{- if and .Values.state.enabled (and (eq .Values.state.backend "file") (empty .Values.state.file.pvc.existingClaim)) }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -8,31 +8,33 @@ metadata:
   {{- if .Values.commonLabels }}
   {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
   {{- end }}
-  {{- if .Values.state.file.labels }}
-  {{- include "common.tplvalues.render" ( dict "value" .Values.state.file.labels "context" $ ) | nindent 4 }}
+  {{- if .Values.state.file.pvc.labels }}
+  {{- include "common.tplvalues.render" ( dict "value" .Values.state.file.pvc.labels "context" $ ) | nindent 4 }}
   {{- end }}
-  {{- if or .Values.state.file.annotations .Values.commonAnnotations }}
   annotations:
   {{- if .Values.commonAnnotations }}
   {{ include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
   {{- end }}
-  {{- if .Values.state.file.annotations }}
-  {{ include "common.tplvalues.render" (dict "value" .Values.state.file.annotations "context" $) | nindent 4 }}
+  {{- if .Values.state.file.pvc.annotations }}
+  {{ include "common.tplvalues.render" (dict "value" .Values.state.file.pvc.annotations "context" $) | nindent 4 }}
   {{- end }}
+  {{- if .Values.useHooks }}
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "-10"  # run before job that uses the PVC
   {{- end }}
 spec:
-  accessModes: {{ toYaml .Values.state.file.accessModes| nindent 4 }}
-  {{- if .Values.state.file.storageClass }}
-  {{- if (eq "-" .Values.state.file.storageClass) }}
+  accessModes: {{ toYaml .Values.state.file.pvc.accessModes| nindent 4 }}
+  {{- if .Values.state.file.pvc.storageClass }}
+  {{- if (eq "-" .Values.state.file.pvc.storageClass) }}
   storageClassName: ""
   {{- else }}
-  storageClassName: {{ .Values.state.file.storageClass }}
+  storageClassName: {{ .Values.state.file.pvc.storageClass }}
   {{- end }}
   {{- end }}
   resources:
     requests:
-      storage: {{ .Values.state.file.storageSize }}
-  {{- with .Values.state.file.selector }}
+      storage: {{ .Values.state.file.pvc.storageSize }}
+  {{- with .Values.state.file.pvc.selector }}
   selector:
     {{ toYaml . | nindent 4 }}
   {{- end }}

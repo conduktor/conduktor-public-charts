@@ -44,7 +44,11 @@ Default fully qualified secret name
 Default persistent volume claim name for stateful provisioner
 */}}
 {{- define "provisioner.stateful.pvcName" -}}
-{{- printf "%s-stateful-pvc" (include "provisioner.fullname" .) -}}
+  {{- if .Values.state.file.pvc.existingClaim -}}
+    {{- .Values.state.file.pvc.existingClaim -}}
+  {{- else -}}
+    {{- printf "%s-stateful-pvc" (include "provisioner.fullname" .) -}}
+  {{- end }}
 {{- end }}
 
 {{/*

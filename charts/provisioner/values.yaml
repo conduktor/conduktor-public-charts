@@ -271,7 +271,7 @@ console:
   ## @param console.insecure Skip TLS verification
   insecure: false
   ## @param console.debug Enable verbose debug mode
-  debug: false
+  debug: true
   ## @param console.manifests Manifests YAML to apply on the Console
   manifests: []
   ## @param console.manifestsConfigMap Manifests YAML to apply on the Console
@@ -361,7 +361,7 @@ gateway:
   ## @param gateway.insecure Skip TLS verification
   insecure: false
   ## @param gateway.debug Enable verbose debug mode
-  debug: false
+  debug: true
   ## @param gateway.manifests Manifests YAML to apply on the Gateway
   manifests: []
   ## @param gateway.manifestsConfigMap Manifests YAML to apply on the Gateway
@@ -441,21 +441,24 @@ state:
   ## File backend configuration
   ##
   file:
-    ## @param state.file.labels Labels for the PersistentVolumeClaim
-    labels: {}
-    ## @param state.file.annotations Annotations for the PersistentVolumeClaim
-    annotations: {}
     ## @param state.file.mountPath Mount path for the state volume
     mountPath: "/var/conduktor/state"
-    ## @param state.file.storageClass Storage class for the PersistentVolumeClaim
-    storageClass: ""
-    ## @param state.file.storageSize Size of the PersistentVolumeClaim
-    storageSize: "1Gi"
-    ## @param state.file.accessModes Access modes for the PersistentVolumeClaim
-    accessModes:
-      - ReadWriteOnce
-    ## @param state.file.selector Selector for the PersistentVolumeClaim
-    selector: {}
+    pvc:
+      ## @param state.file.pvc.existingClaim Name of an existing PersistentVolumeClaim to use
+      existingClaim: ""
+      ## @param state.file.pvc.labels Labels for the PersistentVolumeClaim
+      labels: {}
+      ## @param state.file.pvc.annotations Annotations for the PersistentVolumeClaim
+      annotations: {}
+      ## @param state.file.pvc.storageClass Storage class for the PersistentVolumeClaim
+      storageClass: ""
+      ## @param state.file.pvc.storageSize Size of the PersistentVolumeClaim
+      storageSize: "1Gi"
+      ## @param state.file.pvc.accessModes Access modes for the PersistentVolumeClaim
+      accessModes:
+        - ReadWriteOnce
+      ## @param state.file.pvc.selector Selector for the PersistentVolumeClaim
+      selector: {}
 
 ## @section Other Parameters
 ## @descriptionStart
