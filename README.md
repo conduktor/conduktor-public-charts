@@ -32,6 +32,13 @@
     <a href="https://hub.docker.com/r/conduktor/conduktor-gateway">
         <img alt="Gateway Application Version" src="https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fconduktor%2Fconduktor-public-charts%2Frefs%2Fheads%2Fmain%2Fcharts%2Fgateway%2FChart.yaml&query=%24.appVersion&prefix=conduktor%2Fconduktor-gateway%3A&logo=docker&label=Gateway%20Application&color=BCFE68">
     </a>
+    <br />
+    <a href="https://github.com/conduktor/conduktor-public-charts/releases">
+        <img alt="Provisioner Chart Version" src="https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fconduktor%2Fconduktor-public-charts%2Frefs%2Fheads%2Fmain%2Fcharts%2Fprovisioner%2FChart.yaml&query=%24.version&prefix=conduktor-provisioner:&logo=helm&label=Provisioner%20Chart&color=BCFE68&">
+    </a>  /
+    <a href="https://hub.docker.com/r/conduktor/conduktor-ctl">
+        <img alt="Conduktor CLI Version" src="https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fconduktor%2Fconduktor-public-charts%2Frefs%2Fheads%2Fmain%2Fcharts%2Fprovisioner%2FChart.yaml&query=%24.appVersion&prefix=conduktor%2Fconduktor-ctl%3A&logo=docker&label=Conduktor%20CLI&color=BCFE68">
+    </a>
     <br /><br />
     <a href="https://conduktor.io/"><img src="https://img.shields.io/badge/Website-conduktor.io-192A4E?color=BCFE68" alt="Scale Data Streaming With Security and Control"></a>
     ·
@@ -44,6 +51,7 @@
 
 - console ([doc](https://github.com/conduktor/conduktor-public-charts/blob/main/charts/console/README.md), [values](https://github.com/conduktor/conduktor-public-charts/blob/main/charts/console/values.yaml))
 - conduktor-gateway ([doc](https://github.com/conduktor/conduktor-public-charts/blob/main/charts/gateway/README.md), [values](https://github.com/conduktor/conduktor-public-charts/blob/main/charts/gateway/values.yaml))
+- provisioner ([doc](https://github.com/conduktor/conduktor-public-charts/blob/main/charts/provisioner/README.md), [values](https://github.com/conduktor/conduktor-public-charts/blob/main/charts/provisioner/values.yaml))
 
 ## Prerequisites
 
