@@ -179,7 +179,7 @@ Configuration of Conduktor Console provisioning container using Conduktor CLI.
 | `console.cert`                       | Authentication certificate to access Console. Can be passed as an environment variable `CDK_CERT`                            | `""`                        |
 | `console.key`                        | Authentication certificate key to access Console. Can be passed as an environment variable `CDK_KEY`                         | `""`                        |
 | `console.insecure`                   | Skip TLS verification                                                                                                        | `false`                     |
-| `console.debug`                      | Enable verbose debug mode                                                                                                    | `false`                     |
+| `console.debug`                      | Enable verbose debug mode                                                                                                    | `true`                      |
 | `console.manifests`                  | Manifests YAML to apply on the Console                                                                                       | `[]`                        |
 | `console.manifestsConfigMap`         | Manifests YAML to apply on the Console                                                                                       | `""`                        |
 | `console.manifestsConfigMapKey`      | Manifests YAML to apply on the Console                                                                                       | `00-console-resources.yaml` |
@@ -211,7 +211,7 @@ Configuration of Conduktor Gateway provisioning container using Conduktor CLI.
 | `gateway.cert`                       | Authentication certificate to access Gateway. Can be passed as an environment variable `CDK_CERT`                    | `""`                        |
 | `gateway.key`                        | Authentication certificate key to access Gateway. Can be passed as an environment variable `CDK_KEY`                 | `""`                        |
 | `gateway.insecure`                   | Skip TLS verification                                                                                                | `false`                     |
-| `gateway.debug`                      | Enable verbose debug mode                                                                                            | `false`                     |
+| `gateway.debug`                      | Enable verbose debug mode                                                                                            | `true`                      |
 | `gateway.manifests`                  | Manifests YAML to apply on the Gateway                                                                               | `[]`                        |
 | `gateway.manifestsConfigMap`         | Manifests YAML to apply on the Gateway                                                                               | `""`                        |
 | `gateway.manifestsConfigMapKey`      | Manifests YAML to apply on the Gateway                                                                               | `00-gateway-resources.yaml` |
@@ -234,17 +234,18 @@ Configuration of Conduktor Gateway provisioning container using Conduktor CLI.
 Configuration for CLI provisioner state persistence of manged resources.
 Enabled by default, it allows provisioner to track the resources it has created and manage them properly.
 
-| Name                      | Description                                            | Value                  |
-| ------------------------- | ------------------------------------------------------ | ---------------------- |
-| `state.enabled`           | Enable state persistence                               | `true`                 |
-| `state.backend`           | State backend type. Currently only "file" is supported | `file`                 |
-| `state.file.labels`       | Labels for the PersistentVolumeClaim                   | `{}`                   |
-| `state.file.annotations`  | Annotations for the PersistentVolumeClaim              | `{}`                   |
-| `state.file.mountPath`    | Mount path for the state volume                        | `/var/conduktor/state` |
-| `state.file.storageClass` | Storage class for the PersistentVolumeClaim            | `""`                   |
-| `state.file.storageSize`  | Size of the PersistentVolumeClaim                      | `1Gi`                  |
-| `state.file.accessModes`  | Access modes for the PersistentVolumeClaim             | `["ReadWriteOnce"]`    |
-| `state.file.selector`     | Selector for the PersistentVolumeClaim                 | `{}`                   |
+| Name                           | Description                                            | Value                  |
+| ------------------------------ | ------------------------------------------------------ | ---------------------- |
+| `state.enabled`                | Enable state persistence                               | `true`                 |
+| `state.backend`                | State backend type. Currently only "file" is supported | `file`                 |
+| `state.file.mountPath`         | Mount path for the state volume                        | `/var/conduktor/state` |
+| `state.file.pvc.existingClaim` | Name of an existing PersistentVolumeClaim to use       | `""`                   |
+| `state.file.pvc.labels`        | Labels for the PersistentVolumeClaim                   | `{}`                   |
+| `state.file.pvc.annotations`   | Annotations for the PersistentVolumeClaim              | `{}`                   |
+| `state.file.pvc.storageClass`  | Storage class for the PersistentVolumeClaim            | `""`                   |
+| `state.file.pvc.storageSize`   | Size of the PersistentVolumeClaim                      | `1Gi`                  |
+| `state.file.pvc.accessModes`   | Access modes for the PersistentVolumeClaim             | `["ReadWriteOnce"]`    |
+| `state.file.pvc.selector`      | Selector for the PersistentVolumeClaim                 | `{}`                   |
 
 ### Other Parameters
 

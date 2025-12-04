@@ -421,7 +421,7 @@
                 "debug": {
                     "type": "boolean",
                     "description": "Enable verbose debug mode",
-                    "default": false
+                    "default": true
                 },
                 "manifests": {
                     "type": "array",
@@ -583,7 +583,7 @@
                 "debug": {
                     "type": "boolean",
                     "description": "Enable verbose debug mode",
-                    "default": false
+                    "default": true
                 },
                 "manifests": {
                     "type": "array",
@@ -715,45 +715,55 @@
                 "file": {
                     "type": "object",
                     "properties": {
-                        "labels": {
-                            "type": "object",
-                            "description": "Labels for the PersistentVolumeClaim",
-                            "default": {}
-                        },
-                        "annotations": {
-                            "type": "object",
-                            "description": "Annotations for the PersistentVolumeClaim",
-                            "default": {}
-                        },
                         "mountPath": {
                             "type": "string",
                             "description": "Mount path for the state volume",
                             "default": "/var/conduktor/state"
                         },
-                        "storageClass": {
-                            "type": "string",
-                            "description": "Storage class for the PersistentVolumeClaim",
-                            "default": ""
-                        },
-                        "storageSize": {
-                            "type": "string",
-                            "description": "Size of the PersistentVolumeClaim",
-                            "default": "1Gi"
-                        },
-                        "accessModes": {
-                            "type": "array",
-                            "description": "Access modes for the PersistentVolumeClaim",
-                            "default": [
-                                "ReadWriteOnce"
-                            ],
-                            "items": {
-                                "type": "string"
-                            }
-                        },
-                        "selector": {
+                        "pvc": {
                             "type": "object",
-                            "description": "Selector for the PersistentVolumeClaim",
-                            "default": {}
+                            "properties": {
+                                "existingClaim": {
+                                    "type": "string",
+                                    "description": "Name of an existing PersistentVolumeClaim to use",
+                                    "default": ""
+                                },
+                                "labels": {
+                                    "type": "object",
+                                    "description": "Labels for the PersistentVolumeClaim",
+                                    "default": {}
+                                },
+                                "annotations": {
+                                    "type": "object",
+                                    "description": "Annotations for the PersistentVolumeClaim",
+                                    "default": {}
+                                },
+                                "storageClass": {
+                                    "type": "string",
+                                    "description": "Storage class for the PersistentVolumeClaim",
+                                    "default": ""
+                                },
+                                "storageSize": {
+                                    "type": "string",
+                                    "description": "Size of the PersistentVolumeClaim",
+                                    "default": "1Gi"
+                                },
+                                "accessModes": {
+                                    "type": "array",
+                                    "description": "Access modes for the PersistentVolumeClaim",
+                                    "default": [
+                                        "ReadWriteOnce"
+                                    ],
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "selector": {
+                                    "type": "object",
+                                    "description": "Selector for the PersistentVolumeClaim",
+                                    "default": {}
+                                }
+                            }
                         }
                     }
                 }

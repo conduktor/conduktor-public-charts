@@ -11,6 +11,7 @@ metadata:
     {{- if .Values.useHooks }}
     helm.sh/hook: post-install,post-upgrade
     helm.sh/hook-delete-policy: before-hook-creation
+    helm.sh/hook-weight: "0"  #run after state PVC hooks (if any)
     {{- end }}
     {{- if .Values.commonAnnotations }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
