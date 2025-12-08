@@ -22,9 +22,6 @@ spec:
             - name: grafana
               image: grafana/grafana:10.2.2
   persistentVolumeClaim:
-    metadata:
-      name: "grafana-pvc"
-      namespace: "prometheus-stack"
     spec:
       storageClassName: "local-path"
       accessModes:
