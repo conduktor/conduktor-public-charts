@@ -61,7 +61,7 @@ spec:
            - "/bin/sh"
            - "/wait-for.sh"
           args:
-            - "{{ .Values.console.url }}/api/v1/health/ready"
+            - "{{ .Values.console.url }}/api/health/ready"
           volumeMounts:
             - name: init-script
               mountPath: /wait-for.sh
