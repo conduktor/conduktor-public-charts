@@ -396,12 +396,14 @@ console, we recommend you to look at our
 - [Provide console configuration as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
 - [Provide additional credentials as a Kubernetes Secret](#provide-additional-credentials-as-a-kubernetes-secret)
 - [Install with a toleration](#install-with-a-toleration)
-- [Ingress TLS configuration](#ingress-tls-configuration)
-  - [Using cert-manager](#using-cert-manager)
-  - [Using existing TLS secret](#using-existing-tls-secret)
-  - [Using plain PEM certificate and key](#using-plain-pem-certificate-and-key)
-  - [Using Multiple TLS secrets](#using-multiple-tls-secrets)
-  - [Using Helm generated self-signed certificates](#using-helm-generated-self-signed-certificates)
+- [Ingress configuration](#ingress-configuration)
+  - [Ingress TLS configuration](#ingress-tls-configuration)
+    - [Using cert-manager](#using-cert-manager)
+    - [Using existing TLS secret](#using-existing-tls-secret)
+    - [Using plain PEM certificate and key](#using-plain-pem-certificate-and-key)
+    - [Using Multiple TLS secrets](#using-multiple-tls-secrets)
+    - [Using Helm generated self-signed certificates](#using-helm-generated-self-signed-certificates)
+  - [Ingress with context path](#ingress-with-context-path)
 - [Container TLS configuration](#container-tls-configuration)
   - [Use an existing secret](#use-an-existing-secret-)
   - [Install with Self-Signed TLS certificate](#install-with-self-signed-tls-certificate)
@@ -903,9 +905,11 @@ platformCortex:
       effect: "NoSchedule"
 ```
 
-### Ingress TLS configuration
+### Ingress configuration
 
-#### Using cert-manager
+#### Ingress TLS configuration
+
+##### Using cert-manager
 This solution leverage [cert-manager](https://cert-manager.io/docs/) to generate TLS certificates for your ingress simply using annotations.
 
 Example using a [Nginx Ingress](https://kubernetes.github.io/ingress-nginx/) and cert-manager with [Let's Encrypt](https://cert-manager.io/docs/tutorials/acme/pomerium-ingress/#configure-lets-encrypt-issuer) issuer : 
@@ -913,19 +917,21 @@ Example using a [Nginx Ingress](https://kubernetes.github.io/ingress-nginx/) and
 ingress:
   enabled: true
   hostname: conduktor-console.my-domain.com
+  ingressClassName: <ingress-class-name>
   tls: true
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-issuer
     kubernetes.io/ingress.class: nginx
 ```
 
-#### Using existing TLS secret
+##### Using existing TLS secret
 If you already have a TLS secret of type `kubernetes.io/tls` created in your cluster, you can use it in your ingress configuration.
 
 ```yaml
 ingress:
   enabled: true
   hostname: conduktor-console.my-domain.com
+  ingressClassName: <ingress-class-name>
   tls: true
   secrets:
     - name: my-existing-tls-secret
@@ -935,6 +941,7 @@ OR using `ingress.extraTls`
 ingress:
   enabled: true
   hostname: conduktor-console.my-domain.com
+  ingressClassName: <ingress-class-name>
   tls: true
   extraTls:
     - secretName: my-existing-tls-secret
@@ -942,13 +949,14 @@ ingress:
         - conduktor-console.my-domain.com
 ```
 
-#### Using plain PEM certificate and key
+##### Using plain PEM certificate and key
 
 If you have a PEM certificate and key, you can use them directly in your `values.yaml` file.
 ```yaml
 ingress:
   enabled: true
   hostname: conduktor-console.my-domain.com
+  ingressClassName: <ingress-class-name>
   tls: true
   secrets:
     - name: my-new-tls-secret
@@ -962,7 +970,7 @@ ingress:
         -----END PRIVATE KEY-----
 ```
 
-#### Using Multiple TLS secrets
+##### Using Multiple TLS secrets
 
 If using multiple hostnames, you can use the `extraTls` parameter to add more TLS secrets.
 
@@ -970,6 +978,7 @@ If using multiple hostnames, you can use the `extraTls` parameter to add more TL
 ingress:
   enabled: true
   hostname: conduktor-console.my-domain.com
+  ingressClassName: <ingress-class-name>
   tls: true
   extraHosts:
     - host: my-other-hostname.com
@@ -984,16 +993,41 @@ ingress:
         - my-other-hostname.com
 ```
 
-#### Using Helm generated self-signed certificates
+##### Using Helm generated self-signed certificates
 This solution use Helm [`genCA`](https://helm.sh/docs/chart_template_guide/function_list/#genca), [`genSignedCert`](https://helm.sh/docs/chart_template_guide/function_list/#gensignedcert) functions to generate self-signed certificates for your ingress. (Not for production use)
 ```yaml
 ingress:
   enabled: true
   hostname: conduktor-console.my-domain.com
+  ingressClassName: <ingress-class-name>
   tls: true
   selfSigned: true
 ```
 It will generate a secret name `<hostname>-tls` with the certificates and key.
+
+#### Ingress with context path
+
+Starting Console version 1.41.0, you can configure an ingress with a context path.
+
+Example using `/console` as context path for and Nginx Ingress controller:
+```yaml
+config:
+  platform:
+    external:
+      url: "https://conduktor.my-domain.com/console" # Note the /console path here is needed for proper redirects
+ingress:
+  enabled: true
+  hostname: conduktor.my-domain.com
+  ingressClassName: nginx # example with nginx ingress
+  tls: true
+  path: /console(/|$)(.*)
+  pathType: ImplementationSpecific
+  annotations:
+    # For Nginx Ingress controller only
+    nginx.ingress.kubernetes.io/rewrite-target: /$2 
+``` 
+
+> Note: Depending on your ingress controller, you may need to add specific annotations and path to handle the context path properly. Please refer to your ingress controller documentation for more details.
 
 ### Container TLS configuration
 
