@@ -79,7 +79,7 @@
                         "tag": {
                             "type": "string",
                             "description": "Image tag",
-                            "default": "3.12.0"
+                            "default": "3.16.0"
                         },
                         "pullPolicy": {
                             "type": "string",
@@ -782,6 +782,16 @@
             "type": "object",
             "description": "Conduktor Gateway Pod Security Context",
             "default": {}
+        },
+        "tests": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "",
+                    "default": false
+                }
+            }
         }
     }
 }
