@@ -2,7 +2,7 @@ apiVersion: v2
 appVersion: "3.16.0"
 description: Conduktor Gateway chart
 name: conduktor-gateway
-version: 3.15.0
+version: 3.16.0
 dependencies:
   - name: common
     version: 2.x.x
