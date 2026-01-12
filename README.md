@@ -115,7 +115,8 @@ helm install console charts/console \
   --set config.admin.password=testP4ss! \
   --set config.database.password=conduktor \
   --set config.database.username=postgres \
-  --set config.database.host=postgresql.conduktor.svc.cluster.local \
+  --set 'config.database.hosts[0].host=postgresql.conduktor.svc.cluster.local' \
+  --set 'config.database.hosts[0].port=5432' \
   --set config.database.name=conduktor
 ```
 
