@@ -1,0 +1,33 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+        args: ['--allow-multiple-documents']
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: detect-aws-credentials
+        args: ['--allow-missing-credentials']
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: ^\.secrets\.baseline$
+  - repo: local
+    hooks:
+      - id: helm-lint
+        name: Helm Lint Charts
+        entry: bash -c 'helm lint charts/gateway && helm lint charts/console --set config.organization.name=test,config.admin.email=test@test.io,config.admin.password=test,config.database.password=test,config.database.username=test,config.database.host=test && helm lint charts/provisioner' # pragma: allowlist secret
+        language: system
+        pass_filenames: false
+        files: ^charts/
+      - id: readme-generator
+        name: Generate Chart READMEs
+        entry: make generate-readme
+        language: system
+        pass_filenames: false
+        files: ^charts/.*/(values\.yaml|values\.schema\.json|README\.md)$
