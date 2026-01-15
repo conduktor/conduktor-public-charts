@@ -40,3 +40,6 @@ charts/**/charts
 
 # Chart testing files
 ct-previous*/**
+
+# Local test values for testing charts
+.local-tests
