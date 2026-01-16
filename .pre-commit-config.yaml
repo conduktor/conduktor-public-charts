@@ -20,9 +20,21 @@ repos:
         language: python
         entry: detect-secrets-hook
         args: ['--baseline', '.secrets.baseline']
-      - id: helm-lint
-        name: Helm Lint Charts
-        entry: bash -c 'helm lint charts/gateway && helm lint charts/console --set config.organization.name=test,config.admin.email=test@test.io,config.admin.password=test,config.database.password=test,config.database.username=test,config.database.host=test && helm lint charts/provisioner' # pragma: allowlist secret
+      - id: helm-lint-gateway
+        name: Helm Lint Gateway Chart
+        entry: bash -c 'helm lint charts/gateway'
+        language: system
+        pass_filenames: false
+        files: ^charts/
+      - id: helm-lint-console
+        name: Helm Lint Console Chart
+        entry: bash -c 'helm lint charts/console --set config.organization.name=test,config.admin.email=test@test.io,config.admin.password=test,config.database.password=test,config.database.username=test,config.database.host=test' # pragma: allowlist secret
+        language: system
+        pass_filenames: false
+        files: ^charts/
+      - id: helm-lint-provisioner
+        name: Helm Lint Provisioner Chart
+        entry: bash -c 'helm lint charts/provisioner'
         language: system
         pass_filenames: false
         files: ^charts/
