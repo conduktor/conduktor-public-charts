@@ -39,7 +39,7 @@ metadata:
 spec:
   repo: https://charts.bitnami.com/bitnami
   chart: kafka
-  version: 32.1.2
+  version: 32.4.3
   set:
     clusterId: "test"
     image.debug: "false"
@@ -64,7 +64,7 @@ metadata:
 spec:
   repo: https://charts.bitnami.com/bitnami
   chart: postgresql
-  version: 16.6.0
+  version: 18.2.0
   set:
     auth.postgresPassword: "conduktor123"
     primary.persistence.size: 1Gi
