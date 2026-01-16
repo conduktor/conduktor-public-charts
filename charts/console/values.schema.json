@@ -1449,27 +1449,6 @@
                     }
                 }
             }
-        },
-        "tests": {
-            "type": "object",
-            "properties": {
-                "enabled": {
-                    "type": "boolean",
-                    "description": "",
-                    "default": false
-                },
-                "minio": {
-                    "type": "boolean",
-                    "description": "",
-                    "default": false
-                },
-                "secrets": {
-                    "type": "array",
-                    "description": "",
-                    "default": [],
-                    "items": {}
-                }
-            }
         }
     }
 }

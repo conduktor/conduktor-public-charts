@@ -26,7 +26,7 @@ All types of contributions are encouraged and valued. See the [Table of Contents
 
 ## I Have a Question
 
-> If you want to ask a question, we assume that you have read the available [Documentation](https://docs.conduktor.io/) and chart READMEs. 
+> If you want to ask a question, we assume that you have read the available [Documentation](https://docs.conduktor.io/) and chart READMEs.
 
 Before you ask a question, it is best to search for any existing [Issues](https://github.com/conduktor/conduktor-public-charts/issues) that might help you. In case you have found a suitable issue and still need clarification, you can write your question in this issue. It is also advisable to search the internet for answers first.
 
@@ -97,7 +97,7 @@ Enhancement suggestions are tracked as [GitHub issues](https://github.com/conduk
 
 ### Your First Code Contribution
 
-To run the project locally, you will need Helm 3.2.0+ installed and a Kubernetes server with API version 1.19+ available.  
+To run the project locally, you will need Helm 3.2.0+ installed and a Kubernetes server with API version 1.19+ available.
 You can also use local K3D clusters and use the `make` commands to start K3D cluster and install the charts.
 
 Here some useful commands to get you started:
@@ -129,7 +129,7 @@ make install-dev-deps
 Install chart in local K3D cluster:
 ```shell
  # Install Conduktor Gateway chart
-helm install gateway charts/gateway --namespace conduktor --set kafka.enabled=true 
+helm install gateway charts/gateway --namespace conduktor --set kafka.enabled=true
 
 # Install Conduktor Console chart
 helm install console charts/console \

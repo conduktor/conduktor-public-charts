@@ -74,7 +74,7 @@ or to our charts `README`.
 - [kubectl](https://kubernetes.io/docs/tasks/tools/)
 - [helm](https://helm.sh/docs/intro/install/) 3.6.0+
 
-You can have a working cluster on your local machine with docker and k3d, 
+You can have a working cluster on your local machine with docker and k3d,
 use the Makefile target `k3d-up` to start a cluster with nginx and a postgresql
 database running.
 
@@ -126,18 +126,19 @@ make k3d-down
 ```
 
 ### Setup git hooks
-Pre-commit git hook require to have npm or bitnami [`readme-generator`](https://github.com/bitnami/readme-generator-for-helm) installed. 
+Pre-commit git hook require to have npm or bitnami [`readme-generator`](https://github.com/bitnami/readme-generator-for-helm) installed.
 
 > Note: If readme-generator not installed, hook will try to install if globally using npm
 
 
 ```shell
-$ make install-githooks
+make setup-hooks
 ```
-Now every time you commit to the project, pre-commit hook will run the readme-generator tool to synchronize changes between charts values.yaml and README.md.
+
+Now every time you commit to the project, pre-commit hook will run the readme-generator tool to synchronize changes between charts values.yaml and README.md as well as checking for secrets and linting the charts.
 
 ### Re-generate chart README
-You can also run [`readme-generator`](https://github.com/bitnami/readme-generator-for-helm) directly using : 
+You can also run [`readme-generator`](https://github.com/bitnami/readme-generator-for-helm) directly using :
 
 ```shell
 $ make generate-readme

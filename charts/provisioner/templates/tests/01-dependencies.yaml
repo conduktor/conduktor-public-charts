@@ -39,8 +39,13 @@ metadata:
 spec:
   repo: https://charts.bitnami.com/bitnami
   chart: kafka
-  version: 32.1.2
+  version: 32.4.3
   set:
+    global.security.allowInsecureImages: "\"true\""
+    image.repository: "bitnamilegacy/kafka"
+    externalAccess.autoDiscovery.image.repository: "bitnamilegacy/kubectl"
+    volumePermissions.image.repository: "bitnamilegacy/os-shell"
+    metrics.jmx.image.repository: "bitnamilegacy/jmx-exporter"
     clusterId: "test"
     image.debug: "false"
     existingConfigmap: "test-kafka-config"
@@ -64,8 +69,12 @@ metadata:
 spec:
   repo: https://charts.bitnami.com/bitnami
   chart: postgresql
-  version: 16.6.0
+  version: 18.2.0
   set:
+    global.security.allowInsecureImages: "\"true\""
+    image.repository: "bitnamilegacy/postgresql"
+    volumePermissions.image.repository: "bitnamilegacy/os-shell"
+    metrics.image.repository: "bitnamilegacy/postgres-exporter"
     auth.postgresPassword: "conduktor123"
     primary.persistence.size: 1Gi
     volumePermissions.enabled: "true"

@@ -191,7 +191,7 @@ data:
     logs.dir=/opt/bitnami/kafka/logs
 
     # Common Kafka Configuration
-    
+
     sasl.enabled.mechanisms=PLAIN,SCRAM-SHA-256,SCRAM-SHA-512
     # Interbroker configuration
     inter.broker.listener.name=INTERNAL
@@ -480,13 +480,13 @@ spec:
         checksum/configuration: 2fd3af7672fd5fa213942227bd308a52b0eb8113bea44d273e362f2d63362179
         checksum/passwords-secret: 2f6b3eada0ce0a52ce1c4f265fb2957c9b1ac188ad439a17f41bd9b0ec9956d2
     spec:
-      
+
       automountServiceAccountToken: false
       hostNetwork: false
       hostIPC: false
       affinity:
         podAffinity:
-          
+
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
             - podAffinityTerm:
@@ -498,7 +498,7 @@ spec:
                 topologyKey: kubernetes.io/hostname
               weight: 1
         nodeAffinity:
-          
+
       securityContext:
         fsGroup: 1001
         fsGroupChangePolicy: Always
@@ -524,7 +524,7 @@ spec:
             seLinuxOptions: {}
           resources:
             limits: {}
-            requests: {} 
+            requests: {}
           command:
             - /bin/bash
           args:
