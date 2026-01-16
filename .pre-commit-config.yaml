@@ -4,9 +4,11 @@ repos:
     hooks:
       - id: check-yaml
         args: ['--allow-multiple-documents']
+        exclude: 'charts/.*/templates/.*\.yaml$'
       - id: check-added-large-files
       - id: check-merge-conflict
       - id: detect-private-key
+        exclude: 'charts/.*/README\.md$'
       - id: detect-aws-credentials
         args: ['--allow-missing-credentials']
       - id: end-of-file-fixer
@@ -15,8 +17,11 @@ repos:
     rev: v1.5.0
     hooks:
       - id: detect-secrets
-        args: ['--baseline', '.secrets.baseline']
-        exclude: ^\.secrets\.baseline$
+        args:
+          - '--baseline'
+          - '.secrets.baseline'
+          - '--exclude-files'
+          - '\.secrets\.baseline'
   - repo: local
     hooks:
       - id: helm-lint

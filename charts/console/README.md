@@ -435,7 +435,7 @@ config:
 
   license: "<ENTERPRISE_LICENSE>"
 ```
-License can also be passed as environment variable named `CDK_LICENSE` from a secret using either `existingLicenseSecret` that expect a key named `CDK_LICENSE` or `extraEnvVars` or `extraEnvVarsSecret`. 
+License can also be passed as environment variable named `CDK_LICENSE` from a secret using either `existingLicenseSecret` that expect a key named `CDK_LICENSE` or `extraEnvVars` or `extraEnvVarsSecret`.
 
 ### Install with a basic SSO configuration
 
@@ -455,7 +455,7 @@ config:
     name: "<postgres_database>"
     username: "<postgres_username>"
     password: "<postgres_password>"
-    
+
   sso:
     oauth2:
       - name: "<idp-id>"
@@ -488,7 +488,7 @@ config:
     name: "<postgres_database>"
     username: "<postgres_username>"
     password: "<postgres_password>"
-    
+
   clusters:
     - id: my-local-kafka-cluster
       name: My Local Kafka Cluster
@@ -517,7 +517,7 @@ config:
     name: "<postgres_database>"
     username: "<postgres_username>"
     password: "<postgres_password>"
-    
+
   clusters:
     - id: confluent-cloud-cluster
       name: Confluent Cloud Cluster
@@ -912,7 +912,7 @@ platformCortex:
 ##### Using cert-manager
 This solution leverage [cert-manager](https://cert-manager.io/docs/) to generate TLS certificates for your ingress simply using annotations.
 
-Example using a [Nginx Ingress](https://kubernetes.github.io/ingress-nginx/) and cert-manager with [Let's Encrypt](https://cert-manager.io/docs/tutorials/acme/pomerium-ingress/#configure-lets-encrypt-issuer) issuer : 
+Example using a [Nginx Ingress](https://kubernetes.github.io/ingress-nginx/) and cert-manager with [Let's Encrypt](https://cert-manager.io/docs/tutorials/acme/pomerium-ingress/#configure-lets-encrypt-issuer) issuer :
 ```yaml
 ingress:
   enabled: true
@@ -1024,14 +1024,14 @@ ingress:
   pathType: ImplementationSpecific
   annotations:
     # For Nginx Ingress controller only
-    nginx.ingress.kubernetes.io/rewrite-target: /$2 
-``` 
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+```
 
 > Note: Depending on your ingress controller, you may need to add specific annotations and path to handle the context path properly. Please refer to your ingress controller documentation for more details.
 
 ### Container TLS configuration
 
-#### Use an existing secret 
+#### Use an existing secret
 
 If you already have a TLS secret of type `kubernetes.io/tls` created in your cluster, you can use it in your platform configuration.
 At startup Console will look for a `tls.crt` and `tls.key` PEM inside the secret to be mounted.
