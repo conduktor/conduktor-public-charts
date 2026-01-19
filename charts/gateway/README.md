@@ -259,7 +259,7 @@ The following `values.yaml` file can be used to set up Gateway to proxy traffic 
 gateway:
   licenseKey: "<your license key>" # set GATEWAY_LICENSE_KEY secret env var
   admin:
-    users: # generate GATEWAY_ADMIN_API_USERS secret env var 
+    users: # generate GATEWAY_ADMIN_API_USERS secret env var
       - username: admin
         password: "<your admin password>" # if empty, a random password will be generated
         admin: true
@@ -281,19 +281,19 @@ In particular, the [Client to Gateway Authentication page](https://docs.condukto
 
 ### How to provide secrets
 
-Some environment variables require sensitive information, such as API keys, passwords or license key. These should be provided as Kubernetes secrets. 
+Some environment variables require sensitive information, such as API keys, passwords or license key. These should be provided as Kubernetes secrets.
 
 This chart provide several ways to provide secrets to Gateway deployment:
 
 #### Provide you own secret with `gateway.secretRef`
 
-You can create a secret in your Kubernetes cluster and reference it in the `gateway.secretRef` field in the `values.yaml` file. 
+You can create a secret in your Kubernetes cluster and reference it in the `gateway.secretRef` field in the `values.yaml` file.
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > This secret should contain **environment variables** that Gateway will use and need to be created in the same namespace as the Gateway deployment.
 
-> [!WARNING]  
-> When using `gateway.secretRef`, the following will be ignored as they are expected in the `gateway.secretRef` : `gateway.licenseKey`, `gateway.admin.users` and `gateway.userPool.secretKey`.   
+> [!WARNING]
+> When using `gateway.secretRef`, the following will be ignored as they are expected in the `gateway.secretRef` : `gateway.licenseKey`, `gateway.admin.users` and `gateway.userPool.secretKey`.
 > You should provide them in the secret using environment variable keys: `GATEWAY_LICENSE_KEY`, `GATEWAY_ADMIN_API_USERS`, `GATEWAY_USER_POOL_SECRET_KEY` respectively.
 
 ```yaml
@@ -362,7 +362,7 @@ gateway:
 ```
 
 > [!NOTE]
-> In this example gateway chart will create a secret with only `GATEWAY_ADMIN_API_USERS` key with value from `gateway.admin.users` field 
+> In this example gateway chart will create a secret with only `GATEWAY_ADMIN_API_USERS` key with value from `gateway.admin.users` field
 > as `GATEWAY_LICENSE_KEY` and `GATEWAY_USER_POOL_SECRET_KEY` are provided in the `gateway.extraSecretEnvVars` field.
 
 #### Using values and generated secrets
@@ -374,7 +374,7 @@ This is useful for testing or when you don't want to manage secrets in your clus
 gateway:
   licenseKey: "<your license key>" # set GATEWAY_LICENSE_KEY secret env var
   admin:
-    users: # generate GATEWAY_ADMIN_API_USERS secret env var 
+    users: # generate GATEWAY_ADMIN_API_USERS secret env var
       - username: admin
         password: "<your admin password>" # if empty, a random password will be generated
         admin: true
@@ -539,7 +539,7 @@ podSecurityContext:
 
 ### Node affinity
 
-By default, Gateway pods are configured with a pod anti-affinity that spread pods across nodes using `kubernetes.io/hostname` node label. 
+By default, Gateway pods are configured with a pod anti-affinity that spread pods across nodes using `kubernetes.io/hostname` node label.
 You can disable this behavior by setting `affinity.podAntiAffinityPreset.enable` to `false` and not setting `affinity.podAntiAffinity`.
 
 ```yaml
@@ -552,7 +552,7 @@ affinity:
 ### Monitoring
 
 #### Prometheus metrics
-Conduktor Gateway exposes metrics on the `/api/metrics` endpoint that can be scraped by Prometheus. 
+Conduktor Gateway exposes metrics on the `/api/metrics` endpoint that can be scraped by Prometheus.
 
 The Conduktor Gateway chart can be configured to install Prometheus [ServiceMonitor CRD](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.ServiceMonitor) from [Prometheus Operator](https://prometheus-operator.dev/) to scrape metrics if the API `monitoring.coreos.com/v1/ServiceMonitor` is available on the Kubernetes Cluster.
 
@@ -570,7 +570,7 @@ metrics:
 ```
 
 ##### Prometheus alerts
-Some default alerts are provided in the [`gateway-alerts.yaml`](./prometheus-alerts/gateway-alerts.yaml) file that make use of [PrometheusRule CRD](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.PrometheusRule). 
+Some default alerts are provided in the [`gateway-alerts.yaml`](./prometheus-alerts/gateway-alerts.yaml) file that make use of [PrometheusRule CRD](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.PrometheusRule).
 
 To enable alerts, set the following values in your `values.yaml`:
 ```yaml
@@ -601,7 +601,7 @@ metrics:
 The chart then installs the Grafana dashboards as ConfigMap in the configured namespace. And init CRD if they are installed in Kubernetes Cluster.
 
 ##### Sidecar ConfigMap loading
-If you are not using the Grafana Operator but an official [Grafana Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/grafana), you can use the Sidecar provisioning to load dashboards from ConfigMap. 
+If you are not using the Grafana Operator but an official [Grafana Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/grafana), you can use the Sidecar provisioning to load dashboards from ConfigMap.
 
 To enable Sidecar ConfigMap loading, set the following values in your `values.yaml`:
 ```yaml
@@ -609,14 +609,14 @@ metrics:
   grafana:
     enable: true
     namespace: "" # Namespace used to deploy Grafana dashboards by default use the same namespace as Conduktor Gateway
-    labels: 
+    labels:
       grafana_dashboard: "1" # Label to enable Sidecar ConfigMap loading check Grafana chart sidecar.dashboards.label value for expected value
 ```
 
 ##### Import dashboards manually
 If you want to import dashboards manually, you can use the exported json files from the [grafana-dashboards](./grafana-dashboards) folder.
 
-> [!NOTE]  
+> [!NOTE]
 > Grafana Dashboard exported json files expect to have a datasource named `prometheus` and `loki` to be available in Grafana and that Conduktor Gateway run inside Kubernetes with `pod` label on metrics.
 > Dashboards are tested with Grafana **9.x** and **10.x**.
 

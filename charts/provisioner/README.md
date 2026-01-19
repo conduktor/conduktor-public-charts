@@ -34,7 +34,7 @@ Helm Chart to deploy Conduktor Provisioner on Kubernetes that will provision exi
 
 - Kubernetes 1.19+
 - Helm 3.2.0+
-- Conduktor Console 1.23.0+ (depending on the resources, check [documentation](https://docs.conduktor.io/platform/reference/resource-reference/) for more details) 
+- Conduktor Console 1.23.0+ (depending on the resources, check [documentation](https://docs.conduktor.io/platform/reference/resource-reference/) for more details)
 - Conduktor Gateway 3.1.0+ (depending on the resources, check [documentation](https://docs.conduktor.io/gateway/reference/resources-reference/) for more details)
 
 ## Usage
@@ -43,7 +43,7 @@ Helm Chart to deploy Conduktor Provisioner on Kubernetes that will provision exi
 # Add the Conduktor Helm repository
 helm repo add conduktor https://helm.conduktor.io
 
-# Install Conduktor Console 
+# Install Conduktor Console
 helm install platform conduktor/console \
     --create-namespace -n conduktor \
     --set config.admin.email="admin@conduktor.io" \
@@ -53,11 +53,11 @@ helm install platform conduktor/console \
     --set config.database.host="postgresql" \
     --set config.database.name="postgres" \
     --set config.license="${LICENSE}"
-    
+
 # Push Conduktor CLI compatible YAML manifests files into a ConfigMap. See https://github.com/conduktor/ctl
 kubectl create configmap setup-manifests --from-file=./manifests/console-setup.yaml -n conduktor
-    
-# Use Provisioner chart to provision Console 
+
+# Use Provisioner chart to provision Console
 helm install setup conduktor/provisioner \
     -n conduktor \
     --set console.enabled=true \
@@ -249,13 +249,13 @@ You can provision Conduktor Console only by setting `console.enabled` to `true`.
 console:
   enabled: true
   url: "http://console"
-  username:  "<user_email>" 
-  password: "<password>" 
+  username:  "<user_email>"
+  password: "<password>"
   # OR
   apiToken: "<api_token>"
   insecure: true
   # Embedded manifests to apply on the Console
-  manifests: 
+  manifests:
     - apiVersion: iam/v2
       kind: User
       metadata:
@@ -318,7 +318,7 @@ gateway:
 ### Provision Console and Gateway
 You can provision both Console and Gateway in the same Helm release by setting both `console.enabled` and `gateway.enabled` to `true`.
 
-> Note: The provisioning will share the same Job but use different containers for Console and Gateway provisioning. 
+> Note: The provisioning will share the same Job but use different containers for Console and Gateway provisioning.
 > And so there is no interdependency between the Console and Gateway provisioning.
 
 ```yaml
@@ -337,7 +337,7 @@ gateway:
 ```
 
 ### Use secrets and configmaps for configuration
-You can use a ConfigMap and a Secret to store the environment variables for the Console and Gateway provisioning. 
+You can use a ConfigMap and a Secret to store the environment variables for the Console and Gateway provisioning.
 This is useful for sensitive information like passwords or API tokens.
 For details on supported environment variables, please refer to the [Conduktor CLI documentation](https://github.com/conduktor/ctl)
 
@@ -349,7 +349,7 @@ console:
   #  password: "" Provided by extraEnvVarsSecret
   extraEnvVarsCM: "console-provisioner-config"
   extraEnvVarsSecret: "console-provisioner-secrets"
-  
+
   manifests: [] # Embedded manifests to apply on the Console
 
 # Deploy a ConfigMap and a Secret with CLI configuration environment variables
@@ -383,7 +383,7 @@ console:
   extraManifestsConfigMapRef:
       - name: extra-manifests
         key: console-setup.yaml
-        
+
 gateway:
     enabled: true
     url: "http://gateway"
@@ -399,7 +399,7 @@ extraDeploy:
     metadata:
       name: extra-manifests
     data:
-      console-setup.yaml: |        
+      console-setup.yaml: |
         apiVersion: iam/v2
         kind: User
         metadata:
@@ -417,7 +417,7 @@ extraDeploy:
           type: LOCAL
 ```
 
-> Note: The `${EXTRA_USER_EMAIL}` and `${EXTRA_USER_FIRSTNAME}` variables will be replaced container environment variables. 
+> Note: The `${EXTRA_USER_EMAIL}` and `${EXTRA_USER_FIRSTNAME}` variables will be replaced container environment variables.
 > In this case by the values provided in the `extraEnvVars` section for `EXTRA_USER_EMAIL` and default value "Default Name" for missing `EXTRA_USER_FIRSTNAME`.
 
 ### Using different CLI commands
@@ -440,7 +440,7 @@ console:
         firstName: "John"
         lastName: "Doe"
 ```
-Will delete the user `john.doe@company.org`. 
+Will delete the user `john.doe@company.org`.
 
 ### Using CronJob to run the provisioner
 You can configure the provisioner to run as a [CronJob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) by setting `cronJob.enabled` to `true` and a cron pattern in `cronJob.schedule`.
@@ -454,8 +454,8 @@ cronJob:
 console:
   enabled: true
   url: "http://console"
-  username:  "<user_email>" 
-  password: "<password>" 
+  username:  "<user_email>"
+  password: "<password>"
   # Embedded manifests to apply on the Console
   manifests: []
 ```

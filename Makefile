@@ -29,9 +29,15 @@ minio_default_bucket := conduktor
 help: ## Prints help for targets with comments
 	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: install-githooks
-install-githooks: ## Install git hooks
-	git config --local core.hooksPath .githooks
+.PHONY: install-pre-commit
+install-pre-commit: ## Install required tools and dependencies
+	@./scripts/install_dev_dependencies.sh
+
+.PHONY: setup-hooks
+setup-hooks: install-pre-commit ## Setup all git hooks and pre-commit
+	@command -v pre-commit >/dev/null 2>&1 || { echo "pre-commit not found. Run 'make install' first."; exit 1; }
+	@echo "[*] installing pre-commit hooks..."
+	@pre-commit install --install-hooks
 
 .PHONY: install-readme-generator
 install-readme-generator: ## Install bitnami/readme-generator-for-helm using NMP
@@ -45,7 +51,7 @@ install-readme-generator: ## Install bitnami/readme-generator-for-helm using NMP
 generate-readme: ## Re-generate charts README
 	@echo "Check that readme-generator is installed"
 	command -v readme-generator || $(MAKE) install-readme-generator
-	
+
 	@echo
 	@echo "Updating README.md for console chart"
 	readme-generator --values "./charts/console/values.yaml" --readme "./charts/console/README.md" --schema "./charts/console/values.schema.json"
@@ -326,7 +332,7 @@ create-test-ns: ## Create test namespace
 	kubectl create namespace ${TEST_NAMESPACE} || true
 
 .PHONY: test-chart
-test-chart: ## Run chart-testing 
+test-chart: ## Run chart-testing
 	make check-kube-context
 	make create-test-ns
 	ct install --config $(CURDIR)/.github/ct-config.yaml
