@@ -135,7 +135,7 @@
                 "tag": {
                     "type": "string",
                     "description": "conduktor-ctl image tag (immutable tags are recommended)",
-                    "default": "v0.6.2"
+                    "default": "v0.7.0"
                 },
                 "digest": {
                     "type": "string",
@@ -709,7 +709,7 @@
                 },
                 "backend": {
                     "type": "string",
-                    "description": "State backend type. Currently only \"file\" is supported",
+                    "description": "State backend type either \"file\" or \"remote\". Default is \"file\" using a PersistentVolumeClaim.",
                     "default": "file"
                 },
                 "file": {
@@ -764,6 +764,16 @@
                                     "default": {}
                                 }
                             }
+                        }
+                    }
+                },
+                "remote": {
+                    "type": "object",
+                    "properties": {
+                        "uri": {
+                            "type": "string",
+                            "description": "URI of the remote state backend (e.g., s3://my-bucket/path/to/state or gcs://my-bucket/path/to/state or azblob://my-container/path/to/state)",
+                            "default": ""
                         }
                     }
                 }

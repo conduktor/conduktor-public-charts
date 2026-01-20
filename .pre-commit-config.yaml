@@ -12,6 +12,7 @@ repos:
       - id: detect-aws-credentials
         args: ['--allow-missing-credentials']
       - id: end-of-file-fixer
+        exclude: '(charts/.*/.*\.schema.json$)'
       - id: trailing-whitespace
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.0
@@ -25,21 +26,26 @@ repos:
         language: system
         pass_filenames: false
         files: ^charts/
+        stages: [pre-commit, pre-push, manual]
       - id: helm-lint-console
         name: Helm Lint Console Chart
         entry: bash -c 'helm lint charts/console --set config.organization.name=test,config.admin.email=test@test.io,config.admin.password=test,config.database.password=test,config.database.username=test,config.database.host=test' # pragma: allowlist secret
         language: system
         pass_filenames: false
         files: ^charts/
+        stages: [pre-commit, pre-push, manual]
       - id: helm-lint-provisioner
         name: Helm Lint Provisioner Chart
         entry: bash -c 'helm lint charts/provisioner'
         language: system
         pass_filenames: false
         files: ^charts/
+        stages: [pre-commit, pre-push, manual]
       - id: readme-generator
         name: Generate Chart READMEs
         entry: make generate-readme
         language: system
         pass_filenames: false
         files: ^charts/.*/(values\.yaml|values\.schema\.json|README\.md)$
+        types: [text]
+        stages: [pre-commit, pre-push, manual]

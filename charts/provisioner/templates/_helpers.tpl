@@ -154,6 +154,8 @@ Parameters:
     {{- if eq .context.Values.state.backend "file" -}}
       {{- $filePath := printf "%s/%s" .context.Values.state.file.mountPath $fileName -}}
       {{- $env = merge $env (dict "CDK_STATE_FILE" $filePath) -}}
+    {{- else if eq .context.Values.state.backend "remote" -}}
+      {{- $env = merge $env (dict "CDK_STATE_REMOTE_URI" .context.Values.state.remote.uri) -}}
     {{- end -}}
   {{- end -}}
 {{- range $key, $value := $env }}

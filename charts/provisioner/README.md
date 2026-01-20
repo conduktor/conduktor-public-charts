@@ -115,7 +115,7 @@ Configuration of the conduktor-ctl image used to run the Conduktor CLI commands.
 | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
 | `image.registry`                     | conduktor-ctl image registry                                                                                                                             | `docker.io`               |
 | `image.repository`                   | conduktor-ctl image repository                                                                                                                           | `conduktor/conduktor-ctl` |
-| `image.tag`                          | conduktor-ctl image tag (immutable tags are recommended)                                                                                                 | `v0.6.2`                  |
+| `image.tag`                          | conduktor-ctl image tag (immutable tags are recommended)                                                                                                 | `v0.7.0`                  |
 | `image.digest`                       | conduktor-ctl image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`                      |
 | `image.pullPolicy`                   | conduktor-ctl image pull policy                                                                                                                          | `IfNotPresent`            |
 | `image.pullSecrets`                  | conduktor-ctl image pull secrets                                                                                                                         | `[]`                      |
@@ -234,18 +234,19 @@ Configuration of Conduktor Gateway provisioning container using Conduktor CLI.
 Configuration for CLI provisioner state persistence of manged resources.
 Enabled by default, it allows provisioner to track the resources it has created and manage them properly.
 
-| Name                           | Description                                            | Value                  |
-| ------------------------------ | ------------------------------------------------------ | ---------------------- |
-| `state.enabled`                | Enable state persistence                               | `true`                 |
-| `state.backend`                | State backend type. Currently only "file" is supported | `file`                 |
-| `state.file.mountPath`         | Mount path for the state volume                        | `/var/conduktor/state` |
-| `state.file.pvc.existingClaim` | Name of an existing PersistentVolumeClaim to use       | `""`                   |
-| `state.file.pvc.labels`        | Labels for the PersistentVolumeClaim                   | `{}`                   |
-| `state.file.pvc.annotations`   | Annotations for the PersistentVolumeClaim              | `{}`                   |
-| `state.file.pvc.storageClass`  | Storage class for the PersistentVolumeClaim            | `""`                   |
-| `state.file.pvc.storageSize`   | Size of the PersistentVolumeClaim                      | `1Gi`                  |
-| `state.file.pvc.accessModes`   | Access modes for the PersistentVolumeClaim             | `["ReadWriteOnce"]`    |
-| `state.file.pvc.selector`      | Selector for the PersistentVolumeClaim                 | `{}`                   |
+| Name                           | Description                                                                                                                                  | Value                  |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| `state.enabled`                | Enable state persistence                                                                                                                     | `true`                 |
+| `state.backend`                | State backend type either "file" or "remote". Default is "file" using a PersistentVolumeClaim.                                               | `file`                 |
+| `state.file.mountPath`         | Mount path for the state volume                                                                                                              | `/var/conduktor/state` |
+| `state.file.pvc.existingClaim` | Name of an existing PersistentVolumeClaim to use                                                                                             | `""`                   |
+| `state.file.pvc.labels`        | Labels for the PersistentVolumeClaim                                                                                                         | `{}`                   |
+| `state.file.pvc.annotations`   | Annotations for the PersistentVolumeClaim                                                                                                    | `{}`                   |
+| `state.file.pvc.storageClass`  | Storage class for the PersistentVolumeClaim                                                                                                  | `""`                   |
+| `state.file.pvc.storageSize`   | Size of the PersistentVolumeClaim                                                                                                            | `1Gi`                  |
+| `state.file.pvc.accessModes`   | Access modes for the PersistentVolumeClaim                                                                                                   | `["ReadWriteOnce"]`    |
+| `state.file.pvc.selector`      | Selector for the PersistentVolumeClaim                                                                                                       | `{}`                   |
+| `state.remote.uri`             | URI of the remote state backend (e.g., s3://my-bucket/path/to/state or gcs://my-bucket/path/to/state or azblob://my-container/path/to/state) | `""`                   |
 
 ### Other Parameters
 

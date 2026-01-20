@@ -436,7 +436,7 @@ gateway:
 state:
   ## @param state.enabled Enable state persistence
   enabled: true
-  ## @param state.backend State backend type. Currently only "file" is supported
+  ## @param state.backend State backend type either "file" or "remote". Default is "file" using a PersistentVolumeClaim.
   backend: "file"
   ## File backend configuration
   ##
@@ -459,6 +459,11 @@ state:
         - ReadWriteOnce
       ## @param state.file.pvc.selector Selector for the PersistentVolumeClaim
       selector: {}
+  ## Remote backend configuration
+  ##
+  remote:
+    ## @param state.remote.uri URI of the remote state backend (e.g., s3://my-bucket/path/to/state or gcs://my-bucket/path/to/state or azblob://my-container/path/to/state)
+    uri: ""
 
 ## @section Other Parameters
 ## @descriptionStart
