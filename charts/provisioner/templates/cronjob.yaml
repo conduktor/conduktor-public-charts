@@ -1,5 +1,6 @@
 {{- if .Values.cronJob.enabled -}}
 {{- if or .Values.console.enabled .Values.gateway.enabled -}}
+{{- $rollme := randAlphaNum 5 -}}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -8,13 +9,13 @@ metadata:
   labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
     app.kubernetes.io/component: conduktor-provisioning
   annotations:
-    rollme: {{ randAlphaNum 5 | quote }}
+    rollme: {{ $rollme | quote }}
     checksum/manifests-cm: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum  }}
     checksum/config-secrets: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
     {{- if .Values.useHooks }}
     helm.sh/hook: post-install,post-upgrade
     helm.sh/hook-delete-policy: before-hook-creation
-    helm.sh/hook-weight: "0"  #run after state PVC hooks (if any)
+    helm.sh/hook-weight: "0"
     {{- end }}
     {{- if .Values.commonAnnotations }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
@@ -41,7 +42,7 @@ spec:
           labels: {{- include "provisioner.labels" . | nindent 12 }}
             app.kubernetes.io/component: conduktor-provisioning
           annotations:
-            rollme: {{ randAlphaNum 5 | quote }}
+            rollme: {{ $rollme | quote }}
             checksum/manifests-cm: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
             checksum/config-secrets: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
             {{- if .Values.podAnnotations }}
