@@ -40,12 +40,13 @@ spec:
         metadata:
           labels: {{- include "provisioner.labels" . | nindent 12 }}
             app.kubernetes.io/component: conduktor-provisioning
-          {{- if .Values.podAnnotations }}
-          annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.podAnnotations "context" $) | nindent 12 }}
+          annotations:
             rollme: {{ randAlphaNum 5 | quote }}
             checksum/manifests-cm: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
             checksum/config-secrets: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
-          {{- end }}
+            {{- if .Values.podAnnotations }}
+            {{- include "common.tplvalues.render" ( dict "value" .Values.podAnnotations "context" $) | nindent 12 }}
+            {{- end }}
         spec:
           {{- include "provisioner.imagePullSecrets" . | nindent 10 }}
           {{- if .Values.schedulerName }}

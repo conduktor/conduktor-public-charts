@@ -11,16 +11,14 @@ metadata:
   {{- if .Values.state.file.pvc.labels }}
   {{- include "common.tplvalues.render" ( dict "value" .Values.state.file.pvc.labels "context" $ ) | nindent 4 }}
   {{- end }}
+  {{- if or .Values.commonAnnotations .Values.state.file.pvc.annotations }}
   annotations:
-  {{- if .Values.commonAnnotations }}
-  {{ include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
-  {{- end }}
-  {{- if .Values.state.file.pvc.annotations }}
-  {{ include "common.tplvalues.render" (dict "value" .Values.state.file.pvc.annotations "context" $) | nindent 4 }}
-  {{- end }}
-  {{- if .Values.useHooks }}
-    helm.sh/hook: post-install,post-upgrade
-    helm.sh/hook-weight: "-10"  # run before job that uses the PVC
+    {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.state.file.pvc.annotations }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.state.file.pvc.annotations "context" $) | nindent 4 }}
+    {{- end }}
   {{- end }}
 spec:
   accessModes: {{ toYaml .Values.state.file.pvc.accessModes| nindent 4 }}

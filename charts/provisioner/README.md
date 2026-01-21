@@ -44,7 +44,7 @@ Helm Chart to deploy Conduktor Provisioner on Kubernetes that will provision exi
 helm repo add conduktor https://helm.conduktor.io
 
 # Install Conduktor Console
-helm install platform conduktor/console \
+helm upgrade --install platform conduktor/console \
     --create-namespace -n conduktor \
     --set config.admin.email="admin@conduktor.io" \
     --set config.admin.password="admin123!" \
@@ -58,7 +58,7 @@ helm install platform conduktor/console \
 kubectl create configmap setup-manifests --from-file=./manifests/console-setup.yaml -n conduktor
 
 # Use Provisioner chart to provision Console
-helm install setup conduktor/provisioner \
+helm upgrade --install setup conduktor/provisioner \
     -n conduktor \
     --set console.enabled=true \
     --set console.url="http://console.conduktor" \
