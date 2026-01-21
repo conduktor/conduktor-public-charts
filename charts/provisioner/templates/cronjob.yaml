@@ -8,6 +8,9 @@ metadata:
   labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
     app.kubernetes.io/component: conduktor-provisioning
   annotations:
+    rollme: {{ randAlphaNum 5 | quote }}
+    checksum/manifests-cm: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum  }}
+    checksum/config-secrets: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
     {{- if .Values.useHooks }}
     helm.sh/hook: post-install,post-upgrade
     helm.sh/hook-delete-policy: before-hook-creation
@@ -37,10 +40,11 @@ spec:
         metadata:
           labels: {{- include "provisioner.labels" . | nindent 12 }}
             app.kubernetes.io/component: conduktor-provisioning
-            checksum/manifests-cm: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum  | trunc 63 }}
-            checksum/config-secrets: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum | trunc 63 }}
           {{- if .Values.podAnnotations }}
           annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.podAnnotations "context" $) | nindent 12 }}
+            rollme: {{ randAlphaNum 5 | quote }}
+            checksum/manifests-cm: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+            checksum/config-secrets: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
           {{- end }}
         spec:
           {{- include "provisioner.imagePullSecrets" . | nindent 10 }}
