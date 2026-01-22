@@ -25,3 +25,11 @@ Gateway provisioning job has been deployed targeting Gateway {{ .Values.gateway.
   For job logs, execute:
     kubectl logs -n {{ .Release.Namespace }} job/{{ include "provisioner.fullname" . }} -c conduktor-ctl-gateway
 {{- end }}
+
+{{ if and (not .Values.cronJob.enabled) (not .Values.cleanupAfterFinished.enabled) }}
+  {{- if not .Values.useHooks }}
+⚠️  Note: Job {{ include "provisioner.fullname" . }} require cleanup to upgrade, manually delete it before running helm upgrade or add `--force --wait-for-job` flags.
+  {{- else }}
+⚠️  Note: Job {{ include "provisioner.fullname" . }} will not be delete on helm uninstall. Enable cleanupAfterFinished to auto cleanup jobs or manually delete it after uninstall.
+  {{- end }}
+{{- end }}

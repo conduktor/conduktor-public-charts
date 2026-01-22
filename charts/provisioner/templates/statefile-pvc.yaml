@@ -1,9 +1,13 @@
 {{- if and .Values.state.enabled (and (eq .Values.state.backend "file") (empty .Values.state.file.pvc.existingClaim)) }}
+{{- $pvcName := include "provisioner.stateful.pvcName" . -}}
+{{- $pvcNamespace := include "common.names.namespace" . -}}
+{{- $existingPVC := lookup "v1" "PersistentVolumeClaim" $pvcNamespace $pvcName -}}
+{{- if not $existingPVC }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "provisioner.stateful.pvcName" . }}
-  namespace: {{ include "common.names.namespace" . | quote }}
+  name: {{ $pvcName | quote }}
+  namespace: {{ $pvcNamespace | quote }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
   {{- if .Values.commonLabels }}
   {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
@@ -36,4 +40,5 @@ spec:
   selector:
     {{ toYaml . | nindent 4 }}
   {{- end }}
+{{- end }}
 {{- end }}

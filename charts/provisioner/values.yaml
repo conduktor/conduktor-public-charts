@@ -53,7 +53,9 @@ commonLabels: {}
 ## @param commonAnnotations Annotations to add to all deployed objects
 ##
 commonAnnotations: {}
-## @param useHooks Enable Helm hooks for the conduktor-provisioner Job and CronJob
+## @param useHooks Enable Helm hooks for the conduktor-provisioner Job and CronJob.
+## This is useful when using the provisioner in CI/CD pipelines to wait for the Job completion but job will not be deleted automatically on Helm uninstall.
+## If disabled, the Job will be created as a normal Kubernetes Job resource and require manual cleanup or using --force flag on upgrade or use of cleanupAfterFinished parameter.
 useHooks: true
 ## @param clusterDomain Kubernetes cluster domain name
 ##
@@ -272,6 +274,8 @@ console:
   insecure: false
   ## @param console.debug Enable verbose debug mode
   debug: true
+  ## @param console.trace Enable verbose debug and trace mode
+  trace: false
   ## @param console.manifests Manifests YAML to apply on the Console
   manifests: []
   ## @param console.manifestsConfigMap Manifests YAML to apply on the Console
@@ -362,6 +366,8 @@ gateway:
   insecure: false
   ## @param gateway.debug Enable verbose debug mode
   debug: true
+  ## @param gateway.trace Enable verbose debug and trace mode
+  trace: false
   ## @param gateway.manifests Manifests YAML to apply on the Gateway
   manifests: []
   ## @param gateway.manifestsConfigMap Manifests YAML to apply on the Gateway
@@ -431,6 +437,8 @@ gateway:
 ## @descriptionStart
 ## Configuration for CLI provisioner state persistence of manged resources.
 ## Enabled by default, it allows provisioner to track the resources it has created and manage them properly.
+## Note that on uninstall of the chart, the state will be deleted unless you set the PVC to be kept using annotations "helm.sh/resource-policy: keep".
+## Also uninstall will not delete resources created and managed by the provisioner.
 ## @descriptionEnd
 ##
 state:

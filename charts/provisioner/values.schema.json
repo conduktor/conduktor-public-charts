@@ -75,7 +75,7 @@
         },
         "useHooks": {
             "type": "boolean",
-            "description": "Enable Helm hooks for the conduktor-provisioner Job and CronJob",
+            "description": "Enable Helm hooks for the conduktor-provisioner Job and CronJob.",
             "default": true
         },
         "clusterDomain": {
@@ -423,6 +423,11 @@
                     "description": "Enable verbose debug mode",
                     "default": true
                 },
+                "trace": {
+                    "type": "boolean",
+                    "description": "Enable verbose debug and trace mode",
+                    "default": false
+                },
                 "manifests": {
                     "type": "array",
                     "description": "Manifests YAML to apply on the Console",
@@ -584,6 +589,11 @@
                     "type": "boolean",
                     "description": "Enable verbose debug mode",
                     "default": true
+                },
+                "trace": {
+                    "type": "boolean",
+                    "description": "Enable verbose debug and trace mode",
+                    "default": false
                 },
                 "manifests": {
                     "type": "array",

@@ -131,7 +131,9 @@ Usage:
       {{- end -}}
     {{- end -}}
 
-    {{- if .config.debug -}}
+    {{- if .config.trace -}}
+      {{- $args = append $args "-vv" -}}
+    {{- else if .config.debug -}}
       {{- $args = append $args "-v" -}}
     {{- end -}}
   {{- end -}}
