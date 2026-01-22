@@ -1,0 +1,44 @@
+{{- if and .Values.state.enabled (and (eq .Values.state.backend "file") (empty .Values.state.file.pvc.existingClaim)) }}
+{{- $pvcName := include "provisioner.stateful.pvcName" . -}}
+{{- $pvcNamespace := include "common.names.namespace" . -}}
+{{- $existingPVC := lookup "v1" "PersistentVolumeClaim" $pvcNamespace $pvcName -}}
+{{- if not $existingPVC }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $pvcName | quote }}
+  namespace: {{ $pvcNamespace | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+  {{- if .Values.commonLabels }}
+  {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+  {{- end }}
+  {{- if .Values.state.file.pvc.labels }}
+  {{- include "common.tplvalues.render" ( dict "value" .Values.state.file.pvc.labels "context" $ ) | nindent 4 }}
+  {{- end }}
+  {{- if or .Values.commonAnnotations .Values.state.file.pvc.annotations }}
+  annotations:
+    {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.state.file.pvc.annotations }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.state.file.pvc.annotations "context" $) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+spec:
+  accessModes: {{ toYaml .Values.state.file.pvc.accessModes| nindent 4 }}
+  {{- if .Values.state.file.pvc.storageClass }}
+  {{- if (eq "-" .Values.state.file.pvc.storageClass) }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: {{ .Values.state.file.pvc.storageClass }}
+  {{- end }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.state.file.pvc.storageSize }}
+  {{- with .Values.state.file.pvc.selector }}
+  selector:
+    {{ toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}

@@ -44,7 +44,7 @@ Helm Chart to deploy Conduktor Provisioner on Kubernetes that will provision exi
 helm repo add conduktor https://helm.conduktor.io
 
 # Install Conduktor Console
-helm install platform conduktor/console \
+helm upgrade --install platform conduktor/console \
     --create-namespace -n conduktor \
     --set config.admin.email="admin@conduktor.io" \
     --set config.admin.password="admin123!" \
@@ -58,7 +58,7 @@ helm install platform conduktor/console \
 kubectl create configmap setup-manifests --from-file=./manifests/console-setup.yaml -n conduktor
 
 # Use Provisioner chart to provision Console
-helm install setup conduktor/provisioner \
+helm upgrade --install setup conduktor/provisioner \
     -n conduktor \
     --set console.enabled=true \
     --set console.url="http://console.conduktor" \
@@ -72,10 +72,7 @@ More examples can be found in the [Examples values](#examples-values) section.
 
 ## Limitations
 
-As a job using Conduktor CLI, the provisioner **does not keep track of the resources** it creates.
-So if you remove a resource from the manifests, it will **not be removed from target API**.
-If you want to manage resources lifecycle, you should use [Conduktor Terraform provider](https://registry.terraform.io/providers/conduktor/conduktor/latest) instead.
-
+As a job using Conduktor CLI, the provisioner Job will not be delete by default on `helm uninstall`. Use `cleanupAfterFinished.enabled: true` to cleanup after job finished or manually delete it.
 
 ## Parameters
 
@@ -100,7 +97,7 @@ Configuration provisioning job and other common parameters.
 | `namespaceOverride`      | String to fully override common.names.namespace                                         | `""`            |
 | `commonLabels`           | Labels to add to all deployed objects                                                   | `{}`            |
 | `commonAnnotations`      | Annotations to add to all deployed objects                                              | `{}`            |
-| `useHooks`               | Enable Helm hooks for the conduktor-provisioner Job and CronJob                         | `true`          |
+| `useHooks`               | Enable Helm hooks for the conduktor-provisioner Job and CronJob.                        | `true`          |
 | `clusterDomain`          | Kubernetes cluster domain name                                                          | `cluster.local` |
 | `extraDeploy`            | Array of extra objects to deploy with the release                                       | `[]`            |
 | `diagnosticMode.enabled` | Enable diagnostic mode (all probes will be disabled and the command will be overridden) | `false`         |
@@ -115,7 +112,7 @@ Configuration of the conduktor-ctl image used to run the Conduktor CLI commands.
 | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
 | `image.registry`                     | conduktor-ctl image registry                                                                                                                             | `docker.io`               |
 | `image.repository`                   | conduktor-ctl image repository                                                                                                                           | `conduktor/conduktor-ctl` |
-| `image.tag`                          | conduktor-ctl image tag (immutable tags are recommended)                                                                                                 | `v0.6.2`                  |
+| `image.tag`                          | conduktor-ctl image tag (immutable tags are recommended)                                                                                                 | `v0.7.0`                  |
 | `image.digest`                       | conduktor-ctl image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`                      |
 | `image.pullPolicy`                   | conduktor-ctl image pull policy                                                                                                                          | `IfNotPresent`            |
 | `image.pullSecrets`                  | conduktor-ctl image pull secrets                                                                                                                         | `[]`                      |
@@ -179,7 +176,8 @@ Configuration of Conduktor Console provisioning container using Conduktor CLI.
 | `console.cert`                       | Authentication certificate to access Console. Can be passed as an environment variable `CDK_CERT`                            | `""`                        |
 | `console.key`                        | Authentication certificate key to access Console. Can be passed as an environment variable `CDK_KEY`                         | `""`                        |
 | `console.insecure`                   | Skip TLS verification                                                                                                        | `false`                     |
-| `console.debug`                      | Enable verbose debug mode                                                                                                    | `false`                     |
+| `console.debug`                      | Enable verbose debug mode                                                                                                    | `true`                      |
+| `console.trace`                      | Enable verbose debug and trace mode                                                                                          | `false`                     |
 | `console.manifests`                  | Manifests YAML to apply on the Console                                                                                       | `[]`                        |
 | `console.manifestsConfigMap`         | Manifests YAML to apply on the Console                                                                                       | `""`                        |
 | `console.manifestsConfigMapKey`      | Manifests YAML to apply on the Console                                                                                       | `00-console-resources.yaml` |
@@ -211,7 +209,8 @@ Configuration of Conduktor Gateway provisioning container using Conduktor CLI.
 | `gateway.cert`                       | Authentication certificate to access Gateway. Can be passed as an environment variable `CDK_CERT`                    | `""`                        |
 | `gateway.key`                        | Authentication certificate key to access Gateway. Can be passed as an environment variable `CDK_KEY`                 | `""`                        |
 | `gateway.insecure`                   | Skip TLS verification                                                                                                | `false`                     |
-| `gateway.debug`                      | Enable verbose debug mode                                                                                            | `false`                     |
+| `gateway.debug`                      | Enable verbose debug mode                                                                                            | `true`                      |
+| `gateway.trace`                      | Enable verbose debug and trace mode                                                                                  | `false`                     |
 | `gateway.manifests`                  | Manifests YAML to apply on the Gateway                                                                               | `[]`                        |
 | `gateway.manifestsConfigMap`         | Manifests YAML to apply on the Gateway                                                                               | `""`                        |
 | `gateway.manifestsConfigMapKey`      | Manifests YAML to apply on the Gateway                                                                               | `00-gateway-resources.yaml` |
@@ -228,6 +227,27 @@ Configuration of Conduktor Gateway provisioning container using Conduktor CLI.
 | `gateway.resources.limits.cpu`       | CPU limit for the platform container                                                                                 | `500m`                      |
 | `gateway.resources.limits.memory`    | Memory limit for the container                                                                                       | `128Mi`                     |
 | `gateway.containerSecurityContext`   | conduktor-provisioner containers' Security Context                                                                   | `{}`                        |
+
+### State management configuration
+
+Configuration for CLI provisioner state persistence of manged resources.
+Enabled by default, it allows provisioner to track the resources it has created and manage them properly.
+Note that on uninstall of the chart, the state will be deleted unless you set the PVC to be kept using annotations "helm.sh/resource-policy: keep".
+Also uninstall will not delete resources created and managed by the provisioner.
+
+| Name                           | Description                                                                                                                                  | Value                  |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| `state.enabled`                | Enable state persistence                                                                                                                     | `true`                 |
+| `state.backend`                | State backend type either "file" or "remote". Default is "file" using a PersistentVolumeClaim.                                               | `file`                 |
+| `state.file.mountPath`         | Mount path for the state volume                                                                                                              | `/var/conduktor/state` |
+| `state.file.pvc.existingClaim` | Name of an existing PersistentVolumeClaim to use                                                                                             | `""`                   |
+| `state.file.pvc.labels`        | Labels for the PersistentVolumeClaim                                                                                                         | `{}`                   |
+| `state.file.pvc.annotations`   | Annotations for the PersistentVolumeClaim                                                                                                    | `{}`                   |
+| `state.file.pvc.storageClass`  | Storage class for the PersistentVolumeClaim                                                                                                  | `""`                   |
+| `state.file.pvc.storageSize`   | Size of the PersistentVolumeClaim                                                                                                            | `1Gi`                  |
+| `state.file.pvc.accessModes`   | Access modes for the PersistentVolumeClaim                                                                                                   | `["ReadWriteOnce"]`    |
+| `state.file.pvc.selector`      | Selector for the PersistentVolumeClaim                                                                                                       | `{}`                   |
+| `state.remote.uri`             | URI of the remote state backend (e.g., s3://my-bucket/path/to/state or gcs://my-bucket/path/to/state or azblob://my-container/path/to/state) | `""`                   |
 
 ### Other Parameters
 
@@ -460,7 +480,49 @@ console:
   manifests: []
 ```
 
+### Use remote storage for state
+
+By default managed resource state is saved inside a PVC, but you can choose to use a remote blob storage like S3, GCP, Azure.
+
+
+```yaml
+state:
+  enabled: true
+  backend: "remote"
+  remote:
+    uri: "s3://bucket/state-path/"
+
+console:
+  enabled: true
+  # Provide remote storage authentication env
+  extraEnvVars :
+    - name: AWS_ACCESS_KEY_ID
+      valueFrom:
+        secretKeyRef:
+          name: remote-credentials
+          key: access-key
+    - name: AWS_SECRET_ACCESS_KEY
+      valueFrom:
+        secretKeyRef:
+          name: remote-credentials
+          key: secret-key
+  # ...
+
+```
+See [Remote State Backend documentation](https://github.com/conduktor/ctl/blob/main/docs/state_management.md#remote-state-backends) for more details.
+
 ## Troubleshooting
+
+## Enable debug/trace logs
+
+To have more details on provisioner logs, one can enable debug mode using either `console.debug` or `gateway.debug`.
+
+For even more logs (like API calls), one can enable trace mode using either `console.trace` or `gateway.trace`.
+
+## Enable diagnostic mode
+
+To debug provisioner Pod, one can enable diagnostic mode with `diagnosticMode.enabled: true` that start job pod without running the CLI to allow connection inside Pod to inspect filesystem.
+
 
 ### Immutable job error
 If you encounter an error like `Job.batch "conduktor-provisioner" is invalid: spec.template: Invalid value: core.PodTemplateSpec{...}: field is immutable`, it means that the job already exists and you are trying to change its template.
@@ -470,10 +532,6 @@ Try to enable it or use custom annotations to force the job recreation on each u
 
 ```yaml
 useHooks: true
-# or
-commonAnnotations:
-  helm.sh/hook: pre-install,pre-upgrade
-  helm.sh/hook-delete-policy: before-hook-creation
 ```
 
 You can also manually delete the existing release and job using:

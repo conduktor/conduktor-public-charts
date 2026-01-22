@@ -1,5 +1,6 @@
 {{- if .Values.cronJob.enabled -}}
 {{- if or .Values.console.enabled .Values.gateway.enabled -}}
+{{- $rollme := randAlphaNum 5 -}}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -8,9 +9,13 @@ metadata:
   labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
     app.kubernetes.io/component: conduktor-provisioning
   annotations:
+    rollme: {{ $rollme | quote }}
+    checksum/manifests-cm: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum  }}
+    checksum/config-secrets: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
     {{- if .Values.useHooks }}
     helm.sh/hook: post-install,post-upgrade
     helm.sh/hook-delete-policy: before-hook-creation
+    helm.sh/hook-weight: "0"
     {{- end }}
     {{- if .Values.commonAnnotations }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
@@ -36,13 +41,15 @@ spec:
         metadata:
           labels: {{- include "provisioner.labels" . | nindent 12 }}
             app.kubernetes.io/component: conduktor-provisioning
-            checksum/manifests-cm: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum  | trunc 63 }}
-            checksum/config-secrets: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum | trunc 63 }}
-          {{- if .Values.podAnnotations }}
-          annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.podAnnotations "context" $) | nindent 12 }}
-          {{- end }}
+          annotations:
+            rollme: {{ $rollme | quote }}
+            checksum/manifests-cm: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+            checksum/config-secrets: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+            {{- if .Values.podAnnotations }}
+            {{- include "common.tplvalues.render" ( dict "value" .Values.podAnnotations "context" $) | nindent 12 }}
+            {{- end }}
         spec:
-          {{- include "provisioner.imagePullSecrets" . | nindent 6 }}
+          {{- include "provisioner.imagePullSecrets" . | nindent 10 }}
           {{- if .Values.schedulerName }}
           schedulerName: {{ .Values.schedulerName }}
           {{- end }}
@@ -70,7 +77,7 @@ spec:
                - "/bin/sh"
                - "/wait-for.sh"
               args:
-                - "{{ .Values.console.url }}/api/v1/health/ready"
+                - "{{ .Values.console.url }}/api/health/ready"
               volumeMounts:
                 - name: init-script
                   mountPath: /wait-for.sh
@@ -103,25 +110,11 @@ spec:
               {{- if .Values.console.containerSecurityContext }}
               securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.console.containerSecurityContext "context" $) | nindent 16 }}
               {{- end }}
-              {{- if .Values.diagnosticMode.enabled }}
-              command: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.command "context" $) | nindent 16 }}
-              args: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.args "context" $) | nindent 16 }}
-              {{- else }}
-              {{- if .Values.console.command }}
-              command: {{- include "common.tplvalues.render" (dict "value" .Values.console.command "context" $) | nindent 16 }}
-              {{- end }}
-              {{- if .Values.console.args }}
-              args: {{- include "common.tplvalues.render" (dict "value" .Values.console.args "context" $) | nindent 16 }}
-              {{- else }}
-              args:
-                  - apply
-                  - -f
-                  - /conf/{{ .Values.console.manifestsConfigMapKey }}
-              {{- end }}
-              {{- end }}
+              {{- $command := include "provisioner.command" (dict "config" .Values.gateway "context" $) | fromJsonArray }}
+              {{- $args := include "provisioner.args" (dict "config" .Values.gateway "context" $) | fromJsonArray }}
+              command: {{- include "common.tplvalues.render" (dict "value" $command "context" $) | nindent 16 }}
+              args: {{- include "common.tplvalues.render" (dict "value" $args "context" $) | nindent 16 }}
               env:
-                - name: CDK_DEBUG
-                  value: {{ .Values.console.debug | quote }}
                 - name: CDK_INSECURE
                   value: {{ .Values.console.insecure | quote }}
                 - name: CDK_AUTH_MODE
@@ -142,6 +135,7 @@ spec:
                 - name: CDK_USER
                   value: {{ .Values.console.username | quote }}
                 {{- end }}
+                {{- include "provisioner.stateful.env" (dict "prefix" "console" "context" $) | nindent 16 }}
                 {{- if .Values.console.extraEnvVars }}
                 {{- include "common.tplvalues.render" (dict "value" .Values.console.extraEnvVars "context" $) | nindent 16 }}
                 {{- end }}
@@ -167,6 +161,10 @@ spec:
                 - name: config
                   mountPath: /conf/{{ .Values.console.manifestsConfigMapKey }}
                   subPath: {{ .Values.console.manifestsConfigMapKey }}
+                {{- if and .Values.state.enabled (eq .Values.state.backend "file") }}
+                - name: state-volume
+                  mountPath: {{ .Values.state.file.mountPath }}
+                {{- end }}
                 {{- if .Values.console.extraManifestsConfigMapRef }}
                 {{- range $index, $ref := .Values.console.extraManifestsConfigMapRef }}
                 - name: {{ printf "console-%s-%d" $ref.name $index }}
@@ -182,28 +180,14 @@ spec:
             - name: conduktor-ctl-gateway
               image: {{ include "common.images.image" (dict "imageRoot" .Values.image "global" .Values.global) }}
               imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
-            {{- if .Values.gateway.containerSecurityContext }}
+              {{- if .Values.gateway.containerSecurityContext }}
               securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.console.containerSecurityContext "context" $) | nindent 16 }}
-            {{- end }}
-            {{- if .Values.diagnosticMode.enabled }}
-              command: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.command "context" $) | nindent 16 }}
-              args: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.args "context" $) | nindent 16 }}
-            {{- else }}
-            {{- if .Values.gateway.command }}
-              command: {{- include "common.tplvalues.render" (dict "value" .Values.gateway.command "context" $) | nindent 16 }}
-            {{- end }}
-            {{- if .Values.gateway.args }}
-              args: {{- include "common.tplvalues.render" (dict "value" .Values.gateway.args "context" $) | nindent 16 }}
-            {{- else }}
-              args:
-                - apply
-                - -f
-                - /conf/{{ .Values.gateway.manifestsConfigMapKey }}
-            {{- end }}
-            {{- end }}
+              {{- end }}
+              {{- $command := include "provisioner.command" (dict "config" .Values.gateway "context" $) | fromJsonArray }}
+              {{- $args := include "provisioner.args" (dict "config" .Values.gateway "context" $) | fromJsonArray }}
+              command: {{- include "common.tplvalues.render" (dict "value" $command "context" $) | nindent 16 }}
+              args: {{- include "common.tplvalues.render" (dict "value" $args "context" $) | nindent 16 }}
               env:
-                - name: CDK_DEBUG
-                  value: {{ .Values.gateway.debug | quote }}
                 - name: CDK_INSECURE
                   value: {{ .Values.gateway.insecure | quote }}
               {{- if .Values.gateway.url}}
@@ -222,6 +206,7 @@ spec:
                 - name: CDK_GATEWAY_USER
                   value: {{ .Values.gateway.username | quote }}
               {{- end }}
+              {{- include "provisioner.stateful.env" (dict "prefix" "gateway" "context" $) | nindent 16 }}
               {{- if .Values.gateway.extraEnvVars }}
               {{- include "common.tplvalues.render" (dict "value" .Values.gateway.extraEnvVars "context" $) | nindent 16 }}
               {{- end }}
@@ -246,6 +231,10 @@ spec:
                 - name: config
                   mountPath: /conf/{{ .Values.gateway.manifestsConfigMapKey }}
                   subPath: {{ .Values.gateway.manifestsConfigMapKey }}
+              {{- if and .Values.state.enabled (eq .Values.state.backend "file") }}
+                - name: state-volume
+                  mountPath: {{ .Values.state.file.mountPath }}
+              {{- end }}
               {{- if .Values.gateway.extraManifestsConfigMapRef }}
               {{- range $index, $ref := .Values.gateway.extraManifestsConfigMapRef }}
                 - name: {{ printf "gateway-%s-%d" $ref.name $index }}
@@ -273,6 +262,11 @@ spec:
               configMap:
                 name: {{ include "provisioner.initScript.configMapName" . }}
                 defaultMode: 0755
+            {{- if and .Values.state.enabled (eq .Values.state.backend "file") }}
+            - name: state-volume
+              persistentVolumeClaim:
+                claimName: {{ include "provisioner.stateful.pvcName" . }}
+            {{- end }}
             {{- if and .Values.console.enabled .Values.console.extraManifestsConfigMapRef }}
             {{- range $index, $ref := .Values.console.extraManifestsConfigMapRef }}
             - name: {{ printf "console-%s-%d" $ref.name $index }}

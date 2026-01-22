@@ -75,7 +75,7 @@
         },
         "useHooks": {
             "type": "boolean",
-            "description": "Enable Helm hooks for the conduktor-provisioner Job and CronJob",
+            "description": "Enable Helm hooks for the conduktor-provisioner Job and CronJob.",
             "default": true
         },
         "clusterDomain": {
@@ -135,7 +135,7 @@
                 "tag": {
                     "type": "string",
                     "description": "conduktor-ctl image tag (immutable tags are recommended)",
-                    "default": "v0.6.2"
+                    "default": "v0.7.0"
                 },
                 "digest": {
                     "type": "string",
@@ -421,6 +421,11 @@
                 "debug": {
                     "type": "boolean",
                     "description": "Enable verbose debug mode",
+                    "default": true
+                },
+                "trace": {
+                    "type": "boolean",
+                    "description": "Enable verbose debug and trace mode",
                     "default": false
                 },
                 "manifests": {
@@ -583,6 +588,11 @@
                 "debug": {
                     "type": "boolean",
                     "description": "Enable verbose debug mode",
+                    "default": true
+                },
+                "trace": {
+                    "type": "boolean",
+                    "description": "Enable verbose debug and trace mode",
                     "default": false
                 },
                 "manifests": {
@@ -696,6 +706,86 @@
                     "type": "object",
                     "description": "conduktor-provisioner containers' Security Context",
                     "default": {}
+                }
+            }
+        },
+        "state": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable state persistence",
+                    "default": true
+                },
+                "backend": {
+                    "type": "string",
+                    "description": "State backend type either \"file\" or \"remote\". Default is \"file\" using a PersistentVolumeClaim.",
+                    "default": "file"
+                },
+                "file": {
+                    "type": "object",
+                    "properties": {
+                        "mountPath": {
+                            "type": "string",
+                            "description": "Mount path for the state volume",
+                            "default": "/var/conduktor/state"
+                        },
+                        "pvc": {
+                            "type": "object",
+                            "properties": {
+                                "existingClaim": {
+                                    "type": "string",
+                                    "description": "Name of an existing PersistentVolumeClaim to use",
+                                    "default": ""
+                                },
+                                "labels": {
+                                    "type": "object",
+                                    "description": "Labels for the PersistentVolumeClaim",
+                                    "default": {}
+                                },
+                                "annotations": {
+                                    "type": "object",
+                                    "description": "Annotations for the PersistentVolumeClaim",
+                                    "default": {}
+                                },
+                                "storageClass": {
+                                    "type": "string",
+                                    "description": "Storage class for the PersistentVolumeClaim",
+                                    "default": ""
+                                },
+                                "storageSize": {
+                                    "type": "string",
+                                    "description": "Size of the PersistentVolumeClaim",
+                                    "default": "1Gi"
+                                },
+                                "accessModes": {
+                                    "type": "array",
+                                    "description": "Access modes for the PersistentVolumeClaim",
+                                    "default": [
+                                        "ReadWriteOnce"
+                                    ],
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "selector": {
+                                    "type": "object",
+                                    "description": "Selector for the PersistentVolumeClaim",
+                                    "default": {}
+                                }
+                            }
+                        }
+                    }
+                },
+                "remote": {
+                    "type": "object",
+                    "properties": {
+                        "uri": {
+                            "type": "string",
+                            "description": "URI of the remote state backend (e.g., s3://my-bucket/path/to/state or gcs://my-bucket/path/to/state or azblob://my-container/path/to/state)",
+                            "default": ""
+                        }
+                    }
                 }
             }
         },
