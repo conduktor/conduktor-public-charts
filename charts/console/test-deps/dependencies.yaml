@@ -1,0 +1,37 @@
+# Test dependencies configuration for Conduktor Console chart
+
+shared_dependencies:
+  postgresql:
+    chart: bitnami/postgresql
+    version: "12.5.8"
+    values_file: test/shared-deps/postgresql/values.yaml
+    chart_values_file: test-deps/values/postgresql.yaml
+    release_name: postgresql
+    wait_for: statefulset/postgresql
+    timeout: 300s
+    isolation:
+      type: database
+      template: "{scenario}"
+
+  minio:
+    chart: bitnami/minio
+    version: "12.8.0"
+    values_file: test/shared-deps/minio/values.yaml
+    release_name: minio
+    wait_for: deployment/minio
+    timeout: 180s
+    isolation:
+      type: bucket
+      template: "{chart}-{scenario}"
+
+# Default dependencies (used if scenario doesn't specify)
+default_dependencies:
+  - postgresql
+
+# Per-scenario configuration
+scenarios:
+  # Scenario 05 needs Minio for S3 storage testing
+  05-external-monitoring-storage:
+    dependencies:
+      - postgresql
+      - minio
