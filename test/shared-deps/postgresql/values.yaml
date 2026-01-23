@@ -1,26 +1,15 @@
-# PostgreSQL test configuration for Conduktor charts
-# Uses bitnamilegacy images for compatibility
+# PostgreSQL test configuration
+fullnameOverride: postgresql
 
 image:
   repository: bitnamilegacy/postgresql
   tag: "15.3.0-debian-11-r7"
 
-volumePermissions:
-  image:
-    repository: bitnamilegacy/os-shell
-
-metrics:
-  image:
-    repository: bitnamilegacy/postgres-exporter
-
-# Authentication
 auth:
   postgresPassword: conduktor123
-  database: conduktor
+  database: platform
 
-# Primary configuration
 primary:
-  # Minimal resources for testing
   resources:
     limits:
       cpu: 500m
@@ -28,15 +17,8 @@ primary:
     requests:
       cpu: 100m
       memory: 128Mi
-
-  # No persistence for tests (faster)
   persistence:
     enabled: false
 
-  # Service configuration
-  service:
-    type: ClusterIP
-
-# Disable read replicas for tests
 readReplicas:
   replicaCount: 0

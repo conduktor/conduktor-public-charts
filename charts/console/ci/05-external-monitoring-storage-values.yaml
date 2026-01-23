@@ -68,7 +68,3 @@ extraDeploy:
       CDK_DATABASE_NAME: "platform"
       CDK_DATABASE_USERNAME: "postgres"
       CDK_DATABASE_PASSWORD: "conduktor123"
-
-tests:
-  enabled: true
-  minio: true

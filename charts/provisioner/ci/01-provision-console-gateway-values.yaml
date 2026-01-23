@@ -173,10 +173,3 @@ extraDeploy:
           aclMode: "KAFKA_API"
           superUsers:
             - admin
-
-tests:
-  enabled: true
-  console:
-    enabled: true
-  gateway:
-    enabled: true

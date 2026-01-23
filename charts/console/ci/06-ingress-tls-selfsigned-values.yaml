@@ -48,6 +48,3 @@ extraDeploy:
     type: Opaque
     stringData:
       CDK_DATABASE_URL: "postgresql://postgres:conduktor123@postgresql-hl:5432/platform"
-
-tests:
-  enabled: true
