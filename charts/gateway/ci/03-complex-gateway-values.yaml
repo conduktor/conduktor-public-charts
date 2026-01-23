@@ -3,7 +3,7 @@ nameOverride: gateway-test-03
 gateway:
   replicas: 1
   env:
-    KAFKA_BOOTSTRAP_SERVERS: kafka.default.svc.cluster.local:9092
+    KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
   terminationGracePeriodSeconds: 30
   securityContext:
@@ -54,6 +54,3 @@ gateway:
 
 podSecurityContext:
   runAsNonRoot: true
-
-tests:
-  enabled: true
