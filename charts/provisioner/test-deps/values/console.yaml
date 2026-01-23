@@ -1,0 +1,32 @@
+# Console configuration for provisioner tests
+
+nameOverride: console
+
+config:
+  organization:
+    name: conduktor
+  admin:
+    email: test@test.io
+    password: testP4ss!
+  database:
+    hosts:
+      - host: postgresql-hl
+        port: 5432
+    name: conduktor
+    username: postgres
+    password: conduktor123
+
+platform:
+  startupProbe:
+    initialDelaySeconds: 60
+  terminationGracePeriodSeconds: 0
+  resources:
+    limits:
+      cpu: 1500m
+      memory: 3Gi
+    requests:
+      cpu: 500m
+      memory: 2Gi
+
+platformCortex:
+  enabled: false

@@ -1,0 +1,42 @@
+# Redpanda test configuration - lighter Kafka alternative
+# Faster startup, lower resource usage
+
+# Single node for tests
+statefulset:
+  replicas: 1
+
+# Minimal resources
+resources:
+  cpu:
+    cores: 1
+  memory:
+    container:
+      max: 1Gi
+
+# Storage configuration
+storage:
+  persistentVolume:
+    enabled: false
+
+# Listeners
+listeners:
+  kafka:
+    port: 9092
+  admin:
+    port: 9644
+
+# Disable features not needed for tests
+console:
+  enabled: false
+
+monitoring:
+  enabled: false
+
+# TLS disabled for tests
+tls:
+  enabled: false
+
+# Authentication disabled for tests
+auth:
+  sasl:
+    enabled: false

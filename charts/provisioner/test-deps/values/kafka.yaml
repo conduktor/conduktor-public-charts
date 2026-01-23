@@ -1,0 +1,2 @@
+# Kafka configuration for provisioner tests
+fullnameOverride: kafka

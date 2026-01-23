@@ -2,7 +2,7 @@ name: Chart testing
 
 on:
   pull_request:
-    paths: ["charts/**"]
+    paths: ["charts/**", "test/**"]
     types:
       - opened
       - labeled
@@ -22,7 +22,7 @@ jobs:
       - name: Install readme-generator-for-helm
         run: npm install -g @bitnami/readme-generator-for-helm@2.5.1
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: Checkout Conduktor Charts
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -53,7 +53,7 @@ jobs:
   chart-linting:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: Checkout Conduktor Charts
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -67,26 +67,92 @@ jobs:
       - name: Run chart-testing (lint)
         run: ct lint --config .github/ct-lint-config.yaml
 
-  chart-testing:
-    runs-on: [ubuntu-latest]
+  detect-changed-charts:
+    runs-on: ubuntu-latest
+    outputs:
+      charts: ${{ steps.detect.outputs.charts }}
+      has_changes: ${{ steps.detect.outputs.has_changes }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
-      - name: Fetch history
-        run: git fetch --prune --unshallow
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install test dependencies
+        run: pip install -r test/requirements.txt
+
+      - name: Detect changed charts
+        id: detect
+        run: |
+          charts=$(python -m test.runner detect-changed --json)
+          echo "charts=${charts}" >> $GITHUB_OUTPUT
+          if [[ "$charts" != "[]" ]]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+  lint-manifests:
+    needs: [detect-changed-charts]
+    if: needs.detect-changed-charts.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
       - name: Install helm
         uses: azure/setup-helm@v4
         with:
           version: "v3.19.0"
 
-      - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.7.0
+      - name: Install test dependencies
+        run: pip install -r test/requirements.txt
+
+      - name: Install kubeconform
+        run: |
+          curl -sL https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz | tar xz
+          sudo mv kubeconform /usr/local/bin/
+
+      - name: Build chart dependencies
+        run: |
+          for chart in charts/*/; do
+            helm dependency build "$chart" || true
+          done
+
+      - name: Validate manifests
+        run: python -m test.runner lint-manifests
+
+  chart-testing:
+    needs: [detect-changed-charts, chart-linting]
+    if: needs.detect-changed-charts.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        chart: ${{ fromJson(needs.detect-changed-charts.outputs.charts) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          version: 3.13.0
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install helm
+        uses: azure/setup-helm@v4
+        with:
+          version: "v3.19.0"
 
       - name: Install K3D
         shell: bash
@@ -94,39 +160,47 @@ jobs:
           K3D_INSTALL_DIR: ${{ github.workspace }}/.github/.bin
           K3D_VERSION: "5.7.3"
         run: |
-          mkdir .github/.bin
+          mkdir -p .github/.bin
           export PATH="${{ github.workspace }}/.github/.bin:$PATH"
           echo "PATH=${{ github.workspace }}/.github/.bin:$PATH" >> $GITHUB_ENV
 
           echo "Installing k3d"
           curl -s https://raw.githubusercontent.com/k3d-io/k3d/v${K3D_VERSION}/install.sh | USE_SUDO="false" bash
 
-      - name: Run chart-testing (list-changed)
-        id: list-changed
+      - name: Install yq
         run: |
-          changed=$(ct list-changed --config .github/ct-config.yaml --target-branch main)
-          if [[ -n "$changed" ]]; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-          fi
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+      - name: Install test dependencies
+        run: pip install -r test/requirements.txt
 
       - name: Install helm dependencies
-        if: steps.list-changed.outputs.changed == 'true'
         run: make helm-deps
 
       - name: Create k3d cluster
-        if: steps.list-changed.outputs.changed == 'true'
-        run: |
-          make k3d-ci-up
-          kubectl create ns ct || true
+        run: make k3d-ci-up
 
-      - name: Disable upgrade testing if breaking change
-        if: contains(github.event.pull_request.labels.*.name, 'breaking')
+      - name: Run chart tests
         run: |
-          sed -i 's/upgrade: true/upgrade: false/' .github/ct-config.yaml
+          python -m test.runner run \
+            --chart ${{ matrix.chart }} \
+            ${{ contains(github.event.pull_request.labels.*.name, 'breaking') && '--skip-upgrade' || '' }}
 
-      - name: Run chart-testing (install)
-        run: ct install --config .github/ct-config.yaml
-        if: steps.list-changed.outputs.changed == 'true'
+      - name: Collect logs on failure
+        if: failure()
+        run: |
+          echo "=== Pod Status ==="
+          kubectl get pods -A
+          echo "=== Events ==="
+          kubectl get events -A --sort-by='.lastTimestamp' | tail -50
+          echo "=== Pod Logs ==="
+          for ns in $(kubectl get ns -o jsonpath='{.items[*].metadata.name}' | tr ' ' '\n' | grep '^ct-'); do
+            for pod in $(kubectl get pods -n "$ns" -o name 2>/dev/null); do
+              echo "--- $ns/$pod ---"
+              kubectl logs -n "$ns" "$pod" --all-containers --tail=100 2>/dev/null || true
+            done
+          done
 
       - name: Delete k3d cluster
         if: always()

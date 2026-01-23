@@ -1,0 +1,44 @@
+# Minio test configuration for Conduktor charts
+# Uses bitnamilegacy images
+
+image:
+  repository: bitnamilegacy/minio
+  tag: "2023.7.18-debian-11-r0"
+
+clientImage:
+  repository: bitnamilegacy/minio-client
+
+volumePermissions:
+  image:
+    repository: bitnamilegacy/os-shell
+
+# Authentication
+auth:
+  rootUser: admin
+  rootPassword: conduktor123
+
+# Default bucket
+defaultBuckets: conduktor
+
+# Minimal resources for testing
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# No persistence for tests
+persistence:
+  enabled: false
+
+# Enable web UI for debugging
+disableWebUI: false
+
+# Service configuration
+service:
+  type: ClusterIP
+  ports:
+    api: 9000
+    console: 9001

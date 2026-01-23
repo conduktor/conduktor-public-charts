@@ -1,0 +1,5 @@
+# PostgreSQL configuration for provisioner tests
+fullnameOverride: postgresql
+
+auth:
+  database: conduktor

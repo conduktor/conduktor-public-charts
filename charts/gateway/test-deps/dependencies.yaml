@@ -1,0 +1,21 @@
+# Test dependencies configuration for Conduktor Gateway chart
+
+shared_dependencies:
+  kafka:
+    chart: bitnami/kafka
+    version: "31.0.0"
+    values_file: test/shared-deps/kafka/values.yaml
+    chart_values_file: test-deps/values/kafka.yaml
+    release_name: kafka
+    wait_for: statefulset/kafka-controller
+    timeout: 600s
+    isolation:
+      type: topic_prefix
+      template: "{scenario}_"
+
+# Default dependencies
+default_dependencies:
+  - kafka
+
+# Per-scenario configuration (all scenarios use kafka)
+scenarios: {}
