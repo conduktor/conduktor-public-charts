@@ -90,6 +90,3 @@ ingress:
         CuYIXw/G4Dk/pD7VTvdTTaJY+ShUXLcOCeri1UysQc2L1C6owgvzhr6oMymJirYX
         wvgKzW/jdP22DuI9njmCzeX6Qy+Ip6tBUe5A+fi5uQ1sqZj3jPB/9GOf/etw+Jes
         Q33adkf6WrEn/aN9RAFyiAY=
-
-tests:
-  enabled: true

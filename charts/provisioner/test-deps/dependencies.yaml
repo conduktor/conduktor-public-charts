@@ -1,56 +1,44 @@
-# Test dependencies configuration for Conduktor Provisioner chart
-# NOTE: Provisioner requires Console and Gateway to be running, which
-# themselves require Kafka and PostgreSQL. This creates a dependency chain.
-
-shared_dependencies:
-  # Base infrastructure
-  kafka:
+# Provisioner chart test dependencies
+# Requires full stack: Kafka, PostgreSQL, Console, Gateway
+dependencies:
+  - name: kafka
     chart: bitnami/kafka
     version: "31.0.0"
-    values_file: test/shared-deps/kafka/values.yaml
-    chart_values_file: test-deps/values/kafka.yaml
-    release_name: kafka
-    wait_for: statefulset/kafka-controller
+    wait: statefulset/kafka-controller
     timeout: 600s
 
-  postgresql:
+  - name: postgresql
     chart: bitnami/postgresql
     version: "12.5.8"
-    values_file: test/shared-deps/postgresql/values.yaml
-    chart_values_file: test-deps/values/postgresql.yaml
-    release_name: postgresql
-    wait_for: statefulset/postgresql
-    timeout: 300s
+    wait: statefulset/postgresql
 
-  # Conduktor services (installed after infrastructure)
-  console:
-    chart: ./charts/console
-    version: ""  # Use local chart
-    chart_values_file: test-deps/values/console.yaml
-    release_name: console
-    wait_for: deployment/console
+  - name: console
+    chart: conduktor/console
+    wait: deployment/console
     timeout: 600s
+    values:
+      config:
+        organization:
+          name: conduktor
+        admin:
+          email: test@test.io
+          password: testP4ss!
+        database:
+          host: postgresql
+          name: platform
+          username: postgres
+          password: conduktor123
 
-  gateway:
-    chart: ./charts/gateway
-    version: ""  # Use local chart
-    chart_values_file: test-deps/values/gateway.yaml
-    release_name: gateway
-    wait_for: deployment/gateway-conduktor-gateway
+  - name: gateway
+    chart: conduktor/gateway
+    wait: deployment/gateway-conduktor-gateway
     timeout: 600s
-
-# Default dependencies - install in order
-default_dependencies:
-  - kafka
-  - postgresql
-  - console
-  - gateway
-
-# Per-scenario configuration
-scenarios:
-  01-provision-console-gateway:
-    dependencies:
-      - kafka
-      - postgresql
-      - console
-      - gateway
+    values:
+      gateway:
+        env:
+          KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+        admin:
+          users:
+            - username: admin
+              password: Admin123!
+              admin: true

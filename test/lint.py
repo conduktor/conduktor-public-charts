@@ -1,159 +1,63 @@
-"""
-Manifest linting with kubeconform and helm template validation.
-"""
+"""Manifest linting with kubeconform."""
 
 import tempfile
 from pathlib import Path
-from typing import Optional
 
-from test.config import get_ci_values_file
-from test.helm import get_chart_path, helm_template
-from test.utils import (
-    CHARTS_DIR,
-    CommandResult,
-    get_scenario_names,
-    log_error,
-    log_info,
-    log_success,
-    log_warning,
-    run_command,
-)
+from test.config import get_ci_values_file, get_scenarios
+from test.helm import helm_template
+from test.utils import CHARTS_DIR, log_error, log_info, log_success, log_warning, run_command
 
 
-def check_kubeconform_installed() -> bool:
-    """Check if kubeconform is installed.
+def lint_chart(chart: str, verbose: bool = False) -> bool:
+    """Lint all scenarios for a chart."""
+    log_info(f"Linting {chart}")
 
-    Returns:
-        True if installed
-    """
+    scenarios = get_scenarios(chart)
+    if not scenarios:
+        log_warning(f"No scenarios for {chart}")
+        return True
+
+    all_ok = True
+    for scenario in scenarios:
+        ok = lint_scenario(chart, scenario, verbose)
+        if not ok:
+            all_ok = False
+
+    return all_ok
+
+
+def lint_scenario(chart: str, scenario: str, verbose: bool = False) -> bool:
+    """Lint a single scenario."""
+    chart_path = str(CHARTS_DIR / chart)
+    values_file = get_ci_values_file(chart, scenario)
+
+    # Render templates
+    try:
+        manifests = helm_template(chart_path, "lint", [values_file])
+    except Exception as e:
+        log_error(f"Template failed {chart}/{scenario}: {e}")
+        return False
+
+    # Check if kubeconform is available
     result = run_command(["kubeconform", "-v"])
-    return result.success
+    if not result.success:
+        log_warning("kubeconform not installed, skipping validation")
+        log_success(f"Template OK: {chart}/{scenario}")
+        return True
 
-
-def run_kubeconform(
-    manifests: str,
-    verbose: bool = False,
-) -> tuple[bool, str]:
-    """Run kubeconform on rendered manifests.
-
-    Args:
-        manifests: YAML manifests content
-        verbose: Enable verbose output
-
-    Returns:
-        Tuple of (passed, output)
-    """
-    # Write manifests to temp file
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False
-    ) as f:
+    # Run kubeconform
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
         f.write(manifests)
         temp_path = Path(f.name)
 
     try:
-        cmd = [
-            "kubeconform",
-            "-strict",
-            "-summary",
-            "-output",
-            "text",
-            str(temp_path),
-        ]
-
-        if verbose:
-            cmd.append("-verbose")
-
-        result = run_command(cmd, verbose=verbose)
-        return result.success, result.stdout + result.stderr
-
+        result = run_command(["kubeconform", "-strict", "-summary", str(temp_path)], verbose=verbose)
+        if result.success:
+            log_success(f"Lint OK: {chart}/{scenario}")
+            return True
+        else:
+            log_error(f"Lint failed: {chart}/{scenario}")
+            print(result.stdout + result.stderr)
+            return False
     finally:
         temp_path.unlink(missing_ok=True)
-
-
-def lint_chart_scenario(
-    chart: str,
-    scenario: str,
-    verbose: bool = False,
-) -> bool:
-    """Lint a single chart scenario.
-
-    Args:
-        chart: Chart name
-        scenario: Scenario name
-        verbose: Enable verbose output
-
-    Returns:
-        True if lint passed
-    """
-    log_info(f"Linting {chart}/{scenario}")
-
-    chart_path = get_chart_path(chart)
-    ci_values_file = get_ci_values_file(chart, scenario)
-
-    # Render templates
-    try:
-        manifests = helm_template(
-            release_name=f"{chart}-lint",
-            chart=str(chart_path),
-            namespace="lint",
-            values_files=[ci_values_file],
-            verbose=verbose,
-        )
-    except Exception as e:
-        log_error(f"helm template failed for {chart}/{scenario}: {e}")
-        return False
-
-    # Skip kubeconform if not installed
-    if not check_kubeconform_installed():
-        log_warning("kubeconform not installed, skipping manifest validation")
-        log_success(f"helm template OK: {chart}/{scenario}")
-        return True
-
-    # Run kubeconform
-    passed, output = run_kubeconform(manifests, verbose=verbose)
-
-    if passed:
-        log_success(f"Lint passed: {chart}/{scenario}")
-    else:
-        log_error(f"Lint failed: {chart}/{scenario}")
-        if output:
-            print(output)
-
-    return passed
-
-
-def lint_chart_manifests(
-    chart: str,
-    scenarios: Optional[list[str]] = None,
-    verbose: bool = False,
-) -> bool:
-    """Lint all scenarios for a chart.
-
-    Args:
-        chart: Chart name
-        scenarios: Optional list of specific scenarios
-        verbose: Enable verbose output
-
-    Returns:
-        True if all scenarios passed
-    """
-    log_info(f"Linting chart: {chart}")
-
-    # Get scenarios
-    if scenarios:
-        scenario_list = scenarios
-    else:
-        scenario_list = get_scenario_names(chart)
-
-    if not scenario_list:
-        log_warning(f"No scenarios found for {chart}")
-        return True
-
-    all_passed = True
-
-    for scenario in scenario_list:
-        passed = lint_chart_scenario(chart, scenario, verbose=verbose)
-        if not passed:
-            all_passed = False
-
-    return all_passed

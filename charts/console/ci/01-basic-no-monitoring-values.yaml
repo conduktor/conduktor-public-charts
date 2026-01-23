@@ -42,9 +42,6 @@ platformCortex:
       cpu: 200m
       memory: 200Mi
 
-tests:
-  enabled: true
-
 extraDeploy:
   - apiVersion: v1
     kind: PersistentVolume

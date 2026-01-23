@@ -1,405 +1,200 @@
-"""
-Kubernetes operations wrapper using kubectl.
-"""
+"""Kubernetes operations wrapper."""
 
 import json
-import time
 from typing import Optional
 
-from test.utils import (
-    KubernetesError,
-    log_debug,
-    log_info,
-    log_warning,
-    run_command,
-)
+from test.utils import KubernetesError, log_info, run_command
 
 
 def create_namespace(namespace: str, verbose: bool = False) -> None:
-    """Create a Kubernetes namespace if it doesn't exist.
-
-    Args:
-        namespace: Namespace name
-        verbose: Enable verbose output
-    """
-    # Check if namespace exists
-    result = run_command(
-        ["kubectl", "get", "namespace", namespace],
-        verbose=verbose,
-    )
-
+    """Create namespace if it doesn't exist."""
+    result = run_command(["kubectl", "get", "namespace", namespace], verbose=verbose)
     if result.success:
-        log_debug(f"Namespace {namespace} already exists", verbose)
         return
 
-    # Create namespace
-    result = run_command(
-        ["kubectl", "create", "namespace", namespace],
-        verbose=verbose,
-    )
-
+    result = run_command(["kubectl", "create", "namespace", namespace], verbose=verbose)
     if not result.success:
-        raise KubernetesError(f"Failed to create namespace {namespace}: {result.stderr}")
+        raise KubernetesError(f"Failed to create namespace: {result.stderr}")
 
     log_info(f"Created namespace: {namespace}")
 
 
-def delete_namespace(
-    namespace: str,
-    wait: bool = True,
-    timeout: int = 120,
-    verbose: bool = False,
-) -> None:
-    """Delete a Kubernetes namespace.
-
-    Args:
-        namespace: Namespace name
-        wait: Wait for deletion to complete
-        timeout: Timeout in seconds
-        verbose: Enable verbose output
-    """
-    cmd = ["kubectl", "delete", "namespace", namespace, "--ignore-not-found"]
-
-    if wait:
-        cmd.extend(["--wait=true", f"--timeout={timeout}s"])
-
+def delete_namespace(namespace: str, verbose: bool = False) -> None:
+    """Delete namespace."""
     log_info(f"Deleting namespace: {namespace}")
-    result = run_command(cmd, timeout=timeout + 30, verbose=verbose)
+    run_command(
+        ["kubectl", "delete", "namespace", namespace, "--ignore-not-found", "--wait=true", "--timeout=120s"],
+        verbose=verbose,
+        timeout=150,
+        log=True,
+    )
 
-    if not result.success:
-        log_warning(f"Namespace deletion warning: {result.stderr}")
 
-
-def wait_for_resource(
-    resource: str,
-    namespace: str,
-    condition: str = "Available",
-    timeout: str = "300s",
-    verbose: bool = False,
-) -> None:
-    """Wait for a Kubernetes resource to meet a condition.
-
-    Args:
-        resource: Resource reference (e.g., deployment/my-app, statefulset/db)
-        namespace: Kubernetes namespace
-        condition: Condition to wait for
-        timeout: Timeout string (e.g., "300s")
-        verbose: Enable verbose output
-
-    Raises:
-        KubernetesError: If wait times out or fails
-    """
-    log_info(f"Waiting for {resource} to be {condition}")
-
-    # Parse timeout to seconds for subprocess
-    timeout_seconds = int(timeout.rstrip("s"))
+def wait_for_rollout(resource: str, namespace: str, timeout: str = "300s", verbose: bool = False) -> None:
+    """Wait for a rollout to complete."""
+    log_info(f"Waiting for {resource}")
+    timeout_sec = int(timeout.rstrip("s"))
 
     result = run_command(
-        [
-            "kubectl",
-            "wait",
-            resource,
-            "--namespace",
-            namespace,
-            f"--for=condition={condition}",
-            f"--timeout={timeout}",
-        ],
-        timeout=timeout_seconds + 30,
+        ["kubectl", "rollout", "status", resource, "--namespace", namespace, f"--timeout={timeout}"],
         verbose=verbose,
+        timeout=timeout_sec + 30,
+        log=True,
     )
 
     if not result.success:
-        raise KubernetesError(f"Wait for {resource} failed: {result.stderr}")
+        raise KubernetesError(f"Rollout failed: {result.stderr}")
 
 
-def wait_for_rollout(
-    resource: str,
-    namespace: str,
-    timeout: str = "300s",
-    verbose: bool = False,
-) -> None:
-    """Wait for a rollout to complete.
-
-    Args:
-        resource: Resource reference (e.g., deployment/my-app, statefulset/db)
-        namespace: Kubernetes namespace
-        timeout: Timeout string
-        verbose: Enable verbose output
-
-    Raises:
-        KubernetesError: If rollout times out or fails
-    """
-    log_info(f"Waiting for rollout: {resource}")
-
-    timeout_seconds = int(timeout.rstrip("s"))
-
-    result = run_command(
-        [
-            "kubectl",
-            "rollout",
-            "status",
-            resource,
-            "--namespace",
-            namespace,
-            f"--timeout={timeout}",
-        ],
-        timeout=timeout_seconds + 30,
-        verbose=verbose,
-    )
-
-    if not result.success:
-        raise KubernetesError(f"Rollout status for {resource} failed: {result.stderr}")
+def get_current_context() -> Optional[str]:
+    """Get current kubectl context."""
+    result = run_command(["kubectl", "config", "current-context"])
+    return result.stdout.strip() if result.success else None
 
 
-def get_pods(namespace: str, verbose: bool = False) -> list[dict]:
-    """Get pods in a namespace.
+def get_pods(namespace: str) -> str:
+    """Get pods in namespace."""
+    result = run_command(["kubectl", "get", "pods", "-n", namespace])
+    return result.stdout
 
-    Args:
-        namespace: Kubernetes namespace
-        verbose: Enable verbose output
 
-    Returns:
-        List of pod info dictionaries
-    """
-    result = run_command(
-        [
-            "kubectl",
-            "get",
-            "pods",
-            "--namespace",
-            namespace,
-            "-o",
-            "json",
-        ],
-        verbose=verbose,
-    )
+def get_events(namespace: str) -> str:
+    """Get events in namespace."""
+    result = run_command(["kubectl", "get", "events", "-n", namespace, "--sort-by=.lastTimestamp"])
+    return result.stdout
 
+
+def get_pods_status(namespace: str) -> list[dict]:
+    """Get pods with detailed status information."""
+    result = run_command([
+        "kubectl", "get", "pods", "-n", namespace,
+        "-o", "json"
+    ])
     if not result.success:
         return []
 
     try:
         data = json.loads(result.stdout)
-        return data.get("items", [])
+        pods = []
+        for item in data.get("items", []):
+            name = item.get("metadata", {}).get("name", "unknown")
+            status = item.get("status", {})
+            phase = status.get("phase", "Unknown")
+
+            # Get container statuses
+            containers = []
+            for cs in status.get("containerStatuses", []):
+                container = {
+                    "name": cs.get("name"),
+                    "ready": cs.get("ready", False),
+                    "restartCount": cs.get("restartCount", 0),
+                }
+                # Get state
+                state = cs.get("state", {})
+                if "running" in state:
+                    container["state"] = "Running"
+                elif "waiting" in state:
+                    container["state"] = f"Waiting: {state['waiting'].get('reason', 'Unknown')}"
+                    container["message"] = state["waiting"].get("message", "")
+                elif "terminated" in state:
+                    container["state"] = f"Terminated: {state['terminated'].get('reason', 'Unknown')}"
+                    container["exitCode"] = state["terminated"].get("exitCode")
+                containers.append(container)
+
+            pods.append({
+                "name": name,
+                "phase": phase,
+                "containers": containers,
+                "ready": all(c.get("ready", False) for c in containers) if containers else False,
+            })
+        return pods
     except json.JSONDecodeError:
         return []
 
 
-def get_pod_logs(
-    pod_name: str,
-    namespace: str,
-    container: Optional[str] = None,
-    tail: int = 100,
-    verbose: bool = False,
-) -> str:
-    """Get logs from a pod.
+def get_unhealthy_pods(namespace: str) -> list[str]:
+    """Get list of unhealthy pod names."""
+    pods = get_pods_status(namespace)
+    unhealthy = []
+    for pod in pods:
+        if pod["phase"] not in ("Running", "Succeeded") or not pod["ready"]:
+            unhealthy.append(pod["name"])
+    return unhealthy
 
-    Args:
-        pod_name: Pod name
-        namespace: Kubernetes namespace
-        container: Container name (optional)
-        tail: Number of lines to tail
-        verbose: Enable verbose output
 
-    Returns:
-        Pod logs
-    """
-    cmd = [
-        "kubectl",
-        "logs",
-        pod_name,
-        "--namespace",
-        namespace,
-        f"--tail={tail}",
-    ]
+def describe_pod(pod_name: str, namespace: str) -> str:
+    """Get pod description."""
+    result = run_command(["kubectl", "describe", "pod", pod_name, "-n", namespace])
+    return result.stdout if result.success else result.stderr
 
+
+def get_pod_logs(pod_name: str, namespace: str, container: Optional[str] = None, tail: int = 100) -> str:
+    """Get pod logs."""
+    cmd = ["kubectl", "logs", pod_name, "-n", namespace, f"--tail={tail}"]
     if container:
-        cmd.extend(["--container", container])
+        cmd.extend(["-c", container])
+    # Also get previous logs if container crashed
+    result = run_command(cmd)
+    output = result.stdout if result.success else result.stderr
 
-    result = run_command(cmd, verbose=verbose)
-    return result.stdout
+    # Try to get previous logs too
+    prev_cmd = cmd + ["--previous"]
+    prev_result = run_command(prev_cmd)
+    if prev_result.success and prev_result.stdout.strip():
+        output += f"\n--- Previous logs ---\n{prev_result.stdout}"
 
-
-def get_events(namespace: str, verbose: bool = False) -> str:
-    """Get events in a namespace, sorted by time.
-
-    Args:
-        namespace: Kubernetes namespace
-        verbose: Enable verbose output
-
-    Returns:
-        Events output
-    """
-    result = run_command(
-        [
-            "kubectl",
-            "get",
-            "events",
-            "--namespace",
-            namespace,
-            "--sort-by=.lastTimestamp",
-        ],
-        verbose=verbose,
-    )
-    return result.stdout
+    return output
 
 
-def exec_in_pod(
-    pod_name: str,
-    namespace: str,
-    command: list[str],
-    container: Optional[str] = None,
-    verbose: bool = False,
-) -> str:
-    """Execute a command in a pod.
+def print_debug_info(namespace: str) -> None:
+    """Print comprehensive debug information for a namespace."""
+    from test.utils import console
 
-    Args:
-        pod_name: Pod name
-        namespace: Kubernetes namespace
-        command: Command to execute
-        container: Container name (optional)
-        verbose: Enable verbose output
+    console.print("\n[bold red]━━━ DEBUG INFO ━━━[/bold red]")
 
-    Returns:
-        Command output
+    # Pods status
+    console.print("\n[bold yellow]Pods:[/bold yellow]")
+    pods = get_pods_status(namespace)
+    if not pods:
+        console.print("  No pods found")
+    else:
+        for pod in pods:
+            status_icon = "✓" if pod["ready"] and pod["phase"] == "Running" else "✗"
+            color = "green" if pod["ready"] and pod["phase"] == "Running" else "red"
+            console.print(f"  [{color}]{status_icon}[/{color}] {pod['name']} - {pod['phase']}")
+            for c in pod["containers"]:
+                c_icon = "✓" if c.get("ready") else "✗"
+                c_color = "green" if c.get("ready") else "red"
+                restarts = f" (restarts: {c['restartCount']})" if c.get("restartCount", 0) > 0 else ""
+                console.print(f"      [{c_color}]{c_icon}[/{c_color}] {c['name']}: {c.get('state', 'Unknown')}{restarts}")
+                if c.get("message"):
+                    console.print(f"         {c['message']}")
 
-    Raises:
-        KubernetesError: If command fails
-    """
-    cmd = [
-        "kubectl",
-        "exec",
-        pod_name,
-        "--namespace",
-        namespace,
-        "--",
-    ]
+    # Unhealthy pods details
+    unhealthy = get_unhealthy_pods(namespace)
+    if unhealthy:
+        console.print("\n[bold yellow]Unhealthy Pod Details:[/bold yellow]")
+        for pod_name in unhealthy[:3]:  # Limit to first 3 unhealthy pods
+            console.print(f"\n[bold]--- {pod_name} ---[/bold]")
 
-    if container:
-        cmd.insert(3, "-c")
-        cmd.insert(4, container)
+            # Describe
+            console.print("\n[dim]Description (last 50 lines):[/dim]")
+            desc = describe_pod(pod_name, namespace)
+            desc_lines = desc.strip().split("\n")
+            console.print("\n".join(desc_lines[-50:]))
 
-    cmd.extend(command)
+            # Logs
+            console.print("\n[dim]Logs (last 50 lines):[/dim]")
+            logs = get_pod_logs(pod_name, namespace, tail=50)
+            console.print(logs if logs.strip() else "  No logs available")
 
-    result = run_command(cmd, verbose=verbose)
+    # Recent events
+    console.print("\n[bold yellow]Recent Events:[/bold yellow]")
+    events = get_events(namespace)
+    if events.strip():
+        event_lines = events.strip().split("\n")
+        console.print("\n".join(event_lines[-20:]))  # Last 20 events
+    else:
+        console.print("  No events")
 
-    if not result.success:
-        raise KubernetesError(f"exec in {pod_name} failed: {result.stderr}")
-
-    return result.stdout
-
-
-def create_database(
-    pod_name: str,
-    namespace: str,
-    database: str,
-    user: str = "postgres",
-    verbose: bool = False,
-) -> None:
-    """Create a PostgreSQL database.
-
-    Args:
-        pod_name: PostgreSQL pod name
-        namespace: Kubernetes namespace
-        database: Database name to create
-        user: Database user
-        verbose: Enable verbose output
-    """
-    log_info(f"Creating database: {database}")
-
-    # Check if database exists
-    check_cmd = [
-        "psql",
-        "-U",
-        user,
-        "-tc",
-        f"SELECT 1 FROM pg_database WHERE datname = '{database}'",
-    ]
-
-    try:
-        result = exec_in_pod(pod_name, namespace, check_cmd, verbose=verbose)
-        if "1" in result:
-            log_debug(f"Database {database} already exists", verbose)
-            return
-    except KubernetesError:
-        pass  # Database check failed, try to create
-
-    # Create database
-    create_cmd = ["createdb", "-U", user, database]
-
-    try:
-        exec_in_pod(pod_name, namespace, create_cmd, verbose=verbose)
-        log_info(f"Created database: {database}")
-    except KubernetesError as e:
-        log_warning(f"Database creation warning: {e}")
-
-
-def drop_database(
-    pod_name: str,
-    namespace: str,
-    database: str,
-    user: str = "postgres",
-    verbose: bool = False,
-) -> None:
-    """Drop a PostgreSQL database.
-
-    Args:
-        pod_name: PostgreSQL pod name
-        namespace: Kubernetes namespace
-        database: Database name to drop
-        user: Database user
-        verbose: Enable verbose output
-    """
-    log_info(f"Dropping database: {database}")
-
-    # Force disconnect connections
-    disconnect_cmd = [
-        "psql",
-        "-U",
-        user,
-        "-c",
-        f"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '{database}'",
-    ]
-
-    try:
-        exec_in_pod(pod_name, namespace, disconnect_cmd, verbose=verbose)
-    except KubernetesError:
-        pass  # Ignore errors
-
-    # Drop database
-    drop_cmd = ["dropdb", "-U", user, "--if-exists", database]
-
-    try:
-        exec_in_pod(pod_name, namespace, drop_cmd, verbose=verbose)
-    except KubernetesError as e:
-        log_warning(f"Database drop warning: {e}")
-
-
-def check_current_context(expected_context: str = "k3d-conduktor-platform") -> bool:
-    """Check if the current kubectl context matches expected.
-
-    Args:
-        expected_context: Expected context name
-
-    Returns:
-        True if context matches
-    """
-    result = run_command(["kubectl", "config", "current-context"])
-
-    if not result.success:
-        return False
-
-    current = result.stdout.strip()
-    return current == expected_context
-
-
-def get_current_context() -> Optional[str]:
-    """Get the current kubectl context name.
-
-    Returns:
-        Context name or None
-    """
-    result = run_command(["kubectl", "config", "current-context"])
-
-    if result.success:
-        return result.stdout.strip()
-    return None
+    console.print("\n[bold red]━━━━━━━━━━━━━━━━━[/bold red]\n")

@@ -1,9 +1,0 @@
-# Gateway-specific Kafka configuration overrides
-
-# Use name that gateway expects
-fullnameOverride: kafka
-
-# Service configuration for internal access
-service:
-  ports:
-    client: 9092
