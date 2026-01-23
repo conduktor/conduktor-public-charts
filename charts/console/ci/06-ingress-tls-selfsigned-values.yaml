@@ -41,7 +41,6 @@ extraDeploy:
     kind: Secret
     metadata:
       name: cdkt-test-06-console-config
-      namespace: ct
       annotations:
         "helm.sh/hook": pre-install
         "helm.sh/hook-weight": "-99"
@@ -49,6 +48,3 @@ extraDeploy:
     type: Opaque
     stringData:
       CDK_DATABASE_URL: "postgresql://postgres:conduktor123@postgresql-hl:5432/platform"
-
-tests:
-  enabled: true

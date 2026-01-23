@@ -1,8 +1,0 @@
-# Console-specific PostgreSQL configuration overrides
-
-# Use headless service name that console expects
-fullnameOverride: postgresql
-
-# Create database for console
-auth:
-  database: platform

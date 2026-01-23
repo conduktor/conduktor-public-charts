@@ -171,10 +171,3 @@ extraDeploy:
           aclEnabled: false
           superUsers:
             - admin
-
-tests:
-  enabled: true
-  console:
-    enabled: true
-  gateway:
-    enabled: true
