@@ -11,6 +11,7 @@ let
     buildInputs = [
       pkgs.k3d
       pkgs.kubernetes-helm
+      pkgs.kubeconform
       pkgs.pre-commit
      (pkgs.python3.withPackages (python-pkgs: with python-pkgs; [
           click
