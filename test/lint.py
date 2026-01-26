@@ -4,13 +4,20 @@ import tempfile
 from pathlib import Path
 
 from test.config import get_ci_values_file, get_scenarios
-from test.helm import helm_template
+from test.helm import helm_dependency_build, helm_template
 from test.utils import CHARTS_DIR, log_error, log_info, log_success, log_warning, run_command
 
 
 def lint_chart(chart: str, verbose: bool = False) -> bool:
     """Lint all scenarios for a chart."""
     log_info(f"Linting {chart}")
+
+    # Build dependencies first
+    try:
+        helm_dependency_build(chart, verbose)
+    except Exception as e:
+        log_error(f"Failed to build dependencies for {chart}: {e}")
+        return False
 
     scenarios = get_scenarios(chart)
     if not scenarios:
@@ -31,11 +38,20 @@ def lint_scenario(chart: str, scenario: str, verbose: bool = False) -> bool:
     chart_path = str(CHARTS_DIR / chart)
     values_file = get_ci_values_file(chart, scenario)
 
+    # Check values file exists
+    if not values_file.exists():
+        log_error(f"Values file not found: {values_file}")
+        return False
+
     # Render templates
     try:
         manifests = helm_template(chart_path, "lint", [values_file])
     except Exception as e:
         log_error(f"Template failed {chart}/{scenario}: {e}")
+        if verbose:
+            # Show more details
+            result = run_command(["helm", "template", "test", chart_path, "--values", str(values_file), "--debug"])
+            print(result.stderr)
         return False
 
     # Check if kubeconform is available

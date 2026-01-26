@@ -61,6 +61,8 @@ def run_command(
         return CommandResult(result.returncode, result.stdout, result.stderr)
     except subprocess.TimeoutExpired:
         return CommandResult(1, "", f"Command timed out after {timeout}s")
+    except FileNotFoundError:
+        return CommandResult(127, "", f"Command not found: {cmd[0]}")
 
 
 def log_info(msg: str) -> None:

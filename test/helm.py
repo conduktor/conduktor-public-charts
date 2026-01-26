@@ -119,8 +119,9 @@ def helm_template(chart: str, namespace: str, values_files: Optional[list[Path]]
     cmd = ["helm", "template", "test", chart, "--namespace", namespace]
 
     for vf in (values_files or []):
-        if vf.exists():
-            cmd.extend(["--values", str(vf)])
+        if not vf.exists():
+            raise HelmError(f"Values file not found: {vf}")
+        cmd.extend(["--values", str(vf)])
 
     result = run_command(cmd)
     if not result.success:
@@ -131,7 +132,10 @@ def helm_template(chart: str, namespace: str, values_files: Optional[list[Path]]
 
 def helm_dependency_build(chart: str, verbose: bool = False) -> None:
     """Build chart dependencies."""
-    run_command(["helm", "dependency", "build", str(CHARTS_DIR / chart)], verbose=verbose)
+    log_info(f"Building dependencies for {chart}")
+    result = run_command(["helm", "dependency", "build", str(CHARTS_DIR / chart)], verbose=verbose, log=True)
+    if not result.success:
+        raise HelmError(f"Dependency build failed: {result.stderr}")
 
 
 def get_released_version(chart: str) -> Optional[str]:
