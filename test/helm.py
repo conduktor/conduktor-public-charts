@@ -5,7 +5,43 @@ import tempfile
 from pathlib import Path
 from typing import Optional
 
+import yaml
+
 from test.utils import CHARTS_DIR, HelmError, log_info, run_command
+
+
+def _dependencies_satisfied(chart_path: Path) -> bool:
+    """Check if chart dependencies are already downloaded."""
+    chart_yaml = chart_path / "Chart.yaml"
+    charts_dir = chart_path / "charts"
+
+    if not chart_yaml.exists():
+        return False
+
+    # Parse Chart.yaml to get dependencies
+    with open(chart_yaml) as f:
+        chart_data = yaml.safe_load(f) or {}
+
+    dependencies = chart_data.get("dependencies", [])
+    if not dependencies:
+        return True  # No dependencies needed
+
+    if not charts_dir.exists():
+        return False
+
+    # Check each dependency has a matching .tgz file
+    for dep in dependencies:
+        name = dep.get("name", "")
+        version = dep.get("version", "")
+        if not name or not version:
+            continue
+
+        # Look for {name}-{version}.tgz
+        expected_file = charts_dir / f"{name}-{version}.tgz"
+        if not expected_file.exists():
+            return False
+
+    return True
 
 
 def helm_repo_add(name: str, url: str, verbose: bool = False) -> None:
@@ -130,10 +166,17 @@ def helm_template(chart: str, namespace: str, values_files: Optional[list[Path]]
     return result.stdout
 
 
-def helm_dependency_build(chart: str, verbose: bool = False) -> None:
-    """Build chart dependencies."""
+def helm_dependency_build(chart: str, verbose: bool = False, force: bool = False) -> None:
+    """Build chart dependencies if needed."""
+    chart_path = CHARTS_DIR / chart
+
+    # Skip if dependencies already satisfied
+    if not force and _dependencies_satisfied(chart_path):
+        log_info(f"Dependencies for {chart} already up to date")
+        return
+
     log_info(f"Building dependencies for {chart}")
-    result = run_command(["helm", "dependency", "build", str(CHARTS_DIR / chart)], verbose=verbose, log=True)
+    result = run_command(["helm", "dependency", "build", str(chart_path)], verbose=verbose, log=True)
     if not result.success:
         raise HelmError(f"Dependency build failed: {result.stderr}")
 
