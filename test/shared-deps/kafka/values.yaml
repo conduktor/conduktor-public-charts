@@ -11,10 +11,10 @@ kraft:
 listeners:
   client:
     protocol: PLAINTEXT
-    port: 9092
+    containerPort: 9092
   controller:
     protocol: PLAINTEXT
-    port: 9093
+    containerPort: 9093
 
 controller:
   replicaCount: 1
