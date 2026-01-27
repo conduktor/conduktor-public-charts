@@ -5,32 +5,36 @@ from pathlib import Path
 
 from test.config import get_ci_values_file, get_scenarios
 from test.helm import helm_dependency_build, helm_template
-from test.utils import CHARTS_DIR, log_error, log_info, log_success, log_warning, run_command
+from test.utils import CHARTS_DIR, gh_group_end, gh_group_start, log_error, log_info, log_success, log_warning, run_command
 
 
 def lint_chart(chart: str, verbose: bool = False) -> bool:
     """Lint all scenarios for a chart."""
     log_info(f"Linting {chart}")
+    gh_group_start(f"Lint {chart}")
 
-    # Build dependencies first
     try:
-        helm_dependency_build(chart, verbose)
-    except Exception as e:
-        log_error(f"Failed to build dependencies for {chart}: {e}")
-        return False
+        # Build dependencies first
+        try:
+            helm_dependency_build(chart, verbose)
+        except Exception as e:
+            log_error(f"Failed to build dependencies for {chart}: {e}")
+            return False
 
-    scenarios = get_scenarios(chart)
-    if not scenarios:
-        log_warning(f"No scenarios for {chart}")
-        return True
+        scenarios = get_scenarios(chart)
+        if not scenarios:
+            log_warning(f"No scenarios for {chart}")
+            return True
 
-    all_ok = True
-    for scenario in scenarios:
-        ok = lint_scenario(chart, scenario, verbose)
-        if not ok:
-            all_ok = False
+        all_ok = True
+        for scenario in scenarios:
+            ok = lint_scenario(chart, scenario, verbose)
+            if not ok:
+                all_ok = False
 
-    return all_ok
+        return all_ok
+    finally:
+        gh_group_end()
 
 
 def lint_scenario(chart: str, scenario: str, verbose: bool = False) -> bool:
