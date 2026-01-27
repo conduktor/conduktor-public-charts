@@ -20,12 +20,22 @@ def create_namespace(namespace: str, verbose: bool = False) -> None:
 
 
 def delete_namespace(namespace: str, verbose: bool = False) -> None:
-    """Delete namespace."""
+    """Delete namespace and wait for completion."""
     log_info(f"Deleting namespace: {namespace}")
     run_command(
         ["kubectl", "delete", "namespace", namespace, "--ignore-not-found", "--wait=true", "--timeout=120s"],
         verbose=verbose,
         timeout=150,
+        log=True,
+    )
+
+
+def delete_namespace_async(namespace: str, verbose: bool = False) -> None:
+    """Start namespace deletion without waiting."""
+    log_info(f"Deleting namespace (async): {namespace}")
+    run_command(
+        ["kubectl", "delete", "namespace", namespace, "--ignore-not-found", "--wait=false"],
+        verbose=verbose,
         log=True,
     )
 
