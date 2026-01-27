@@ -44,6 +44,3 @@ platformCortex:
     requests:
       cpu: 200m
       memory: 200Mi
-
-tests:
-  enabled: true

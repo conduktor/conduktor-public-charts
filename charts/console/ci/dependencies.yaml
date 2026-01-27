@@ -1,0 +1,17 @@
+# Console chart test dependencies
+dependencies:
+  - name: postgresql
+    chart: bitnami/postgresql
+    version: "12.5.8"
+    wait: statefulset/postgresql
+
+  - name: minio
+    chart: bitnami/minio
+    version: "12.8.0"
+    wait: deployment/minio
+    optional: true  # Only for scenarios that need S3
+
+# Which scenarios need which optional dependencies
+scenarios:
+  05-external-monitoring-storage:
+    include: [minio]

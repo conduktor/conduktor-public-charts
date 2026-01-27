@@ -11,6 +11,9 @@ bin/*
 # OSX leaves these everywhere on SMB shares
 ._*
 
+# Direnv files
+.direnv
+
 # OSX trash
 .DS_Store
 

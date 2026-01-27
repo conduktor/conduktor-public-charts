@@ -332,7 +332,38 @@ create-test-ns: ## Create test namespace
 	kubectl create namespace ${TEST_NAMESPACE} || true
 
 .PHONY: test-chart
-test-chart: ## Run chart-testing
+test-chart: ## Run chart-testing (legacy ct install)
 	make check-kube-context
 	make create-test-ns
 	ct install --config $(CURDIR)/.github/ct-config.yaml
+
+# New Python-based test runner
+###############################
+
+.PHONY: test-deps
+test-deps: ## Install Python test dependencies
+	pip install -r test/requirements.txt
+
+.PHONY: test-run
+test-run: check-kube-context ## Run tests for a specific chart (usage: make test-run CHART=console)
+	python -m test.runner run --chart $(CHART)
+
+.PHONY: test-run-scenario
+test-run-scenario: check-kube-context ## Run a specific scenario (usage: make test-run-scenario CHART=console SCENARIO=01-basic)
+	python -m test.runner run --chart $(CHART) --scenario $(SCENARIO)
+
+.PHONY: test-changed
+test-changed: check-kube-context ## Run tests for changed charts only
+	python -m test.runner run --changed
+
+.PHONY: test-all-charts
+test-all-charts: check-kube-context ## Run all chart tests
+	python -m test.runner run --all
+
+.PHONY: lint-manifests
+lint-manifests: ## Validate helm template output with kubeconform
+	python -m test.runner lint-manifests
+
+.PHONY: detect-changed
+detect-changed: ## List charts that have changed vs main branch
+	python -m test.runner detect-changed

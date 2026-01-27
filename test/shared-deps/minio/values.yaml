@@ -1,0 +1,27 @@
+# Minio test configuration
+fullnameOverride: minio
+
+image:
+  repository: bitnamilegacy/minio
+  tag: "2023.7.18-debian-11-r0"
+
+auth:
+  rootUser: admin
+  rootPassword: conduktor123
+
+defaultBuckets: conduktor
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+persistence:
+  enabled: false
+
+service:
+  ports:
+    api: 9000
