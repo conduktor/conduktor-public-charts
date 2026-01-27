@@ -20,7 +20,7 @@ import click
 from test.config import get_ci_values_file, get_old_values_content, get_scenarios
 from test.dependencies import DependencyManager, setup_helm_repos
 from test.helm import get_released_version, helm_dependency_build, helm_install, helm_test, helm_uninstall, helm_upgrade
-from test.kubernetes import create_namespace, delete_namespace, get_current_context, print_debug_info
+from test.kubernetes import create_namespace, delete_namespace_async, get_current_context, print_debug_info
 from test.models import ScenarioResult
 from test.utils import BOLD, RESET, BLUE, CHARTS_DIR, ROOT_DIR, _print, get_charts, gh_group_end, gh_group_start, log_error, log_info, log_step, log_success, print_summary
 
@@ -142,7 +142,8 @@ def run_scenario(
         except Exception:
             pass
         try:
-            delete_namespace(namespace, verbose)
+            # Use async deletion - don't wait for namespace to fully delete
+            delete_namespace_async(namespace, verbose)
         except Exception:
             pass
         gh_group_end()
