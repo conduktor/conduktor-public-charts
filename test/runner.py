@@ -22,7 +22,7 @@ from test.dependencies import DependencyManager, setup_helm_repos
 from test.helm import get_released_version, helm_dependency_build, helm_install, helm_test, helm_uninstall, helm_upgrade
 from test.kubernetes import create_namespace, delete_namespace, get_current_context, print_debug_info
 from test.models import ScenarioResult
-from test.utils import CHARTS_DIR, ROOT_DIR, console, get_charts, log_error, log_info, log_step, log_success, print_summary
+from test.utils import BOLD, RESET, BLUE, CHARTS_DIR, ROOT_DIR, _print, get_charts, gh_group_end, gh_group_start, log_error, log_info, log_step, log_success, print_summary
 
 
 def detect_changed_charts() -> list[str]:
@@ -65,7 +65,8 @@ def run_scenario(
     # Dependencies in same namespace as the test
     dep_manager = DependencyManager(chart, namespace, verbose)
 
-    console.print(f"\n[bold blue]>>> {chart}/{scenario}[/bold blue]")
+    _print(f"\n{BOLD}{BLUE}>>> {chart}/{scenario}{RESET}")
+    gh_group_start(f"{chart}/{scenario}")
 
     try:
         # Setup
@@ -144,11 +145,12 @@ def run_scenario(
             delete_namespace(namespace, verbose)
         except Exception:
             pass
+        gh_group_end()
 
 
 def run_chart(chart: str, scenarios: Optional[list[str]] = None, upgrade: bool = True, verbose: bool = False) -> list[ScenarioResult]:
     """Run all scenarios for a chart."""
-    console.print(f"\n[bold white on blue] TESTING: {chart.upper()} [/bold white on blue]")
+    _print(f"\n{BOLD}{BLUE}========== TESTING: {chart.upper()} =========={RESET}")
 
     scenario_list = scenarios or get_scenarios(chart)
     if not scenario_list:

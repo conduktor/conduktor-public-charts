@@ -1,20 +1,34 @@
 """Utility functions for the test framework."""
 
+import os
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
-
-from rich.console import Console
-from rich.table import Table
 
 # Paths
 ROOT_DIR = Path(__file__).parent.parent.resolve()
 CHARTS_DIR = ROOT_DIR / "charts"
 SHARED_DEPS_DIR = ROOT_DIR / "test" / "shared-deps"
 
-# Console for rich output
-console = Console()
+# Detect CI environment
+IS_CI = os.environ.get("CI", "").lower() == "true"
+IS_GITHUB_ACTIONS = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
+
+# ANSI color codes
+RESET = "\033[0m"
+BOLD = "\033[1m"
+DIM = "\033[2m"
+RED = "\033[31m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+BLUE = "\033[34m"
+CYAN = "\033[36m"
+
+
+def _print(msg: str) -> None:
+    """Print message and flush."""
+    print(msg, flush=True)
 
 
 # Exceptions
@@ -43,7 +57,7 @@ class CommandResult:
 
 def log_command(cmd: list[str]) -> None:
     """Log a command that is about to be executed."""
-    console.print(f"[dim]$ {' '.join(cmd)}[/dim]")
+    _print(f"{DIM}$ {' '.join(cmd)}{RESET}")
 
 
 def run_command(
@@ -66,38 +80,59 @@ def run_command(
 
 
 def log_info(msg: str) -> None:
-    console.print(f"[blue]INFO[/blue] {msg}")
+    _print(f"{BLUE}INFO{RESET} {msg}")
 
 
 def log_success(msg: str) -> None:
-    console.print(f"[green]OK[/green] {msg}")
+    _print(f"{GREEN}OK{RESET} {msg}")
 
 
 def log_warning(msg: str) -> None:
-    console.print(f"[yellow]WARN[/yellow] {msg}")
+    prefix = "::warning::" if IS_GITHUB_ACTIONS else ""
+    _print(f"{prefix}{YELLOW}WARN{RESET} {msg}")
 
 
 def log_error(msg: str) -> None:
-    console.print(f"[red]ERROR[/red] {msg}")
+    prefix = "::error::" if IS_GITHUB_ACTIONS else ""
+    _print(f"{prefix}{RED}ERROR{RESET} {msg}")
 
 
 def log_step(step: str, msg: str) -> None:
-    console.print(f"[cyan]STEP {step}[/cyan] {msg}")
+    _print(f"{CYAN}STEP {step}{RESET} {msg}")
+
+
+# GitHub Actions grouping
+def gh_group_start(title: str) -> None:
+    """Start a collapsible group in GitHub Actions."""
+    if IS_GITHUB_ACTIONS:
+        _print(f"::group::{title}")
+
+
+def gh_group_end() -> None:
+    """End a collapsible group in GitHub Actions."""
+    if IS_GITHUB_ACTIONS:
+        _print("::endgroup::")
 
 
 def print_summary(results: list[tuple[str, str, bool, Optional[str]]]) -> None:
     """Print test results summary."""
-    table = Table(title="Test Results")
-    table.add_column("Chart")
-    table.add_column("Scenario")
-    table.add_column("Status")
-    table.add_column("Error")
+    _print(f"\n{BOLD}{'=' * 60}{RESET}")
+    _print(f"{BOLD}Test Results{RESET}")
+    _print(f"{BOLD}{'=' * 60}{RESET}")
 
     for chart, scenario, success, error in results:
-        status = "[green]PASS[/green]" if success else "[red]FAIL[/red]"
-        table.add_row(chart, scenario, status, error or "")
+        status = f"{GREEN}PASS{RESET}" if success else f"{RED}FAIL{RESET}"
+        line = f"  {status} {chart}/{scenario}"
+        if error:
+            line += f" - {DIM}{error}{RESET}"
+        _print(line)
 
-    console.print(table)
+    # Summary counts
+    passed = sum(1 for _, _, s, _ in results if s)
+    failed = len(results) - passed
+    _print(f"{BOLD}{'=' * 60}{RESET}")
+    _print(f"Total: {len(results)} | {GREEN}Passed: {passed}{RESET} | {RED}Failed: {failed}{RESET}")
+    _print(f"{BOLD}{'=' * 60}{RESET}\n")
 
 
 def get_charts() -> list[str]:

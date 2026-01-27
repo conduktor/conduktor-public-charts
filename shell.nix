@@ -17,8 +17,6 @@ let
           click
           pydantic
           pyyaml
-          rich
-          gitpython
       ]))
      ];
   };
