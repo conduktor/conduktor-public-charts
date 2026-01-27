@@ -1,3 +1,25 @@
+{{- $tls_enabled := or ((.Values.config.platform.https).existingSecret) ((.Values.config.platform.https).selfSigned) }}
+{{- $scheme := "http" -}}
+{{- if $tls_enabled }}
+{{- $scheme = "https" -}}
+{{- end }}
+{{- $serviceName := include "common.names.fullname" . -}}
+{{- $servicePort := .Values.service.ports.http -}}
+{{- $url := printf "%v://%v:%v/platform/api/modules/health/ready" $scheme $serviceName $servicePort }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "common.names.fullname" . }}-test-console"
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  containers:
+    - name: curl-platform
+      image: curlimages/curl:8.1.2
+      args: [ '--insecure', "--verbose" ,'{{ $url }}']
+  restartPolicy: Never
+---
 {{- if .Values.platformCortex.enabled }}
 {{- $serviceName := include "conduktor.platformCortex.fullname" . -}}
 {{- $cortexPort := .Values.platformCortex.service.ports.cortex -}}
