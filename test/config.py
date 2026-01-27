@@ -10,7 +10,7 @@ from test.utils import CHARTS_DIR, SHARED_DEPS_DIR
 
 def load_chart_config(chart: str) -> ChartTestConfig:
     """Load test configuration for a chart."""
-    config_file = CHARTS_DIR / chart / "test-deps" / "dependencies.yaml"
+    config_file = CHARTS_DIR / chart / "ci" / "dependencies.yaml"
 
     if not config_file.exists():
         return ChartTestConfig()
