@@ -148,53 +148,53 @@ def get_pod_logs(pod_name: str, namespace: str, container: Optional[str] = None,
 
 def print_debug_info(namespace: str) -> None:
     """Print comprehensive debug information for a namespace."""
-    from test.utils import console
+    from test.utils import BOLD, RESET, RED, YELLOW, GREEN, DIM, _print
 
-    console.print("\n[bold red]━━━ DEBUG INFO ━━━[/bold red]")
+    _print(f"\n{BOLD}{RED}━━━ DEBUG INFO ━━━{RESET}")
 
     # Pods status
-    console.print("\n[bold yellow]Pods:[/bold yellow]")
+    _print(f"\n{BOLD}{YELLOW}Pods:{RESET}")
     pods = get_pods_status(namespace)
     if not pods:
-        console.print("  No pods found")
+        _print("  No pods found")
     else:
         for pod in pods:
             status_icon = "✓" if pod["ready"] and pod["phase"] == "Running" else "✗"
-            color = "green" if pod["ready"] and pod["phase"] == "Running" else "red"
-            console.print(f"  [{color}]{status_icon}[/{color}] {pod['name']} - {pod['phase']}")
+            color = GREEN if pod["ready"] and pod["phase"] == "Running" else RED
+            _print(f"  {color}{status_icon}{RESET} {pod['name']} - {pod['phase']}")
             for c in pod["containers"]:
                 c_icon = "✓" if c.get("ready") else "✗"
-                c_color = "green" if c.get("ready") else "red"
+                c_color = GREEN if c.get("ready") else RED
                 restarts = f" (restarts: {c['restartCount']})" if c.get("restartCount", 0) > 0 else ""
-                console.print(f"      [{c_color}]{c_icon}[/{c_color}] {c['name']}: {c.get('state', 'Unknown')}{restarts}")
+                _print(f"      {c_color}{c_icon}{RESET} {c['name']}: {c.get('state', 'Unknown')}{restarts}")
                 if c.get("message"):
-                    console.print(f"         {c['message']}")
+                    _print(f"         {c['message']}")
 
     # Unhealthy pods details
     unhealthy = get_unhealthy_pods(namespace)
     if unhealthy:
-        console.print("\n[bold yellow]Unhealthy Pod Details:[/bold yellow]")
+        _print(f"\n{BOLD}{YELLOW}Unhealthy Pod Details:{RESET}")
         for pod_name in unhealthy[:3]:  # Limit to first 3 unhealthy pods
-            console.print(f"\n[bold]--- {pod_name} ---[/bold]")
+            _print(f"\n{BOLD}--- {pod_name} ---{RESET}")
 
             # Describe
-            console.print("\n[dim]Description (last 50 lines):[/dim]")
+            _print(f"\n{DIM}Description (last 50 lines):{RESET}")
             desc = describe_pod(pod_name, namespace)
             desc_lines = desc.strip().split("\n")
-            console.print("\n".join(desc_lines[-50:]))
+            _print("\n".join(desc_lines[-50:]))
 
             # Logs
-            console.print("\n[dim]Logs (last 50 lines):[/dim]")
+            _print(f"\n{DIM}Logs (last 50 lines):{RESET}")
             logs = get_pod_logs(pod_name, namespace, tail=50)
-            console.print(logs if logs.strip() else "  No logs available")
+            _print(logs if logs.strip() else "  No logs available")
 
     # Recent events
-    console.print("\n[bold yellow]Recent Events:[/bold yellow]")
+    _print(f"\n{BOLD}{YELLOW}Recent Events:{RESET}")
     events = get_events(namespace)
     if events.strip():
         event_lines = events.strip().split("\n")
-        console.print("\n".join(event_lines[-20:]))  # Last 20 events
+        _print("\n".join(event_lines[-20:]))  # Last 20 events
     else:
-        console.print("  No events")
+        _print("  No events")
 
-    console.print("\n[bold red]━━━━━━━━━━━━━━━━━[/bold red]\n")
+    _print(f"\n{BOLD}{RED}━━━━━━━━━━━━━━━━━{RESET}\n")
