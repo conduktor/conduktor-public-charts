@@ -61,6 +61,7 @@ def helm_install(
     values_files: Optional[list[Path]] = None,
     version: Optional[str] = None,
     timeout: str = "600s",
+    wait: bool = True,
     verbose: bool = False,
 ) -> None:
     """Install a Helm chart."""
@@ -68,9 +69,10 @@ def helm_install(
         "helm", "install", release_name, chart,
         "--namespace", namespace,
         "--create-namespace",
-        "--wait",
-        "--timeout", timeout,
     ]
+
+    if wait:
+        cmd.extend(["--wait", "--timeout", timeout])
 
     if version:
         cmd.extend(["--version", version])
@@ -79,8 +81,8 @@ def helm_install(
         if vf.exists():
             cmd.extend(["--values", str(vf)])
 
-    log_info(f"Installing {release_name}")
-    result = run_command(cmd, verbose=verbose, timeout=900, log=True)
+    log_info(f"Installing {release_name}" + ("" if wait else " (no wait)"))
+    result = run_command(cmd, verbose=verbose, timeout=900 if wait else 120, log=True)
 
     if not result.success:
         raise HelmError(f"Install failed: {result.stderr}")

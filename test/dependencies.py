@@ -29,13 +29,22 @@ class DependencyManager:
         if not deps:
             return
 
-        log_info(f"Setting up {len(deps)} dependencies")
+        log_info(f"Setting up {len(deps)} dependencies (parallel install)")
 
+        # Phase 1: Install all dependencies without waiting
+        deps_to_wait = []
         for dep in deps:
             if dep.name in self.installed:
                 continue
-            self._install(dep)
+            self._install(dep, wait=False)
             self.installed.append(dep.name)
+            deps_to_wait.append(dep)
+
+        # Phase 2: Wait for all dependencies to be ready
+        if deps_to_wait:
+            log_info(f"Waiting for {len(deps_to_wait)} dependencies to be ready")
+            for dep in deps_to_wait:
+                wait_for_rollout(dep.wait, self.namespace, dep.timeout, self.verbose)
 
         log_success("Dependencies ready")
 
@@ -49,10 +58,8 @@ class DependencyManager:
 
         self.installed.clear()
 
-    def _install(self, dep: Dependency) -> None:
+    def _install(self, dep: Dependency, wait: bool = True) -> None:
         """Install a single dependency."""
-        log_info(f"Installing {dep.name} ({dep.chart})")
-
         # Collect values files
         values_files = []
 
@@ -78,11 +85,13 @@ class DependencyManager:
                 values_files=values_files,
                 version=dep.version,
                 timeout=dep.timeout,
+                wait=wait,
                 verbose=self.verbose,
             )
 
-            # Wait for resource
-            wait_for_rollout(dep.wait, self.namespace, dep.timeout, self.verbose)
+            # Wait for resource only if wait=True
+            if wait:
+                wait_for_rollout(dep.wait, self.namespace, dep.timeout, self.verbose)
 
         finally:
             if inline_values_file:
