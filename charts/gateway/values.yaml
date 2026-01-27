@@ -509,7 +509,3 @@ affinity:
 ##
 podSecurityContext: {}
 # runAsNonRoot: true
-
-## @skip tests
-tests:
-  enabled: false
