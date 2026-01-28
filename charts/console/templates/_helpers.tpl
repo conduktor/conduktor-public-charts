@@ -58,12 +58,20 @@ Return the full configuration for the platform ConfigMap
 {{- end -}}
 
 {{- define "conduktor.sanitize.database"}}
-{{/* Move deprecated host/port to hosts list*/}}
-{{- if $.database.host }}
-{{- $host_1 := dict "host" $.database.host -}}
-{{- if $.database.port }}
-{{- $_ := set $host_1 "port" $.database.port -}}
+
+{{/* Add default port if not set or set to 0 */}}
+{{- if $.database.hosts -}}
+  {{- range $index, $host := $.database.hosts -}}
+    {{- if or (not (hasKey $host "port")) (eq (int (index $host "port")) 0) -}}
+      {{- $_ := set $host "port" (default 5432 $.database.port) -}}
+    {{- end -}}
+  {{- end -}}
 {{- end }}
+
+{{/* Move deprecated host/port to hosts list */}}
+{{- if and $.database.host (empty $.database.hosts) }}
+{{- $host_1 := dict "host" $.database.host -}}
+{{- $_ := set $host_1 "port" (default 5432 $.database.port) -}}
 {{- $hosts := list $host_1 -}}
 {{- $_ := set $.database "hosts" $hosts -}}
 {{- end }}
