@@ -86,7 +86,8 @@ gateway:
       metadata:
         name: "my-app-A"
       spec:
-        aclEnabled: false
+        aclEnabled: true
+        aclMode: "KAFKA_API"
         superUsers:
           - admin
 
@@ -168,7 +169,8 @@ extraDeploy:
         metadata:
           name: "my-app-B"
         spec:
-          aclEnabled: false
+          aclEnabled: true
+          aclMode: "KAFKA_API"
           superUsers:
             - admin
 
