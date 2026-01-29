@@ -59,6 +59,7 @@ def helm_install(
     chart: str,
     namespace: str,
     values_files: Optional[list[Path]] = None,
+    set_overrides: Optional[list[str]] = None,
     version: Optional[str] = None,
     timeout: str = "600s",
     wait: bool = True,
@@ -66,7 +67,7 @@ def helm_install(
 ) -> None:
     """Install a Helm chart."""
     cmd = [
-        "helm", "install", release_name, chart,
+        "helm", "upgrade", "--install", release_name, chart,
         "--namespace", namespace,
         "--create-namespace",
     ]
@@ -81,6 +82,9 @@ def helm_install(
         if vf.exists():
             cmd.extend(["--values", str(vf)])
 
+    for override in (set_overrides or []):
+        cmd.extend(["--set", override])
+
     log_info(f"Installing {release_name}" + ("" if wait else " (no wait)"))
     result = run_command(cmd, verbose=verbose, timeout=900 if wait else 120, log=True)
 
@@ -93,6 +97,7 @@ def helm_upgrade(
     chart: str,
     namespace: str,
     values_files: Optional[list[Path]] = None,
+    set_overrides: Optional[list[str]] = None,
     values_content: Optional[str] = None,
     timeout: str = "600s",
     verbose: bool = False,
@@ -108,6 +113,9 @@ def helm_upgrade(
     for vf in (values_files or []):
         if vf.exists():
             cmd.extend(["--values", str(vf)])
+
+    for override in (set_overrides or []):
+        cmd.extend(["--set", override])
 
     # Handle raw values content
     temp_file = None
@@ -182,6 +190,17 @@ def helm_dependency_build(chart: str, verbose: bool = False, force: bool = False
     if not result.success:
         raise HelmError(f"Dependency build failed: {result.stderr}")
 
+
+def get_chart_name(chart_path: Path) -> Optional[str]:
+    """Get the name of a chart from its Chart.yaml."""
+    chart_yaml = chart_path / "Chart.yaml"
+    if not chart_yaml.exists():
+        return None
+
+    with open(chart_yaml) as f:
+        chart_data = yaml.safe_load(f) or {}
+
+    return chart_data.get("name")
 
 def get_released_version(chart: str) -> Optional[str]:
     """Get latest released version of a chart."""
