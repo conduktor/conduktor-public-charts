@@ -264,7 +264,7 @@
                         "tag": {
                             "type": "string",
                             "description": "Conduktor Console image tag (immutable tags are recommended)",
-                            "default": "1.41.0"
+                            "default": "1.42.0"
                         },
                         "digest": {
                             "type": "string",
@@ -970,7 +970,7 @@
                         "tag": {
                             "type": "string",
                             "description": "Conduktor Console Cortex image tag (immutable tags are recommended)",
-                            "default": "1.41.0"
+                            "default": "1.42.0"
                         },
                         "digest": {
                             "type": "string",
@@ -1447,6 +1447,27 @@
                             "default": {}
                         }
                     }
+                }
+            }
+        },
+        "tests": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "",
+                    "default": false
+                },
+                "minio": {
+                    "type": "boolean",
+                    "description": "",
+                    "default": false
+                },
+                "secrets": {
+                    "type": "array",
+                    "description": "",
+                    "default": [],
+                    "items": {}
                 }
             }
         }
