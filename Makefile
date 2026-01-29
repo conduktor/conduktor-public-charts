@@ -345,20 +345,24 @@ test-deps: ## Install Python test dependencies
 	pip install -r test/requirements.txt
 
 .PHONY: test-run
-test-run: check-kube-context ## Run tests for a specific chart (usage: make test-run CHART=console)
-	python -m test.runner run --chart $(CHART)
+test-run: check-kube-context ## Run tests for a chart (usage: make test-run CHART=console [SCENARIO=01-basic] [SKIP_UPGRADE=1])
+	python -m test.runner run --chart $(CHART) $(if $(SCENARIO),--scenario $(SCENARIO)) $(if $(SKIP_UPGRADE),--skip-upgrade)
 
-.PHONY: test-run-scenario
-test-run-scenario: check-kube-context ## Run a specific scenario (usage: make test-run-scenario CHART=console SCENARIO=01-basic)
-	python -m test.runner run --chart $(CHART) --scenario $(SCENARIO)
+.PHONY: test-install
+test-install: check-kube-context ## Install a scenario for local dev/debug (usage: make test-install CHART=console SCENARIO=01-basic)
+	python -m test.runner install --chart $(CHART) --scenario $(SCENARIO)
+
+.PHONY: test-uninstall
+test-uninstall: check-kube-context ## Uninstall a scenario and its dependencies (usage: make test-uninstall CHART=console SCENARIO=01-basic)
+	python -m test.runner uninstall --chart $(CHART) --scenario $(SCENARIO)
 
 .PHONY: test-changed
-test-changed: check-kube-context ## Run tests for changed charts only
-	python -m test.runner run --changed
+test-changed: check-kube-context ## Run tests for changed charts only (usage: make test-changed [SKIP_UPGRADE=1])
+	python -m test.runner run --changed $(if $(SKIP_UPGRADE),--skip-upgrade)
 
 .PHONY: test-all-charts
-test-all-charts: check-kube-context ## Run all chart tests
-	python -m test.runner run --all
+test-all-charts: check-kube-context ## Run all chart tests (usage: make test-all-charts [SKIP_UPGRADE=1])
+	python -m test.runner run --all $(if $(SKIP_UPGRADE),--skip-upgrade)
 
 .PHONY: lint-manifests
 lint-manifests: ## Validate helm template output with kubeconform

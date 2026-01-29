@@ -20,7 +20,7 @@ console:
   extraEnvVarsSecret: "console-provisioner-secrets"
   extraEnvVarsCM: "console-provisioner-config"
 
-  url: "http://console"
+  url: "http://console.ct-provisioner-deps.svc.cluster.local"
 #  username: "" Provided by extraEnvVarsCM
 #  password: "" Provided by extraEnvVarsSecret
   insecure: true
@@ -63,7 +63,7 @@ gateway:
   extraEnvVarsSecret: "gateway-provisioner-secrets"
   extraEnvVarsCM: "gateway-provisioner-config"
 
-  url: "http://gateway-conduktor-gateway-internal:8888"
+  url: "http://gateway-conduktor-gateway-internal.ct-provisioner-deps.svc.cluster.local:8888"
   #  username: "" Provided by extraEnvVarsCM
   #  password: "" Provided by extraEnvVarsSecret
   insecure: true

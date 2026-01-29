@@ -30,6 +30,38 @@ def delete_namespace(namespace: str, verbose: bool = False) -> None:
     )
 
 
+def create_configmap(name: str, namespace: str, data: dict[str, str], verbose: bool = False) -> None:
+    """Create a ConfigMap with the given data.
+
+    Uses --dry-run=client and kubectl apply for idempotency.
+    """
+    if not data:
+        return
+
+    import subprocess
+
+    # Build kubectl create configmap command with --dry-run and pipe to apply
+    cmd = ["kubectl", "create", "configmap", name, "-n", namespace]
+    for key, value in data.items():
+        cmd.extend([f"--from-literal={key}={value}"])
+    cmd.extend(["--dry-run=client", "-o", "yaml"])
+
+    # Get the YAML
+    result = run_command(cmd, verbose=verbose, log=True)
+    if not result.success:
+        raise KubernetesError(f"Failed to generate ConfigMap: {result.stderr}")
+
+    # Apply it by piping the YAML to kubectl apply
+    proc = subprocess.run(
+        ["kubectl", "apply", "-n", namespace, "-f", "-"],
+        input=result.stdout,
+        capture_output=True,
+        text=True,
+    )
+    if proc.returncode != 0:
+        raise KubernetesError(f"Failed to apply ConfigMap: {proc.stderr}")
+
+
 def delete_namespace_async(namespace: str, verbose: bool = False) -> None:
     """Start namespace deletion without waiting."""
     log_info(f"Deleting namespace (async): {namespace}")
@@ -60,6 +92,29 @@ def get_current_context() -> Optional[str]:
     """Get current kubectl context."""
     result = run_command(["kubectl", "config", "current-context"])
     return result.stdout.strip() if result.success else None
+
+
+def kubectl_exec(
+    pod: str,
+    namespace: str,
+    command: list[str],
+    container: Optional[str] = None,
+    verbose: bool = False,
+    timeout: int = 60,
+) -> tuple[bool, str, str]:
+    """Execute a command in a pod.
+
+    Returns:
+        Tuple of (success, stdout, stderr)
+    """
+    cmd = ["kubectl", "exec", pod, "-n", namespace]
+    if container:
+        cmd.extend(["-c", container])
+    cmd.append("--")
+    cmd.extend(command)
+
+    result = run_command(cmd, verbose=verbose, timeout=timeout)
+    return result.success, result.stdout, result.stderr
 
 
 def get_pods(namespace: str) -> str:

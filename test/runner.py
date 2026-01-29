@@ -4,6 +4,8 @@ Conduktor Helm Charts test runner CLI.
 Usage:
     python -m test.runner run --chart console
     python -m test.runner run --changed
+    python -m test.runner install --chart console --scenario 01-basic
+    python -m test.runner uninstall --chart console --scenario 01-basic
     python -m test.runner detect-changed --json
     python -m test.runner lint-manifests
 """
@@ -17,12 +19,12 @@ from typing import Optional
 
 import click
 
-from test.config import get_ci_values_file, get_old_values_content, get_scenarios
+from test.config import get_ci_values_file, get_old_values_content, get_scenarios, load_chart_config
 from test.dependencies import DependencyManager, setup_helm_repos
-from test.helm import get_released_version, helm_dependency_build, helm_install, helm_test, helm_uninstall, helm_upgrade
-from test.kubernetes import create_namespace, delete_namespace_async, get_current_context, print_debug_info
+from test.helm import get_chart_name, get_released_version, helm_dependency_build, helm_install, helm_test, helm_uninstall, helm_upgrade
+from test.kubernetes import create_namespace, delete_namespace, delete_namespace_async, get_current_context, print_debug_info
 from test.models import ScenarioResult
-from test.utils import BOLD, RESET, BLUE, CHARTS_DIR, ROOT_DIR, _print, get_charts, gh_group_end, gh_group_start, log_error, log_info, log_step, log_success, print_summary
+from test.utils import BOLD, RESET, BLUE, CHARTS_DIR, ROOT_DIR, _print, get_charts, gh_group_end, gh_group_start, log_error, log_info, log_step, log_success, log_warning, print_summary
 
 
 def detect_changed_charts() -> list[str]:
@@ -53,17 +55,27 @@ def detect_changed_charts() -> list[str]:
 def run_scenario(
     chart: str,
     scenario: str,
+    scenario_id: str,
     namespace: str,
+    dep_manager: Optional[DependencyManager] = None,
     upgrade: bool = True,
     verbose: bool = False,
 ) -> ScenarioResult:
-    """Run a single test scenario."""
+    """Run a single test scenario.
+
+    Args:
+        chart: Chart name
+        scenario: Scenario name
+        scenario_id: Scenario identifier (e.g., s01, s02)
+        namespace: Namespace for the test (chart release)
+        dep_manager: Optional dependency manager for resource initialization
+        upgrade: Whether to run upgrade test path
+        verbose: Enable verbose output
+    """
     start = time.time()
     release = f"{chart}-test"
     chart_path = str(CHARTS_DIR / chart)
-
-    # Dependencies in same namespace as the test
-    dep_manager = DependencyManager(chart, namespace, verbose)
+    chart_name = get_chart_name(CHARTS_DIR / chart)
 
     _print(f"\n{BOLD}{BLUE}>>> {chart}/{scenario}{RESET}")
     gh_group_start(f"{chart}/{scenario}")
@@ -73,8 +85,10 @@ def run_scenario(
         log_step("1", "Create namespace")
         create_namespace(namespace, verbose)
 
-        log_step("2", "Setup dependencies")
-        dep_manager.setup(scenario)
+        # Initialize isolation resources (database, bucket) for this scenario
+        if dep_manager:
+            log_step("2", "Initialize isolation resources")
+            dep_manager.init_scenario_resources(scenario_id)
 
         log_step("3", "Build chart dependencies")
         helm_dependency_build(chart, verbose)
@@ -84,44 +98,43 @@ def run_scenario(
             raise FileNotFoundError(f"CI values file not found: {ci_values}")
 
         if upgrade:
-            old_version = get_released_version(chart)
-            old_values = get_old_values_content(chart, scenario)
+            old_version = get_released_version(chart_name)
+            old_values = get_old_values_content(chart, scenario, "main")
 
             if old_version and old_values:
-
                 with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
                     f.write(old_values)
                     old_values_path = Path(f.name)
 
-                # Install old version
-                log_step("4", f"Install old version ({old_version})")
-                helm_install(release, f"conduktor/{chart}", namespace, values_files=[old_values_path], version=old_version, verbose=verbose)
-
-                log_step("4a", "Test old version")
-                helm_test(release, namespace, verbose=verbose)
-
-                # Upgrade with old values
-                log_step("5", "Upgrade to current (old values)")
-
                 try:
-                    helm_upgrade(release, chart_path, namespace, values_files=[old_values_path], verbose=verbose)
-                    log_step("5a", "Test upgrade")
+                    # Install old version
+                    log_step("5", f"Install old version ({old_version})")
+                    helm_install(release, f"conduktor/{chart_name}", namespace, values_files=[old_values_path], version=old_version, verbose=verbose)
+
+                    log_step("5a", "Test old version")
                     helm_test(release, namespace, verbose=verbose)
+
+                    # Upgrade with old values
+                    log_step("6", "Upgrade to current (old values)")
+                    helm_upgrade(release, chart_path, namespace, values_files=[old_values_path], verbose=verbose)
+
+                    log_step("6a", "Test upgrade")
+                    helm_test(release, namespace, verbose=verbose)
+
+                    # Upgrade with current values
+                    log_step("7", "Upgrade with current values")
+                    helm_upgrade(release, chart_path, namespace, values_files=[ci_values], verbose=verbose)
                 finally:
                     old_values_path.unlink(missing_ok=True)
-
-                # Upgrade with current values
-                log_step("6", "Upgrade with current values")
-                helm_upgrade(release, chart_path, namespace, values_files=[ci_values], verbose=verbose)
             else:
                 log_info("No old version found, fresh install")
-                log_step("4", "Install current version")
+                log_step("5", "Install current version")
                 helm_install(release, chart_path, namespace, values_files=[ci_values], verbose=verbose)
         else:
-            log_step("4", "Install current version")
+            log_step("5", "Install current version")
             helm_install(release, chart_path, namespace, values_files=[ci_values], verbose=verbose)
 
-        log_step("7", "Run helm test")
+        log_step("8", "Run helm test")
         helm_test(release, namespace, verbose=verbose)
 
         log_success(f"PASSED: {chart}/{scenario}")
@@ -133,10 +146,6 @@ def run_scenario(
         return ScenarioResult(chart=chart, scenario=scenario, success=False, duration=time.time() - start, error=str(e))
 
     finally:
-        try:
-            dep_manager.teardown()
-        except Exception:
-            pass
         try:
             helm_uninstall(release, namespace, verbose)
         except Exception:
@@ -150,7 +159,14 @@ def run_scenario(
 
 
 def run_chart(chart: str, scenarios: Optional[list[str]] = None, upgrade: bool = True, verbose: bool = False) -> list[ScenarioResult]:
-    """Run all scenarios for a chart."""
+    """Run all scenarios for a chart.
+
+    This function orchestrates shared dependencies across scenarios:
+    1. Creates a shared deps namespace
+    2. Installs all dependencies once
+    3. Runs each scenario (isolation via convention-based resource naming)
+    4. Tears down dependencies after all scenarios
+    """
     _print(f"\n{BOLD}{BLUE}========== TESTING: {chart.upper()} =========={RESET}")
 
     scenario_list = scenarios or get_scenarios(chart)
@@ -158,13 +174,154 @@ def run_chart(chart: str, scenarios: Optional[list[str]] = None, upgrade: bool =
         log_info(f"No scenarios found for {chart}")
         return []
 
-    results = []
-    for scenario in scenario_list:
-        namespace = f"ct-{chart}-{scenario.replace('_', '-')}"
-        result = run_scenario(chart, scenario, namespace, upgrade, verbose)
-        results.append(result)
+    # Load chart config for dependencies
+    config = load_chart_config(chart)
+    deps_namespace = f"ct-{chart}-deps"
 
-    return results
+    # Setup shared dependencies
+    dep_manager = None
+    has_deps = len(config.get_all_dependencies()) > 0
+
+    if has_deps:
+        log_info(f"Setting up shared dependencies in {deps_namespace}")
+        create_namespace(deps_namespace, verbose)
+        dep_manager = DependencyManager(chart, deps_namespace, verbose)
+        dep_manager.setup_all()
+
+    try:
+        results = []
+        for i, scenario in enumerate(scenario_list):
+            namespace = f"ct-{chart}-{scenario.replace('_', '-')}"
+            scenario_id = f"{i+1:02d}"  # 01, 02, 03...
+
+            result = run_scenario(
+                chart, scenario, scenario_id, namespace,
+                dep_manager=dep_manager,
+                upgrade=upgrade,
+                verbose=verbose
+            )
+            results.append(result)
+
+        return results
+
+    finally:
+        # Teardown shared dependencies
+        if dep_manager:
+            try:
+                log_info("Tearing down shared dependencies")
+                dep_manager.teardown()
+            except Exception as e:
+                log_warning(f"Failed to teardown dependencies: {e}")
+            try:
+                delete_namespace(deps_namespace, verbose)
+            except Exception:
+                pass
+
+
+def install_scenario(chart: str, scenario: str, verbose: bool = False) -> None:
+    """Install a scenario for local development/debugging.
+
+    This installs dependencies and the chart but does NOT cleanup afterward.
+    Use uninstall_scenario to cleanup when done.
+    """
+    config = load_chart_config(chart)
+    scenarios = get_scenarios(chart)
+
+    # Find scenario index for isolation ID
+    scenario_id = "01"
+    for i, s in enumerate(scenarios):
+        if s == scenario:
+            scenario_id = f"{i+1:02d}"
+            break
+
+    deps_namespace = f"ct-{chart}-deps"
+    namespace = f"ct-{chart}-{scenario.replace('_', '-')}"
+    release = f"{chart}-test"
+    chart_path = str(CHARTS_DIR / chart)
+
+    _print(f"\n{BOLD}{BLUE}========== INSTALLING: {chart}/{scenario} =========={RESET}")
+
+    # Setup dependencies
+    dep_manager = None
+    has_deps = len(config.get_all_dependencies()) > 0
+
+    if has_deps:
+        log_info(f"Setting up dependencies in {deps_namespace}")
+        create_namespace(deps_namespace, verbose)
+        dep_manager = DependencyManager(chart, deps_namespace, verbose)
+        dep_manager.setup_all()
+
+        # Initialize isolation resources
+        log_step("1", "Initialize isolation resources")
+        dep_manager.init_scenario_resources(scenario_id)
+
+    # Create namespace and install chart
+    log_step("2", "Create namespace")
+    create_namespace(namespace, verbose)
+
+    log_step("3", "Build chart dependencies")
+    helm_dependency_build(chart, verbose)
+
+    ci_values = get_ci_values_file(chart, scenario)
+    if not ci_values.exists():
+        raise FileNotFoundError(f"CI values file not found: {ci_values}")
+
+    log_step("4", "Install chart")
+    helm_install(release, chart_path, namespace, values_files=[ci_values], verbose=verbose)
+
+    log_success(f"Installed {chart}/{scenario}")
+    _print(f"\n{BOLD}Namespaces:{RESET}")
+    _print(f"  Chart:        {namespace}")
+    if has_deps:
+        _print(f"  Dependencies: {deps_namespace}")
+    _print(f"\n{BOLD}To access:{RESET}")
+    _print(f"  kubectl get pods -n {namespace}")
+    _print(f"  kubectl logs -n {namespace} -l app.kubernetes.io/name={chart} -f")
+    _print(f"\n{BOLD}To cleanup:{RESET}")
+    _print(f"  make test-uninstall CHART={chart} SCENARIO={scenario}")
+
+
+def uninstall_scenario(chart: str, scenario: str, verbose: bool = False) -> None:
+    """Uninstall a scenario and its dependencies."""
+    deps_namespace = f"ct-{chart}-deps"
+    namespace = f"ct-{chart}-{scenario.replace('_', '-')}"
+    release = f"{chart}-test"
+
+    _print(f"\n{BOLD}{BLUE}========== UNINSTALLING: {chart}/{scenario} =========={RESET}")
+
+    # Uninstall chart
+    try:
+        log_step("1", "Uninstall chart")
+        helm_uninstall(release, namespace, verbose)
+    except Exception as e:
+        log_warning(f"Failed to uninstall chart: {e}")
+
+    # Delete chart namespace
+    try:
+        log_step("2", "Delete chart namespace")
+        delete_namespace(namespace, verbose)
+    except Exception as e:
+        log_warning(f"Failed to delete namespace {namespace}: {e}")
+
+    # Uninstall dependencies
+    config = load_chart_config(chart)
+    if config.get_all_dependencies():
+        try:
+            log_step("3", "Uninstall dependencies")
+            dep_manager = DependencyManager(chart, deps_namespace, verbose)
+            # Mark all deps as installed so teardown will uninstall them
+            dep_manager.installed = [d.name for d in config.get_all_dependencies()]
+            dep_manager.teardown()
+        except Exception as e:
+            log_warning(f"Failed to uninstall dependencies: {e}")
+
+        try:
+            log_step("4", "Delete dependencies namespace")
+            delete_namespace(deps_namespace, verbose)
+        except Exception as e:
+            log_warning(f"Failed to delete namespace {deps_namespace}: {e}")
+
+    log_success(f"Uninstalled {chart}/{scenario}")
 
 
 # CLI
@@ -210,6 +367,44 @@ def run(chart: Optional[str], scenario: Optional[str], changed: bool, test_all: 
 
     print_summary([(r.chart, r.scenario, r.success, r.error) for r in all_results])
     sys.exit(0 if all(r.success for r in all_results) else 1)
+
+
+@cli.command()
+@click.option("--chart", "-c", required=True, help="Chart to install")
+@click.option("--scenario", "-s", required=True, help="Scenario to install")
+@click.option("--verbose", "-v", is_flag=True)
+def install(chart: str, scenario: str, verbose: bool):
+    """Install a scenario for local dev/debug (no cleanup)."""
+    ctx = get_current_context()
+    if not ctx or "k3d" not in ctx:
+        log_error(f"Not a k3d context: {ctx}")
+        sys.exit(1)
+
+    setup_helm_repos(verbose)
+
+    try:
+        install_scenario(chart, scenario, verbose)
+    except Exception as e:
+        log_error(f"Install failed: {e}")
+        sys.exit(1)
+
+
+@cli.command()
+@click.option("--chart", "-c", required=True, help="Chart to uninstall")
+@click.option("--scenario", "-s", required=True, help="Scenario to uninstall")
+@click.option("--verbose", "-v", is_flag=True)
+def uninstall(chart: str, scenario: str, verbose: bool):
+    """Uninstall a scenario and its dependencies."""
+    ctx = get_current_context()
+    if not ctx or "k3d" not in ctx:
+        log_error(f"Not a k3d context: {ctx}")
+        sys.exit(1)
+
+    try:
+        uninstall_scenario(chart, scenario, verbose)
+    except Exception as e:
+        log_error(f"Uninstall failed: {e}")
+        sys.exit(1)
 
 
 @cli.command("detect-changed")
