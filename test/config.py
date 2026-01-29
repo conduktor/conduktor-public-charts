@@ -48,13 +48,22 @@ def get_scenarios(chart: str) -> list[str]:
 
 
 def get_old_values_content(chart: str, scenario: str, ref: str = "main") -> Optional[str]:
-    """Get old CI values content from git ref."""
+    """Get old CI values content from git ref.
+
+    Tries origin/{ref} first (for CI environments), then {ref} (for local).
+    """
     import subprocess
 
     path = f"charts/{chart}/ci/{scenario}-values.yaml"
-    result = subprocess.run(
-        ["git", "show", f"{ref}:{path}"],
-        capture_output=True,
-        text=True,
-    )
-    return result.stdout if result.returncode == 0 else None
+
+    # Try origin/ref first (CI typically has origin/main but not local main)
+    for git_ref in [f"origin/{ref}", ref]:
+        result = subprocess.run(
+            ["git", "show", f"{git_ref}:{path}"],
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode == 0 and result.stdout:
+            return result.stdout
+
+    return None
