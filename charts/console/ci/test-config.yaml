@@ -4,14 +4,16 @@ dependencies:
     chart: bitnami/postgresql
     version: "12.5.8"
     wait: statefulset/postgresql
+    init:
+      database: "db_{scenario_id}"
+      user: postgres
+      password: conduktor123
 
   - name: minio
     chart: bitnami/minio
     version: "12.8.0"
     wait: deployment/minio
-    optional: true  # Only for scenarios that need S3
-
-# Which scenarios need which optional dependencies
-scenarios:
-  05-external-monitoring-storage:
-    include: [minio]
+    init:
+      bucket: "bucket-{scenario_id}"
+      user: admin
+      password: conduktor123

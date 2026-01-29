@@ -4,6 +4,14 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
+class DependencyInitConfig(BaseModel):
+    """Initialization configuration for a dependency (database, bucket creation)."""
+    database: Optional[str] = None  # PostgreSQL database name template
+    bucket: Optional[str] = None  # Minio bucket name template
+    user: Optional[str] = None
+    password: Optional[str] = None
+
+
 class Dependency(BaseModel):
     """A single dependency specification."""
     name: str
@@ -11,32 +19,41 @@ class Dependency(BaseModel):
     version: Optional[str] = None
     wait: str  # Resource to wait for (e.g., statefulset/postgresql)
     timeout: str = "300s"
-    optional: bool = False
     values: Optional[dict] = None  # Inline values override
-
-
-class ScenarioConfig(BaseModel):
-    """Per-scenario configuration."""
-    include: list[str] = Field(default_factory=list)  # Optional deps to include
-    skip_upgrade: bool = False
+    init: Optional[DependencyInitConfig] = None  # Resource init config (database/bucket)
 
 
 class ChartTestConfig(BaseModel):
     """Test configuration for a chart."""
     dependencies: list[Dependency] = Field(default_factory=list)
-    scenarios: dict[str, ScenarioConfig] = Field(default_factory=dict)
 
-    def get_dependencies_for_scenario(self, scenario: str) -> list[Dependency]:
-        """Get list of dependencies needed for a scenario."""
-        # Start with required dependencies
-        deps = [d for d in self.dependencies if not d.optional]
+    def get_all_dependencies(self) -> list[Dependency]:
+        """Get all dependencies."""
+        return list(self.dependencies)
 
-        # Add optional dependencies if scenario includes them
-        if scenario in self.scenarios:
-            include = self.scenarios[scenario].include
-            deps.extend([d for d in self.dependencies if d.optional and d.name in include])
+    def get_init_config_for_scenario(self, scenario_id: str) -> dict:
+        """Get initialization config for a scenario.
 
-        return deps
+        Returns dict with 'database' and 'bucket' keys if configured.
+        """
+        result = {}
+
+        for dep in self.dependencies:
+            if dep.init:
+                if dep.init.database:
+                    result['database'] = {
+                        'name': dep.init.database.format(scenario_id=scenario_id),
+                        'user': dep.init.user,
+                        'password': dep.init.password,
+                    }
+                if dep.init.bucket:
+                    result['bucket'] = {
+                        'name': dep.init.bucket.format(scenario_id=scenario_id),
+                        'user': dep.init.user,
+                        'password': dep.init.password,
+                    }
+
+        return result
 
 
 class ScenarioResult(BaseModel):

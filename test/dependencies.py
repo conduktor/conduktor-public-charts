@@ -7,9 +7,9 @@ import yaml
 
 from test.config import get_shared_values_file, load_chart_config
 from test.helm import helm_install, helm_uninstall
-from test.kubernetes import wait_for_rollout
+from test.kubernetes import kubectl_exec, wait_for_rollout
 from test.models import Dependency
-from test.utils import log_info, log_success, log_warning
+from test.utils import log_info, log_success, log_warning, log_error
 
 
 class DependencyManager:
@@ -22,10 +22,107 @@ class DependencyManager:
         self.config = load_chart_config(chart)
         self.installed: list[str] = []
 
-    def setup(self, scenario: str) -> None:
-        """Install dependencies for a scenario."""
-        deps = self.config.get_dependencies_for_scenario(scenario)
+    def setup_all(self) -> None:
+        """Install all dependencies.
 
+        Dependencies are installed once in a shared namespace
+        before running scenarios.
+        """
+        deps = self.config.get_all_dependencies()
+        self._install_deps(deps)
+
+    def init_scenario_resources(self, scenario_id: str) -> None:
+        """Initialize resources (database, bucket) for a single scenario.
+
+        This should be called at the beginning of each scenario test.
+        """
+        init_config = self.config.get_init_config_for_scenario(scenario_id)
+
+        # Create PostgreSQL database if needed
+        if 'database' in init_config and "postgresql" in self.installed:
+            self._create_postgresql_database(init_config['database'])
+
+        # Create Minio bucket if needed
+        if 'bucket' in init_config and "minio" in self.installed:
+            self._create_minio_bucket(init_config['bucket'])
+
+    def _get_pod_name(self, label_selector: str) -> Optional[str]:
+        """Get pod name by label selector."""
+        from test.utils import run_command
+        result = run_command([
+            "kubectl", "get", "pods", "-n", self.namespace,
+            "-l", label_selector,
+            "-o", "jsonpath={.items[0].metadata.name}"
+        ], verbose=self.verbose)
+        return result.stdout.strip() if result.success and result.stdout.strip() else None
+
+    def _create_postgresql_database(self, config: dict) -> None:
+        """Create a single database in PostgreSQL.
+
+        Args:
+            config: Dict with 'name', 'user', 'password' keys
+        """
+        db_name = config['name']
+        user = config.get('user', 'postgres')
+        password = config.get('password', '')
+
+        log_info(f"Creating PostgreSQL database: {db_name}")
+
+        # Use psql with PGPASSWORD env var to create database if not exists
+        sql = f"SELECT 'CREATE DATABASE {db_name}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '{db_name}')\\gexec"
+        success, stdout, stderr = kubectl_exec(
+            pod="postgresql-0",
+            namespace=self.namespace,
+            command=[
+                "sh", "-c",
+                f"echo \"{sql}\" | PGPASSWORD='{password}' psql -U {user}"
+            ],
+            verbose=self.verbose,
+        )
+
+        if success:
+            log_success(f"PostgreSQL database ready: {db_name}")
+        else:
+            log_warning(f"Failed to create database {db_name}: {stderr}")
+
+    def _create_minio_bucket(self, config: dict) -> None:
+        """Create a single bucket in Minio using mc (minio client).
+
+        Args:
+            config: Dict with 'name', 'user', 'password' keys
+        """
+        bucket_name = config['name']
+        user = config.get('user', 'admin')
+        password = config.get('password', '')
+
+        log_info(f"Creating Minio bucket: {bucket_name}")
+
+        # Find minio pod - it's a deployment so name is minio-xxxxx
+        pod_name = self._get_pod_name("app.kubernetes.io/name=minio")
+        if not pod_name:
+            log_warning("Could not find minio pod, skipping bucket creation")
+            return
+
+        # Use mc to create bucket - mc is included in bitnami minio image
+        # First configure mc alias, then create bucket
+        success, stdout, stderr = kubectl_exec(
+            pod=pod_name,
+            namespace=self.namespace,
+            command=[
+                "sh", "-c",
+                f"mc alias set local http://localhost:9000 {user} {password} && "
+                f"mc mb --ignore-existing local/{bucket_name}"
+            ],
+            verbose=self.verbose,
+        )
+
+        if success:
+            log_success(f"Minio bucket ready: {bucket_name}")
+        else:
+            log_warning(f"Failed to create bucket {bucket_name}: {stderr}")
+
+    def _install_deps(self, deps: list[Dependency]) -> None:
+        """Install a list of dependencies with parallel install."""
         if not deps:
             return
 

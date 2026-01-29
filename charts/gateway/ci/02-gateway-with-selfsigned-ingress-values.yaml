@@ -6,7 +6,8 @@ gateway:
     port: 8888
 
   env:
-    KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    KAFKA_BOOTSTRAP_SERVERS: kafka.ct-gateway-deps.svc.cluster.local:9092
+    GATEWAY_CLUSTER_ID: "gw-02"
 
 service:
   external:

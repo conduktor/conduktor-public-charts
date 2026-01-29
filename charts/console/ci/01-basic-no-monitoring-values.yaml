@@ -11,8 +11,8 @@ config:
     password: testP4ss!
 
   database:
-    name: platform
-    host: postgresql-hl
+    name: db_01
+    host: postgresql.ct-console-deps.svc.cluster.local
     port: 5432
     password: conduktor123
     username: postgres

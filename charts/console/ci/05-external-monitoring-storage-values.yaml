@@ -14,8 +14,8 @@ monitoringConfig:
   existingSecret: cdkt-test-05
   storage:
     s3:
-      endpoint: "minio:9000"
-      bucket: "conduktor"
+      endpoint: "minio.ct-console-deps.svc.cluster.local:9000"
+      bucket: "bucket-05"
       insecure: true
 
 platform:
@@ -63,8 +63,8 @@ extraDeploy:
         "helm.sh/hook-delete-policy": before-hook-creation
     type: Opaque
     stringData:
-      CDK_DATABASE_HOSTS_0_HOST: "postgresql-hl"
+      CDK_DATABASE_HOSTS_0_HOST: "postgresql-hl.ct-console-deps.svc.cluster.local"
       CDK_DATABASE_HOSTS_0_PORT: "5432"
-      CDK_DATABASE_NAME: "platform"
+      CDK_DATABASE_NAME: "db_05"
       CDK_DATABASE_USERNAME: "postgres"
       CDK_DATABASE_PASSWORD: "conduktor123"
