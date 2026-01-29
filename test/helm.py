@@ -202,13 +202,23 @@ def get_chart_name(chart_path: Path) -> Optional[str]:
 
     return chart_data.get("name")
 
-def get_released_version(chart: str) -> Optional[str]:
-    """Get latest released version of a chart."""
-    result = run_command(["helm", "search", "repo", f"conduktor/{chart}", "--versions", "-o", "json"])
+def get_released_version(chart_name: str, verbose: bool = False) -> Optional[str]:
+    """Get latest released version of a chart from conduktor helm repo."""
+    result = run_command(
+        ["helm", "search", "repo", f"conduktor/{chart_name}", "--versions", "-o", "json"],
+        verbose=verbose,
+    )
     if result.success:
         try:
             data = json.loads(result.stdout)
-            return data[0]["version"] if data else None
-        except (json.JSONDecodeError, KeyError, IndexError):
-            pass
+            if data:
+                version = data[0]["version"]
+                if verbose:
+                    log_info(f"Found released version: {chart_name} v{version}")
+                return version
+        except (json.JSONDecodeError, KeyError, IndexError) as e:
+            if verbose:
+                log_info(f"Failed to parse helm search result: {e}")
+    elif verbose:
+        log_info(f"Helm search failed: {result.stderr}")
     return None

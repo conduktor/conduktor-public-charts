@@ -98,7 +98,7 @@ def run_scenario(
             raise FileNotFoundError(f"CI values file not found: {ci_values}")
 
         if upgrade:
-            old_version = get_released_version(chart_name)
+            old_version = get_released_version(chart_name, verbose)
             old_values = get_old_values_content(chart, scenario, "main")
 
             if old_version and old_values:
