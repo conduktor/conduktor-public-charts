@@ -1,7 +1,7 @@
 apiVersion: v2
 name: console
 appVersion: 1.42.0
-version: 1.26.1
+version: 1.27.0
 description: Helm chart to deploy Conduktor Console on Kubernetes
 icon: https://www.conduktor.io/svgs/logo/symbol.svg
 home: https://www.conduktor.io
@@ -16,4 +16,4 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     tags:
       - bitnami-common
-    version: 2.30.2  # force version to avoid breaking changes due to remove support for older k8s versions in common chart v2.31.0 and above
+    version: 2.30.2 # force version to avoid breaking changes due to remove support for older k8s versions in common chart v2.31.0 and above
