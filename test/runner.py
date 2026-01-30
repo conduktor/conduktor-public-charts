@@ -60,6 +60,7 @@ def run_scenario(
     dep_manager: Optional[DependencyManager] = None,
     upgrade: bool = True,
     verbose: bool = False,
+    pause_on_failure: bool = False,
 ) -> ScenarioResult:
     """Run a single test scenario.
 
@@ -71,11 +72,13 @@ def run_scenario(
         dep_manager: Optional dependency manager for resource initialization
         upgrade: Whether to run upgrade test path
         verbose: Enable verbose output
+        pause_on_failure: Pause before cleanup on failure to allow debugging
     """
     start = time.time()
     release = f"{chart}-test"
     chart_path = str(CHARTS_DIR / chart)
     chart_name = get_chart_name(CHARTS_DIR / chart)
+    failed = False
 
     _print(f"\n{BOLD}{BLUE}>>> {chart}/{scenario}{RESET}")
     gh_group_start(f"{chart}/{scenario}")
@@ -141,11 +144,20 @@ def run_scenario(
         return ScenarioResult(chart=chart, scenario=scenario, success=True, duration=time.time() - start)
 
     except Exception as e:
+        failed = True
         log_error(f"FAILED: {chart}/{scenario} - {e}")
         print_debug_info(namespace)
         return ScenarioResult(chart=chart, scenario=scenario, success=False, duration=time.time() - start, error=str(e))
 
     finally:
+        # Pause before cleanup if test failed and flag is set
+        if failed and pause_on_failure:
+            _print(f"\n{BOLD}Test failed. Pausing for debugging.{RESET}")
+            _print(f"  Namespace: {namespace}")
+            _print(f"  kubectl get pods -n {namespace}")
+            _print(f"  kubectl logs -n {namespace} -l app.kubernetes.io/name={chart} -f")
+            input("\nPress Enter to continue with cleanup...")
+
         try:
             helm_uninstall(release, namespace, verbose)
         except Exception:
@@ -158,7 +170,7 @@ def run_scenario(
         gh_group_end()
 
 
-def run_chart(chart: str, scenarios: Optional[list[str]] = None, upgrade: bool = True, verbose: bool = False) -> list[ScenarioResult]:
+def run_chart(chart: str, scenarios: Optional[list[str]] = None, upgrade: bool = True, verbose: bool = False, pause_on_failure: bool = False) -> list[ScenarioResult]:
     """Run all scenarios for a chart.
 
     This function orchestrates shared dependencies across scenarios:
@@ -192,13 +204,14 @@ def run_chart(chart: str, scenarios: Optional[list[str]] = None, upgrade: bool =
         results = []
         for i, scenario in enumerate(scenario_list):
             namespace = f"ct-{chart}-{scenario.replace('_', '-')}"
-            scenario_id = f"{i+1:02d}"  # 01, 02, 03...
+            scenario_id = scenario.split("-")[0]  # e.g., "01" from "01-basic"
 
             result = run_scenario(
                 chart, scenario, scenario_id, namespace,
                 dep_manager=dep_manager,
                 upgrade=upgrade,
-                verbose=verbose
+                verbose=verbose,
+                pause_on_failure=pause_on_failure,
             )
             results.append(result)
 
@@ -337,8 +350,9 @@ def cli():
 @click.option("--changed", is_flag=True, help="Test changed charts only")
 @click.option("--all", "test_all", is_flag=True, help="Test all charts")
 @click.option("--skip-upgrade", is_flag=True, help="Skip upgrade tests")
+@click.option("--pause-on-failure", is_flag=True, help="Pause before cleanup on failure for debugging")
 @click.option("--verbose", "-v", is_flag=True)
-def run(chart: Optional[str], scenario: Optional[str], changed: bool, test_all: bool, skip_upgrade: bool, verbose: bool):
+def run(chart: Optional[str], scenario: Optional[str], changed: bool, test_all: bool, skip_upgrade: bool, pause_on_failure: bool, verbose: bool):
     """Run chart tests."""
     ctx = get_current_context()
     if not ctx or "k3d" not in ctx:
@@ -362,7 +376,7 @@ def run(chart: Optional[str], scenario: Optional[str], changed: bool, test_all: 
 
     all_results = []
     for c in charts:
-        results = run_chart(c, [scenario] if scenario else None, not skip_upgrade, verbose)
+        results = run_chart(c, [scenario] if scenario else None, not skip_upgrade, verbose, pause_on_failure)
         all_results.extend(results)
 
     print_summary([(r.chart, r.scenario, r.success, r.error) for r in all_results])
