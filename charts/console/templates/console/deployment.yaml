@@ -34,6 +34,9 @@ spec:
         {{- if not .Values.config.existingSecret }}
         checksum/credentials: {{ include (print $.Template.BasePath "/console/secret-credentials.yaml") . | sha256sum }}
         {{- end }}
+        {{- if and .Values.config.platform.https.selfSigned (not .Values.config.platform.https.existingSecret) }}
+        checksum/tls: {{ include (print $.Template.BasePath "/console/pod-tls-secret.yaml") . | sha256sum }}
+        {{- end }}
         {{- if and .Values.config.license (not .Values.config.existingLicenseSecret) }}
         checksum/license: {{ include (print $.Template.BasePath "/secret-license.yaml") . | sha256sum }}
         {{- end }}
