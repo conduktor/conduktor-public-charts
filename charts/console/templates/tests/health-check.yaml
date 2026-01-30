@@ -54,7 +54,7 @@ spec:
         - "-c"
         - |
           retries=0
-          max_retries=10
+          max_retries=30
           retry_interval=5
 
           while [ $retries -lt $max_retries ]; do
