@@ -39,7 +39,7 @@ spec:
         {{- end }}
         {{- if and $verifyCA (and .Values.config.platform.https.selfSigned (not .Values.config.platform.https.existingSecret)) }}
         checksum/tls: {{ include (print $.Template.BasePath "/console/pod-tls-secret.yaml") . | sha256sum }}
-        {{- end }
+        {{- end }}
       labels: {{- include "common.labels.standard" . | nindent 8 }}
         app.kubernetes.io/component: conduktor-platform-cortex
         {{- if .Values.platformCortex.podLabels }}
