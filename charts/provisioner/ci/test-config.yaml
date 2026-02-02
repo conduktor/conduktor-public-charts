@@ -1,4 +1,7 @@
-# Provisioner chart test dependencies
+# Helm install/upgrade/test timeout
+timeout: "900s"
+
+# Provisioner chart test configuration
 # Requires full stack: Kafka, PostgreSQL, Console, Gateway
 dependencies:
   - name: kafka
