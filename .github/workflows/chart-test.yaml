@@ -15,6 +15,10 @@ permissions:
   contents: read
   pull-requests: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != format('refs/heads/{0}', 'main') }}
+
 jobs:
   check-readme:
     runs-on: ubuntu-latest
