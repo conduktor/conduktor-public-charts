@@ -61,6 +61,7 @@ def run_scenario(
     upgrade: bool = True,
     verbose: bool = False,
     pause_on_failure: bool = False,
+    timeout: str = "600s",
 ) -> ScenarioResult:
     """Run a single test scenario.
 
@@ -73,6 +74,7 @@ def run_scenario(
         upgrade: Whether to run upgrade test path
         verbose: Enable verbose output
         pause_on_failure: Pause before cleanup on failure to allow debugging
+        timeout: Helm install/upgrade/test timeout (e.g., "600s", "10m")
     """
     start = time.time()
     release = f"{chart}-test"
@@ -112,33 +114,33 @@ def run_scenario(
                 try:
                     # Install old version
                     log_step("5", f"Install old version ({old_version})")
-                    helm_install(release, f"conduktor/{chart_name}", namespace, values_files=[old_values_path], version=old_version, verbose=verbose)
+                    helm_install(release, f"conduktor/{chart_name}", namespace, values_files=[old_values_path], version=old_version, timeout=timeout, verbose=verbose)
 
                     log_step("5a", "Test old version")
-                    helm_test(release, namespace, verbose=verbose)
+                    helm_test(release, namespace, timeout=timeout, verbose=verbose)
 
                     # Upgrade with old values
                     log_step("6", "Upgrade to current (old values)")
-                    helm_upgrade(release, chart_path, namespace, values_files=[old_values_path], verbose=verbose)
+                    helm_upgrade(release, chart_path, namespace, values_files=[old_values_path], timeout=timeout, verbose=verbose)
 
                     log_step("6a", "Test upgrade")
-                    helm_test(release, namespace, verbose=verbose)
+                    helm_test(release, namespace, timeout=timeout, verbose=verbose)
 
                     # Upgrade with current values
                     log_step("7", "Upgrade with current values")
-                    helm_upgrade(release, chart_path, namespace, values_files=[ci_values], verbose=verbose)
+                    helm_upgrade(release, chart_path, namespace, values_files=[ci_values], timeout=timeout, verbose=verbose)
                 finally:
                     old_values_path.unlink(missing_ok=True)
             else:
                 log_info("No old version found, fresh install")
                 log_step("5", "Install current version")
-                helm_install(release, chart_path, namespace, values_files=[ci_values], verbose=verbose)
+                helm_install(release, chart_path, namespace, values_files=[ci_values], timeout=timeout, verbose=verbose)
         else:
             log_step("5", "Install current version")
-            helm_install(release, chart_path, namespace, values_files=[ci_values], verbose=verbose)
+            helm_install(release, chart_path, namespace, values_files=[ci_values], timeout=timeout, verbose=verbose)
 
         log_step("8", "Run helm test")
-        helm_test(release, namespace, verbose=verbose)
+        helm_test(release, namespace, timeout=timeout, verbose=verbose)
 
         log_success(f"PASSED: {chart}/{scenario}")
         return ScenarioResult(chart=chart, scenario=scenario, success=True, duration=time.time() - start)
@@ -170,7 +172,7 @@ def run_scenario(
         gh_group_end()
 
 
-def run_chart(chart: str, scenarios: Optional[list[str]] = None, upgrade: bool = True, verbose: bool = False, pause_on_failure: bool = False) -> list[ScenarioResult]:
+def run_chart(chart: str, scenarios: Optional[list[str]] = None, upgrade: bool = True, verbose: bool = False, pause_on_failure: bool = False, timeout: Optional[str] = None) -> list[ScenarioResult]:
     """Run all scenarios for a chart.
 
     This function orchestrates shared dependencies across scenarios:
@@ -189,6 +191,9 @@ def run_chart(chart: str, scenarios: Optional[list[str]] = None, upgrade: bool =
     # Load chart config for dependencies
     config = load_chart_config(chart)
     deps_namespace = f"ct-{chart}-deps"
+
+    # Use config timeout if not explicitly provided
+    effective_timeout = timeout or config.timeout
 
     # Setup shared dependencies
     dep_manager = None
@@ -212,6 +217,7 @@ def run_chart(chart: str, scenarios: Optional[list[str]] = None, upgrade: bool =
                 upgrade=upgrade,
                 verbose=verbose,
                 pause_on_failure=pause_on_failure,
+                timeout=effective_timeout,
             )
             results.append(result)
 
@@ -231,13 +237,14 @@ def run_chart(chart: str, scenarios: Optional[list[str]] = None, upgrade: bool =
                 pass
 
 
-def install_scenario(chart: str, scenario: str, verbose: bool = False) -> None:
+def install_scenario(chart: str, scenario: str, verbose: bool = False, timeout: Optional[str] = None) -> None:
     """Install a scenario for local development/debugging.
 
     This installs dependencies and the chart but does NOT cleanup afterward.
     Use uninstall_scenario to cleanup when done.
     """
     config = load_chart_config(chart)
+    effective_timeout = timeout or config.timeout
     scenarios = get_scenarios(chart)
 
     # Find scenario index for isolation ID
@@ -280,7 +287,7 @@ def install_scenario(chart: str, scenario: str, verbose: bool = False) -> None:
         raise FileNotFoundError(f"CI values file not found: {ci_values}")
 
     log_step("4", "Install chart")
-    helm_install(release, chart_path, namespace, values_files=[ci_values], verbose=verbose)
+    helm_install(release, chart_path, namespace, values_files=[ci_values], timeout=effective_timeout, verbose=verbose)
 
     log_success(f"Installed {chart}/{scenario}")
     _print(f"\n{BOLD}Namespaces:{RESET}")
@@ -351,8 +358,9 @@ def cli():
 @click.option("--all", "test_all", is_flag=True, help="Test all charts")
 @click.option("--skip-upgrade", is_flag=True, help="Skip upgrade tests")
 @click.option("--pause-on-failure", is_flag=True, help="Pause before cleanup on failure for debugging")
+@click.option("--timeout", "-t", help="Helm install/upgrade/test timeout (default: 600s)")
 @click.option("--verbose", "-v", is_flag=True)
-def run(chart: Optional[str], scenario: Optional[str], changed: bool, test_all: bool, skip_upgrade: bool, pause_on_failure: bool, verbose: bool):
+def run(chart: Optional[str], scenario: Optional[str], changed: bool, test_all: bool, skip_upgrade: bool, pause_on_failure: bool, timeout: Optional[str], verbose: bool):
     """Run chart tests."""
     ctx = get_current_context()
     if not ctx or "k3d" not in ctx:
@@ -376,7 +384,7 @@ def run(chart: Optional[str], scenario: Optional[str], changed: bool, test_all: 
 
     all_results = []
     for c in charts:
-        results = run_chart(c, [scenario] if scenario else None, not skip_upgrade, verbose, pause_on_failure)
+        results = run_chart(c, [scenario] if scenario else None, not skip_upgrade, verbose, pause_on_failure, timeout)
         all_results.extend(results)
 
     print_summary([(r.chart, r.scenario, r.success, r.error) for r in all_results])
@@ -386,8 +394,9 @@ def run(chart: Optional[str], scenario: Optional[str], changed: bool, test_all: 
 @cli.command()
 @click.option("--chart", "-c", required=True, help="Chart to install")
 @click.option("--scenario", "-s", required=True, help="Scenario to install")
+@click.option("--timeout", "-t", default="600s", help="Helm install timeout (default: 600s)")
 @click.option("--verbose", "-v", is_flag=True)
-def install(chart: str, scenario: str, verbose: bool):
+def install(chart: str, scenario: str, timeout: str, verbose: bool):
     """Install a scenario for local dev/debug (no cleanup)."""
     ctx = get_current_context()
     if not ctx or "k3d" not in ctx:
@@ -397,7 +406,7 @@ def install(chart: str, scenario: str, verbose: bool):
     setup_helm_repos(verbose)
 
     try:
-        install_scenario(chart, scenario, verbose)
+        install_scenario(chart, scenario, verbose, timeout)
     except Exception as e:
         log_error(f"Install failed: {e}")
         sys.exit(1)

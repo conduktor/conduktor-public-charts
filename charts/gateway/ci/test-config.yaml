@@ -1,4 +1,7 @@
-# Gateway chart test dependencies
+# Helm install/upgrade/test timeout
+timeout: "600s"
+
+# Gateway chart test dependency configuration
 dependencies:
   - name: kafka
     chart: bitnami/kafka

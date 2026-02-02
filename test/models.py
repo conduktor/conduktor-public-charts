@@ -26,6 +26,7 @@ class Dependency(BaseModel):
 class ChartTestConfig(BaseModel):
     """Test configuration for a chart."""
     dependencies: list[Dependency] = Field(default_factory=list)
+    timeout: str = "600s"  # Default timeout for helm install/upgrade/test
 
     def get_all_dependencies(self) -> list[Dependency]:
         """Get all dependencies."""

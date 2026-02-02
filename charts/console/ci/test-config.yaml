@@ -1,4 +1,7 @@
-# Console chart test dependencies
+# Helm install/upgrade/test timeout
+timeout: "600s"
+
+# Console chart test dependencies configuration
 dependencies:
   - name: postgresql
     chart: bitnami/postgresql
