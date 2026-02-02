@@ -45,7 +45,6 @@ extraDeploy:
     kind: Secret
     metadata:
       name: cdkt-test-05
-      namespace: ct
       annotations:
         "helm.sh/hook": pre-install
         "helm.sh/hook-weight": "-99"
@@ -58,7 +57,6 @@ extraDeploy:
     kind: Secret
     metadata:
       name: cdkt-test-05-console-config
-      namespace: ct
       annotations:
         "helm.sh/hook": pre-install
         "helm.sh/hook-weight": "-99"
