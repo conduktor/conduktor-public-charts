@@ -24,7 +24,7 @@ from test.dependencies import DependencyManager, setup_helm_repos
 from test.helm import get_chart_name, get_released_version, helm_dependency_build, helm_install, helm_test, helm_uninstall, helm_upgrade
 from test.kubernetes import create_namespace, delete_namespace, delete_namespace_async, get_current_context, print_debug_info
 from test.models import ScenarioResult
-from test.utils import BOLD, RESET, BLUE, CHARTS_DIR, ROOT_DIR, _print, get_charts, gh_group_end, gh_group_start, log_error, log_info, log_step, log_success, log_warning, print_summary
+from test.utils import BOLD, RESET, BLUE, GREEN, RED, CHARTS_DIR, ROOT_DIR, _print, get_charts, gh_group_end, gh_group_start, log_error, log_info, log_step, log_success, log_warning, print_summary, timed_step
 
 
 def detect_changed_charts() -> list[str]:
@@ -87,16 +87,16 @@ def run_scenario(
 
     try:
         # Setup
-        log_step("1", "Create namespace")
-        create_namespace(namespace, verbose)
+        with timed_step("1", "Create namespace"):
+            create_namespace(namespace, verbose)
 
         # Initialize isolation resources (database, bucket) for this scenario
         if dep_manager:
-            log_step("2", "Initialize isolation resources")
-            dep_manager.init_scenario_resources(scenario_id)
+            with timed_step("2", "Initialize isolation resources"):
+                dep_manager.init_scenario_resources(scenario_id)
 
-        log_step("3", "Build chart dependencies")
-        helm_dependency_build(chart, verbose)
+        with timed_step("3", "Build chart dependencies"):
+            helm_dependency_build(chart, verbose)
 
         ci_values = get_ci_values_file(chart, scenario)
         if not ci_values.exists():
@@ -113,43 +113,45 @@ def run_scenario(
 
                 try:
                     # Install old version
-                    log_step("5", f"Install old version ({old_version})")
-                    helm_install(release, f"conduktor/{chart_name}", namespace, values_files=[old_values_path], version=old_version, timeout=timeout, verbose=verbose)
+                    with timed_step("4", f"Install old version ({old_version})"):
+                        helm_install(release, f"conduktor/{chart_name}", namespace, values_files=[old_values_path], version=old_version, timeout=timeout, verbose=verbose)
 
-                    log_step("5a", "Test old version")
-                    helm_test(release, namespace, timeout=timeout, verbose=verbose)
+                    with timed_step("4a", "Test old version"):
+                        helm_test(release, namespace, timeout=timeout, verbose=verbose)
 
                     # Upgrade with old values
-                    log_step("6", "Upgrade to current (old values)")
-                    helm_upgrade(release, chart_path, namespace, values_files=[old_values_path], timeout=timeout, verbose=verbose)
+                    with timed_step("5", "Upgrade to current (old values)"):
+                        helm_upgrade(release, chart_path, namespace, values_files=[old_values_path], timeout=timeout, verbose=verbose)
 
-                    log_step("6a", "Test upgrade")
-                    helm_test(release, namespace, timeout=timeout, verbose=verbose)
+                    with timed_step("5a", "Test upgrade"):
+                        helm_test(release, namespace, timeout=timeout, verbose=verbose)
 
                     # Upgrade with current values
-                    log_step("7", "Upgrade with current values")
-                    helm_upgrade(release, chart_path, namespace, values_files=[ci_values], timeout=timeout, verbose=verbose)
+                    with timed_step("6", "Upgrade with current values"):
+                        helm_upgrade(release, chart_path, namespace, values_files=[ci_values], timeout=timeout, verbose=verbose)
                 finally:
                     old_values_path.unlink(missing_ok=True)
             else:
                 log_info("No old version found, fresh install")
-                log_step("5", "Install current version")
-                helm_install(release, chart_path, namespace, values_files=[ci_values], timeout=timeout, verbose=verbose)
+                with timed_step("4", "Install current version"):
+                    helm_install(release, chart_path, namespace, values_files=[ci_values], timeout=timeout, verbose=verbose)
         else:
-            log_step("5", "Install current version")
-            helm_install(release, chart_path, namespace, values_files=[ci_values], timeout=timeout, verbose=verbose)
+            with timed_step("4", "Install current version"):
+                helm_install(release, chart_path, namespace, values_files=[ci_values], timeout=timeout, verbose=verbose)
 
-        log_step("8", "Run helm test")
-        helm_test(release, namespace, timeout=timeout, verbose=verbose)
+        with timed_step("7", "Run helm test"):
+            helm_test(release, namespace, timeout=timeout, verbose=verbose)
 
-        log_success(f"PASSED: {chart}/{scenario}")
-        return ScenarioResult(chart=chart, scenario=scenario, success=True, duration=time.time() - start)
+        duration = time.time() - start
+        log_success(f"PASSED: {chart}/{scenario} ({duration:.1f}s)")
+        return ScenarioResult(chart=chart, scenario=scenario, success=True, duration=duration)
 
     except Exception as e:
         failed = True
-        log_error(f"FAILED: {chart}/{scenario} - {e}")
+        duration = time.time() - start
+        log_error(f"FAILED: {chart}/{scenario} ({duration:.1f}s) - {e}")
         print_debug_info(namespace)
-        return ScenarioResult(chart=chart, scenario=scenario, success=False, duration=time.time() - start, error=str(e))
+        return ScenarioResult(chart=chart, scenario=scenario, success=False, duration=duration, error=str(e))
 
     finally:
         # Pause before cleanup if test failed and flag is set
@@ -181,6 +183,7 @@ def run_chart(chart: str, scenarios: Optional[list[str]] = None, upgrade: bool =
     3. Runs each scenario (isolation via convention-based resource naming)
     4. Tears down dependencies after all scenarios
     """
+    chart_start = time.time()
     _print(f"\n{BOLD}{BLUE}========== TESTING: {chart.upper()} =========={RESET}")
 
     scenario_list = scenarios or get_scenarios(chart)
@@ -220,6 +223,13 @@ def run_chart(chart: str, scenarios: Optional[list[str]] = None, upgrade: bool =
                 timeout=effective_timeout,
             )
             results.append(result)
+
+        # Print chart summary
+        chart_duration = time.time() - chart_start
+        passed = sum(1 for r in results if r.success)
+        failed = len(results) - passed
+        status = f"{GREEN}ALL PASSED{RESET}" if failed == 0 else f"{RED}{failed} FAILED{RESET}"
+        _print(f"\n{BOLD}=== {chart.upper()}: {passed}/{len(results)} scenarios passed ({chart_duration:.1f}s) - {status} ==={RESET}")
 
         return results
 
@@ -272,22 +282,22 @@ def install_scenario(chart: str, scenario: str, verbose: bool = False, timeout: 
         dep_manager.setup_all()
 
         # Initialize isolation resources
-        log_step("1", "Initialize isolation resources")
-        dep_manager.init_scenario_resources(scenario_id)
+        with timed_step("1", "Initialize isolation resources"):
+            dep_manager.init_scenario_resources(scenario_id)
 
     # Create namespace and install chart
-    log_step("2", "Create namespace")
-    create_namespace(namespace, verbose)
+    with timed_step("2", "Create namespace"):
+        create_namespace(namespace, verbose)
 
-    log_step("3", "Build chart dependencies")
-    helm_dependency_build(chart, verbose)
+    with timed_step("3", "Build chart dependencies"):
+        helm_dependency_build(chart, verbose)
 
     ci_values = get_ci_values_file(chart, scenario)
     if not ci_values.exists():
         raise FileNotFoundError(f"CI values file not found: {ci_values}")
 
-    log_step("4", "Install chart")
-    helm_install(release, chart_path, namespace, values_files=[ci_values], timeout=effective_timeout, verbose=verbose)
+    with timed_step("4", "Install chart"):
+        helm_install(release, chart_path, namespace, values_files=[ci_values], timeout=effective_timeout, verbose=verbose)
 
     log_success(f"Installed {chart}/{scenario}")
     _print(f"\n{BOLD}Namespaces:{RESET}")
