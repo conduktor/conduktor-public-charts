@@ -153,17 +153,42 @@ $ make generate-readme
 ```
 
 ### Run chart tests
-You need to have [chart-testing](https://github.com/helm/chart-testing) installed and a running kubernetes cluster.
+
+Requires a running Kubernetes cluster (k3d recommended) and Python 3.10+.
 
 ```shell
-# Update helm dependencies
-make helm-deps
-# Create local K3D cluster for test and local dev (require k3d, helm and kubectl)
+# Install test dependencies
+pip install -r test/requirements.txt
+
+# Create local K3D cluster
 make k3d-up
-# Run Chart-testing tests on chart that contain changes (require chart-testing and helm)
-make test-chart
-# Delete K3D cluster
-make k3d-down
+
+# Run tests for a specific chart
+make test-run CHART=console
+
+# Run a specific scenario
+make test-run CHART=console SCENARIO=01-basic
+
+# Run tests for all changed charts (vs main branch)
+make test-changed
+
+# Run all chart tests
+make test-charts
+```
+
+**Available options:**
+- `SKIP_UPGRADE=1` - Skip upgrade path testing (fresh install only)
+- `PAUSE_ON_FAILURE=1` - Pause before cleanup on failure for debugging
+- `TIMEOUT=900s` - Override helm timeout (default from `test-config.yaml`)
+- `VERBOSE=1` - Enable verbose output
+
+**Local development/debugging:**
+```shell
+# Install a scenario without cleanup (for debugging)
+make test-install CHART=console SCENARIO=01-basic
+
+# Cleanup when done
+make test-uninstall CHART=console SCENARIO=01-basic
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
