@@ -101,6 +101,35 @@ def log_step(step: str, msg: str) -> None:
     _print(f"{CYAN}STEP {step}{RESET} {msg}")
 
 
+class timed_step:
+    """Context manager that logs step execution time.
+
+    Usage:
+        with timed_step("1", "Create namespace"):
+            create_namespace(namespace)
+    """
+
+    def __init__(self, step: str, msg: str):
+        self.step = step
+        self.msg = msg
+        self.start = 0.0
+
+    def __enter__(self):
+        import time
+        self.start = time.time()
+        _print(f"{CYAN}STEP {self.step}{RESET} {self.msg}")
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        import time
+        duration = time.time() - self.start
+        if exc_type is None:
+            _print(f"{DIM}  └─ done in {duration:.1f}s{RESET}")
+        else:
+            _print(f"{DIM}  └─ failed after {duration:.1f}s{RESET}")
+        return False  # Don't suppress exceptions
+
+
 # GitHub Actions grouping
 def gh_group_start(title: str) -> None:
     """Start a collapsible group in GitHub Actions."""
