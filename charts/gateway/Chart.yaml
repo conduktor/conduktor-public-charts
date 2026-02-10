@@ -2,10 +2,10 @@ apiVersion: v2
 appVersion: "3.17.1"
 description: Conduktor Gateway chart
 name: conduktor-gateway
-version: 3.17.0
+version: 3.17.1
 dependencies:
   - name: common
-    version: 2.30.2  # force version to avoid breaking changes due to remove support for older k8s versions in common chart v2.31.0 and above
+    version: 2.30.2 # force version to avoid breaking changes due to remove support for older k8s versions in common chart v2.31.0 and above
     repository: https://charts.bitnami.com/bitnami
     tags:
       - bitnami-common
