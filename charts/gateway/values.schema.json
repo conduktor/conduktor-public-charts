@@ -79,7 +79,7 @@
                         "tag": {
                             "type": "string",
                             "description": "Image tag",
-                            "default": "3.17.0"
+                            "default": "3.17.1"
                         },
                         "pullPolicy": {
                             "type": "string",
