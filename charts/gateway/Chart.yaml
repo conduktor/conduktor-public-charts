@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: "3.17.0"
+appVersion: "3.17.1"
 description: Conduktor Gateway chart
 name: conduktor-gateway
 version: 3.17.0
