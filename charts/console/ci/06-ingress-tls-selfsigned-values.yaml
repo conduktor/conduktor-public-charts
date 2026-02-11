@@ -47,7 +47,4 @@ extraDeploy:
         "helm.sh/hook-delete-policy": before-hook-creation
     type: Opaque
     stringData:
-      CDK_DATABASE_URL: "postgresql://postgres:conduktor123@postgresql-hl:5432/platform"
-
-tests:
-  enabled: true
+      CDK_DATABASE_URL: "postgresql://postgres:conduktor123@postgresql-hl.ct-console-deps.svc.cluster.local:5432/db_06"
