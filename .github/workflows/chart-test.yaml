@@ -125,7 +125,7 @@ jobs:
           sed -i 's/upgrade: true/upgrade: false/' .github/ct-config.yaml
 
       - name: Run chart-testing (install)
-        run: ct install --config .github/ct-config.yaml
+        run: ct install --config .github/ct-config.yaml --helm-extra-set-args "--set=gateway.licenseKey=${{ secrets.LICENSE_V3_CONDUKTOR_DEV }}"
         if: steps.list-changed.outputs.changed == 'true'
 
       - name: Delete k3d cluster
