@@ -1,0 +1,10 @@
+# Helm install/upgrade/test timeout
+timeout: "600s"
+
+# Gateway chart test dependency configuration
+dependencies:
+  - name: kafka
+    chart: bitnami/kafka
+    version: "31.0.0"
+    wait: statefulset/kafka-controller
+    timeout: 600s

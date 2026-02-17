@@ -331,8 +331,38 @@ create-test-ns: ## Create test namespace
 	make check-kube-context
 	kubectl create namespace ${TEST_NAMESPACE} || true
 
-.PHONY: test-chart
-test-chart: ## Run chart-testing
-	make check-kube-context
-	make create-test-ns
-	ct install --config $(CURDIR)/.github/ct-config.yaml
+
+# New Python-based test runner
+###############################
+
+.PHONY: test-deps
+test-deps: ## Install Python test dependencies
+	pip install -r test/requirements.txt
+
+.PHONY: test-run
+test-run: check-kube-context ## Run tests for a chart (usage: make test-run CHART=console [SCENARIO=01-basic] [SKIP_UPGRADE=1] [PAUSE_ON_FAILURE=1] [TIMEOUT=600s] [VERBOSE=1])
+	python -m test.runner run --chart $(CHART) $(if $(SCENARIO),--scenario $(SCENARIO)) $(if $(SKIP_UPGRADE),--skip-upgrade) $(if $(PAUSE_ON_FAILURE),--pause-on-failure) $(if $(TIMEOUT),--timeout $(TIMEOUT)) $(if $(VERBOSE),--verbose)
+
+.PHONY: test-install
+test-install: check-kube-context ## Install a scenario for local dev/debug (usage: make test-install CHART=console SCENARIO=01-basic [TIMEOUT=600s] [VERBOSE=1])
+	python -m test.runner install --chart $(CHART) --scenario $(SCENARIO) $(if $(TIMEOUT),--timeout $(TIMEOUT)) $(if $(VERBOSE),--verbose)
+
+.PHONY: test-uninstall
+test-uninstall: check-kube-context ## Uninstall a scenario and its dependencies (usage: make test-uninstall CHART=console SCENARIO=01-basic [VERBOSE=1])
+	python -m test.runner uninstall --chart $(CHART) --scenario $(SCENARIO) $(if $(VERBOSE),--verbose)
+
+.PHONY: test-changed
+test-changed: check-kube-context ## Run tests for changed charts only (usage: make test-changed [SKIP_UPGRADE=1] [PAUSE_ON_FAILURE=1] [TIMEOUT=600s] [VERBOSE=1])
+	python -m test.runner run --changed $(if $(SKIP_UPGRADE),--skip-upgrade) $(if $(PAUSE_ON_FAILURE),--pause-on-failure) $(if $(TIMEOUT),--timeout $(TIMEOUT)) $(if $(VERBOSE),--verbose)
+
+.PHONY: test-charts
+test-charts: check-kube-context ## Run all chart tests (usage: make test-charts [SKIP_UPGRADE=1] [PAUSE_ON_FAILURE=1] [TIMEOUT=600s] [VERBOSE=1])
+	python -m test.runner run --all $(if $(SKIP_UPGRADE),--skip-upgrade) $(if $(PAUSE_ON_FAILURE),--pause-on-failure) $(if $(TIMEOUT),--timeout $(TIMEOUT)) $(if $(VERBOSE),--verbose)
+
+.PHONY: lint-manifests
+lint-manifests: ## Validate helm template output with kubeconform
+	python -m test.runner lint-manifests
+
+.PHONY: detect-changed
+detect-changed: ## List charts that have changed vs main branch
+	python -m test.runner detect-changed

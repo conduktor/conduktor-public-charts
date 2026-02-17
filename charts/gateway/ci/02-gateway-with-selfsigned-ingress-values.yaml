@@ -6,7 +6,8 @@ gateway:
     port: 8888
 
   env:
-    KAFKA_BOOTSTRAP_SERVERS: kafka.default.svc.cluster.local:9092
+    KAFKA_BOOTSTRAP_SERVERS: kafka.ct-gateway-deps.svc.cluster.local:9092
+    GATEWAY_CLUSTER_ID: "gw-02"
 
 service:
   external:
@@ -26,6 +27,3 @@ ingress:
   hostname: gateway.private
   tls: true
   selfSigned: true
-
-tests:
-  enabled: true

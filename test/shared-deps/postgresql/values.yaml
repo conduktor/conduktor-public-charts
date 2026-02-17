@@ -1,0 +1,24 @@
+# PostgreSQL test configuration
+fullnameOverride: postgresql
+
+image:
+  repository: bitnamilegacy/postgresql
+  tag: "15.3.0-debian-11-r7"
+
+auth:
+  postgresPassword: conduktor123
+  database: platform
+
+primary:
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  persistence:
+    enabled: false
+
+readReplicas:
+  replicaCount: 0

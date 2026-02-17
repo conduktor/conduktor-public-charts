@@ -1,0 +1,22 @@
+# Helm install/upgrade/test timeout
+timeout: "600s"
+
+# Console chart test dependencies configuration
+dependencies:
+  - name: postgresql
+    chart: bitnami/postgresql
+    version: "12.5.8"
+    wait: statefulset/postgresql
+    init:
+      database: "db_{scenario_id}"
+      user: postgres
+      password: conduktor123
+
+  - name: minio
+    chart: bitnami/minio
+    version: "12.8.0"
+    wait: deployment/minio
+    init:
+      bucket: "bucket-{scenario_id}"
+      user: admin
+      password: conduktor123

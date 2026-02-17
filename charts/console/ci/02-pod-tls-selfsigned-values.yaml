@@ -11,9 +11,9 @@ config:
     password: testP4ss!
 
   database:
-    name: platform
+    name: db_02
     hosts:
-      - host: postgresql-hl
+      - host: postgresql-hl.ct-console-deps.svc.cluster.local
         port: 5432
     password: conduktor123
     username: postgres
@@ -44,6 +44,3 @@ platformCortex:
     requests:
       cpu: 200m
       memory: 200Mi
-
-tests:
-  enabled: true
