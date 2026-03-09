@@ -22,8 +22,8 @@ import click
 from test.config import get_ci_values_file, get_old_values_content, get_scenarios, load_chart_config
 from test.dependencies import DependencyManager, setup_helm_repos
 from test.helm import get_chart_name, get_released_version, helm_dependency_build, helm_install, helm_test, helm_uninstall, helm_upgrade
-from test.kubernetes import create_namespace, delete_namespace, delete_namespace_async, get_current_context, print_debug_info
-from test.models import ScenarioResult
+from test.kubernetes import create_namespace, create_secret, delete_namespace, delete_namespace_async, get_current_context, print_debug_info
+from test.models import K8sSecretConfig, ScenarioResult
 from test.utils import BOLD, RESET, BLUE, GREEN, RED, CHARTS_DIR, ROOT_DIR, _print, get_charts, gh_group_end, gh_group_start, log_error, log_info, log_step, log_success, log_warning, print_summary, timed_step
 
 
@@ -62,6 +62,7 @@ def run_scenario(
     verbose: bool = False,
     pause_on_failure: bool = False,
     timeout: str = "600s",
+    k8s_secrets: Optional[list[K8sSecretConfig]] = None,
 ) -> ScenarioResult:
     """Run a single test scenario.
 
@@ -89,6 +90,11 @@ def run_scenario(
         # Setup
         with timed_step("1", "Create namespace"):
             create_namespace(namespace, verbose)
+
+        if k8s_secrets:
+            with timed_step("1a", "Create K8s secrets"):
+                for secret in k8s_secrets:
+                    create_secret(namespace, secret.name, secret.data)
 
         # Initialize isolation resources (database, bucket) for this scenario
         if dep_manager:
@@ -197,6 +203,7 @@ def run_chart(chart: str, scenarios: Optional[list[str]] = None, upgrade: bool =
 
     # Use config timeout if not explicitly provided
     effective_timeout = timeout or config.timeout
+    effective_k8s_secrets = config.k8s_secrets or None
 
     # Setup shared dependencies
     dep_manager = None
@@ -221,6 +228,7 @@ def run_chart(chart: str, scenarios: Optional[list[str]] = None, upgrade: bool =
                 verbose=verbose,
                 pause_on_failure=pause_on_failure,
                 timeout=effective_timeout,
+                k8s_secrets=effective_k8s_secrets,
             )
             results.append(result)
 
@@ -288,6 +296,11 @@ def install_scenario(chart: str, scenario: str, verbose: bool = False, timeout: 
     # Create namespace and install chart
     with timed_step("2", "Create namespace"):
         create_namespace(namespace, verbose)
+
+    if config.k8s_secrets:
+        with timed_step("2a", "Create K8s secrets"):
+            for secret in config.k8s_secrets:
+                create_secret(namespace, secret.name, secret.data)
 
     with timed_step("3", "Build chart dependencies"):
         helm_dependency_build(chart, verbose)

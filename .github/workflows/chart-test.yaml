@@ -187,6 +187,8 @@ jobs:
         run: make k3d-ci-up
 
       - name: Run chart tests
+        env:
+          CDK_LICENSE: ${{ secrets.CDK_LICENSE }}
         run: |
           python -m test.runner run \
             --chart ${{ matrix.chart }} \

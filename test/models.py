@@ -23,10 +23,17 @@ class Dependency(BaseModel):
     init: Optional[DependencyInitConfig] = None  # Resource init config (database/bucket)
 
 
+class K8sSecretConfig(BaseModel):
+    """A Kubernetes Secret to create before helm install."""
+    name: str
+    data: dict[str, str]  # key → value (values support ${VAR} and ${VAR:-default} expansion)
+
+
 class ChartTestConfig(BaseModel):
     """Test configuration for a chart."""
     dependencies: list[Dependency] = Field(default_factory=list)
     timeout: str = "600s"  # Default timeout for helm install/upgrade/test
+    k8s_secrets: list[K8sSecretConfig] = Field(default_factory=list)  # Secrets created before helm install
 
     def get_all_dependencies(self) -> list[Dependency]:
         """Get all dependencies."""

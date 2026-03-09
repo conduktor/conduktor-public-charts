@@ -1,11 +1,38 @@
 """Configuration loading for test dependencies."""
 
+import os
+import re
 from pathlib import Path
 from typing import Optional
 import yaml
 
 from test.models import ChartTestConfig
 from test.utils import CHARTS_DIR, SHARED_DEPS_DIR
+
+
+def _make_replacer(config_file: Path):
+    """Return a regex replace function that expands ${VAR} and ${VAR:-default}."""
+    def replace(m: re.Match) -> str:
+        expr = m.group(1)
+        if ":-" in expr:
+            var_name, default = expr.split(":-", 1)
+            return os.environ.get(var_name, default)
+        else:
+            var_name = expr
+            if var_name not in os.environ:
+                raise ValueError(
+                    f"Environment variable '{var_name}' referenced in {config_file} is not set and has no default"
+                )
+            return os.environ[var_name]
+    return replace
+
+
+def _expand_str(value: str, config_file: Path) -> str:
+    return re.sub(r"\$\{([^}]+)\}", _make_replacer(config_file), value)
+
+
+def _expand_dict_values(data: dict[str, str], config_file: Path) -> dict[str, str]:
+    return {k: _expand_str(v, config_file) for k, v in data.items()}
 
 
 def load_chart_config(chart: str) -> ChartTestConfig:
@@ -18,7 +45,13 @@ def load_chart_config(chart: str) -> ChartTestConfig:
     with open(config_file) as f:
         data = yaml.safe_load(f) or {}
 
-    return ChartTestConfig(**data)
+    config = ChartTestConfig(**data)
+
+    # Expand env vars in k8s_secrets data values at load time
+    for secret in config.k8s_secrets:
+        secret.data = _expand_dict_values(secret.data, config_file)
+
+    return config
 
 
 def get_shared_values_file(dep_name: str) -> Optional[Path]:

@@ -1,7 +1,10 @@
 """Kubernetes operations wrapper."""
 
 import json
+import subprocess
 from typing import Optional
+
+import yaml
 
 from test.utils import KubernetesError, log_info, run_command
 
@@ -60,6 +63,33 @@ def create_configmap(name: str, namespace: str, data: dict[str, str], verbose: b
     )
     if proc.returncode != 0:
         raise KubernetesError(f"Failed to apply ConfigMap: {proc.stderr}")
+
+
+def create_secret(namespace: str, name: str, data: dict[str, str]) -> None:
+    """Create a Kubernetes Secret from the given data.
+
+    Values are passed via stdin as YAML to avoid exposing them in process args or logs.
+    Only the secret name is logged, never its contents.
+    """
+    log_info(f"Creating secret: {name}")
+
+    secret_manifest = yaml.dump({
+        "apiVersion": "v1",
+        "kind": "Secret",
+        "metadata": {"name": name, "namespace": namespace},
+        "type": "Opaque",
+        "stringData": data,
+    })
+
+    # Apply via stdin only — do NOT use run_command (it logs the command args)
+    proc = subprocess.run(
+        ["kubectl", "apply", "-f", "-"],
+        input=secret_manifest,
+        capture_output=True,
+        text=True,
+    )
+    if proc.returncode != 0:
+        raise KubernetesError(f"Failed to create secret '{name}': {proc.stderr}")
 
 
 def delete_namespace_async(namespace: str, verbose: bool = False) -> None:

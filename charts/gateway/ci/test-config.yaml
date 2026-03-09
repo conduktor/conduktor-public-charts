@@ -1,6 +1,12 @@
 # Helm install/upgrade/test timeout
 timeout: "600s"
 
+# K8s secrets created before helm install (env vars expanded at runtime, values never logged)
+k8s_secrets:
+  - name: gateway-license
+    data:
+      GATEWAY_LICENSE_KEY: "${CDK_LICENSE}"
+
 # Gateway chart test dependency configuration
 dependencies:
   - name: kafka
