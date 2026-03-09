@@ -495,12 +495,3 @@ serviceAccount:
   ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
   ##
   automountServiceAccountToken: true
-
-
-## @skip tests
-tests:
-  enabled: false
-  console:
-    enabled: false
-  gateway:
-    enabled: false

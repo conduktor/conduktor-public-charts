@@ -1086,17 +1086,3 @@ platformCortex:
     ## extraSpecs:
     ##   loadBalancerIP: "10.10.10.10"
     extraSpecs: {}
-## @skip tests
-tests:
-  enabled: false
-  minio: false
-  # secrets:
-  #    - name: cdkt-test-04
-  #      type: Opaque
-  #      stringData:
-  #        CDK_ORGANIZATION_NAME: conduktor
-  #        CDK_ADMIN_EMAIL: admin@conduktor.io
-  #        CDK_ADMIN_PASSWORD: Admin123!
-  #        CDK_DATABASE_PASSWORD: conduktor123
-  #        CDK_DATABASE_USERNAME: postgres
-  secrets: []

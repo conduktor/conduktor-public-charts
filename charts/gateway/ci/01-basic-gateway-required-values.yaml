@@ -3,7 +3,14 @@ nameOverride: gateway-test-01
 gateway:
   replicas: 1
   env:
-    KAFKA_BOOTSTRAP_SERVERS: kafka.default.svc.cluster.local:9092
+    KAFKA_BOOTSTRAP_SERVERS: kafka.ct-gateway-deps.svc.cluster.local:9092
+    GATEWAY_CLUSTER_ID: "gw-01"
+  extraSecretEnvVars:
+    - name: GATEWAY_LICENSE_KEY
+      valueFrom:
+        secretKeyRef:
+          name: gateway-license
+          key: GATEWAY_LICENSE_KEY
 
   securityContext:
     capabilities:
@@ -23,6 +30,3 @@ gateway:
 
 podSecurityContext:
   runAsNonRoot: true
-
-tests:
-  enabled: true

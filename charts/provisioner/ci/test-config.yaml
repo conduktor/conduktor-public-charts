@@ -1,0 +1,76 @@
+# Helm install/upgrade/test timeout
+timeout: "900s"
+
+# Provisioner chart test configuration
+# Requires full stack: Kafka, PostgreSQL, Console, Gateway
+dependencies:
+  - name: kafka
+    chart: bitnami/kafka
+    version: "31.0.0"
+    wait: statefulset/kafka-controller
+    timeout: 600s
+    values:
+      listeners:
+        client:
+          protocol: SASL_PLAINTEXT
+          containerPort: 9092
+      sasl:
+        client:
+          users:
+            - kafka-admin
+          passwords: kafka-admin-password # checkov:skip=CKV_SECRET_6: test credentials
+
+  - name: postgresql
+    chart: bitnami/postgresql
+    version: "12.5.8"
+    wait: statefulset/postgresql
+
+  - name: console
+    chart: conduktor/console
+    wait: deployment/console
+    timeout: 600s
+    values:
+      config:
+        organization:
+          name: conduktor
+        admin:
+          email: test@test.io
+          password: testP4ss!
+        database:
+          name: platform
+          hosts:
+            - host: postgresql-hl
+              port: 5432
+          password: conduktor123 # checkov:skip=CKV_SECRET_6: test credentials
+          username: postgres
+        clusters:
+          - id: kafka
+            name: kafka
+            bootstrapServers: "kafka:9092"
+            properties: "sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username='kafka-admin' password='kafka-admin-password';\nsasl.mechanism=PLAIN\nsecurity.protocol=SASL_PLAINTEXT" # checkov:skip=CKV_SECRET_6: test credentials
+          - id: gateway
+            name: gateway
+            bootstrapServers: "gateway-conduktor-gateway:9092"
+            properties: "sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username='admin' password='Admin123!';\nsasl.mechanism=PLAIN\nsecurity.protocol=SASL_PLAINTEXT" # checkov:skip=CKV_SECRET_6: test credentials
+
+  - name: gateway
+    chart: conduktor/conduktor-gateway
+    wait: deployment/gateway-conduktor-gateway
+    timeout: 600s
+    values:
+      gateway:
+        replicas: 1
+        env:
+          KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+          KAFKA_SECURITY_PROTOCOL: "SASL_PLAINTEXT"
+          KAFKA_SASL_MECHANISM: "PLAIN"
+          KAFKA_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required username='kafka-admin' password='kafka-admin-password';" # checkov:skip=CKV_SECRET_6: test credentials
+          GATEWAY_SECURITY_MODE: "GATEWAY_MANAGED"
+          GATEWAY_SECURITY_PROTOCOL: "SASL_PLAINTEXT"
+          GATEWAY_ACL_ENABLED: "true"
+          GATEWAY_SUPER_USERS: "admin"
+        admin:
+          users:
+            - username: admin
+              password: Admin123!
+              admin: true
