@@ -188,7 +188,7 @@ jobs:
 
       - name: Run chart tests
         env:
-          CDK_LICENSE: ${{ secrets.CDK_LICENSE }}
+          CDK_LICENSE: ${{ secrets.TEST_LICENSE_V3 }}
         run: |
           python -m test.runner run \
             --chart ${{ matrix.chart }} \
