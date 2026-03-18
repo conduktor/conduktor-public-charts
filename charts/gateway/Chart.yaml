@@ -2,7 +2,7 @@ apiVersion: v2
 appVersion: "3.18.0"
 description: Conduktor Gateway chart
 name: conduktor-gateway
-version: 3.17.2
+version: 3.18.0
 dependencies:
   - name: common
     # force version to avoid breaking changes due to remove support for older k8s versions in common chart v2.31.0 and above
