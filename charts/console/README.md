@@ -146,7 +146,7 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/co
 | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------- |
 | `platform.image.registry`                     | Conduktor Console image registry                                                                                                                             | `docker.io`                   |
 | `platform.image.repository`                   | Conduktor Console image repository                                                                                                                           | `conduktor/conduktor-console` |
-| `platform.image.tag`                          | Conduktor Console image tag (immutable tags are recommended)                                                                                                 | `1.43.3`                      |
+| `platform.image.tag`                          | Conduktor Console image tag (immutable tags are recommended)                                                                                                 | `1.44.1`                      |
 | `platform.image.digest`                       | Conduktor Console image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`                          |
 | `platform.image.pullPolicy`                   | Conduktor Console image pull policy                                                                                                                          | `IfNotPresent`                |
 | `platform.image.pullSecrets`                  | Conduktor Console image pull secrets                                                                                                                         | `[]`                          |
@@ -285,7 +285,7 @@ Console expose metrics that could be collected and presented if your environment
 | `platformCortex.enabled`                            | Enable Conduktor Console Cortex                                                                                                                                     | `true`                               |
 | `platformCortex.image.registry`                     | Conduktor Console Cortex image registry                                                                                                                             | `docker.io`                          |
 | `platformCortex.image.repository`                   | Conduktor Console Cortex image repository                                                                                                                           | `conduktor/conduktor-console-cortex` |
-| `platformCortex.image.tag`                          | Conduktor Console Cortex image tag (immutable tags are recommended)                                                                                                 | `1.43.3`                             |
+| `platformCortex.image.tag`                          | Conduktor Console Cortex image tag (immutable tags are recommended)                                                                                                 | `1.44.1`                             |
 | `platformCortex.image.digest`                       | Conduktor Console Cortex image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`                                 |
 | `platformCortex.image.pullPolicy`                   | Conduktor Console Cortex image pull policy                                                                                                                          | `IfNotPresent`                       |
 | `platformCortex.image.pullSecrets`                  | Conduktor Console Cortex image pull secrets                                                                                                                         | `[]`                                 |
@@ -411,6 +411,7 @@ console, we recommend you to look at our
 - [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
 - [Install with Console technical monitoring](#install-with-console-technical-monitoring)
 - [Install with custom certificates or keytab](#install-with-custom-certificates-or-keytab)
+- [Install network debugging image as a sidecar](#install-network-debugging-image-as-a-sidecar)
 
 ### Install with an enterprise license
 
@@ -1272,5 +1273,34 @@ platform:
 For guides and advanced help, please refer to our
 [documentation](https://docs.conduktor.io/platform/installation/get-started/kubernetes),
 or to our charts `README`.
+
+### Install network debugging image as a sidecar
+
+If you need to investigate network level issues, you can install a network debugging image (e.g. [netshoot](https://github.com/nicolaka/netshoot)), as a sidecar container.
+
+```yaml
+platform:
+  podSecurityContext:
+    runAsNonRoot: false
+  sidecars:
+    - name: netshoot
+      image: nicolaka/netshoot:latest
+      command:
+        - /bin/bash
+        - -c
+        - "sleep infinity"
+      securityContext:
+        runAsUser: 0
+        capabilities:
+          add:
+            - NET_RAW
+            - NET_ADMIN
+```
+
+Once the sidecar is running, you can login to it and execute network level commands, like `tcpdump`:
+
+```bash
+kubectl exec -it $CONSOLE_POD_NAME -n conduktor -c netshoot -- tcpdump -i any -nn -l 'tcp dst port 8080 and tcp[tcpflags] & tcp-syn != 0'
+```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

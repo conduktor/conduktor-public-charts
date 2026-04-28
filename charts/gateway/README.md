@@ -61,7 +61,7 @@ This section defines the image to be used.
 | -------------------------- | -------------------------------------------------------- | ----------------------------- |
 | `gateway.image.registry`   | Docker registry to use                                   | `docker.io`                   |
 | `gateway.image.repository` | Image in repository format (conduktor/conduktor-gateway) | `conduktor/conduktor-gateway` |
-| `gateway.image.tag`        | Image tag                                                | `3.17.2`                      |
+| `gateway.image.tag`        | Image tag                                                | `3.18.0`                      |
 | `gateway.image.pullPolicy` | Kubernetes image pull policy                             | `IfNotPresent`                |
 
 ### Gateway configurations
@@ -238,6 +238,7 @@ Shared Kubernetes configuration of the chart.
   * [Using `gateway.extraSecretEnvVars`](#using-gatewayextrasecretenvvars)
   * [Using values and generated secrets](#using-values-and-generated-secrets)
   * [Pulling from private registry using `global.imagePullSecrets`](#pulling-from-private-registry-using-globalimagepullsecrets)
+  * [Air-gapped deployment](#air-gapped-deployment)
 * [Ingress configuration examples](#ingress-configuration-examples)
   * [Nginx Ingress without TLS](#nginx-ingress-without-tls)
   * [Nginx Ingress with Self-signed TLS](#nginx-ingress-with-self-signed-tls)
@@ -418,6 +419,55 @@ gateway:
     registry: regsitry.company.io
     repository: conduktor/conduktor-gateway
     tag: nightly
+```
+
+#### Air-gapped deployment
+
+To deploy Gateway in an environment without internet access, you need to complete the following steps on an internet-connected machine before deploying to the cluster.
+
+**1. Get the chart**
+
+Download the packaged chart from the [GitHub releases page](https://github.com/conduktor/conduktor-public-charts/releases) or pull it from the Helm repository:
+
+```sh
+helm repo add conduktor https://helm.conduktor.io
+helm repo update
+helm pull conduktor/conduktor-gateway --version <version>
+```
+
+Both sources ship with all chart dependencies already bundled — no `helm dependency build` needed.
+
+**2. Repackage the chart for your private registry**
+
+Inject your private registry as the default and push the chart to your internal OCI registry:
+
+```sh
+# Set your private image registry as the default
+yq -i '.global.imageRegistry = "<your-private-registry>"' conduktor-gateway/values.yaml
+
+# Repackage and push to your internal OCI registry
+tar czf conduktor-gateway-<version>.tgz conduktor-gateway/
+helm push conduktor-gateway-<version>.tgz oci://<your-chart-registry>
+```
+
+**3. Mirror the Gateway image**
+
+Pull the Gateway image from Docker Hub and push it to your private registry:
+
+```sh
+docker pull conduktor/conduktor-gateway:<version>
+docker tag conduktor/conduktor-gateway:<version> <your-private-registry>/conduktor/conduktor-gateway:<version>
+docker push <your-private-registry>/conduktor/conduktor-gateway:<version>
+```
+
+**4. Set up registry authentication**
+
+Configure your cluster to authenticate to your private registry. The recommended approach is to use your cloud provider's native registry authentication (for example, IRSA on EKS) to avoid managing short-lived credentials. Alternatively, use `global.imagePullSecrets` — see [Pulling from private registry using `global.imagePullSecrets`](#pulling-from-private-registry-using-globalimagepullsecrets).
+
+**5. Install**
+
+```sh
+helm install my-gateway oci://<your-chart-registry>/conduktor-gateway --version <version>
 ```
 
 ### Ingress configuration examples
