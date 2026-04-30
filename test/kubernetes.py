@@ -65,21 +65,33 @@ def create_configmap(name: str, namespace: str, data: dict[str, str], verbose: b
         raise KubernetesError(f"Failed to apply ConfigMap: {proc.stderr}")
 
 
-def create_secret(namespace: str, name: str, data: dict[str, str]) -> None:
+def create_secret(namespace: str, name: str, data: dict[str, str], data_files: Optional[dict[str, str]] = None) -> None:
     """Create a Kubernetes Secret from the given data.
 
     Values are passed via stdin as YAML to avoid exposing them in process args or logs.
     Only the secret name is logged, never its contents.
+    data_files: key → file path relative to repo root, loaded as base64-encoded binary data.
     """
+    import base64
+    from test.utils import ROOT_DIR
+
     log_info(f"Creating secret: {name}")
 
-    secret_manifest = yaml.dump({
+    manifest: dict = {
         "apiVersion": "v1",
         "kind": "Secret",
         "metadata": {"name": name, "namespace": namespace},
         "type": "Opaque",
-        "stringData": data,
-    })
+    }
+    if data:
+        manifest["stringData"] = data
+    if data_files:
+        manifest["data"] = {
+            key: base64.b64encode((ROOT_DIR / path).read_bytes()).decode()
+            for key, path in data_files.items()
+        }
+
+    secret_manifest = yaml.dump(manifest)
 
     # Apply via stdin only — do NOT use run_command (it logs the command args)
     proc = subprocess.run(

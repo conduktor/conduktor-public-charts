@@ -26,7 +26,8 @@ class Dependency(BaseModel):
 class K8sSecretConfig(BaseModel):
     """A Kubernetes Secret to create before helm install."""
     name: str
-    data: dict[str, str]  # key → value (values support ${VAR} and ${VAR:-default} expansion)
+    data: dict[str, str] = Field(default_factory=dict)  # key → value (values support ${VAR} and ${VAR:-default} expansion)
+    data_files: dict[str, str] = Field(default_factory=dict)  # key → file path relative to repo root (binary, base64-encoded)
 
 
 class ChartTestConfig(BaseModel):
