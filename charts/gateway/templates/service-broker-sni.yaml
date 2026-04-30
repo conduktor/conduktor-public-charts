@@ -1,0 +1,24 @@
+{{- if and .Values.gateway.preview.listeners (eq .Values.gateway.listeners.internal.routing "sni") }}
+{{- $brokerData := include "conduktor-gateway.expandBrokerIds" .Values.gateway.listeners.internal.brokerIds | fromJson }}
+{{- $portData := include "conduktor-gateway.portPairsJson" .Values.gateway.listeners.internal.ports | fromJson }}
+{{- range $brokerData.ids }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ printf "%s-broker-%d" (include "conduktor-gateway.fullname" $ | trunc 50 | trimSuffix "-") (int .) }}
+  namespace: {{ include "common.names.namespace" $ | quote }}
+  labels: {{ include "common.labels.standard" $ | nindent 4 }}
+    app.kubernetes.io/component: conduktor-gateway
+spec:
+  type: ClusterIP
+  ports:
+    {{- range $portData.pairs }}
+    - name: broker-{{ .advertised }}
+      port: {{ .advertised }}
+      targetPort: {{ .local }}
+      protocol: TCP
+    {{- end }}
+  selector: {{ include "conduktor-gateway.podSelectorLabels" $ | nindent 4 }}
+{{- end }}
+{{- end }}

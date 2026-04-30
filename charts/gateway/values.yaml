@@ -90,6 +90,62 @@ gateway:
     start: 9092
     ## @param gateway.portRange.count Max number of broker to expose
     count: 7
+  ## @section Gateway experimental preview features
+  ## @descriptionStart
+  ## Opt-in flags for features that are not yet stable. Defaults keep existing behaviour unchanged.
+  ## @descriptionEnd
+  preview:
+    ## @param gateway.preview.listeners Enable experimental named listener mode.
+    ## When true, gateway.listeners.internal and gateway.listeners.external drive all env var generation.
+    ## When false (default), the legacy portRange-based configuration is used unchanged.
+    listeners: false
+  ## @param gateway.securityMode Gateway security mode — GATEWAY_MANAGED | KAFKA_MANAGED.
+  ## Used only when gateway.preview.listeners is true. Emitted as GATEWAY_SECURITY_MODE.
+  ## If gateway.env.GATEWAY_SECURITY_MODE is set, that value takes precedence (a warning is shown in NOTES).
+  securityMode: "GATEWAY_MANAGED"
+  ## @param gateway.aclEnabled Enable ACL for the Gateway virtual cluster.
+  ## Used only when gateway.preview.listeners is true. Emitted as GATEWAY_ACL_ENABLED.
+  ## Leave empty (default) to infer from securityMode: true for GATEWAY_MANAGED, false for KAFKA_MANAGED.
+  ## If gateway.env.GATEWAY_ACL_ENABLED is set, that value takes precedence (a warning is shown in NOTES).
+  aclEnabled: ""
+  ## @section Gateway named listener configuration (preview)
+  ## @descriptionStart
+  ## Only active when gateway.preview.listeners is true.
+  ## Two predefined listeners: internal (maps to *-internal ClusterIP service) and
+  ## external (maps to *-external service, only when service.external.enable is true).
+  ## @descriptionEnd
+  listeners:
+    internal:
+      ## @param gateway.listeners.internal.securityProtocol Security protocol — PLAINTEXT | SSL | SASL_PLAINTEXT | SASL_SSL
+      securityProtocol: PLAINTEXT
+      ## @param gateway.listeners.internal.routing Routing mode — port | sni
+      routing: port
+      ## @param gateway.listeners.internal.ports Port specs. Format: ADVERTISED:LOCAL or range (e.g. "9092-9098", "443:9092")
+      ports:
+        - "9092-9098"
+      ## @param gateway.listeners.internal.brokerIds Kafka broker IDs for internal SNI routing. Required when routing is sni.
+      ## Supports range syntax: ["0-2", "10", "12-13"] or combined ["0-2,10,12-13"] or plain integers.
+      brokerIds: []
+      ## @param gateway.listeners.internal.sslClientAuth TLS client auth — NONE | OPTIONAL | REQUIRE (only for SSL/SASL_SSL)
+      sslClientAuth: "NONE"
+      # advertisedHost: ""  # Advanced override — defaults to FQDN of *-internal service.
+      #                     # Only set if you have a custom DNS name for the internal service.
+    external:
+      ## @param gateway.listeners.external.securityProtocol Security protocol — PLAINTEXT | SSL | SASL_PLAINTEXT | SASL_SSL
+      securityProtocol: SASL_SSL
+      ## @param gateway.listeners.external.routing Routing mode — port | sni
+      routing: sni
+      ## @param gateway.listeners.external.ports Port specs. Format: ADVERTISED:LOCAL or range (e.g. "9092", "443:9092")
+      ports:
+        - "9092"
+      ## @param gateway.listeners.external.advertisedHost Externally-reachable hostname. Required when preview.listeners and service.external.enable are both true.
+      advertisedHost: ""
+      ## @param gateway.listeners.external.advertisedHostPattern Per-broker hostname pattern for SNI routing. Must contain {{nodeId}}.
+      advertisedHostPattern: ""
+      ## @param gateway.listeners.external.bootstrapHostPattern Bootstrap hostname for SNI routing. Derived from advertisedHostPattern if empty.
+      bootstrapHostPattern: ""
+      ## @param gateway.listeners.external.sslClientAuth TLS client auth — NONE | OPTIONAL | REQUIRE (only for SSL/SASL_SSL)
+      sslClientAuth: "NONE"
   admin:
     ## @param gateway.admin.port Admin HTTP server port
     port: 8888

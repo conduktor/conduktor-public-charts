@@ -145,6 +145,112 @@
                         }
                     }
                 },
+                "preview": {
+                    "type": "object",
+                    "properties": {
+                        "listeners": {
+                            "type": "boolean",
+                            "description": "Enable experimental named listener mode.",
+                            "default": false
+                        }
+                    }
+                },
+                "securityMode": {
+                    "type": "string",
+                    "description": "Gateway security mode — GATEWAY_MANAGED | KAFKA_MANAGED.",
+                    "default": "GATEWAY_MANAGED"
+                },
+                "aclEnabled": {
+                    "type": "string",
+                    "description": "Enable ACL for the Gateway virtual cluster.",
+                    "default": ""
+                },
+                "listeners": {
+                    "type": "object",
+                    "properties": {
+                        "internal": {
+                            "type": "object",
+                            "properties": {
+                                "securityProtocol": {
+                                    "type": "string",
+                                    "description": "Security protocol — PLAINTEXT | SSL | SASL_PLAINTEXT | SASL_SSL",
+                                    "default": "PLAINTEXT"
+                                },
+                                "routing": {
+                                    "type": "string",
+                                    "description": "Routing mode — port | sni",
+                                    "default": "port"
+                                },
+                                "ports": {
+                                    "type": "array",
+                                    "description": "Port specs. Format: ADVERTISED:LOCAL or range (e.g. \"9092-9098\", \"443:9092\")",
+                                    "default": [
+                                        "9092-9098"
+                                    ],
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "brokerIds": {
+                                    "type": "array",
+                                    "description": "Kafka broker IDs for internal SNI routing. Required when routing is sni.",
+                                    "default": [],
+                                    "items": {}
+                                },
+                                "sslClientAuth": {
+                                    "type": "string",
+                                    "description": "TLS client auth — NONE | OPTIONAL | REQUIRE (only for SSL/SASL_SSL)",
+                                    "default": "NONE"
+                                }
+                            }
+                        },
+                        "external": {
+                            "type": "object",
+                            "properties": {
+                                "securityProtocol": {
+                                    "type": "string",
+                                    "description": "Security protocol — PLAINTEXT | SSL | SASL_PLAINTEXT | SASL_SSL",
+                                    "default": "SASL_SSL"
+                                },
+                                "routing": {
+                                    "type": "string",
+                                    "description": "Routing mode — port | sni",
+                                    "default": "sni"
+                                },
+                                "ports": {
+                                    "type": "array",
+                                    "description": "Port specs. Format: ADVERTISED:LOCAL or range (e.g. \"9092\", \"443:9092\")",
+                                    "default": [
+                                        "9092"
+                                    ],
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "advertisedHost": {
+                                    "type": "string",
+                                    "description": "Externally-reachable hostname. Required when preview.listeners and service.external.enable are both true.",
+                                    "default": ""
+                                },
+                                "advertisedHostPattern": {
+                                    "type": "string",
+                                    "description": "Per-broker hostname pattern for SNI routing. Must contain {{nodeId}}.",
+                                    "default": ""
+                                },
+                                "bootstrapHostPattern": {
+                                    "type": "string",
+                                    "description": "Bootstrap hostname for SNI routing. Derived from advertisedHostPattern if empty.",
+                                    "default": ""
+                                },
+                                "sslClientAuth": {
+                                    "type": "string",
+                                    "description": "TLS client auth — NONE | OPTIONAL | REQUIRE (only for SSL/SASL_SSL)",
+                                    "default": "NONE"
+                                }
+                            }
+                        }
+                    }
+                },
                 "admin": {
                     "type": "object",
                     "properties": {
