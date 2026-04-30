@@ -26,11 +26,21 @@ spec:
   {{- include "common.tplvalues.render" (dict "value" .Values.service.internal.extraSpecs "context" $) | nindent 2 }}
   {{- end }}
   ports:
+    {{- if .Values.gateway.preview.listeners }}
+    {{- $portData := include "conduktor-gateway.portPairsJson" .Values.gateway.listeners.internal.ports | fromJson }}
+    {{- range $portData.pairs }}
+    - name: broker-{{ .advertised }}
+      port: {{ .advertised }}
+      targetPort: {{ .local }}
+      protocol: TCP
+    {{- end }}
+    {{- else }}
     {{- range untilStep (int .Values.gateway.portRange.start) (int (add .Values.gateway.portRange.start .Values.gateway.portRange.count)) 1 }}
     - name: broker-gateway-{{ . }}
       port: {{ . }}
       targetPort: {{ . }}
       protocol: TCP
+    {{- end }}
     {{- end }}
     - name: admin-http
       port: {{ .Values.gateway.admin.port }}
