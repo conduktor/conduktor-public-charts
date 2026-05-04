@@ -150,19 +150,19 @@
                     "properties": {
                         "listeners": {
                             "type": "boolean",
-                            "description": "Enable experimental named listener mode.",
+                            "description": "Enable experimental named listener mode. When true, gateway.listeners.internal/external drive all env var generation; when false (default), legacy portRange config is used.",
                             "default": false
                         }
                     }
                 },
                 "securityMode": {
                     "type": "string",
-                    "description": "Gateway security mode — GATEWAY_MANAGED | KAFKA_MANAGED.",
+                    "description": "Gateway security mode, GATEWAY_MANAGED or KAFKA_MANAGED. Used only when gateway.preview.listeners is true. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).",
                     "default": "GATEWAY_MANAGED"
                 },
                 "aclEnabled": {
                     "type": "string",
-                    "description": "Enable ACL for the Gateway virtual cluster.",
+                    "description": "Enable ACL for the Gateway virtual cluster. Used only when gateway.preview.listeners is true. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED).",
                     "default": ""
                 },
                 "listeners": {
@@ -173,12 +173,12 @@
                             "properties": {
                                 "securityProtocol": {
                                     "type": "string",
-                                    "description": "Security protocol — PLAINTEXT | SSL | SASL_PLAINTEXT | SASL_SSL",
+                                    "description": "Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL",
                                     "default": "PLAINTEXT"
                                 },
                                 "routing": {
                                     "type": "string",
-                                    "description": "Routing mode — port | sni",
+                                    "description": "Listener routing mode: port or sni",
                                     "default": "port"
                                 },
                                 "ports": {
@@ -193,13 +193,13 @@
                                 },
                                 "brokerIds": {
                                     "type": "array",
-                                    "description": "Kafka broker IDs for internal SNI routing. Required when routing is sni.",
+                                    "description": "Kafka broker IDs for internal SNI routing. Required when routing is sni. Supports range syntax e.g. [\"0-2\"] or [\"0-2,10,12-13\"].",
                                     "default": [],
                                     "items": {}
                                 },
                                 "sslClientAuth": {
                                     "type": "string",
-                                    "description": "TLS client auth — NONE | OPTIONAL | REQUIRE (only for SSL/SASL_SSL)",
+                                    "description": "TLS client authentication: NONE, OPTIONAL or REQUIRE (only for SSL/SASL_SSL)",
                                     "default": "NONE"
                                 }
                             }
@@ -209,12 +209,12 @@
                             "properties": {
                                 "securityProtocol": {
                                     "type": "string",
-                                    "description": "Security protocol — PLAINTEXT | SSL | SASL_PLAINTEXT | SASL_SSL",
+                                    "description": "Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL",
                                     "default": "SASL_SSL"
                                 },
                                 "routing": {
                                     "type": "string",
-                                    "description": "Routing mode — port | sni",
+                                    "description": "Listener routing mode: port or sni",
                                     "default": "sni"
                                 },
                                 "ports": {
@@ -244,7 +244,7 @@
                                 },
                                 "sslClientAuth": {
                                     "type": "string",
-                                    "description": "TLS client auth — NONE | OPTIONAL | REQUIRE (only for SSL/SASL_SSL)",
+                                    "description": "TLS client authentication: NONE, OPTIONAL or REQUIRE (only for SSL/SASL_SSL)",
                                     "default": "NONE"
                                 }
                             }
