@@ -362,11 +362,7 @@ Resolve the advertised host for the internal listener.
 Defaults to the full FQDN of the *-internal service for cross-namespace reachability.
 */}}
 {{- define "conduktor-gateway.internalListenerAdvertisedHost" -}}
-{{- if .Values.gateway.listeners.internal.advertisedHost -}}
-  {{- .Values.gateway.listeners.internal.advertisedHost -}}
-{{- else -}}
-  {{- printf "%s.%s.svc.%s" (include "conduktor-gateway.internalServiceName" .) .Release.Namespace .Values.clusterDomain -}}
-{{- end -}}
+{{- printf "%s.%s.svc.%s" (include "conduktor-gateway.internalServiceName" .) .Release.Namespace .Values.clusterDomain -}}
 {{- end -}}
 
 {{/*
