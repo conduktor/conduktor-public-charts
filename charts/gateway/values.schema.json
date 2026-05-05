@@ -127,7 +127,7 @@
                 },
                 "interceptors": {
                     "type": "string",
-                    "description": "Json configuration for interceptors to be loaded at startup by Gateway",
+                    "description": "Deprecated: Json configuration for interceptors to be loaded at startup by Gateway. Use API instead. This will be removed in future versions.",
                     "default": "[]"
                 },
                 "portRange": {
@@ -135,13 +135,84 @@
                     "properties": {
                         "start": {
                             "type": "number",
-                            "description": "Start port of the gateway port range",
+                            "description": "Deprecated: start port of the gateway port range. Use gateway.listeners.internal.ports with gateway.preview.listeners: true instead.",
                             "default": 9092
                         },
                         "count": {
                             "type": "number",
-                            "description": "Max number of broker to expose",
+                            "description": "Deprecated: max number of brokers to expose. Use gateway.listeners.internal.ports with gateway.preview.listeners: true instead.",
                             "default": 7
+                        }
+                    }
+                },
+                "admin": {
+                    "type": "object",
+                    "properties": {
+                        "port": {
+                            "type": "number",
+                            "description": "Admin HTTP server port",
+                            "default": 8888
+                        },
+                        "users": {
+                            "type": "array",
+                            "description": "API Admin username. (not used if `gateway.secretRef` is set)",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "username": {
+                                        "type": "string",
+                                        "description": "API Admin username. (not used if `gateway.secretRef` is set)"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "description": "API Admin password. If empty, a random password will be generated (not used if `gateway.secretRef` is set)"
+                                    },
+                                    "admin": {
+                                        "type": "boolean",
+                                        "description": "API user admin role flag. (not used if `gateway.secretRef` is set)"
+                                    }
+                                }
+                            }
+                        },
+                        "mainAdminSecretKeys": {
+                            "type": "object",
+                            "properties": {
+                                "username": {
+                                    "type": "string",
+                                    "description": "Secret key used to store the username of the main admin user from `gateway.admin.users` (first with admin role)",
+                                    "default": "GATEWAY_ADMIN_USERNAME"
+                                },
+                                "password": {
+                                    "type": "string",
+                                    "description": "Secret key used to store the password of the main admin user from `gateway.admin.users` (first with admin role)",
+                                    "default": "GATEWAY_ADMIN_PASSWORD"
+                                }
+                            }
+                        },
+                        "securedMetrics": {
+                            "type": "boolean",
+                            "description": "Enable secured metrics using api users credentials. If `gateway.secretRef` is set, this can't be used by `metrics.prometheus` to automatically configure basic auth on scrapping.",
+                            "default": true
+                        }
+                    }
+                },
+                "jmx": {
+                    "type": "object",
+                    "properties": {
+                        "enable": {
+                            "type": "boolean",
+                            "description": "Enable JMX JVM options",
+                            "default": false
+                        },
+                        "port": {
+                            "type": "number",
+                            "description": "JMX port to expose by default JVM args",
+                            "default": 9999
+                        },
+                        "jvmArgs": {
+                            "type": "string",
+                            "description": "Arguments to pass to the gateway container JVM",
+                            "default": "-Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1"
                         }
                     }
                 },
@@ -157,12 +228,12 @@
                 },
                 "securityMode": {
                     "type": "string",
-                    "description": "Gateway security mode, GATEWAY_MANAGED or KAFKA_MANAGED. Used only when gateway.preview.listeners is true. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).",
+                    "description": "Gateway security mode: GATEWAY_MANAGED or KAFKA_MANAGED. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).",
                     "default": "GATEWAY_MANAGED"
                 },
                 "aclEnabled": {
                     "type": "string",
-                    "description": "Enable ACL for the Gateway virtual cluster. Used only when gateway.preview.listeners is true. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED).",
+                    "description": "Enable ACL for the Gateway virtual cluster. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED).",
                     "default": ""
                 },
                 "listeners": {
@@ -248,77 +319,6 @@
                                     "default": "NONE"
                                 }
                             }
-                        }
-                    }
-                },
-                "admin": {
-                    "type": "object",
-                    "properties": {
-                        "port": {
-                            "type": "number",
-                            "description": "Admin HTTP server port",
-                            "default": 8888
-                        },
-                        "users": {
-                            "type": "array",
-                            "description": "API Admin username. (not used if `gateway.secretRef` is set)",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "username": {
-                                        "type": "string",
-                                        "description": "API Admin username. (not used if `gateway.secretRef` is set)"
-                                    },
-                                    "password": {
-                                        "type": "string",
-                                        "description": "API Admin password. If empty, a random password will be generated (not used if `gateway.secretRef` is set)"
-                                    },
-                                    "admin": {
-                                        "type": "boolean",
-                                        "description": "API user admin role flag. (not used if `gateway.secretRef` is set)"
-                                    }
-                                }
-                            }
-                        },
-                        "mainAdminSecretKeys": {
-                            "type": "object",
-                            "properties": {
-                                "username": {
-                                    "type": "string",
-                                    "description": "Secret key used to store the username of the main admin user from `gateway.admin.users` (first with admin role)",
-                                    "default": "GATEWAY_ADMIN_USERNAME"
-                                },
-                                "password": {
-                                    "type": "string",
-                                    "description": "Secret key used to store the password of the main admin user from `gateway.admin.users` (first with admin role)",
-                                    "default": "GATEWAY_ADMIN_PASSWORD"
-                                }
-                            }
-                        },
-                        "securedMetrics": {
-                            "type": "boolean",
-                            "description": "Enable secured metrics using api users credentials. If `gateway.secretRef` is set, this can't be used by `metrics.prometheus` to automatically configure basic auth on scrapping.",
-                            "default": true
-                        }
-                    }
-                },
-                "jmx": {
-                    "type": "object",
-                    "properties": {
-                        "enable": {
-                            "type": "boolean",
-                            "description": "Enable JMX JVM options",
-                            "default": false
-                        },
-                        "port": {
-                            "type": "number",
-                            "description": "JMX port to expose by default JVM args",
-                            "default": 9999
-                        },
-                        "jvmArgs": {
-                            "type": "string",
-                            "description": "Arguments to pass to the gateway container JVM",
-                            "default": "-Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1"
                         }
                     }
                 },
