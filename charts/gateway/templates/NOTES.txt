@@ -101,6 +101,54 @@ NOTE: GATEWAY_ACL_ENABLED is set in gateway.env. It is being used as the effecti
   management and remove it from gateway.env once moved.
 {{- end }}
 
+{{- /* Deprecation notice + migration snippet for legacy portRange configuration */ -}}
+{{- if not .Values.gateway.preview.listeners }}
+  {{- $legacyProtocol := "PLAINTEXT" }}
+  {{- if hasKey .Values.gateway.env "GATEWAY_SECURITY_PROTOCOL" }}
+    {{- $legacyProtocol = index .Values.gateway.env "GATEWAY_SECURITY_PROTOCOL" }}
+  {{- end }}
+  {{- $legacyRouting := "port" }}
+  {{- if hasKey .Values.gateway.env "GATEWAY_ROUTING_MECHANISM" }}
+    {{- if eq (index .Values.gateway.env "GATEWAY_ROUTING_MECHANISM") "host" }}
+      {{- $legacyRouting = "sni" }}
+    {{- end }}
+  {{- end }}
+  {{- $portStart := int .Values.gateway.portRange.start }}
+  {{- $portEnd := sub (add $portStart .Values.gateway.portRange.count) 1 | int }}
+  {{- $portSpec := printf "%d-%d" $portStart $portEnd }}
+  {{- if eq $legacyRouting "sni" }}
+    {{- $portSpec = printf "%d" $portStart }}
+  {{- end }}
+  {{- $effectiveSecurityMode := .Values.gateway.securityMode | default "GATEWAY_MANAGED" }}
+  {{- if hasKey .Values.gateway.env "GATEWAY_SECURITY_MODE" }}
+    {{- $effectiveSecurityMode = index .Values.gateway.env "GATEWAY_SECURITY_MODE" }}
+  {{- end }}
+
+DEPRECATION NOTICE: gateway.portRange is deprecated and will be removed in a future
+  major chart version. Migrate to named listener mode using this starting-point config:
+
+  gateway:
+    preview:
+      listeners: true
+    securityMode: "{{ $effectiveSecurityMode }}"
+    listeners:
+      internal:
+        securityProtocol: {{ $legacyProtocol }}
+        routing: {{ $legacyRouting }}
+        ports:
+          - "{{ $portSpec }}"
+{{- if .Values.service.external.enable }}
+      external:
+        securityProtocol: {{ $legacyProtocol }}
+        routing: {{ $legacyRouting }}
+        ports:
+          - "{{ printf "%d" $portStart }}"
+        advertisedHost: "{{ index .Values.gateway.env "GATEWAY_ADVERTISED_HOST" | default "<set-externally-reachable-hostname>" }}"
+{{- end }}
+
+  See README.md for the full step-by-step migration guide.
+{{- end }}
+
 {{ if .Values.resources -}}
 Depreciation Warning:
 - Root value "resources" is deprecated. We recommend using "gateway.resources" instead.

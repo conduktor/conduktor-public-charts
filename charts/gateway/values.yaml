@@ -83,30 +83,50 @@ gateway:
   userPool:
     ## @param gateway.userPool.secretKey Secret key (256bits) encoded in base64 to sign service accounts credentials when `SASL_PLAIN` or `SASL_SSL` is used for `GATEWAY_SECURITY_PROTOCOL`. If empty, a random key will be generated. Not used if `gateway.secretRef` is set.
     secretKey: ""
-  ## @param gateway.interceptors Json configuration for interceptors to be loaded at startup by Gateway
+  ## @param gateway.interceptors Deprecated: Json configuration for interceptors to be loaded at startup by Gateway. Use API instead. This will be removed in future versions.
   interceptors: "[]"
   portRange:
-    ## @param gateway.portRange.start Start port of the gateway port range
+    ## @param gateway.portRange.start Deprecated: start port of the gateway port range. Use gateway.listeners.internal.ports with gateway.preview.listeners: true instead.
     start: 9092
-    ## @param gateway.portRange.count Max number of broker to expose
+    ## @param gateway.portRange.count Deprecated: max number of brokers to expose. Use gateway.listeners.internal.ports with gateway.preview.listeners: true instead.
     count: 7
-  ## @section Gateway experimental preview features
+  admin:
+    ## @param gateway.admin.port Admin HTTP server port
+    port: 8888
+    ## @param gateway.admin.users[0].username API Admin username. (not used if `gateway.secretRef` is set)
+    ## @param gateway.admin.users[0].password API Admin password. If empty, a random password will be generated (not used if `gateway.secretRef` is set)
+    ## @param gateway.admin.users[0].admin API user admin role flag. (not used if `gateway.secretRef` is set)
+    users:
+      - username: "admin"
+        password: ""
+        admin: true
+    ## @param gateway.admin.mainAdminSecretKeys.username Secret key used to store the username of the main admin user from `gateway.admin.users` (first with admin role)
+    ## @param gateway.admin.mainAdminSecretKeys.password Secret key used to store the password of the main admin user from `gateway.admin.users` (first with admin role)
+    mainAdminSecretKeys:
+      username: "GATEWAY_ADMIN_USERNAME"
+      password: "GATEWAY_ADMIN_PASSWORD"
+    ## @param gateway.admin.securedMetrics Enable secured metrics using api users credentials. If `gateway.secretRef` is set, this can't be used by `metrics.prometheus` to automatically configure basic auth on scrapping.
+    securedMetrics: true
+  jmx:
+    ## @param gateway.jmx.enable Enable JMX JVM options
+    enable: false
+    ## @param gateway.jmx.port JMX port to expose by default JVM args
+    port: 9999
+    ## @param gateway.jmx.jvmArgs Arguments to pass to the gateway container JVM
+    jvmArgs: -Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1
+  ## @section Named listener mode (preview)
   ## @descriptionStart
-  ## Opt-in flags for features that are not yet stable. Defaults keep existing behaviour unchanged.
+  ## Opt-in named listener API (Gateway >= v3.18). Enable with gateway.preview.listeners: true.
+  ## When active, gateway.listeners.internal and gateway.listeners.external replace the legacy
+  ## portRange config. Inactive by default — existing installs are unaffected until opt-in.
   ## @descriptionEnd
   preview:
     ## @param gateway.preview.listeners Enable experimental named listener mode. When true, gateway.listeners.internal/external drive all env var generation; when false (default), legacy portRange config is used.
     listeners: false
-  ## @param gateway.securityMode Gateway security mode, GATEWAY_MANAGED or KAFKA_MANAGED. Used only when gateway.preview.listeners is true. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).
+  ## @param gateway.securityMode Gateway security mode: GATEWAY_MANAGED or KAFKA_MANAGED. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).
   securityMode: "GATEWAY_MANAGED"
-  ## @param gateway.aclEnabled Enable ACL for the Gateway virtual cluster. Used only when gateway.preview.listeners is true. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED).
+  ## @param gateway.aclEnabled Enable ACL for the Gateway virtual cluster. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED).
   aclEnabled: ""
-  ## @section Gateway named listener configuration (preview)
-  ## @descriptionStart
-  ## Only active when gateway.preview.listeners is true.
-  ## Two predefined listeners: internal (maps to *-internal ClusterIP service) and
-  ## external (maps to *-external service, only when service.external.enable is true).
-  ## @descriptionEnd
   listeners:
     internal:
       ## @param gateway.listeners.internal.securityProtocol Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL
@@ -136,30 +156,10 @@ gateway:
       bootstrapHostPattern: ""
       ## @param gateway.listeners.external.sslClientAuth TLS client authentication: NONE, OPTIONAL or REQUIRE (only for SSL/SASL_SSL)
       sslClientAuth: "NONE"
-  admin:
-    ## @param gateway.admin.port Admin HTTP server port
-    port: 8888
-    ## @param gateway.admin.users[0].username API Admin username. (not used if `gateway.secretRef` is set)
-    ## @param gateway.admin.users[0].password API Admin password. If empty, a random password will be generated (not used if `gateway.secretRef` is set)
-    ## @param gateway.admin.users[0].admin API user admin role flag. (not used if `gateway.secretRef` is set)
-    users:
-      - username: "admin"
-        password: ""
-        admin: true
-    ## @param gateway.admin.mainAdminSecretKeys.username Secret key used to store the username of the main admin user from `gateway.admin.users` (first with admin role)
-    ## @param gateway.admin.mainAdminSecretKeys.password Secret key used to store the password of the main admin user from `gateway.admin.users` (first with admin role)
-    mainAdminSecretKeys:
-      username: "GATEWAY_ADMIN_USERNAME"
-      password: "GATEWAY_ADMIN_PASSWORD"
-    ## @param gateway.admin.securedMetrics Enable secured metrics using api users credentials. If `gateway.secretRef` is set, this can't be used by `metrics.prometheus` to automatically configure basic auth on scrapping.
-    securedMetrics: true
-  jmx:
-    ## @param gateway.jmx.enable Enable JMX JVM options
-    enable: false
-    ## @param gateway.jmx.port JMX port to expose by default JVM args
-    port: 9999
-    ## @param gateway.jmx.jvmArgs Arguments to pass to the gateway container JVM
-    jvmArgs: -Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1
+  ## @section Gateway pod/container configuration
+  ## @descriptionStart
+  ## Resource requests/limits, pod labels, security context, volumes, sidecars, init containers and health probes.
+  ## @descriptionEnd
   # Conduktor Gateway resource requests and limits
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ## Gateway system requirements: https://docs.conduktor.io/gateway/get-started/system-requirements/
