@@ -45,7 +45,7 @@ Return the full configuration for the platform ConfigMap
 {{- $_ := set $config "database" $database -}}
 
 {{/* Sanitize kafka sql database object if exist */}}
-{{- if and (hasKey .Values.config "kafkasql") (hasKey .Values.config.kafkasql "database") -}}
+{{- if and .Values.config.kafkasql .Values.config.kafkasql.database -}}
   {{- $kafkaSql := .Values.config.kafkasql | deepCopy -}}
   {{- $kafkaSqlDb := .Values.config.kafkasql.database | deepCopy -}}
   {{- include "conduktor.sanitize.database" (dict "database" $kafkaSqlDb) -}}
