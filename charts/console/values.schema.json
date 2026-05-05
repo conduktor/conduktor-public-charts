@@ -1008,11 +1008,6 @@
                             "description": "Conduktor Console Cortex HTTP (or HTTPS if configured) container port",
                             "default": 9009
                         },
-                        "alertmanager": {
-                            "type": "number",
-                            "description": "Conduktor Console AlertManager HTTP (or HTTPS if configured) container port",
-                            "default": 9010
-                        },
                         "prometheus": {
                             "type": "number",
                             "description": "Conduktor Console Prometheus HTTP (or HTTPS if configured) container port",
@@ -1367,11 +1362,6 @@
                                     "description": "Conduktor Console Cortex service HTTP port",
                                     "default": 9009
                                 },
-                                "alertmanager": {
-                                    "type": "number",
-                                    "description": "Conduktor Console Cortex AlertManager service HTTP port",
-                                    "default": 9010
-                                },
                                 "prometheus": {
                                     "type": "number",
                                     "description": "Conduktor Console Cortex Prometheus service HTTP port",
@@ -1385,11 +1375,6 @@
                                 "cortex": {
                                     "type": "string",
                                     "description": "Node port for Cortex HTTP",
-                                    "default": ""
-                                },
-                                "alertmanager": {
-                                    "type": "string",
-                                    "description": "Node port for AlertManager HTTP",
                                     "default": ""
                                 },
                                 "prometheus": {

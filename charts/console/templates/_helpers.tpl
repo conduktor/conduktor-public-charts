@@ -403,10 +403,10 @@ Return platform monitoring cortex url. Like http(s)://cortex.nsp.svc.cluster.loc
 {{- end -}}
 
 {{/*
-Return platform monitoring alertmanager url. Like http(s)://cortex.nsp.svc.cluster.local:9010/
+Return platform monitoring alertmanager url. Like http(s)://cortex.nsp.svc.cluster.local:9009/
 */}}
 {{- define "conduktor.monitoring.alertManagerUrl" -}}
-{{- $url := printf "http://%s:%d/" (include "conduktor.platformCortex.serviceDomain" .) (.Values.platformCortex.service.ports.alertmanager | int) -}}
+{{- $url := printf "http://%s:%d/" (include "conduktor.platformCortex.serviceDomain" .) (.Values.platformCortex.service.ports.cortex | int) -}}
 {{- if .Values.config.monitoring -}}
 {{- $url := (default $url (index .Values "config" "monitoring" "alert-manager-url")) }}
 {{- end -}}

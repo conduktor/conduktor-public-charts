@@ -52,16 +52,6 @@ spec:
       nodePort: null
       {{- end }}
 
-    - name: alertmanager
-      port: {{ .Values.platformCortex.service.ports.alertmanager }}
-      protocol: TCP
-      targetPort: alertmanager
-      {{- if and (or (eq .Values.platformCortex.service.type "NodePort") (eq .Values.platformCortex.service.type "LoadBalancer")) (not (empty .Values.platformCortex.service.nodePorts.alertmanager)) }}
-      nodePort: {{ .Values.platformCortex.service.nodePorts.alertmanager }}
-      {{- else if eq .Values.platformCortex.service.type "ClusterIP" }}
-      nodePort: null
-      {{- end }}
-
     - name: prometheus
       port: {{ .Values.platformCortex.service.ports.prometheus }}
       protocol: TCP
