@@ -855,7 +855,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: a92398d72bf960377e5120b865da1b347426ae824e995b3b394403cca0222cdf
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -878,7 +878,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: ce2395c42279ef95d95c6e89c57f0f27e5e13fe704b6fa2d2c9073bc28866d0c
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -901,7 +901,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 4d32ab1a74bbbe1262eeea074bcb7ce20c9b598e25b97d5efd914b767c624f9e
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -924,7 +924,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 7ae958996ff2628d822dbfa6d029da3865b0122f1bab3641ec7752ed8c27a8c9
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -947,7 +947,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: e8db19e5868a172d26ca567faa1d43a4ae3b3b30d60c081fb8f64e9c9652efa2
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -970,7 +970,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: fe98f9522e9062be9774e94dffb8c8fa14f83ce863bc2f82f2a0b00a4b39b7fc
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -993,7 +993,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: ea2cdd779cb4cc7e58b925763194406d9213cb622e2874a16aa649e85b4fcb03
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1016,7 +1016,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: cdb66ddc2ece1d3821469ef6193698a9272d9502a66e6dde195f18bc552b3b24
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1039,7 +1039,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 09b2b0599f42fd0e3a99af2dcab9827d2a770df25441c1447e9c00d8b2206bd3
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1062,7 +1062,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 43b96ff1826c2a5ece762bdfcf2471e07b233c5377105b5dfc791858714737c1
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1085,7 +1085,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: ca61f13100e5196e61802f9f402971ddd25d383bf032229b49e8a50ee119f43a
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1108,7 +1108,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 761a2dfb23eaf6fed45cdb18605bcf123298137650f12e50b8500c302c2e2a93
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1131,7 +1131,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 24263ec47e583005a9c33e49d6ffadb3caa6a1e7f5466a23c8badd86882e88b6
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1154,7 +1154,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: fc8f73daac7e9a0388c2c4e8584feb8a03df15f890a18b2b672f980c5b047687
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1177,7 +1177,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 967adc16bd2c9875c9300f01fc0a4222b73e6d724d616ecae389f6b325ad247f
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1200,7 +1200,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 49a63ab408a0419cfd4f83eae9ca5ce28ec564a40a503ff0a57a2ed4fbba8872
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1223,7 +1223,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 649a3409fce157e513333327fb74abc9e2c13f1993236ba04f413f11ff5a6495
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1246,7 +1246,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 290c475ba3f8a601fa58553754b6d8b2061963d76c08b6b5ef3ba4be870cb347
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1269,7 +1269,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: f3e9a171747ff7c20c734221511128d0d8c4640dd8fb6ce107b14a1d8e86900c
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1292,7 +1292,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 26fcfaf61fa1031471aaa3854d12720bcef425a0a9078659f13cd8010528941c
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1315,7 +1315,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: c78d6bd1728153d7fd0ffcae639065dde75b0f938e0e59860ce438d14a31093e
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1338,7 +1338,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 90bde9bc180a40444e32f3a40f8ec0a423d9f88e1a693f27741c5cd87ef588be
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1361,7 +1361,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 21e4dae2bb4f356db9b09d2356827a2274d67068f25928191fd1bced8d976975
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1384,7 +1384,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 54ecbb3b4014bb27b8fe38633f34d8864fbb644a18cb7500a64f50540fd6e94f
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1407,7 +1407,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: a168e8b100da96dda1748eebe94c314b7720884b84120480a7bd29ffff44d22c
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1430,7 +1430,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: f8010ca4249406492d54881519924bd9f4242d8f49193735874403f249c4b732
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1453,7 +1453,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 8c1856fbdb94551c1f785ccbb2c12cb9815919fd5a5ef2f0be98393284656765
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1476,7 +1476,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 9d73cc308d288b91dc98189362e5483b7d7d4ac1904ab3e97b588752774c99a5
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1499,7 +1499,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 201a505d84f2d3677289d696ed0c598ee1d8b485a1dfe35f7e1d57d1369dce20
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1522,7 +1522,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: a789b30a398ab6c5fc3b41fb8457d81335226464c31c1d62c8bdc8919b34f1df
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1545,7 +1545,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 9a81cdf3807c83674dcfecf44aca6120150db0a3a25c1c31c3a019e9be904c9c
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1568,7 +1568,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 148e14bca3b8f07d73b19a562c3f9ee4f54ac87a4b99dbba09da2a92a7e233a7
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1591,7 +1591,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 01a5e131d838a724a9436791c965789705b67886fb0038e829fdd1f9675c66d3
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1614,7 +1614,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 94f39a62b9d3b5d0c14845f853ebc69c0b9bd7cbc82ac5f8657d949a71225b27
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1637,7 +1637,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: ca905c86de6943460d2de7883bb44ad2005c381ac3f9053161108377862c8a0a
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1660,7 +1660,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: d7d32a625657f29aa26c3325eb9440057c1d3ce5d29c3b2e96177201f341edb7
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1683,7 +1683,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 59892e159b7b8081e40555450aa7e0a26ed0480ed535cc8820ad5d23e1a444dc
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1706,7 +1706,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 03272f4fe85630374e6f0ca89380dc872467f75ee25a3a07a08934c61f3525e7
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1729,7 +1729,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 52583809fbcc8cb383c23659d63f6e8485893856408eb08239ee5741a74ec8c1
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1752,7 +1752,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: fc8fc1364e60dba8d720ac7b4f92730aaaf3c87616c34e39862a33b39a3b1c1d
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1775,7 +1775,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: eeeb1afaa9097563cb9869ec4983822e129da60ff3d7c0f50c710df0cc6e5d7a
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1798,7 +1798,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 5703ae2221250dff90ea4f6bc75614529af1f26168be259ba3469015b2dbf9e8
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1821,7 +1821,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 90b7a84a147aefffda8b93c615e2e0b6c5b6b1bd9b544f7dee5c59d201897008
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1844,7 +1844,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 7dd1f3651283e7d328dce73c67e360d14ed5518b5353969f4effdbb02d89434f
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1867,7 +1867,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: ccb4b0d455951b2091145e89cad1139fdb211d3d61e469bf2ecf80023e7d3083
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1890,7 +1890,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: e7c66bcf1222c31cae55b6a132bd4120b10690c7b35848040a44e2baaa9f88c4
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1913,7 +1913,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: e918839c9af0450eb2d43d76e82d9195527cc3a68f6f49f539abd1f8f5d743c1
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1936,7 +1936,7 @@ entries:
     description: Helm chart to deploy Conduktor Console on Kubernetes
     digest: 9acf2a6120ce571d6df0d1babfc4ef9041c2cee80a745dc8c1964bc9f58dce67
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -1959,7 +1959,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: 0a264949ddfc8a4c5bb399b5699cd764a12095d5b6ea1110ceda43d1892c29fe
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -1982,7 +1982,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: e83d3c5224e137603c87bdfa29126ad3ae028a399631d7b3979b6f48e7227a3f
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2005,7 +2005,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: a2b414f4a1e926b4c6bc532c5378afd5cdad80f393ad219e8f331388c7d718c1
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2028,7 +2028,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: fb9c90b251b2b39848bdc4bde059f7a1203cd60c4553da48160b9bc299c6c477
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2051,7 +2051,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: 3c9c711d9d68e85b65df2d86abc0480e9a17b65576dbdeaa58bf206143633425
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2074,7 +2074,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: a39ac9a5b40e611e3be1129477a03506380e00c2770ee8b4a5ab7a544a6f611b
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2097,7 +2097,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: 6aa1e20595c58057c8eed46b28de80a97f31e4abb9de2f86568bbbdc2b144349
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2120,7 +2120,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: a55ad1cb475f27a432f1ed630095832ed370578159be9d6e153141291ba81104
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2143,7 +2143,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: 2525487ea32039b024a80347cebdda0fd0764cfe716ec0b732c3e264a7f8e23e
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2166,7 +2166,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: ed4627a6192756a29339497d8616cbb37af7551fc68da1bd4579d813f51a19b0
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2189,7 +2189,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: 220a51989d55b9293514a098533cb932d4813a7e33d1b466ebd7716899627f4d
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2212,7 +2212,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: cb375bf024c20e347c0c18ab7f3d729e48a6f2fddc1b13c0ffa3ecd2516553b9
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2235,7 +2235,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: 77f76b3fafd9acbb5694abd9071cfa5e38c08eb70b54f89840fcfce68ae73461
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2258,7 +2258,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: 113f208cfedb55ddc134f51d8faa4b9d744c0d2d17f07d4f822682d0eccbf71f
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2281,7 +2281,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: b29bb040d5e6445fa587b5c01547f355fbd6d1e49fb671d241af58872e7de931
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2304,7 +2304,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: 47dccdde753cee92a83be2f80080efa5a8295bb5367e7b7b3967450b872310d1
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2327,7 +2327,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: 86966061d4a4d3181c52826875c52dd2e381a9330663c2afe85e4dbb56f4defa
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2350,7 +2350,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: c4ee5939612a01e36c27237f6ebf6979c77a70aff436c495ed57133c4953c7a7
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2373,7 +2373,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: 97ae5dea853d2f4de6dfef3578e5ad49406972a932f1552aad8cb985ea7465dc
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2396,7 +2396,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: fa58d570db0e360738213b3f31167ad5f6adc23dee9112faead4b8a097226b6e
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2419,7 +2419,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: 1ae45fab0911d3aee28b7a0f9c707df1fed2795a059a9f45574a7a55df05ca44
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2442,7 +2442,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: ed79befc8552d8cc25cc865c76ce8bb2a8fdf975e69e239fa5b2af69212a75c8
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2465,7 +2465,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: 18e0c91b374a239aa5b0d5c6a915f1cb89498779a81123a0d473bfc25f7ebe7a
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2488,7 +2488,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: fe844d4cd9cd2425cc2ead42e738e99b635a24c7a700638d9ea9cb0ab7c75da6
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2511,7 +2511,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: aea082b9d6fc9d63b7505bf7660db895fe99d761cde6a67c80e1196c4b370bf6
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2534,7 +2534,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: f466035781a3de464795977057f4bae544c3fa4350b91b188992e84e24d23c3b
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2557,7 +2557,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: ba83902e97e64e3198d7ab6db3e57baede159dc768cb29639ee67f0a897826a8
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2580,7 +2580,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: 3945cf2290b8af6e3dc80c76f1eb2e0c4e7fc4fd852ef1b924d27062ab1c24fb
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2603,7 +2603,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: 55e0e16290da14c4c79da8b47a15a8ea9d2f22766b71d236059b145fccccf06d
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2626,7 +2626,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: e581b38975f6f90acea559b802425a611f249c66a90f0471a3ee9eeda3cde66f
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2649,7 +2649,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: 5836bdfe4dd553ee85a84a4a8f6a5941b42ac9acd9fc37acfaa451b601e6a285
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2672,7 +2672,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: b5ee0b9fd5b50890748699689dadf45949259a109ee5e6b55292b0d4f61307e8
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2695,7 +2695,7 @@ entries:
     description: Helm chart to deploy Conduktor Platform on Kubernetes
     digest: 5843c6a6c9e57b84b2b87f67cc50517ff79f6d5a1507e31b16a032c8cb788e07
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2737,7 +2737,7 @@ entries:
     description: Conduktor Controller
     digest: c69b47b31675c72731794358d045ef3a048c97d216999dcb6ba52574da21b460
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2777,7 +2777,7 @@ entries:
     description: Conduktor Controller
     digest: 300c6e934de3b848e64729cf5c1f8752a3e494adf64361407ec092d16cdf645b
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2817,7 +2817,7 @@ entries:
     description: Conduktor Controller
     digest: 0e5ece5da5df8004cb8a1a2a833d0ff821c14bc9ca043cbe1917e1a7dad9ffd5
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2857,7 +2857,7 @@ entries:
     description: Conduktor Controller
     digest: be0315a45f84f55295c8d41d3f6969b077f73ba6a2717e19b14141ed6269a78c
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2897,7 +2897,7 @@ entries:
     description: Conduktor Controller
     digest: fb1f65ef14248c430c5820c9e4a318ad4bcabda386658dbe8d2884f4cf2b324c
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2937,7 +2937,7 @@ entries:
     description: Conduktor Controller
     digest: 415a1a7d860bbf2ad09333a1ad7e7f8c1fc57bfed234ce72f148557a722cd424
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -2977,7 +2977,7 @@ entries:
     description: Conduktor Controller
     digest: 292469bfa6ab515771a327669c61f673dea3b827ce50e9b796eff27d14159069
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -3017,7 +3017,7 @@ entries:
     description: Conduktor Controller
     digest: 67a713f651218a098a37b6c19e2b740495b6c4c90825113f4939797bfcc5af90
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -3057,7 +3057,7 @@ entries:
     description: Conduktor Controller
     digest: 489f3f411a9572dfa7e8defb864c26f461c12a4beb5ba85ed40fa0c5db070bf1
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -3097,7 +3097,7 @@ entries:
     description: Conduktor Controller
     digest: deb1615212bb5925f9c7fe444e9d6e07630ad2754eb9bc5ac48c2b07e7f124ad
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -3137,7 +3137,7 @@ entries:
     description: Conduktor Controller
     digest: b52561b2f86af13c7c655af1c17705863d8edd963bb1cae31edd7df99c2e4b3e
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -3177,7 +3177,7 @@ entries:
     description: Conduktor Controller
     digest: 4949720fa2c8ac23a8013bb41aeef5b1348654aa56f02a1cd6a90c38a02dbe18
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -3217,7 +3217,7 @@ entries:
     description: Conduktor Controller
     digest: 347850bad11837a8d7df302989939d558a70898fda0fba86a83cce03697a75b3
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -3257,7 +3257,7 @@ entries:
     description: Conduktor Controller
     digest: 42a96e1b40f8aede5efa81a1ab0f48e249c619ca1e7648fa08cfc5323a323577
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor Platform
@@ -3472,7 +3472,7 @@ entries:
     description: Helm chart to run Conduktor CLI provisioning on Conduktor Plaform
     digest: 2af2f1bc7513dcc314f2c6fece17f85f7330c7932f1b92030f22e3414b63961e
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
@@ -3496,7 +3496,7 @@ entries:
     description: Helm chart to run Conduktor CLI provisioning on Conduktor Plaform
     digest: 1f77b6d1c5404b0a89a93f80c641cbd2cac13c73b69ec02b8fd041bf3729021b
     home: https://www.conduktor.io
-    icon: https://www.conduktor.io/svgs/logo/symbol.svg
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
     maintainers:
     - email: support@conduktor.io
       name: Conduktor
