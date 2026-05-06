@@ -102,10 +102,10 @@ portRange config. Inactive by default — existing installs are unaffected until
 | `gateway.preview.listeners`                        | Enable experimental named listener mode. When true, gateway.listeners.internal/external drive all env var generation; when false (default), legacy portRange config is used.                                             | `false`           |
 | `gateway.securityMode`                             | Gateway security mode: GATEWAY_MANAGED or KAFKA_MANAGED. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).                 | `GATEWAY_MANAGED` |
 | `gateway.aclEnabled`                               | Enable ACL for the Gateway virtual cluster. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED). | `""`              |
+| `gateway.kafka.brokerIds`                          | Kafka broker IDs used for SNI routing. Required when any listener uses routing: sni. Supports range syntax e.g. ["0-2"] or ["0-2,10,12-13"].                                                                             | `[]`              |
 | `gateway.listeners.internal.securityProtocol`      | Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL                                                                                                                                                   | `PLAINTEXT`       |
 | `gateway.listeners.internal.routing`               | Listener routing mode: port or sni                                                                                                                                                                                       | `port`            |
 | `gateway.listeners.internal.ports`                 | Port specs. Format: ADVERTISED:LOCAL or range (e.g. "9092-9098", "443:9092")                                                                                                                                             | `["9092-9098"]`   |
-| `gateway.listeners.internal.brokerIds`             | Kafka broker IDs for internal SNI routing. Required when routing is sni. Supports range syntax e.g. ["0-2"] or ["0-2,10,12-13"].                                                                                         | `[]`              |
 | `gateway.listeners.internal.sslClientAuth`         | TLS client authentication: NONE, OPTIONAL or REQUIRE (only for SSL/SASL_SSL)                                                                                                                                             | `NONE`            |
 | `gateway.listeners.external.securityProtocol`      | Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL                                                                                                                                                   | `SASL_SSL`        |
 | `gateway.listeners.external.routing`               | Listener routing mode: port or sni                                                                                                                                                                                       | `sni`             |
@@ -837,7 +837,7 @@ TLS certificate must include SANs: `*.kafka.example.com`, `bootstrap.kafka.examp
 
 Internal SNI routing multiplexes multiple broker addresses over a single port within the cluster. The chart creates one ClusterIP Service per broker ID — each resolving to a stable in-cluster DNS name — and Gateway uses SNI to route traffic to the correct broker.
 
-`gateway.listeners.internal.brokerIds` is required when `routing: sni`. It accepts a list of range specs:
+`gateway.kafka.brokerIds` is required when `routing: sni`. It accepts a list of range specs:
 
 | Format    | Example          | Expands to          |
 |-----------|------------------|---------------------|
@@ -856,14 +856,15 @@ gateway:
   preview:
     listeners: true
   securityMode: "GATEWAY_MANAGED"
+  kafka:
+    brokerIds:
+      - "0-2"
   listeners:
     internal:
       securityProtocol: PLAINTEXT
       routing: sni
       ports:
         - "9092"
-      brokerIds:
-        - "0-2"
   env:
     KAFKA_BOOTSTRAP_SERVERS: kafka.default.svc.cluster.local:9092
 ```
@@ -968,14 +969,15 @@ gateway:
   preview:
     listeners: true
   securityMode: "GATEWAY_MANAGED"
+  kafka:
+    brokerIds:
+      - "0-3"                             # match your Kafka broker IDs
   listeners:
     internal:
       securityProtocol: SASL_SSL
       routing: sni
       ports:
         - "9092"
-      brokerIds:
-        - "0-3"                           # match your Kafka broker IDs
     external:
       securityProtocol: SASL_SSL
       routing: sni

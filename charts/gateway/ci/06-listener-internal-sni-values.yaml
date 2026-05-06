@@ -6,14 +6,15 @@ gateway:
     listeners: true
   securityMode: "GATEWAY_MANAGED"
   aclEnabled: "false"
+  kafka:
+    brokerIds:
+      - "0-2"
   listeners:
     internal:
       securityProtocol: SSL
       routing: sni
       ports:
         - "9092"
-      brokerIds:
-        - "0-2"
   env:
     KAFKA_BOOTSTRAP_SERVERS: kafka.ct-gateway-deps.svc.cluster.local:9092
     GATEWAY_CLUSTER_ID: "gw-06"

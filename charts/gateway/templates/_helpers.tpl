@@ -497,8 +497,8 @@ Accumulates all errors and fails once with a combined message.
 {{- end -}}
 
 {{- /* Internal SNI requires brokerIds */ -}}
-{{- if and (eq .Values.gateway.listeners.internal.routing "sni") (empty .Values.gateway.listeners.internal.brokerIds) -}}
-  {{- $errors = append $errors "- gateway.listeners.internal.brokerIds is required when gateway.listeners.internal.routing is sni. Use range syntax e.g. [\"0-2\"] or [\"0-2,10,12-13\"]." -}}
+{{- if and (eq .Values.gateway.listeners.internal.routing "sni") (empty .Values.gateway.kafka.brokerIds) -}}
+  {{- $errors = append $errors "- gateway.kafka.brokerIds is required when gateway.listeners.internal.routing is sni. Use range syntax e.g. [\"0-2\"] or [\"0-2,10,12-13\"]." -}}
 {{- end -}}
 {{- /* Internal SNI requires TLS (SNI is a TLS feature) */ -}}
 {{- if and (eq .Values.gateway.listeners.internal.routing "sni") (has .Values.gateway.listeners.internal.securityProtocol (list "PLAINTEXT" "SASL_PLAINTEXT")) -}}

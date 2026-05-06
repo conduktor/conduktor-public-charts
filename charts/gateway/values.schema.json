@@ -236,6 +236,17 @@
                     "description": "Enable ACL for the Gateway virtual cluster. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED).",
                     "default": ""
                 },
+                "kafka": {
+                    "type": "object",
+                    "properties": {
+                        "brokerIds": {
+                            "type": "array",
+                            "description": "Kafka broker IDs used for SNI routing. Required when any listener uses routing: sni. Supports range syntax e.g. [\"0-2\"] or [\"0-2,10,12-13\"].",
+                            "default": [],
+                            "items": {}
+                        }
+                    }
+                },
                 "listeners": {
                     "type": "object",
                     "properties": {
@@ -261,12 +272,6 @@
                                     "items": {
                                         "type": "string"
                                     }
-                                },
-                                "brokerIds": {
-                                    "type": "array",
-                                    "description": "Kafka broker IDs for internal SNI routing. Required when routing is sni. Supports range syntax e.g. [\"0-2\"] or [\"0-2,10,12-13\"].",
-                                    "default": [],
-                                    "items": {}
                                 },
                                 "sslClientAuth": {
                                     "type": "string",

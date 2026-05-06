@@ -24,7 +24,7 @@ Gateway Bootstrap server :
   SNI listener 'INTERNAL' detected. Per-broker ClusterIP Services created:
     Bootstrap DNS  : {{ include "conduktor-gateway.internalListenerAdvertisedHost" . }}
     Broker pattern : {{ include "conduktor-gateway.internalSNIAdvertisedHostPattern" . }}
-    {{- $brokerData := include "conduktor-gateway.expandBrokerIds" .Values.gateway.listeners.internal.brokerIds | fromJson }}
+    {{- $brokerData := include "conduktor-gateway.expandBrokerIds" .Values.gateway.kafka.brokerIds | fromJson }}
     Services       :
     {{- range $brokerData.ids }}
       {{ printf "%s-broker-%d" (include "conduktor-gateway.fullname" $ | trunc 50 | trimSuffix "-") (int .) }}.{{ $.Release.Namespace }}.svc.{{ $.Values.clusterDomain }}

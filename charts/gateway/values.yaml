@@ -127,6 +127,9 @@ gateway:
   securityMode: "GATEWAY_MANAGED"
   ## @param gateway.aclEnabled Enable ACL for the Gateway virtual cluster. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED).
   aclEnabled: ""
+  kafka:
+    ## @param gateway.kafka.brokerIds Kafka broker IDs used for SNI routing. Required when any listener uses routing: sni. Supports range syntax e.g. ["0-2"] or ["0-2,10,12-13"].
+    brokerIds: []
   listeners:
     internal:
       ## @param gateway.listeners.internal.securityProtocol Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL
@@ -136,8 +139,6 @@ gateway:
       ## @param gateway.listeners.internal.ports Port specs. Format: ADVERTISED:LOCAL or range (e.g. "9092-9098", "443:9092")
       ports:
         - "9092-9098"
-      ## @param gateway.listeners.internal.brokerIds Kafka broker IDs for internal SNI routing. Required when routing is sni. Supports range syntax e.g. ["0-2"] or ["0-2,10,12-13"].
-      brokerIds: []
       ## @param gateway.listeners.internal.sslClientAuth TLS client authentication: NONE, OPTIONAL or REQUIRE (only for SSL/SASL_SSL)
       sslClientAuth: "NONE"
     external:
