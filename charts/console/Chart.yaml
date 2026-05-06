@@ -3,7 +3,7 @@ name: console
 appVersion: 1.45.0
 version: 1.30.0
 description: Helm chart to deploy Conduktor Console on Kubernetes
-icon: https://www.conduktor.io/svgs/logo/symbol.svg
+icon: https://cdn.conduktor.io/brand/symbol_lime.svg
 home: https://www.conduktor.io
 maintainers:
   - name: Conduktor
