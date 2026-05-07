@@ -18,3 +18,27 @@ dependencies:
       - bitnami-common
     # force version to avoid breaking changes due to remove support for older k8s versions in common chart v2.31.0 and above
     version: 2.30.2
+annotations:
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/category: streaming-messaging
+  artifacthub.io/images: |
+    - name: conduktor-console
+      image: conduktor/conduktor-console:1.45.0
+      platforms:
+        - linux/amd64
+        - linux/arm64
+    - name: conduktor-console-cortex
+      image: conduktor/conduktor-console-cortex:1.45.0
+      platforms:
+        - linux/amd64
+        - linux/arm64
+  artifacthub.io/links: |
+    - name: Changelog
+      url: https://docs.conduktor.io/guide/release-notes#console-1-45-0
+    - name: Documentation
+      url: https://docs.conduktor.io 
+    - name: support
+      url: https://www.conduktor.io/contact/support
+  artifacthub.io/screenshots: |
+    - title: Deployment architecture
+      url: https://docs.conduktor.io/images/deployment-overview.png
