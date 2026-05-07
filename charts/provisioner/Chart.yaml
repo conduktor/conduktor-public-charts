@@ -31,7 +31,7 @@ annotations:
     - name: Changelog
       url: https://docs.conduktor.io/guide/release-notes
     - name: Documentation
-      url: https://docs.conduktor.io 
+      url: https://docs.conduktor.io
     - name: support
       url: https://www.conduktor.io/contact/support
   artifacthub.io/screenshots: |
