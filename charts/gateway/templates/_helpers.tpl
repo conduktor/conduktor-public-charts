@@ -81,11 +81,13 @@ Helper function that check if all env values are strings and warn if not
 .*/}}
 {{- define "conduktor-gateway.validate.env" -}}
   {{ $notStringEnv := list}}
-  {{- range $key, $value := .Values.gateway.env }}
-    {{- if ne (typeOf $value) "string" }}
-      {{- $notStringEnv = append $notStringEnv $key }}
+  {{- if .Values.gateway.env -}}
+    {{- range $key, $value := .Values.gateway.env }}
+      {{- if ne (typeOf $value) "string" }}
+        {{- $notStringEnv = append $notStringEnv $key }}
+      {{- end }}
     {{- end }}
-  {{- end }}
+  {{- end -}}
   {{- if $notStringEnv }}
     {{- fail (printf "Some gateway.env values are not typed as string : %v"  (join ", " $notStringEnv )) }}
   {{- end }}
@@ -98,7 +100,10 @@ If it does not exist in either, or exists in both, fail the chart.
 {{- define "conduktor-gateway.validate.kafka-bootstrap-server" -}}
   {{- $env := .Values.gateway.env }}
   {{- $extraEnv := .Values.gateway.extraSecretEnvVars }}
-  {{- $foundInEnv := hasKey $env "KAFKA_BOOTSTRAP_SERVERS" }}
+  {{- $foundInEnv := false }}
+  {{- if $env }}
+    {{- $foundInEnv = hasKey $env "KAFKA_BOOTSTRAP_SERVERS" }}
+  {{- end }}
   {{- $foundInExtraEnv := false }}
   {{- if $extraEnv }}
     {{- range $index, $item := $extraEnv }}
@@ -182,7 +187,9 @@ Params:
 */}}
 {{- define "conduktor-gateway.envExists" -}}
   {{- $exists := false -}}
-  {{- $exists = hasKey $.context.Values.gateway.env $.envkey -}}
+  {{- if and (hasKey $.context.Values.gateway "env") ($.context.Values.gateway.env) -}}
+    {{- $exists = hasKey $.context.Values.gateway.env $.envkey -}}
+  {{- end -}}
   {{- if not $exists -}}
     {{- range $.context.Values.gateway.extraSecretEnvVars -}}
       {{- if eq .name $.envkey -}}

@@ -71,10 +71,10 @@ config:
   admin:
     ## @param config.admin.email Your Conduktor Console Admin email. If changed a new admin user will be created with this email and previous admin user will still be available
     ## Could be provided via an existing secret with `config.existingSecret` using the key `CDK_ADMIN_EMAIL`.
-    email: ""
+    email: "admin@conduktor.io"
     ## @param config.admin.password Your Conduktor Console Admin password. If change current admin user password will be updated.
     ## Could be provided via an existing secret with `config.existingSecret` using the key `CDK_ADMIN_PASSWORD`.
-    password: ""
+    password: "admin"
   ## @param config.database.url Your Conduktor Console Database URL (postgresql or jdbc format)
   ## @param config.database.hosts List of Conduktor Console Database hosts (host and port)
   ## @extra config.database.hosts[].host [string: ""] Conduktor Console Database host
