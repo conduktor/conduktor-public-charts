@@ -108,12 +108,12 @@
                         "email": {
                             "type": "string",
                             "description": "Your Conduktor Console Admin email. If changed a new admin user will be created with this email and previous admin user will still be available",
-                            "default": ""
+                            "default": "admin@conduktor.io"
                         },
                         "password": {
                             "type": "string",
                             "description": "Your Conduktor Console Admin password. If change current admin user password will be updated.",
-                            "default": ""
+                            "default": "admin"
                         }
                     }
                 },

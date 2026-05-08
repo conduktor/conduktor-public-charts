@@ -80,26 +80,26 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/en
 
 A list of Kafka clusters can be configured by adding them under the `config.clusters` key. See [Install with a Kafka cluster](#install-with-a-kafka-cluster) below. Alternatively, clusters can be added in the Console UI.
 
-| Name                                   | Description                                                                                                                                     | Value       |
-| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `config.organization.name`             | Your Conduktor Console Organization. Default is `Conduktor` if not set.                                                                         | `Conduktor` |
-| `config.admin.email`                   | Your Conduktor Console Admin email. If changed a new admin user will be created with this email and previous admin user will still be available | `""`        |
-| `config.admin.password`                | Your Conduktor Console Admin password. If change current admin user password will be updated.                                                   | `""`        |
-| `config.database.url`                  | Your Conduktor Console Database URL (postgresql or jdbc format)                                                                                 | `""`        |
-| `config.database.hosts`                | List of Conduktor Console Database hosts (host and port)                                                                                        | `[]`        |
-| `config.database.hosts[].host`         | Conduktor Console Database host                                                                                                                 |             |
-| `config.database.hosts[].port`         | Conduktor Console Database port                                                                                                                 |             |
-| `config.database.host`                 | **Deprecated** Conduktor Console Database host. Automatically fallback to `config.database.hosts[0].host` if set                                |             |
-| `config.database.port`                 | **Deprecated** Conduktor Console Database port. Automatically fallback to `config.database.hosts[0].port` if set                                |             |
-| `config.database.name`                 | Your Conduktor Console Database name                                                                                                            | `""`        |
-| `config.database.username`             | Your Conduktor Console Database username                                                                                                        | `""`        |
-| `config.database.password`             | Your Conduktor Console Database password                                                                                                        | `""`        |
-| `config.license`                       | Conduktor Console Enterprise license, if none given, the product will run in free tier                                                          | `""`        |
-| `config.existingLicenseSecret`         | Name of an existing secret containing the license                                                                                               | `""`        |
-| `config.existingSecret`                | Name of an existing secret containing sensitive configuration                                                                                   | `""`        |
-| `config.platform.external.url`         | Force the platform to redirect and use this URL (useful when behind a proxy to fix SSO issues)                                                  | `""`        |
-| `config.platform.https.selfSigned`     | Enable HTTPS with a self-signed certificate (not recommended for production) based on 'config.platform.external.url' (required).                | `false`     |
-| `config.platform.https.existingSecret` | Enable HTTPS with an existing secret containing the tls.crt and tls.key (required).                                                             | `""`        |
+| Name                                   | Description                                                                                                                                     | Value                |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| `config.organization.name`             | Your Conduktor Console Organization. Default is `Conduktor` if not set.                                                                         | `Conduktor`          |
+| `config.admin.email`                   | Your Conduktor Console Admin email. If changed a new admin user will be created with this email and previous admin user will still be available | `admin@conduktor.io` |
+| `config.admin.password`                | Your Conduktor Console Admin password. If change current admin user password will be updated.                                                   | `admin`              |
+| `config.database.url`                  | Your Conduktor Console Database URL (postgresql or jdbc format)                                                                                 | `""`                 |
+| `config.database.hosts`                | List of Conduktor Console Database hosts (host and port)                                                                                        | `[]`                 |
+| `config.database.hosts[].host`         | Conduktor Console Database host                                                                                                                 |                      |
+| `config.database.hosts[].port`         | Conduktor Console Database port                                                                                                                 |                      |
+| `config.database.host`                 | **Deprecated** Conduktor Console Database host. Automatically fallback to `config.database.hosts[0].host` if set                                |                      |
+| `config.database.port`                 | **Deprecated** Conduktor Console Database port. Automatically fallback to `config.database.hosts[0].port` if set                                |                      |
+| `config.database.name`                 | Your Conduktor Console Database name                                                                                                            | `""`                 |
+| `config.database.username`             | Your Conduktor Console Database username                                                                                                        | `""`                 |
+| `config.database.password`             | Your Conduktor Console Database password                                                                                                        | `""`                 |
+| `config.license`                       | Conduktor Console Enterprise license, if none given, the product will run in free tier                                                          | `""`                 |
+| `config.existingLicenseSecret`         | Name of an existing secret containing the license                                                                                               | `""`                 |
+| `config.existingSecret`                | Name of an existing secret containing sensitive configuration                                                                                   | `""`                 |
+| `config.platform.external.url`         | Force the platform to redirect and use this URL (useful when behind a proxy to fix SSO issues)                                                  | `""`                 |
+| `config.platform.https.selfSigned`     | Enable HTTPS with a self-signed certificate (not recommended for production) based on 'config.platform.external.url' (required).                | `false`              |
+| `config.platform.https.existingSecret` | Enable HTTPS with an existing secret containing the tls.crt and tls.key (required).                                                             | `""`                 |
 
 ### Platform Monitoring product Parameters
 
