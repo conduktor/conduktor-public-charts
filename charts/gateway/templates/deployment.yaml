@@ -35,6 +35,10 @@ spec:
       {{- if .Values.gateway.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.gateway.terminationGracePeriodSeconds }}
       {{- end }}
+      {{- if .Values.tls.certManager.enabled }}
+      {{/* For cert-manager TLS, the gateway needs to be aware of its own hostname to include it in the certificate request */}}
+      hostname: {{ include "conduktor-gateway.fullname" . }}
+      {{- end }}
       initContainers:
         {{- if .Values.gateway.initContainers }}
           {{- include "common.tplvalues.render" (dict "value" .Values.gateway.initContainers "context" $) | nindent 8 }}
@@ -57,9 +61,15 @@ spec:
             - name: GATEWAY_SECURED_METRICS
               value: {{ .Values.gateway.admin.securedMetrics | quote }}
             {{- end}}
-            {{- if and .Values.tls.enable .Values.tls.secretRef}}
-            - name: GATEWAY_SSL_KEY_STORE_PATH
-              value: /etc/gateway/tls/{{ .Values.tls.keystoreFile }}
+            {{- $tlsVars := include "conduktor-gateway.tlsEnvVars" . | fromJson }}
+            {{- range $name, $value := $tlsVars }}
+            {{- if kindIs "map" $value }}
+            - name: {{ $name }}
+              valueFrom: {{ $value | toYaml | nindent 16 }}
+            {{- else }}
+            - name: {{ $name }}
+              value: {{ $value | quote }}
+            {{- end }}
             {{- end }}
             {{- if eq (include "conduktor-gateway.envExists" (dict "envkey" "GATEWAY_FEATURE_FLAGS_INTERNAL_LOAD_BALANCING" "context" $)) "false" }}
             - name: GATEWAY_FEATURE_FLAGS_INTERNAL_LOAD_BALANCING
@@ -120,9 +130,15 @@ spec:
             {{- with .Values.gateway.volumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-            {{- if and .Values.tls.enable .Values.tls.secretRef }}
+            {{- if or (and .Values.tls.enable (include "conduktor-gateway.keystoreSecretRef" .)) .Values.tls.certManager.enabled }}
             - name: keystore
               mountPath: /etc/gateway/tls/
+              readOnly: true
+            {{- end }}
+            {{- if and .Values.tls.truststore.secretRef (not (and .Values.tls.certManager.enabled .Values.tls.certManager.truststore.enabled)) }}
+            - name: truststore
+              mountPath: /etc/gateway/tls/{{ .Values.tls.truststore.keystoreFile }}
+              subPath: {{ .Values.tls.truststore.keystoreKey }}
               readOnly: true
             {{- end }}
             - name: config
@@ -178,13 +194,27 @@ spec:
         {{- with .Values.gateway.volumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- if .Values.tls.enable }}
+        {{- $keystoreFile := include "conduktor-gateway.keystoreFile" . }}
+        {{- if or .Values.tls.enable .Values.tls.certManager.enabled }}
         - name: keystore
           secret:
-            secretName: {{ required "A .tls.secretRef is required when .tls.enable is true" .Values.tls.secretRef }}
+            secretName: {{ if .Values.tls.certManager.enabled -}}
+              {{ include "conduktor-gateway.fullname" . }}-tls
+            {{- else -}}
+              {{ required "tls.keystore.secretRef (or deprecated tls.secretRef) is required when tls.enable is true" (include "conduktor-gateway.keystoreSecretRef" .) }}
+            {{- end }}
             items:
-            - key: {{ .Values.tls.keystoreKey }}
-              path: {{ .Values.tls.keystoreFile }}
+            - key: {{ if .Values.tls.certManager.enabled }}keystore.jks{{ else }}{{ include "conduktor-gateway.keystoreKey" . }}{{ end }}
+              path: {{ $keystoreFile }}
+            {{- if and .Values.tls.certManager.enabled .Values.tls.certManager.truststore.enabled }}
+            - key: truststore.jks
+              path: {{ .Values.tls.truststore.keystoreFile }}
+            {{- end }}
+        {{- end }}
+        {{- if and .Values.tls.truststore.secretRef (not (and .Values.tls.certManager.enabled .Values.tls.certManager.truststore.enabled)) }}
+        - name: truststore
+          secret:
+            secretName: {{ .Values.tls.truststore.secretRef }}
         {{- end }}
         - name: config
           configMap:

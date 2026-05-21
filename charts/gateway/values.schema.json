@@ -538,18 +538,165 @@
                 },
                 "secretRef": {
                     "type": "string",
-                    "description": "Secret name with keystore to load",
+                    "description": "DEPRECATED: use tls.keystore.secretRef instead. Secret name with keystore to load",
                     "default": ""
                 },
                 "keystoreKey": {
                     "type": "string",
-                    "description": "Key in the secret to load as keystore",
+                    "description": "DEPRECATED: use tls.keystore.keystoreKey instead. Key in the secret to load as keystore",
                     "default": "keystore.jks"
                 },
                 "keystoreFile": {
                     "type": "string",
-                    "description": "File name to mount keystore as",
+                    "description": "DEPRECATED: use tls.keystore.keystoreFile instead. File name to mount keystore as",
                     "default": "keystore.jks"
+                },
+                "keystore": {
+                    "type": "object",
+                    "properties": {
+                        "secretRef": {
+                            "type": "string",
+                            "description": "Secret containing the JKS keystore file",
+                            "default": ""
+                        },
+                        "keystoreKey": {
+                            "type": "string",
+                            "description": "Key in the keystore secret",
+                            "default": "keystore.jks"
+                        },
+                        "keystoreFile": {
+                            "type": "string",
+                            "description": "Filename to mount the keystore as",
+                            "default": "keystore.jks"
+                        },
+                        "passwordSecretRef": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "Secret containing the keystore password",
+                                    "default": ""
+                                },
+                                "key": {
+                                    "type": "string",
+                                    "description": "Key in the password secret",
+                                    "default": "password"
+                                }
+                            }
+                        }
+                    }
+                },
+                "truststore": {
+                    "type": "object",
+                    "properties": {
+                        "secretRef": {
+                            "type": "string",
+                            "description": "Secret containing the JKS truststore file (manual path; leave empty to skip)",
+                            "default": ""
+                        },
+                        "keystoreKey": {
+                            "type": "string",
+                            "description": "Key in the truststore secret",
+                            "default": "truststore.jks"
+                        },
+                        "keystoreFile": {
+                            "type": "string",
+                            "description": "Filename to mount the truststore as",
+                            "default": "truststore.jks"
+                        },
+                        "passwordSecretRef": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "Secret containing the truststore password",
+                                    "default": ""
+                                },
+                                "key": {
+                                    "type": "string",
+                                    "description": "Key in the truststore password secret",
+                                    "default": "password"
+                                }
+                            }
+                        }
+                    }
+                },
+                "certManager": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enable cert-manager integration using native JKS keystore generation",
+                            "default": false
+                        },
+                        "issuerRef": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "cert-manager Issuer or ClusterIssuer name",
+                                    "default": ""
+                                },
+                                "kind": {
+                                    "type": "string",
+                                    "description": "Issuer kind — Issuer or ClusterIssuer",
+                                    "default": "ClusterIssuer"
+                                },
+                                "group": {
+                                    "type": "string",
+                                    "description": "Issuer group (leave empty to default to cert-manager.io)",
+                                    "default": ""
+                                }
+                            }
+                        },
+                        "extraDnsNames": {
+                            "type": "array",
+                            "description": "Additional DNS SANs beyond those auto-derived from listener config",
+                            "default": [],
+                            "items": {"type": "string"}
+                        },
+                        "extraIpAddresses": {
+                            "type": "array",
+                            "description": "Additional IP SANs to include in the certificate",
+                            "default": [],
+                            "items": {"type": "string"}
+                        },
+                        "duration": {
+                            "type": "string",
+                            "description": "Certificate validity duration",
+                            "default": "8760h"
+                        },
+                        "renewBefore": {
+                            "type": "string",
+                            "description": "How early to renew before expiry",
+                            "default": "720h"
+                        },
+                        "sslContextRefreshMinutes": {
+                            "type": "integer",
+                            "description": "How often Gateway reloads the SSL context from disk (GATEWAY_SSL_UPDATE_CONTEXT_INTERVAL_MINUTES)",
+                            "default": 5
+                        },
+                        "truststore": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "Mount the cert-manager JKS truststore and set GATEWAY_SSL_TRUST_STORE_* env vars. Enable only when upstream Kafka uses SSL or listeners require mTLS. Leave false for PLAINTEXT Kafka.",
+                                    "default": false
+                                }
+                            }
+                        },
+                        "httpsAdminApi": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "Secure the admin API with the same JKS keystore",
+                                    "default": false
+                                }
+                            }
+                        }
+                    }
                 }
             }
         },

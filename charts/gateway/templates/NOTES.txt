@@ -12,6 +12,7 @@ To learn more about the release, try:
 
 {{- include "conduktor-gateway.validate.kafka-bootstrap-server" . }}
 {{- include "conduktor-gateway.validate.listeners" . }}
+{{- include "conduktor-gateway.validate.tls" . }}
 
 Gateway Bootstrap server :
 {{- $internalServiceHost := printf "%s.%s.svc.%s" (include "conduktor-gateway.internalServiceName" .) .Release.Namespace .Values.clusterDomain -}}
@@ -27,7 +28,7 @@ Gateway Bootstrap server :
     {{- $brokerData := include "conduktor-gateway.expandBrokerIds" .Values.gateway.listeners.internal.brokerIds | fromJson }}
     Services       :
     {{- range $brokerData.ids }}
-      {{ printf "%s-broker-%d" (include "conduktor-gateway.fullname" $ | trunc 50 | trimSuffix "-") (int .) }}.{{ $.Release.Namespace }}.svc.{{ $.Values.clusterDomain }}
+      {{ include "conduktor-gateway.brokerSniServiceName" (dict "id" . "context" $) }}.{{ $.Release.Namespace }}.svc.{{ $.Values.clusterDomain }}
     {{- end }}
     {{- end }}
   {{- if .Values.service.external.enable }}
@@ -152,4 +153,16 @@ DEPRECATION NOTICE: gateway.portRange is deprecated and will be removed in a fut
 {{ if .Values.resources -}}
 Depreciation Warning:
 - Root value "resources" is deprecated. We recommend using "gateway.resources" instead.
+{{- end }}
+
+{{- if or .Values.tls.secretRef .Values.tls.keystoreKey .Values.tls.keystoreFile }}
+
+DEPRECATION NOTICE: tls.secretRef, tls.keystoreKey, and tls.keystoreFile are deprecated.
+  Migrate to the new tls.keystore.* structure:
+
+  tls:
+    keystore:
+      secretRef: "{{ .Values.tls.secretRef }}"
+      keystoreKey: "{{ .Values.tls.keystoreKey }}"
+      keystoreFile: "{{ .Values.tls.keystoreFile }}"
 {{- end }}

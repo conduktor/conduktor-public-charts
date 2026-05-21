@@ -113,11 +113,14 @@ name: conduktor
  # Install Conduktor Gateway chart
 helm install gateway charts/gateway \
   --namespace conduktor \
+  --dependency-update
+  --set gateway.licenseKey="<your conduktor license key>"
   --set gateway.env.KAFKA_BOOTSTRAP_SERVERS="kafka-local-dev.conduktor.svc.cluster.local:9092"
 
 # Install Conduktor Console chart
 helm install console charts/console \
   --namespace conduktor \
+  --dependency-update
   --set config.organization.name=test \
   --set config.admin.email=test@test.io \
   --set config.admin.password=testP4ss! \
