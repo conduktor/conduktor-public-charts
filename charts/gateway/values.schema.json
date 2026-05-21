@@ -539,17 +539,17 @@
                 "secretRef": {
                     "type": "string",
                     "description": "DEPRECATED: use tls.keystore.secretRef instead. Secret name with keystore to load",
-                    "default": ""
+                    "default": "\"\""
                 },
                 "keystoreKey": {
                     "type": "string",
                     "description": "DEPRECATED: use tls.keystore.keystoreKey instead. Key in the secret to load as keystore",
-                    "default": "keystore.jks"
+                    "default": "\"\""
                 },
                 "keystoreFile": {
                     "type": "string",
                     "description": "DEPRECATED: use tls.keystore.keystoreFile instead. File name to mount keystore as",
-                    "default": "keystore.jks"
+                    "default": "\"\""
                 },
                 "keystore": {
                     "type": "object",
@@ -574,7 +574,7 @@
                             "properties": {
                                 "name": {
                                     "type": "string",
-                                    "description": "Secret containing the keystore password",
+                                    "description": "Secret containing the keystore password (optional; leave empty to set via gateway.env or gateway.extraSecretEnvVars)",
                                     "default": ""
                                 },
                                 "key": {
@@ -601,7 +601,7 @@
                         },
                         "keystoreFile": {
                             "type": "string",
-                            "description": "Filename to mount the truststore as",
+                            "description": "Filename to mount the truststore as (also used for cert-manager truststore path)",
                             "default": "truststore.jks"
                         },
                         "passwordSecretRef": {
@@ -609,7 +609,7 @@
                             "properties": {
                                 "name": {
                                     "type": "string",
-                                    "description": "Secret containing the truststore password",
+                                    "description": "Secret containing the truststore password (optional)",
                                     "default": ""
                                 },
                                 "key": {
@@ -626,7 +626,7 @@
                     "properties": {
                         "enabled": {
                             "type": "boolean",
-                            "description": "Enable cert-manager integration using native JKS keystore generation",
+                            "description": "Enable cert-manager integration using native JKS keystore generation (requires cert-manager >= 0.15)",
                             "default": false
                         },
                         "issuerRef": {
@@ -653,26 +653,26 @@
                             "type": "array",
                             "description": "Additional DNS SANs beyond those auto-derived from listener config",
                             "default": [],
-                            "items": {"type": "string"}
+                            "items": {}
                         },
                         "extraIpAddresses": {
                             "type": "array",
                             "description": "Additional IP SANs to include in the certificate",
                             "default": [],
-                            "items": {"type": "string"}
+                            "items": {}
                         },
                         "duration": {
                             "type": "string",
-                            "description": "Certificate validity duration",
-                            "default": "8760h"
+                            "description": "Certificate validity duration. Defaults to 90 days.",
+                            "default": "2160h"
                         },
                         "renewBefore": {
                             "type": "string",
-                            "description": "How early to renew before expiry",
-                            "default": "720h"
+                            "description": "How early cert-manager starts renewing before expiry. Must be less than duration.",
+                            "default": "360h"
                         },
                         "sslContextRefreshMinutes": {
-                            "type": "integer",
+                            "type": "number",
                             "description": "How often Gateway reloads the SSL context from disk (GATEWAY_SSL_UPDATE_CONTEXT_INTERVAL_MINUTES)",
                             "default": 5
                         },
@@ -681,7 +681,7 @@
                             "properties": {
                                 "enabled": {
                                     "type": "boolean",
-                                    "description": "Mount the cert-manager JKS truststore and set GATEWAY_SSL_TRUST_STORE_* env vars. Enable only when upstream Kafka uses SSL or listeners require mTLS. Leave false for PLAINTEXT Kafka.",
+                                    "description": "Mount the cert-manager JKS truststore and set GATEWAY_SSL_TRUST_STORE_* env vars. Enable only when the upstream Kafka broker uses SSL or when Gateway listeners require mTLS. Leave false when upstream Kafka is PLAINTEXT — enabling with PLAINTEXT Kafka will cause Gateway to fail at startup.",
                                     "default": false
                                 }
                             }
