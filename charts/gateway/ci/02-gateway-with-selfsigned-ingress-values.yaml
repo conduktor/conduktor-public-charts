@@ -1,4 +1,4 @@
-nameOverride: gw-02
+nameOverride: gateway-test-02
 
 gateway:
   replicas: 1
