@@ -282,12 +282,62 @@ gateway:
 tls:
   ## @param tls.enable Enable TLS injection into Gateway
   enable: false
-  ## @param tls.secretRef Secret name with keystore to load
+  ## @param tls.secretRef [string] DEPRECATED: use tls.keystore.secretRef instead. Secret name with keystore to load
   secretRef: ""
-  ## @param tls.keystoreKey Key in the secret to load as keystore
+  ## @param tls.keystoreKey [string] DEPRECATED: use tls.keystore.keystoreKey instead. Key in the secret to load as keystore
   keystoreKey: keystore.jks
-  ## @param tls.keystoreFile File name to mount keystore as
+  ## @param tls.keystoreFile [string] DEPRECATED: use tls.keystore.keystoreFile instead. File name to mount keystore as
   keystoreFile: keystore.jks
+  ## @param tls.keystore.secretRef Secret containing the JKS keystore file
+  ## @param tls.keystore.keystoreKey Key in the keystore secret
+  ## @param tls.keystore.keystoreFile Filename to mount the keystore as
+  ## @param tls.keystore.passwordSecretRef.name Secret containing the keystore password (optional; leave empty to set via gateway.env or gateway.extraSecretEnvVars)
+  ## @param tls.keystore.passwordSecretRef.key Key in the password secret
+  keystore:
+    secretRef: ""
+    keystoreKey: keystore.jks
+    keystoreFile: keystore.jks
+    passwordSecretRef:
+      name: ""
+      key: "password"
+  ## @param tls.truststore.secretRef Secret containing the JKS truststore file (manual path; leave empty to skip)
+  ## @param tls.truststore.keystoreKey Key in the truststore secret
+  ## @param tls.truststore.keystoreFile Filename to mount the truststore as (also used for cert-manager truststore path)
+  ## @param tls.truststore.passwordSecretRef.name Secret containing the truststore password (optional)
+  ## @param tls.truststore.passwordSecretRef.key Key in the truststore password secret
+  truststore:
+    secretRef: ""
+    keystoreKey: truststore.jks
+    keystoreFile: truststore.jks
+    passwordSecretRef:
+      name: ""
+      key: "password"
+  ## @param tls.certManager.enabled Enable cert-manager integration using native JKS keystore generation (requires cert-manager >= 0.15)
+  ## @param tls.certManager.issuerRef.name cert-manager Issuer or ClusterIssuer name
+  ## @param tls.certManager.issuerRef.kind Issuer kind — Issuer or ClusterIssuer
+  ## @param tls.certManager.issuerRef.group Issuer group (leave empty to default to cert-manager.io)
+  ## @param tls.certManager.extraDnsNames Additional DNS SANs beyond those auto-derived from listener config
+  ## @param tls.certManager.extraIpAddresses Additional IP SANs to include in the certificate
+  ## @param tls.certManager.duration Certificate validity duration
+  ## @param tls.certManager.renewBefore How early to renew before expiry
+  ## @param tls.certManager.sslContextRefreshMinutes How often Gateway reloads the SSL context from disk (GATEWAY_SSL_UPDATE_CONTEXT_INTERVAL_MINUTES)
+  ## @param tls.certManager.truststore.enabled Mount the cert-manager JKS truststore and set GATEWAY_SSL_TRUST_STORE_* env vars. Enable only when the upstream Kafka broker uses SSL or when Gateway listeners require mTLS. Leave false when upstream Kafka is PLAINTEXT — enabling with PLAINTEXT Kafka will cause Gateway to fail at startup.
+  ## @param tls.certManager.httpsAdminApi.enabled Secure the admin API with the same JKS keystore
+  certManager:
+    enabled: false
+    issuerRef:
+      name: ""
+      kind: ClusterIssuer
+      group: ""
+    extraDnsNames: []
+    extraIpAddresses: []
+    duration: "8760h"
+    renewBefore: "720h"
+    sslContextRefreshMinutes: 5
+    truststore:
+      enabled: false
+    httpsAdminApi:
+      enabled: false
 ## @section Gateway service configurations
 ## @descriptionStart
 ## This section contains Kubernetes services configuration.

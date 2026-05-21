@@ -70,6 +70,7 @@ helm-deps: ## Install helm dependencies
 	helm repo add conduktor https://helm.conduktor.io/ || true
 	helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx || true
 	helm repo add bitnami https://charts.bitnami.com/bitnami || true
+	helm repo add jetstack https://charts.jetstack.io || true
 	helm repo update
 
 .PHONY: k3d-up
@@ -78,6 +79,8 @@ k3d-up: ## Setup k3d cluster
 	make create-k3d-cluster
 	@echo "Installing nginx-ingress"
 	make helm-nginx
+	@echo "Installing cert-manager"
+	make helm-cert-manager
 	@echo "Create Test namespace"
 	make create-test-ns
 
@@ -87,6 +90,8 @@ k3d-ci-up: ## Setup CI k3d cluster
 	make create-k3d-cluster
 	@echo "Installing nginx-ingress"
 	make helm-nginx
+	@echo "Installing cert-manager"
+	make helm-cert-manager
 	@echo "Create Test namespace"
 	make create-test-ns
 
@@ -167,6 +172,21 @@ helm-nginx: ## Install nginx-ingress helm chart from ingress-nginx
 	@echo "Waiting for ingress-nginx to be ready..."
 	kubectl wait deployment -n ingress-nginx \
 		ingress-nginx-controller --for condition=Available=True --timeout=90s
+
+.PHONY: helm-cert-manager
+helm-cert-manager: ## Install cert-manager and a default self-signed ClusterIssuer
+	make check-kube-context
+
+	@echo "Installing cert-manager"
+	helm upgrade --install cert-manager jetstack/cert-manager \
+	  --namespace cert-manager --create-namespace \
+	  --set crds.enabled=true \
+	  --wait --timeout 120s
+	@echo "Waiting for cert-manager webhook to be ready..."
+	kubectl wait deployment -n cert-manager \
+		cert-manager-webhook --for condition=Available=True --timeout=60s
+	@echo "Applying self-signed ClusterIssuer"
+	kubectl apply -f $(CURDIR)/k3d/selfsigned-issuer.yaml
 
 .PHONY: helm-postgresql
 helm-postgresql: ## Install postgresql helm chart from bitnami

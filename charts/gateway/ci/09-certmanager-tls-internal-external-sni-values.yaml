@@ -1,4 +1,4 @@
-nameOverride: gw-05
+nameOverride: gw-09
 
 gateway:
   replicas: 1
@@ -7,22 +7,24 @@ gateway:
   securityMode: "GATEWAY_MANAGED"
   listeners:
     internal:
-      securityProtocol: PLAINTEXT
-      routing: port
-      ports:
-        - "19092-19098"
-    external:
       securityProtocol: SASL_SSL
       routing: sni
       ports:
         - "9092"
+      brokerIds:
+        - "0-2"
+    external:
+      securityProtocol: SASL_SSL
+      routing: sni
+      ports:
+        - "19092"
       advertisedHost: "kafka.example.com"
       advertisedHostPattern: "broker-{{nodeId}}.kafka.example.com"
       bootstrapHostPattern: "bootstrap.kafka.example.com"
       sslClientAuth: "NONE"
   env:
     KAFKA_BOOTSTRAP_SERVERS: kafka.ct-gateway-deps.svc.cluster.local:9092
-    GATEWAY_CLUSTER_ID: "gw-05"
+    GATEWAY_CLUSTER_ID: "gw-09"
     GATEWAY_SSL_KEY_STORE_PASSWORD: "conduktor"
     GATEWAY_SSL_KEY_PASSWORD: "conduktor"
   extraSecretEnvVars:
@@ -51,10 +53,17 @@ podSecurityContext:
   runAsNonRoot: true
 
 tls:
-  enable: true
-  secretRef: gateway-tls-keystore
-  keystoreKey: keystore.jks
-  keystoreFile: keystore.jks
+  certManager:
+    enabled: true
+    issuerRef:
+      name: selfsigned-cluster-issuer
+      kind: ClusterIssuer
+    sslContextRefreshMinutes: 5
+    truststore:
+      enabled: false  # Kafka in CI is PLAINTEXT; truststore sets GATEWAY_SSL_TRUST_STORE_* which forces SSL upstream
+    httpsAdminApi:
+      enabled: true
+
 
 service:
   external:
