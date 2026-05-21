@@ -318,8 +318,8 @@ tls:
   ## @param tls.certManager.issuerRef.group Issuer group (leave empty to default to cert-manager.io)
   ## @param tls.certManager.extraDnsNames Additional DNS SANs beyond those auto-derived from listener config
   ## @param tls.certManager.extraIpAddresses Additional IP SANs to include in the certificate
-  ## @param tls.certManager.duration Certificate validity duration
-  ## @param tls.certManager.renewBefore How early to renew before expiry
+  ## @param tls.certManager.duration Certificate validity duration. Defaults to 90 days.
+  ## @param tls.certManager.renewBefore How early cert-manager starts renewing before expiry. Must be less than duration.
   ## @param tls.certManager.sslContextRefreshMinutes How often Gateway reloads the SSL context from disk (GATEWAY_SSL_UPDATE_CONTEXT_INTERVAL_MINUTES)
   ## @param tls.certManager.truststore.enabled Mount the cert-manager JKS truststore and set GATEWAY_SSL_TRUST_STORE_* env vars. Enable only when the upstream Kafka broker uses SSL or when Gateway listeners require mTLS. Leave false when upstream Kafka is PLAINTEXT — enabling with PLAINTEXT Kafka will cause Gateway to fail at startup.
   ## @param tls.certManager.httpsAdminApi.enabled Secure the admin API with the same JKS keystore
@@ -331,8 +331,8 @@ tls:
       group: ""
     extraDnsNames: []
     extraIpAddresses: []
-    duration: "8760h"
-    renewBefore: "720h"
+    duration: "2160h"   # 90 days
+    renewBefore: "360h" # 15 days
     sslContextRefreshMinutes: 5
     truststore:
       enabled: false
