@@ -282,11 +282,11 @@ gateway:
 tls:
   ## @param tls.enable Enable TLS injection into Gateway
   enable: false
-  ## @param tls.secretRef [string] DEPRECATED: use tls.keystore.secretRef instead. Secret name with keystore to load
+  ## @param tls.secretRef DEPRECATED: use tls.keystore.secretRef instead. Secret name with keystore to load
   secretRef: ""
-  ## @param tls.keystoreKey [string] DEPRECATED: use tls.keystore.keystoreKey instead. Key in the secret to load as keystore
+  ## @param tls.keystoreKey DEPRECATED: use tls.keystore.keystoreKey instead. Key in the secret to load as keystore
   keystoreKey: keystore.jks
-  ## @param tls.keystoreFile [string] DEPRECATED: use tls.keystore.keystoreFile instead. File name to mount keystore as
+  ## @param tls.keystoreFile DEPRECATED: use tls.keystore.keystoreFile instead. File name to mount keystore as
   keystoreFile: keystore.jks
   ## @param tls.keystore.secretRef Secret containing the JKS keystore file
   ## @param tls.keystore.keystoreKey Key in the keystore secret

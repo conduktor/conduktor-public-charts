@@ -25,8 +25,6 @@ gateway:
   env:
     KAFKA_BOOTSTRAP_SERVERS: kafka.ct-gateway-deps.svc.cluster.local:9092
     GATEWAY_CLUSTER_ID: "gw-09"
-    GATEWAY_SSL_KEY_STORE_PASSWORD: "conduktor"
-    GATEWAY_SSL_KEY_PASSWORD: "conduktor"
   extraSecretEnvVars:
     - name: GATEWAY_LICENSE_KEY
       valueFrom:
@@ -58,7 +56,6 @@ tls:
     issuerRef:
       name: selfsigned-cluster-issuer
       kind: ClusterIssuer
-    sslContextRefreshMinutes: 5
     extraDnsNames: 
       - "extra.kafka.example.com"
     extraIpAddresses: 
