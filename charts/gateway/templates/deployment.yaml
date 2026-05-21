@@ -36,7 +36,9 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.gateway.terminationGracePeriodSeconds }}
       {{- end }}
       {{- if .Values.tls.certManager.enabled }}
-      {{/* For cert-manager TLS, the gateway needs to be aware of its own hostname to include it in the certificate request */}}
+      {{/* Set a deterministic pod hostname so Gateway can locate its own SAN entry in the mounted JKS keystore.
+           Without this the pod hostname is a random suffix that doesn't appear in the cert SANs derived at
+           template time, causing Gateway to fail SSL context initialisation. */}}
       hostname: {{ include "conduktor-gateway.fullname" . }}
       {{- end }}
       initContainers:

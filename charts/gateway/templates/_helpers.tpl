@@ -375,7 +375,7 @@ Validate TLS configuration. Called unconditionally from NOTES.txt.
 {{- if .Values.tls.certManager.enabled -}}
 
   {{- if not (.Capabilities.APIVersions.Has "cert-manager.io/v1") -}}
-    {{- fail "tls.certManager.enabled requires cert-manager >= 0.15 to be installed in the cluster (cert-manager.io/v1 API not found). Install cert-manager first or pass --api-versions cert-manager.io/v1 to helm template." -}}
+    {{- fail "tls.certManager.enabled requires cert-manager >= 0.15 to be installed in the cluster (cert-manager.io/v1 API not found). Install cert-manager first." -}}
   {{- end -}}
 
   {{- if not .Values.gateway.preview.listeners -}}
@@ -389,6 +389,16 @@ Validate TLS configuration. Called unconditionally from NOTES.txt.
 
   {{- if and .Values.tls.truststore.secretRef .Values.tls.certManager.truststore.enabled -}}
     {{- fail "tls.truststore.secretRef and tls.certManager.truststore.enabled cannot both be set. Use one or the other." -}}
+  {{- end -}}
+
+  {{- $dur := .Values.tls.certManager.duration -}}
+  {{- $renew := .Values.tls.certManager.renewBefore -}}
+  {{- if and (hasSuffix "h" $dur) (hasSuffix "h" $renew) -}}
+    {{- $durH := trimSuffix "h" $dur | atoi -}}
+    {{- $renewH := trimSuffix "h" $renew | atoi -}}
+    {{- if ge $renewH $durH -}}
+      {{- fail (printf "tls.certManager.renewBefore (%s) must be less than tls.certManager.duration (%s)." $renew $dur) -}}
+    {{- end -}}
   {{- end -}}
 
 {{- end -}}

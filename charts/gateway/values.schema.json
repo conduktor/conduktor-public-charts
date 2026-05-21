@@ -539,17 +539,17 @@
                 "secretRef": {
                     "type": "string",
                     "description": "DEPRECATED: use tls.keystore.secretRef instead. Secret name with keystore to load",
-                    "default": "\"\""
+                    "default": ""
                 },
                 "keystoreKey": {
                     "type": "string",
                     "description": "DEPRECATED: use tls.keystore.keystoreKey instead. Key in the secret to load as keystore",
-                    "default": "\"\""
+                    "default": "keystore.jks"
                 },
                 "keystoreFile": {
                     "type": "string",
                     "description": "DEPRECATED: use tls.keystore.keystoreFile instead. File name to mount keystore as",
-                    "default": "\"\""
+                    "default": "keystore.jks"
                 },
                 "keystore": {
                     "type": "object",
