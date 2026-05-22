@@ -382,36 +382,54 @@ console, we recommend you to look at our
 - [Install without Conduktor monitoring](#install-without-conduktor-monitoring)
 
 ### Kubernetes configuration
-- [Install with an enterprise license](#install-with-an-enterprise-license)
-- [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
-- [Install with a Kafka cluster](#install-with-a-kafka-cluster)
-- [Install with a Confluent Cloud cluster](#install-with-a-confluent-cloud-cluster)
-- [Install without Conduktor monitoring](#install-without-conduktor-monitoring)
-- [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
-- [Provide credentials configuration as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
-- [Provide monitoring configuration as a Kubernetes Secret](#provide-monitoring-configuration-as-a-kubernetes-secret)
-- [Pulling from private registry using `global.imagePullSecrets`](#pulling-from-private-registry-using-globalimagepullsecrets)
-- [Store platform data into a Persistent Volume](#store-platform-data-into-a-persistent-volume)
-- [Install with a PodAffinity](#install-with-a-podaffinity)
-- [Provide console configuration as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
-- [Provide additional credentials as a Kubernetes Secret](#provide-additional-credentials-as-a-kubernetes-secret)
-- [Install with a toleration](#install-with-a-toleration)
-- [Ingress configuration](#ingress-configuration)
-  - [Ingress TLS configuration](#ingress-tls-configuration)
-    - [Using cert-manager](#using-cert-manager)
-    - [Using existing TLS secret](#using-existing-tls-secret)
-    - [Using plain PEM certificate and key](#using-plain-pem-certificate-and-key)
-    - [Using Multiple TLS secrets](#using-multiple-tls-secrets)
-    - [Using Helm generated self-signed certificates](#using-helm-generated-self-signed-certificates)
-  - [Ingress with context path](#ingress-with-context-path)
-- [Container TLS configuration](#container-tls-configuration)
-  - [Use an existing secret](#use-an-existing-secret-)
-  - [Install with Self-Signed TLS certificate](#install-with-self-signed-tls-certificate)
-- [Install with a custom service account](#install-with-a-custom-service-account)
-- [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
-- [Install with Console technical monitoring](#install-with-console-technical-monitoring)
-- [Install with custom certificates or keytab](#install-with-custom-certificates-or-keytab)
-- [Install network debugging image as a sidecar](#install-network-debugging-image-as-a-sidecar)
+- [Conduktor Console](#conduktor-console)
+  - [TL;DR](#tldr)
+  - [Introduction](#introduction)
+  - [Prerequisites](#prerequisites)
+  - [Parameters](#parameters)
+    - [Global parameters](#global-parameters)
+    - [Common parameters](#common-parameters)
+    - [Platform product Parameters](#platform-product-parameters)
+    - [Platform Monitoring product Parameters](#platform-monitoring-product-parameters)
+    - [Platform Deployment Parameters](#platform-deployment-parameters)
+    - [Platform Metrics activation](#platform-metrics-activation)
+    - [Traffic Exposure Parameters](#traffic-exposure-parameters)
+    - [Other Parameters](#other-parameters)
+    - [Platform Cortex Parameters](#platform-cortex-parameters)
+  - [Snippets](#snippets)
+    - [Console configuration](#console-configuration)
+    - [Kubernetes configuration](#kubernetes-configuration)
+    - [Install with an enterprise license](#install-with-an-enterprise-license)
+    - [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
+    - [Install with a Kafka cluster](#install-with-a-kafka-cluster)
+    - [Install with a Confluent Cloud cluster](#install-with-a-confluent-cloud-cluster)
+    - [Install without Conduktor monitoring](#install-without-conduktor-monitoring)
+    - [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
+    - [Provide credentials configuration as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
+    - [Provide monitoring configuration as a Kubernetes Secret](#provide-monitoring-configuration-as-a-kubernetes-secret)
+    - [Pulling from private registry using `global.imagePullSecrets`](#pulling-from-private-registry-using-globalimagepullsecrets)
+    - [Store platform data into a Persistent Volume](#store-platform-data-into-a-persistent-volume)
+    - [Install with a PodAffinity](#install-with-a-podaffinity)
+    - [Provide console configuration as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
+    - [Provide additional credentials as a Kubernetes Secret](#provide-additional-credentials-as-a-kubernetes-secret)
+    - [Install with a toleration](#install-with-a-toleration)
+    - [Ingress configuration](#ingress-configuration)
+      - [Ingress TLS configuration](#ingress-tls-configuration)
+        - [Using cert-manager](#using-cert-manager)
+        - [Using existing TLS secret](#using-existing-tls-secret)
+        - [Using plain PEM certificate and key](#using-plain-pem-certificate-and-key)
+        - [Using Multiple TLS secrets](#using-multiple-tls-secrets)
+        - [Using Helm generated self-signed certificates](#using-helm-generated-self-signed-certificates)
+      - [Ingress with context path](#ingress-with-context-path)
+    - [Container TLS configuration](#container-tls-configuration)
+      - [Use an existing secret](#use-an-existing-secret)
+      - [Install with Self-Signed TLS certificate](#install-with-self-signed-tls-certificate)
+    - [Install with a custom service account](#install-with-a-custom-service-account)
+    - [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
+    - [Install with Console technical monitoring](#install-with-console-technical-monitoring)
+    - [Install with custom certificates or keytab](#install-with-custom-certificates-or-keytab)
+  - [Troubleshooting](#troubleshooting)
+    - [Install network debugging image as a sidecar](#install-network-debugging-image-as-a-sidecar)
 
 ### Install with an enterprise license
 
@@ -724,6 +742,17 @@ platformCortex:
 
 ### Store platform data into a Persistent Volume
 
+By default, both Console and Cortex use `emptyDir` for their `dataVolume` and `tmpVolume`, which is backed by the node's ephemeral storage. You may want to move them onto a PersistentVolume in two cases: to avoid filling node disks on large deployments, and (for Cortex specifically) to give the compaction cache a dedicated, sized volume.
+
+**Cortex** is a single-replica stateful service — it holds a local compaction cache for the monitoring backend (long-term data lives in your configured object storage). When backing it with a `ReadWriteOnce` PVC (the default access mode for most cloud storage classes), you **must** also set `updateStrategy.type: Recreate`. Without this, Helm upgrades will start the new pod before terminating the old one, and the new pod will fail to mount the PVC — or, on single-node clusters, both pods will mount it simultaneously and risk data corruption. Size the cortex `dataVolume` based on your workload.
+
+> **Don't use `ReadWriteMany` for Cortex.** RWX would let the old and new pods mount the volume simultaneously during a rolling upgrade, sidestepping the mount race — but cortex is a single-writer process and would corrupt the compaction cache when two pods write to it at once. Stick with RWO + Recreate.
+
+**Console** has no local state that needs to survive a pod restart — its real state lives in PostgreSQL, and the contents of `dataVolume` (generated config files and startup logs) are regenerated on every start. If you choose to attach a PVC anyway (for example to avoid node ephemeral disk usage), you have two options:
+
+- **Single-replica Console**: use a `ReadWriteOnce` PVC and set `platform.updateStrategy.type: Recreate`, same as Cortex.
+- **Multi-replica Console**: the PVC must be `ReadWriteMany` (e.g. NFS, EFS, CephFS, or a GCS/S3-backed CSI driver). With RWO and multiple replicas, only one pod will ever schedule and rolling upgrades will hang.
+
 ```yaml
 # values.yaml
 config:
@@ -751,6 +780,8 @@ platform:
 
 platformCortex:
   enabled: true
+  updateStrategy:
+    type: Recreate
   dataVolume:
     persistentVolumeClaim:
       claimName: monitoring-data-pv-claim
