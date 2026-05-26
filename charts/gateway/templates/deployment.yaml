@@ -72,7 +72,7 @@ spec:
               value: {{ $value | quote }}
             {{- end }}
             {{- else }}
-            {{- $modeVars := include "conduktor-gateway.legacyModeEnvVars" . | fromJson }}
+            {{- $modeVars := include "conduktor-gateway.singleListenerModeEnvVars" . | fromJson }}
             {{- range $name, $value := $modeVars }}
             - name: {{ $name }}
               value: {{ $value | quote }}

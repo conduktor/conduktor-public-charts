@@ -78,8 +78,8 @@ This section contains configuration of the Conduktor Gateway.
 | `gateway.licenseKey`                         | License key to activate Conduktor Gateway not used if `gateway.secretRef` is set                                                                                                                                                       | `""`                                                                                                                                                                                                                                                                                                                        |
 | `gateway.userPool.secretKey`                 | Secret key (256bits) encoded in base64 to sign service accounts credentials when `SASL_PLAIN` or `SASL_SSL` is used for `GATEWAY_SECURITY_PROTOCOL`. If empty, a random key will be generated. Not used if `gateway.secretRef` is set. | `""`                                                                                                                                                                                                                                                                                                                        |
 | `gateway.interceptors`                       | Deprecated: Json configuration for interceptors to be loaded at startup by Gateway. Use API instead. This will be removed in future versions.                                                                                          | `[]`                                                                                                                                                                                                                                                                                                                        |
-| `gateway.portRange.start`                    | Deprecated: start port of the gateway port range. Use gateway.listeners.internal.ports with gateway.preview.listeners: true instead.                                                                                                   | `9092`                                                                                                                                                                                                                                                                                                                      |
-| `gateway.portRange.count`                    | Deprecated: max number of brokers to expose. Use gateway.listeners.internal.ports with gateway.preview.listeners: true instead.                                                                                                        | `7`                                                                                                                                                                                                                                                                                                                         |
+| `gateway.portRange.start`                    | start port of the gateway port range (single listener mode)                                                                                                                                                                            | `9092`                                                                                                                                                                                                                                                                                                                      |
+| `gateway.portRange.count`                    | max number of brokers to expose (single listener mode)                                                                                                                                                                                 | `7`                                                                                                                                                                                                                                                                                                                         |
 | `gateway.admin.port`                         | Admin HTTP server port                                                                                                                                                                                                                 | `8888`                                                                                                                                                                                                                                                                                                                      |
 | `gateway.admin.users[0].username`            | API Admin username. (not used if `gateway.secretRef` is set)                                                                                                                                                                           | `admin`                                                                                                                                                                                                                                                                                                                     |
 | `gateway.admin.users[0].password`            | API Admin password. If empty, a random password will be generated (not used if `gateway.secretRef` is set)                                                                                                                             | `""`                                                                                                                                                                                                                                                                                                                        |
@@ -91,15 +91,16 @@ This section contains configuration of the Conduktor Gateway.
 | `gateway.jmx.port`                           | JMX port to expose by default JVM args                                                                                                                                                                                                 | `9999`                                                                                                                                                                                                                                                                                                                      |
 | `gateway.jmx.jvmArgs`                        | Arguments to pass to the gateway container JVM                                                                                                                                                                                         | `-Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1` |
 
-### Named listener mode (preview)
+### Multi-listeners mode (preview)
 
-Opt-in named listener API (Gateway >= v3.18). Enable with gateway.preview.listeners: true.
-When active, gateway.listeners.internal and gateway.listeners.external replace the legacy
-portRange config. Inactive by default — existing installs are unaffected until opt-in.
+Opt-in multi-listeners API (Gateway >= v3.18). Enable with gateway.preview.listeners: true.
+When active, gateway.listeners.internal and gateway.listeners.external drive all listener
+env var generation instead of the single listener gateway.portRange config. Inactive by
+default — existing installs are unaffected until opt-in.
 
 | Name                                               | Description                                                                                                                                                                                                              | Value             |
 | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------- |
-| `gateway.preview.listeners`                        | Enable experimental named listener mode. When true, gateway.listeners.internal/external drive all env var generation; when false (default), legacy portRange config is used.                                             | `false`           |
+| `gateway.preview.listeners`                        | Enable experimental multi-listeners mode. When true, gateway.listeners.internal/external drive all env var generation; when false (default), single listener portRange config is used.                                   | `false`           |
 | `gateway.securityMode`                             | Gateway security mode: GATEWAY_MANAGED or KAFKA_MANAGED. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).                 | `GATEWAY_MANAGED` |
 | `gateway.aclEnabled`                               | Enable ACL for the Gateway virtual cluster. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED). | `""`              |
 | `gateway.kafka.brokerIds`                          | Kafka broker IDs used for SNI routing. Required when any listener uses routing: sni. Supports range syntax e.g. ["0-2"] or ["0-2,10,12-13"].                                                                             | `[]`              |
@@ -751,9 +752,9 @@ gateway:
           mountPath: /mnt/sidecar
 ```
 
-### Named listener mode (preview)
+### Multi-listeners mode (preview)
 
-Named listener mode gives explicit control over listener configuration through named listeners instead of the legacy port-range approach. Enable with `gateway.preview.listeners: true`.
+Multi-listeners mode gives explicit control over listener configuration through dedicated internal and external listeners instead of the single listener port-range approach. Enable with `gateway.preview.listeners: true`.
 
 > [!WARNING]
 > This is a preview feature. The API may change in future releases.
@@ -914,12 +915,12 @@ service:
 
 For SNI listeners you also need wildcard records. Wildcard support varies by DNS provider — check the [external-dns documentation](https://github.com/kubernetes-sigs/external-dns) for your specific provider.
 
-#### Migrating from legacy env var configuration
+#### Migrating from single listener env var configuration
 
-If you previously set `GATEWAY_LISTENER_*` environment variables directly via `gateway.env`, you can migrate to the chart-managed listener mode:
+If you previously set `GATEWAY_LISTENER_*` environment variables directly via `gateway.env`, you can migrate to the chart-managed multi-listeners mode:
 
-| Legacy `gateway.env` key | Listener mode equivalent |
-|--------------------------|--------------------------|
+| Single listener `gateway.env` key | Multi-listeners mode equivalent |
+|-----------------------------------|---------------------------------|
 | `GATEWAY_SECURITY_MODE` | `gateway.securityMode` |
 | `GATEWAY_ACL_ENABLED` | `gateway.aclEnabled` |
 | `GATEWAY_LISTENER_NAMES` | derived from `service.external.enable` |
@@ -928,18 +929,14 @@ If you previously set `GATEWAY_LISTENER_*` environment variables directly via `g
 
 The chart emits a warning in `helm install` output if `GATEWAY_LISTENER_*` keys are found in `gateway.env` while `gateway.preview.listeners` is false — both cannot be mixed safely.
 
-#### Migrating from portRange to named listeners
-
-> [!WARNING]
-> `gateway.portRange` is deprecated and will be removed in a future major chart version.
-> Migrate at your own pace — the legacy port range continues to work until that removal.
+#### Migrating from single listener portRange to multi-listeners
 
 `helm install` / `helm upgrade` output includes a generated starting-point config snippet derived from your current `gateway.portRange` and `gateway.env` values. Use it as a baseline and adjust as needed.
 
-**Step 1 — Identify your current legacy configuration:**
+**Step 1 — Identify your current single listener configuration:**
 
 ```yaml
-# Typical legacy values.yaml
+# Typical single listener values.yaml
 gateway:
   portRange:
     start: 9092
@@ -960,9 +957,9 @@ service:
     type: LoadBalancer
 ```
 
-**Step 2 — Enable named listener mode:**
+**Step 2 — Enable multi-listeners mode:**
 
-Set `gateway.preview.listeners: true` and translate your legacy config into the listener objects. Keep all existing `gateway.env` vars in place during the initial migration — Gateway ignores legacy port vars in explicit listener mode, but removing them is a separate clean-up step.
+Set `gateway.preview.listeners: true` and translate your single listener config into the listener objects. Keep all existing `gateway.env` vars in place during the initial migration — Gateway ignores single listener port vars in explicit multi-listeners mode, but removing them is a separate clean-up step.
 
 ```yaml
 gateway:
@@ -1002,11 +999,11 @@ service:
 ```
 
 > [!NOTE]
-> Internal and external listeners can use different port ranges in listener mode. If your legacy `portRange` was used for both, consider assigning separate ranges (e.g. `19092-19095` for internal, `9092` for external) to avoid bind conflicts on the same pod.
+> In multi-listeners mode, the internal and external listeners run inside the same Gateway pod, so they must bind to disjoint local port ranges to avoid conflicts. The single listener `gateway.portRange` exposed a single range shared by both internal and external services; when migrating, split it into two non-overlapping ranges (e.g. `19092-19095` for internal, `9092` for external).
 
-**Legacy → named listener field mapping:**
+**Single listener → multi-listeners field mapping:**
 
-| Legacy `gateway.env` key | Named listener equivalent |
+| Single listener `gateway.env` key | Multi-listeners equivalent |
 | --- | --- |
 | `GATEWAY_SECURITY_PROTOCOL` | `gateway.listeners.*.securityProtocol` |
 | `GATEWAY_ROUTING_MECHANISM: "host"` | `gateway.listeners.*.routing: sni` |
@@ -1017,9 +1014,9 @@ service:
 | `GATEWAY_SECURITY_MODE` | `gateway.securityMode` |
 | `GATEWAY_ACL_ENABLED` | `gateway.aclEnabled` |
 
-**Step 3 — Clean up legacy env vars:**
+**Step 3 — Clean up single listener env vars:**
 
-After confirming the new listener config works, remove the legacy keys from `gateway.env` and remove `gateway.portRange`:
+After confirming the new multi-listeners config works, remove the single listener keys from `gateway.env` and remove `gateway.portRange`:
 
 ```yaml
 # Keys to remove from gateway.env:

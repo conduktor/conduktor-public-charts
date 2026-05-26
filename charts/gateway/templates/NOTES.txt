@@ -16,7 +16,7 @@ To learn more about the release, try:
 Gateway Bootstrap server :
 {{- $internalServiceHost := printf "%s.%s.svc.%s" (include "conduktor-gateway.internalServiceName" .) .Release.Namespace .Values.clusterDomain -}}
 {{- if .Values.gateway.preview.listeners }}
-  Listener mode enabled (gateway.preview.listeners: true).
+  Multi-listeners mode enabled (gateway.preview.listeners: true).
   INTERNAL listener ({{ .Values.gateway.listeners.internal.routing }} routing):
     Cluster-internal bootstrap: {{ include "conduktor-gateway.internalListenerAdvertisedHost" . }}:{{ include "conduktor-gateway.firstAdvertisedPort" (index .Values.gateway.listeners.internal.ports 0) }}
     {{- if eq .Values.gateway.listeners.internal.routing "sni" }}
@@ -66,7 +66,7 @@ Admin API :
     ADMIN_PASSWORD="$(kubectl get secret {{ include "conduktor-gateway.secretName" . }} -n {{ .Release.Namespace }} -o jsonpath="{.data.GATEWAY_ADMIN_API_USER_0_PASSWORD}" | base64 --decode)"
 {{- end }}
 
-{{- /* Warn when GATEWAY_LISTENER_* vars are set in legacy mode */ -}}
+{{- /* Warn when GATEWAY_LISTENER_* vars are set in single listener mode */ -}}
 {{- if not .Values.gateway.preview.listeners }}
   {{- $listenerEnvFound := false }}
   {{- range $key, $_ := .Values.gateway.env }}
@@ -78,10 +78,10 @@ Admin API :
 
 WARNING: One or more GATEWAY_LISTENER_* keys are set in gateway.env while
   gateway.preview.listeners is false. These vars are passed directly to Gateway
-  and will activate Gateway's explicit listener mode, but the chart's Service port
-  definitions still use the legacy portRange — causing a mismatch.
+  and will activate Gateway's explicit multi-listeners mode, but the chart's Service
+  port definitions still use the single listener portRange — causing a mismatch.
 
-  To use the named listener API through the chart, set:
+  To use the multi-listeners API through the chart, set:
     gateway.preview.listeners: true
   and configure listeners via gateway.listeners.internal / gateway.listeners.external.
   {{- end }}
@@ -101,22 +101,22 @@ NOTE: GATEWAY_ACL_ENABLED is set in gateway.env. It is being used as the effecti
   management and remove it from gateway.env once moved.
 {{- end }}
 
-{{- /* Deprecation notice + migration snippet for legacy portRange configuration */ -}}
+{{- /* Migration snippet from single listener portRange to multi-listeners mode */ -}}
 {{- if not .Values.gateway.preview.listeners }}
-  {{- $legacyProtocol := "PLAINTEXT" }}
+  {{- $currentProtocol := "PLAINTEXT" }}
   {{- if hasKey .Values.gateway.env "GATEWAY_SECURITY_PROTOCOL" }}
-    {{- $legacyProtocol = index .Values.gateway.env "GATEWAY_SECURITY_PROTOCOL" }}
+    {{- $currentProtocol = index .Values.gateway.env "GATEWAY_SECURITY_PROTOCOL" }}
   {{- end }}
-  {{- $legacyRouting := "port" }}
+  {{- $currentRouting := "port" }}
   {{- if hasKey .Values.gateway.env "GATEWAY_ROUTING_MECHANISM" }}
     {{- if eq (index .Values.gateway.env "GATEWAY_ROUTING_MECHANISM") "host" }}
-      {{- $legacyRouting = "sni" }}
+      {{- $currentRouting = "sni" }}
     {{- end }}
   {{- end }}
   {{- $portStart := int .Values.gateway.portRange.start }}
   {{- $portEnd := sub (add $portStart .Values.gateway.portRange.count) 1 | int }}
   {{- $portSpec := printf "%d-%d" $portStart $portEnd }}
-  {{- if eq $legacyRouting "sni" }}
+  {{- if eq $currentRouting "sni" }}
     {{- $portSpec = printf "%d" $portStart }}
   {{- end }}
   {{- $effectiveSecurityMode := .Values.gateway.securityMode | default "GATEWAY_MANAGED" }}
@@ -124,8 +124,8 @@ NOTE: GATEWAY_ACL_ENABLED is set in gateway.env. It is being used as the effecti
     {{- $effectiveSecurityMode = index .Values.gateway.env "GATEWAY_SECURITY_MODE" }}
   {{- end }}
 
-DEPRECATION NOTICE: gateway.portRange is deprecated and will be removed in a future
-  major chart version. Migrate to named listener mode using this starting-point config:
+NOTE: You can migrate your single listener gateway.portRange config to multi-listeners mode.
+  Starting-point config derived from your current values:
 
   gateway:
     preview:
@@ -133,14 +133,14 @@ DEPRECATION NOTICE: gateway.portRange is deprecated and will be removed in a fut
     securityMode: "{{ $effectiveSecurityMode }}"
     listeners:
       internal:
-        securityProtocol: {{ $legacyProtocol }}
-        routing: {{ $legacyRouting }}
+        securityProtocol: {{ $currentProtocol }}
+        routing: {{ $currentRouting }}
         ports:
           - "{{ $portSpec }}"
 {{- if .Values.service.external.enable }}
       external:
-        securityProtocol: {{ $legacyProtocol }}
-        routing: {{ $legacyRouting }}
+        securityProtocol: {{ $currentProtocol }}
+        routing: {{ $currentRouting }}
         ports:
           - "{{ printf "%d" $portStart }}"
         advertisedHost: "{{ index .Values.gateway.env "GATEWAY_ADVERTISED_HOST" | default "<set-externally-reachable-hostname>" }}"

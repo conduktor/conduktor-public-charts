@@ -135,12 +135,12 @@
                     "properties": {
                         "start": {
                             "type": "number",
-                            "description": "Deprecated: start port of the gateway port range. Use gateway.listeners.internal.ports with gateway.preview.listeners: true instead.",
+                            "description": "start port of the gateway port range (single listener mode)",
                             "default": 9092
                         },
                         "count": {
                             "type": "number",
-                            "description": "Deprecated: max number of brokers to expose. Use gateway.listeners.internal.ports with gateway.preview.listeners: true instead.",
+                            "description": "max number of brokers to expose (single listener mode)",
                             "default": 7
                         }
                     }
@@ -221,7 +221,7 @@
                     "properties": {
                         "listeners": {
                             "type": "boolean",
-                            "description": "Enable experimental named listener mode. When true, gateway.listeners.internal/external drive all env var generation; when false (default), legacy portRange config is used.",
+                            "description": "Enable experimental multi-listeners mode. When true, gateway.listeners.internal/external drive all env var generation; when false (default), single listener portRange config is used.",
                             "default": false
                         }
                     }

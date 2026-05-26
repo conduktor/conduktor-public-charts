@@ -435,10 +435,10 @@ Go template iterates JSON object keys in sorted order — output is deterministi
 {{- end -}}
 
 {{/*
-Generate env vars for legacy mode (gateway.preview.listeners: false).
+Generate env vars for single listener mode (gateway.preview.listeners: false).
 Returns a JSON object mapping env var names to string values.
 */}}
-{{- define "conduktor-gateway.legacyModeEnvVars" -}}
+{{- define "conduktor-gateway.singleListenerModeEnvVars" -}}
 {{- $vars := dict -}}
 {{- if not (hasKey .Values.gateway.env "GATEWAY_ADVERTISED_HOST") -}}
   {{- $_ := set $vars "GATEWAY_ADVERTISED_HOST" (include "conduktor-gateway.internalServiceName" .) -}}

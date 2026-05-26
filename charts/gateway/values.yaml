@@ -86,9 +86,9 @@ gateway:
   ## @param gateway.interceptors Deprecated: Json configuration for interceptors to be loaded at startup by Gateway. Use API instead. This will be removed in future versions.
   interceptors: "[]"
   portRange:
-    ## @param gateway.portRange.start Deprecated: start port of the gateway port range. Use gateway.listeners.internal.ports with gateway.preview.listeners: true instead.
+    ## @param gateway.portRange.start start port of the gateway port range (single listener mode)
     start: 9092
-    ## @param gateway.portRange.count Deprecated: max number of brokers to expose. Use gateway.listeners.internal.ports with gateway.preview.listeners: true instead.
+    ## @param gateway.portRange.count max number of brokers to expose (single listener mode)
     count: 7
   admin:
     ## @param gateway.admin.port Admin HTTP server port
@@ -114,14 +114,15 @@ gateway:
     port: 9999
     ## @param gateway.jmx.jvmArgs Arguments to pass to the gateway container JVM
     jvmArgs: -Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1
-  ## @section Named listener mode (preview)
+  ## @section Multi-listeners mode (preview)
   ## @descriptionStart
-  ## Opt-in named listener API (Gateway >= v3.18). Enable with gateway.preview.listeners: true.
-  ## When active, gateway.listeners.internal and gateway.listeners.external replace the legacy
-  ## portRange config. Inactive by default — existing installs are unaffected until opt-in.
+  ## Opt-in multi-listeners API (Gateway >= v3.18). Enable with gateway.preview.listeners: true.
+  ## When active, gateway.listeners.internal and gateway.listeners.external drive all listener
+  ## env var generation instead of the single listener gateway.portRange config. Inactive by
+  ## default — existing installs are unaffected until opt-in.
   ## @descriptionEnd
   preview:
-    ## @param gateway.preview.listeners Enable experimental named listener mode. When true, gateway.listeners.internal/external drive all env var generation; when false (default), legacy portRange config is used.
+    ## @param gateway.preview.listeners Enable experimental multi-listeners mode. When true, gateway.listeners.internal/external drive all env var generation; when false (default), single listener portRange config is used.
     listeners: false
   ## @param gateway.securityMode Gateway security mode: GATEWAY_MANAGED or KAFKA_MANAGED. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).
   securityMode: "GATEWAY_MANAGED"
