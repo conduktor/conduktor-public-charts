@@ -12,3 +12,22 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     tags:
       - bitnami-common
+annotations:
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/category: streaming-messaging
+  artifacthub.io/images: |
+    - name: conduktor-gateway
+      image: conduktor/conduktor-gateway:3.19.0
+      platforms:
+        - linux/amd64
+        - linux/arm64
+  artifacthub.io/links: |
+    - name: Changelog
+      url: https://docs.conduktor.io/guide/release-notes#gateway-3--0
+    - name: Documentation
+      url: https://docs.conduktor.io
+    - name: support
+      url: https://www.conduktor.io/contact/support
+  artifacthub.io/screenshots: |
+    - title: Deployment architecture
+      url: https://docs.conduktor.io/images/deployment-overview.png
