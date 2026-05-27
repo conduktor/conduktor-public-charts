@@ -983,7 +983,7 @@ tls:
       name: my-cluster-issuer
       kind: ClusterIssuer
     truststore:
-      enabled: false
+      enabled: true                   # Mount cert-manager CA truststore
     httpsAdminApi:
       enabled: true                   # serve the admin API over HTTPS
 ```
