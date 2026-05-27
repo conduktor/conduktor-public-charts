@@ -161,12 +161,33 @@ Resource requests/limits, pod labels, security context, volumes, sidecars, init 
 
 This section is for configuring Gateway to handle certificate to manage TLS endpoint inside Gateway deployment.
 
-| Name               | Description                           | Value          |
-| ------------------ | ------------------------------------- | -------------- |
-| `tls.enable`       | Enable TLS injection into Gateway     | `false`        |
-| `tls.secretRef`    | Secret name with keystore to load     | `""`           |
-| `tls.keystoreKey`  | Key in the secret to load as keystore | `keystore.jks` |
-| `tls.keystoreFile` | File name to mount keystore as        | `keystore.jks` |
+| Name                                       | Description                                                                                                                                                                                                                                                                                       | Value            |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| `tls.enable`                               | Enable TLS injection into Gateway                                                                                                                                                                                                                                                                 | `false`          |
+| `tls.secretRef`                            | DEPRECATED: use tls.keystore.secretRef instead. Secret name with keystore to load                                                                                                                                                                                                                 | `""`             |
+| `tls.keystoreKey`                          | DEPRECATED: use tls.keystore.keystoreKey instead. Key in the secret to load as keystore                                                                                                                                                                                                           | `keystore.jks`   |
+| `tls.keystoreFile`                         | DEPRECATED: use tls.keystore.keystoreFile instead. File name to mount keystore as                                                                                                                                                                                                                 | `keystore.jks`   |
+| `tls.keystore.secretRef`                   | Secret containing the JKS keystore file                                                                                                                                                                                                                                                           | `""`             |
+| `tls.keystore.keystoreKey`                 | Key in the keystore secret                                                                                                                                                                                                                                                                        | `keystore.jks`   |
+| `tls.keystore.keystoreFile`                | Filename to mount the keystore as                                                                                                                                                                                                                                                                 | `keystore.jks`   |
+| `tls.keystore.passwordSecretRef.name`      | Secret containing the keystore password (optional; leave empty to set via gateway.env or gateway.extraSecretEnvVars)                                                                                                                                                                              | `""`             |
+| `tls.keystore.passwordSecretRef.key`       | Key in the password secret                                                                                                                                                                                                                                                                        | `password`       |
+| `tls.truststore.secretRef`                 | Secret containing the JKS truststore file (manual path; leave empty to skip)                                                                                                                                                                                                                      | `""`             |
+| `tls.truststore.keystoreKey`               | Key in the truststore secret                                                                                                                                                                                                                                                                      | `truststore.jks` |
+| `tls.truststore.keystoreFile`              | Filename to mount the truststore as (also used for cert-manager truststore path)                                                                                                                                                                                                                  | `truststore.jks` |
+| `tls.truststore.passwordSecretRef.name`    | Secret containing the truststore password (optional)                                                                                                                                                                                                                                              | `""`             |
+| `tls.truststore.passwordSecretRef.key`     | Key in the truststore password secret                                                                                                                                                                                                                                                             | `password`       |
+| `tls.certManager.enabled`                  | Enable cert-manager integration using native JKS keystore generation (requires cert-manager >= 0.15)                                                                                                                                                                                              | `false`          |
+| `tls.certManager.issuerRef.name`           | cert-manager Issuer or ClusterIssuer name                                                                                                                                                                                                                                                         | `""`             |
+| `tls.certManager.issuerRef.kind`           | Issuer kind — Issuer or ClusterIssuer                                                                                                                                                                                                                                                             | `ClusterIssuer`  |
+| `tls.certManager.issuerRef.group`          | Issuer group (leave empty to default to cert-manager.io)                                                                                                                                                                                                                                          | `""`             |
+| `tls.certManager.extraDnsNames`            | Additional DNS SANs beyond those auto-derived from listener config                                                                                                                                                                                                                                | `[]`             |
+| `tls.certManager.extraIpAddresses`         | Additional IP SANs to include in the certificate                                                                                                                                                                                                                                                  | `[]`             |
+| `tls.certManager.duration`                 | Certificate validity duration. Defaults to 90 days.                                                                                                                                                                                                                                               | `2160h`          |
+| `tls.certManager.renewBefore`              | How early cert-manager starts renewing before expiry. Must be less than duration.                                                                                                                                                                                                                 | `360h`           |
+| `tls.certManager.sslContextRefreshMinutes` | How often Gateway reloads the SSL context from disk (GATEWAY_SSL_UPDATE_CONTEXT_INTERVAL_MINUTES)                                                                                                                                                                                                 | `5`              |
+| `tls.certManager.truststore.enabled`       | Mount the cert-manager JKS truststore and set GATEWAY_SSL_TRUST_STORE_* env vars. Enable only when the upstream Kafka broker uses SSL or when Gateway listeners require mTLS. Leave false when upstream Kafka is PLAINTEXT — enabling with PLAINTEXT Kafka will cause Gateway to fail at startup. | `false`          |
+| `tls.certManager.httpsAdminApi.enabled`    | Secure the admin API with the same JKS keystore                                                                                                                                                                                                                                                   | `false`          |
 
 ### Gateway service configurations
 
@@ -285,6 +306,13 @@ Shared Kubernetes configuration of the chart.
     * [Sidecar ConfigMap loading](#sidecar-configmap-loading)
     * [Import dashboards manually](#import-dashboards-manually)
 * [Extra resource to deploy](#extra-resource-to-deploy)
+* [Named listener mode (preview)](#named-listener-mode-preview)
+  * [cert-manager TLS (automated certificate management)](#cert-manager-tls-automated-certificate-management)
+    * [Internal SNI routing with cert-manager](#internal-sni-routing-with-cert-manager)
+    * [Internal port routing with cert-manager and secured admin API](#internal-port-routing-with-cert-manager-and-secured-admin-api)
+    * [Internal + external SNI routing with cert-manager](#internal--external-sni-routing-with-cert-manager)
+    * [Using a custom Issuer namespace or group](#using-a-custom-issuer-namespace-or-group)
+    * [Providing a custom password secret](#providing-a-custom-password-secret)
 
 The following `values.yaml` file can be used to set up Gateway to proxy traffic to a Confluent Cloud cluster:
 
@@ -881,6 +909,175 @@ And sets the bootstrap address to the internal service:
 * `<release>-gateway-internal.<namespace>.svc.cluster.local`
 
 No additional DNS configuration is required — standard CoreDNS resolves all names automatically.
+
+#### cert-manager TLS (automated certificate management)
+
+When [cert-manager](https://cert-manager.io/) is installed in your cluster, you can let it provision and renew the Gateway TLS certificate automatically instead of managing a JKS secret by hand.
+
+**Prerequisites:**
+
+* cert-manager ≥ 0.15 installed in your cluster
+* An `Issuer` or `ClusterIssuer` configured (self-signed, Let's Encrypt, Vault, etc.)
+* `gateway.preview.listeners: true`
+
+The chart auto-derives certificate SANs from the listener configuration — no manual DNS name list is needed for most setups.
+
+> [!NOTE]
+> Set `tls.certManager.truststore.enabled: false` when the upstream Kafka broker uses PLAINTEXT. Enabling it forces the gateway to open an SSL connection upstream, which will fail if Kafka is not TLS-enabled.
+
+##### Internal SNI routing with cert-manager
+
+The chart generates per-broker ClusterIP Services and includes their FQDNs as certificate SANs automatically.
+
+```yaml
+gateway:
+  preview:
+    listeners: true
+  securityMode: "GATEWAY_MANAGED"
+  listeners:
+    internal:
+      securityProtocol: SSL
+      routing: sni
+      ports:
+        - "9092"
+      brokerIds:
+        - "0-2"
+  env:
+    KAFKA_BOOTSTRAP_SERVERS: kafka.default.svc.cluster.local:9092
+
+tls:
+  certManager:
+    enabled: true
+    issuerRef:
+      name: letsencrypt-prod          # name of your Issuer or ClusterIssuer
+      kind: ClusterIssuer
+    truststore:
+      enabled: false                  # set true only when upstream Kafka uses TLS or mTLS clients
+```
+
+cert-manager creates a secret named `<release>-tls` containing the JKS keystore.
+The Gateway reloads the SSL context every `tls.certManager.sslContextRefreshMinutes` minutes (default 5), so certificate renewals are picked up automatically without a pod restart.
+
+##### Internal port routing with cert-manager and secured admin API
+
+Port-based routing assigns one port per broker; no per-broker Service is required. Optionally, the admin API can be served over HTTPS using the same certificate.
+
+```yaml
+gateway:
+  preview:
+    listeners: true
+  securityMode: "GATEWAY_MANAGED"
+  listeners:
+    internal:
+      securityProtocol: SSL
+      routing: port
+      ports:
+        - "9092-9098"
+  env:
+    KAFKA_BOOTSTRAP_SERVERS: kafka.default.svc.cluster.local:9092
+
+tls:
+  certManager:
+    enabled: true
+    issuerRef:
+      name: my-cluster-issuer
+      kind: ClusterIssuer
+    truststore:
+      enabled: true                   # Mount cert-manager CA truststore
+    httpsAdminApi:
+      enabled: true                   # serve the admin API over HTTPS
+```
+
+##### Internal + external SNI routing with cert-manager
+
+Both listeners can use cert-manager TLS. The chart adds the external advertised and bootstrap hostnames as SANs automatically. Use `tls.certManager.extraDnsNames` for any additional SANs.
+
+```yaml
+gateway:
+  preview:
+    listeners: true
+  securityMode: "GATEWAY_MANAGED"
+  listeners:
+    internal:
+      securityProtocol: SASL_SSL
+      routing: sni
+      ports:
+        - "9092"
+      brokerIds:
+        - "0-2"
+    external:
+      securityProtocol: SASL_SSL
+      routing: sni
+      ports:
+        - "19092"
+      advertisedHost: "kafka.example.com"
+      advertisedHostPattern: "broker-{{nodeId}}.kafka.example.com"
+      bootstrapHostPattern: "bootstrap.kafka.example.com"
+  env:
+    KAFKA_BOOTSTRAP_SERVERS: kafka.default.svc.cluster.local:9092
+
+tls:
+  certManager:
+    enabled: true
+    issuerRef:
+      name: letsencrypt-prod
+      kind: ClusterIssuer
+    duration: "2160h"                 # certificate validity (default 90 days)
+    renewBefore: "360h"               # renew 15 days before expiry
+    sslContextRefreshMinutes: 5       # how often Gateway polls the keystore for updates
+    truststore:
+      enabled: false
+    httpsAdminApi:
+      enabled: true
+    extraDnsNames:
+      - "extra.kafka.example.com"     # any additional SANs not auto-derived
+
+service:
+  external:
+    enable: true
+    type: LoadBalancer
+    annotations:
+      # if external-dns is available in cluster to automate DNS records creation
+      external-dns.alpha.kubernetes.io/hostname: "kafka.example.com"
+```
+
+The chart automatically adds these SANs to the certificate:
+
+* Per-broker services: `<release>-gateway-broker-<N>.<namespace>.svc.cluster.local` (internal SNI)
+* Internal service FQDN: `<release>-gateway-internal.<namespace>.svc.cluster.local`
+* External bootstrap: value of `bootstrapHostPattern` (wildcard-expanded for `{{nodeId}}` patterns)
+* External per-broker wildcard from `advertisedHostPattern`
+
+##### Using a custom Issuer namespace or group
+
+For namespace-scoped Issuers or CRD groups other than `cert-manager.io`:
+
+```yaml
+tls:
+  certManager:
+    enabled: true
+    issuerRef:
+      name: my-issuer
+      kind: Issuer                    # namespace-scoped
+      group: cert-manager.io          # optional; defaults to cert-manager.io
+```
+
+##### Providing a custom password secret
+
+By default the chart generates a random keystore password and stores it in a Secret. To use your own:
+
+```yaml
+tls:
+  keystore:
+    passwordSecretRef:
+      name: my-tls-password-secret    # must exist before helm install
+      key: password
+  certManager:
+    enabled: true
+    issuerRef:
+      name: my-issuer
+      kind: ClusterIssuer
+```
 
 #### LoadBalancer chicken-and-egg problem
 

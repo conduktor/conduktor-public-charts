@@ -1,0 +1,30 @@
+{{- if .Values.tls.certManager.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "conduktor-gateway.fullname" . }}-tls
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
+spec:
+  secretName: {{ include "conduktor-gateway.fullname" . }}-tls
+  issuerRef:
+    name: {{ required "tls.certManager.issuerRef.name is required" .Values.tls.certManager.issuerRef.name }}
+    kind: {{ .Values.tls.certManager.issuerRef.kind }}
+    {{- with .Values.tls.certManager.issuerRef.group }}
+    group: {{ . }}
+    {{- end }}
+  commonName: {{ include "conduktor-gateway.internalServiceName" . }}
+  {{- $certDns := include "conduktor-gateway.certManagerDnsNames" . | fromJson }}
+  dnsNames: {{ $certDns.names | toYaml | nindent 4 }}
+  {{- with .Values.tls.certManager.extraIpAddresses }}
+  ipAddresses: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  duration: {{ .Values.tls.certManager.duration }}
+  renewBefore: {{ .Values.tls.certManager.renewBefore }}
+  keystores:
+    jks:
+      create: true
+      passwordSecretRef:
+        name: {{ include "conduktor-gateway.tlsPasswordSecretRef" . }}
+        key: {{ .Values.tls.keystore.passwordSecretRef.key | default "password" }}
+{{- end }}

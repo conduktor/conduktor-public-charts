@@ -200,8 +200,208 @@ Return admin api scheme http or https
   {{- $scheme := "http" -}}
   {{- if eq (include "conduktor-gateway.envExists" (dict "envkey" "GATEWAY_HTTPS_KEY_STORE_PATH" "context" $)) "true"  -}}
     {{- $scheme = "https" -}}
+  {{- else if and .Values.tls.certManager.enabled .Values.tls.certManager.httpsAdminApi.enabled -}}
+    {{- $scheme = "https" -}}
   {{- end -}}
   {{- $scheme -}}
+{{- end -}}
+
+{{/*
+Resolve the effective keystore secret name (tls.keystore.secretRef takes precedence over deprecated tls.secretRef).
+*/}}
+{{- define "conduktor-gateway.keystoreSecretRef" -}}
+{{- .Values.tls.keystore.secretRef | default .Values.tls.secretRef -}}
+{{- end -}}
+
+{{/*
+Resolve the effective keystore key (tls.keystore.keystoreKey takes precedence over deprecated tls.keystoreKey).
+*/}}
+{{- define "conduktor-gateway.keystoreKey" -}}
+{{- .Values.tls.keystore.keystoreKey | default .Values.tls.keystoreKey -}}
+{{- end -}}
+
+{{/*
+Resolve the effective keystore mount filename (tls.keystore.keystoreFile takes precedence over deprecated tls.keystoreFile).
+*/}}
+{{- define "conduktor-gateway.keystoreFile" -}}
+{{- .Values.tls.keystore.keystoreFile | default .Values.tls.keystoreFile -}}
+{{- end -}}
+
+{{/*
+Name of the auto-generated TLS keystore password secret.
+*/}}
+{{- define "conduktor-gateway.tlsPasswordSecretName" -}}
+{{- printf "%s-tls-password" (include "conduktor-gateway.fullname" . | trunc 50 | trimSuffix "-") -}}
+{{- end -}}
+
+{{/*
+Resolve the cert-manager keystore password secret name.
+Uses tls.keystore.passwordSecretRef.name when provided; otherwise falls back to the
+auto-generated secret. Only call this from cert-manager templates — the auto-generated
+secret only exists when tls.certManager.enabled is true.
+*/}}
+{{- define "conduktor-gateway.tlsPasswordSecretRef" -}}
+{{- .Values.tls.keystore.passwordSecretRef.name | default (include "conduktor-gateway.tlsPasswordSecretName" .) -}}
+{{- end -}}
+
+{{/*
+Build a dict of GATEWAY_SSL_* / GATEWAY_HTTPS_* env vars to inject into the container spec.
+Plain-string values are stored as strings; secretKeyRef values are stored as a map
+  {"secretKeyRef": {"name": "...", "key": "..."}}
+so that the caller can dispatch on kind (see deployment.yaml tlsEnvVars range block).
+Two code paths:
+  - tls.enable        : user-supplied JKS keystore secret
+  - tls.certManager.* : cert-manager-issued JKS (password always from the auto/user-supplied secret)
+Returns JSON.
+*/}}
+{{- define "conduktor-gateway.tlsEnvVars" -}}
+{{- $vars := dict -}}
+{{- $ksFile  := include "conduktor-gateway.keystoreFile" . -}}
+{{- $pwKey   := .Values.tls.keystore.passwordSecretRef.key | default "password" -}}
+{{- if and .Values.tls.enable (include "conduktor-gateway.keystoreSecretRef" .) -}}
+  {{- $_ := set $vars "GATEWAY_SSL_KEY_STORE_PATH" (printf "/etc/gateway/tls/%s" $ksFile) -}}
+  {{- $_ := set $vars "GATEWAY_SSL_KEY_TYPE"       "jks" -}}
+  {{- if .Values.tls.keystore.passwordSecretRef.name -}}
+    {{- $ref := dict "secretKeyRef" (dict "name" .Values.tls.keystore.passwordSecretRef.name "key" $pwKey) -}}
+    {{- $_ := set $vars "GATEWAY_SSL_KEY_STORE_PASSWORD" $ref -}}
+  {{- end -}}
+{{- end -}}
+{{- if .Values.tls.truststore.secretRef -}}
+  {{- $_ := set $vars "GATEWAY_SSL_TRUST_STORE_PATH" (printf "/etc/gateway/tls/%s" .Values.tls.truststore.keystoreFile) -}}
+  {{- $_ := set $vars "GATEWAY_SSL_TRUST_STORE_TYPE" "jks" -}}
+  {{- if .Values.tls.truststore.passwordSecretRef.name -}}
+    {{- $tsPwKey := .Values.tls.truststore.passwordSecretRef.key | default "password" -}}
+    {{- $ref := dict "secretKeyRef" (dict "name" .Values.tls.truststore.passwordSecretRef.name "key" $tsPwKey) -}}
+    {{- $_ := set $vars "GATEWAY_SSL_TRUST_STORE_PASSWORD" $ref -}}
+  {{- end -}}
+{{- end -}}
+{{- if .Values.tls.certManager.enabled -}}
+  {{- $secretName := include "conduktor-gateway.tlsPasswordSecretRef" . -}}
+  {{- $ref        := dict "secretKeyRef" (dict "name" $secretName "key" $pwKey) -}}
+  {{- $_ := set $vars "GATEWAY_SSL_KEY_STORE_PATH"               (printf "/etc/gateway/tls/%s" $ksFile) -}}
+  {{- $_ := set $vars "GATEWAY_SSL_KEY_TYPE"                     "jks" -}}
+  {{- $_ := set $vars "GATEWAY_SSL_KEY_STORE_PASSWORD"           $ref -}}
+  {{- $_ := set $vars "GATEWAY_SSL_KEY_PASSWORD"                 $ref -}}
+  {{- $_ := set $vars "GATEWAY_SSL_UPDATE_CONTEXT_INTERVAL_MINUTES" (.Values.tls.certManager.sslContextRefreshMinutes | toString) -}}
+  {{- if .Values.tls.certManager.truststore.enabled -}}
+    {{- $_ := set $vars "GATEWAY_SSL_TRUST_STORE_PATH"     (printf "/etc/gateway/tls/%s" .Values.tls.truststore.keystoreFile) -}}
+    {{- $_ := set $vars "GATEWAY_SSL_TRUST_STORE_TYPE"     "jks" -}}
+    {{- $_ := set $vars "GATEWAY_SSL_TRUST_STORE_PASSWORD" $ref -}}
+  {{- end -}}
+  {{- if .Values.tls.certManager.httpsAdminApi.enabled -}}
+    {{- $_ := set $vars "GATEWAY_HTTPS_KEY_STORE_PATH"     (printf "/etc/gateway/tls/%s" $ksFile) -}}
+    {{- $_ := set $vars "GATEWAY_HTTPS_KEY_STORE_PASSWORD" $ref -}}
+    {{- if .Values.tls.certManager.truststore.enabled -}}
+      {{- $_ := set $vars "GATEWAY_HTTPS_TRUST_STORE_PATH"     (printf "/etc/gateway/tls/%s" .Values.tls.truststore.keystoreFile) -}}
+      {{- $_ := set $vars "GATEWAY_HTTPS_TRUST_STORE_PASSWORD" $ref -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- toJson $vars -}}
+{{- end -}}
+
+{{/*
+Name of the per-broker SNI ClusterIP service for a given broker ID.
+Params:
+  - id      - int    - Required - Broker ID.
+  - context - Context - Required - Parent context ($).
+*/}}
+{{- define "conduktor-gateway.brokerSniServiceName" -}}
+{{- printf "%s-broker-%d" (include "conduktor-gateway.fullname" .context | trunc 50 | trimSuffix "-") (int .id) -}}
+{{- end -}}
+
+{{/*
+Derive the list of DNS SANs for the cert-manager Certificate resource.
+Auto-derives from listener config; user can append extras via tls.certManager.extraDnsNames.
+Returns a JSON array of strings.
+*/}}
+{{- define "conduktor-gateway.certManagerDnsNames" -}}
+{{- $names := list -}}
+
+{{- if and .Values.gateway.preview.listeners (eq .Values.gateway.listeners.internal.routing "sni") -}}
+  {{- $brokerData := include "conduktor-gateway.expandBrokerIds" .Values.gateway.listeners.internal.brokerIds | fromJson -}}
+  {{- range $brokerData.ids -}}
+    {{- $svcName := include "conduktor-gateway.brokerSniServiceName" (dict "id" . "context" $) -}}
+    {{- $names = append $names (printf "%s.%s.svc.%s" $svcName $.Release.Namespace $.Values.clusterDomain) -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $names = append $names (include "conduktor-gateway.internalListenerAdvertisedHost" .) -}}
+
+{{- if and .Values.gateway.preview.listeners .Values.service.external.enable -}}
+  {{- $ext := .Values.gateway.listeners.external -}}
+  {{- if $ext.advertisedHost -}}
+    {{- $names = append $names $ext.advertisedHost -}}
+  {{- end -}}
+  {{- if $ext.bootstrapHostPattern -}}
+    {{- $names = append $names $ext.bootstrapHostPattern -}}
+  {{- end -}}
+  {{- if and $ext.advertisedHostPattern (contains "{{nodeId}}" $ext.advertisedHostPattern) -}}
+    {{- $parts := splitList "." $ext.advertisedHostPattern -}}
+    {{- $wildcardParts := list -}}
+    {{- range $parts -}}
+      {{- if contains "{{nodeId}}" . -}}
+        {{- $wildcardParts = append $wildcardParts "*" -}}
+      {{- else -}}
+        {{- $wildcardParts = append $wildcardParts . -}}
+      {{- end -}}
+    {{- end -}}
+    {{- $names = append $names (join "." $wildcardParts) -}}
+  {{- else if $ext.advertisedHostPattern -}}
+    {{- $names = append $names $ext.advertisedHostPattern -}}
+  {{- end -}}
+{{- end -}}
+
+{{- range .Values.tls.certManager.extraDnsNames -}}
+  {{- $names = append $names . -}}
+{{- end -}}
+
+{{- dict "names" ($names | uniq) | toJson -}}
+{{- end -}}
+
+{{/*
+Validate TLS configuration. Called unconditionally from NOTES.txt.
+*/}}
+{{- define "conduktor-gateway.validate.tls" -}}
+
+{{- if and .Values.tls.enable .Values.tls.certManager.enabled -}}
+  {{- fail "tls.enable and tls.certManager.enabled cannot both be true." -}}
+{{- end -}}
+
+{{- if and .Values.tls.certManager.httpsAdminApi.enabled (not .Values.tls.certManager.enabled) -}}
+  {{- fail "tls.certManager.httpsAdminApi.enabled requires tls.certManager.enabled to be true." -}}
+{{- end -}}
+
+{{- if .Values.tls.certManager.enabled -}}
+
+  {{- if not (.Capabilities.APIVersions.Has "cert-manager.io/v1") -}}
+    {{- fail "tls.certManager.enabled requires cert-manager >= 0.15 to be installed in the cluster (cert-manager.io/v1 API not found). Install cert-manager first." -}}
+  {{- end -}}
+
+  {{- if not .Values.gateway.preview.listeners -}}
+    {{- fail "tls.certManager.enabled requires gateway.preview.listeners to be true. cert-manager integration is not supported in legacy listener mode." -}}
+  {{- end -}}
+
+  {{- $certDns := include "conduktor-gateway.certManagerDnsNames" . | fromJson -}}
+  {{- if empty $certDns.names -}}
+    {{- fail "tls.certManager: could not derive any dnsNames from listener config. Set gateway.listeners or tls.certManager.extraDnsNames." -}}
+  {{- end -}}
+
+  {{- if and .Values.tls.truststore.secretRef .Values.tls.certManager.truststore.enabled -}}
+    {{- fail "tls.truststore.secretRef and tls.certManager.truststore.enabled cannot both be set. Use one or the other." -}}
+  {{- end -}}
+
+  {{- $dur := .Values.tls.certManager.duration -}}
+  {{- $renew := .Values.tls.certManager.renewBefore -}}
+  {{- if and (hasSuffix "h" $dur) (hasSuffix "h" $renew) -}}
+    {{- $durH := trimSuffix "h" $dur | atoi -}}
+    {{- $renewH := trimSuffix "h" $renew | atoi -}}
+    {{- if ge $renewH $durH -}}
+      {{- fail (printf "tls.certManager.renewBefore (%s) must be less than tls.certManager.duration (%s)." $renew $dur) -}}
+    {{- end -}}
+  {{- end -}}
+
+{{- end -}}
 {{- end -}}
 
 
@@ -537,8 +737,8 @@ Accumulates all errors and fails once with a combined message.
 {{- $sslProtocols := list "SSL" "SASL_SSL" -}}
 {{- if or (has .Values.gateway.listeners.internal.securityProtocol $sslProtocols)
           (and .Values.service.external.enable (has .Values.gateway.listeners.external.securityProtocol $sslProtocols)) -}}
-  {{- if not .Values.tls.enable -}}
-    {{- $errors = append $errors "- tls.enable must be true when any listener uses SSL or SASL_SSL securityProtocol." -}}
+  {{- if and (not .Values.tls.enable) (not .Values.tls.certManager.enabled) -}}
+    {{- $errors = append $errors "- tls.enable or tls.certManager.enabled must be set when any listener uses SSL or SASL_SSL securityProtocol." -}}
   {{- end -}}
 {{- end -}}
 
