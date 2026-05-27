@@ -570,7 +570,7 @@ ingress:
   hostname: conduktor-gateway.mycompany.com
   tls: true
   selfSigned: false
-  ingress.annotations:
+  annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     kubernetes.io/ingress.class: nginx
 ```
@@ -621,7 +621,7 @@ gateway:
   volumeMounts:
     - name: truststore
       mountPath: /etc/gateway/tls/truststore/
-      readonly: true
+      readOnly: true
 ```
 
 Finally, we can configure our truststore location
@@ -836,7 +836,7 @@ gateway:
       securityProtocol: PLAINTEXT
       routing: port
       ports:
-        - "9092-9098"
+        - "19092-19098"
     external:
       securityProtocol: SASL_SSL
       routing: sni
@@ -882,7 +882,7 @@ Internal SNI routing multiplexes multiple broker addresses over a single port wi
 > [!NOTE]
 > Broker IDs do not need to start at 0 or be contiguous. Use whatever IDs match your Kafka cluster (e.g. `"100,104,110"`).
 
-The chart auto-generates the advertised and bootstrap host patterns from the release name and namespace. You can override them with `gateway.listeners.internal.advertisedHostPattern` and `gateway.listeners.internal.bootstrapHostPattern` if needed.
+The chart auto-generates the advertised and bootstrap host patterns from the release name and namespace.
 
 ```yaml
 gateway:
@@ -904,13 +904,13 @@ gateway:
 
 This creates three ClusterIP Services:
 
-* `<release>-gateway-broker-0.<namespace>.svc.cluster.local`
-* `<release>-gateway-broker-1.<namespace>.svc.cluster.local`
-* `<release>-gateway-broker-2.<namespace>.svc.cluster.local`
+* `<release>-gateway-broker-0.<namespace>.svc.<clusterDomain>`
+* `<release>-gateway-broker-1.<namespace>.svc.<clusterDomain>`
+* `<release>-gateway-broker-2.<namespace>.svc.<clusterDomain>`
 
 And sets the bootstrap address to the internal service:
 
-* `<release>-gateway-internal.<namespace>.svc.cluster.local`
+* `<release>-gateway-internal.<namespace>.svc.<clusterDomain>`
 
 No additional DNS configuration is required — standard CoreDNS resolves all names automatically.
 
@@ -1177,7 +1177,7 @@ gateway:
       securityProtocol: SASL_SSL
       routing: sni
       ports:
-        - "9092"
+        - "19092"
     external:
       securityProtocol: SASL_SSL
       routing: sni
