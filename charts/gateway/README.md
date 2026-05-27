@@ -306,7 +306,11 @@ Shared Kubernetes configuration of the chart.
     * [Sidecar ConfigMap loading](#sidecar-configmap-loading)
     * [Import dashboards manually](#import-dashboards-manually)
 * [Extra resource to deploy](#extra-resource-to-deploy)
-* [Named listener mode (preview)](#named-listener-mode-preview)
+* [Multi-listeners](#multi-listeners)
+  * [Port spec format](#port-spec-format)
+  * [Internal-only listener (port routing)](#internal-only-listener-port-routing)
+  * [Internal + external listener (SNI routing for external access)](#internal--external-listener-sni-routing-for-external-access)
+  * [Internal listener with SNI routing](#internal-listener-with-sni-routing)
   * [cert-manager TLS (automated certificate management)](#cert-manager-tls-automated-certificate-management)
     * [Internal SNI routing with cert-manager](#internal-sni-routing-with-cert-manager)
     * [Internal port routing with cert-manager and secured admin API](#internal-port-routing-with-cert-manager-and-secured-admin-api)
@@ -780,7 +784,7 @@ gateway:
           mountPath: /mnt/sidecar
 ```
 
-### Multi-listeners mode (preview)
+### Multi-listeners
 
 Multi-listeners mode gives explicit control over listener configuration through dedicated internal and external listeners instead of the single listener port-range approach. Enable with `gateway.preview.listeners: true`.
 
@@ -934,14 +938,15 @@ gateway:
   preview:
     listeners: true
   securityMode: "GATEWAY_MANAGED"
+  kafka:
+    brokerIds:
+      - "0-2"
   listeners:
     internal:
       securityProtocol: SSL
       routing: sni
       ports:
         - "9092"
-      brokerIds:
-        - "0-2"
   env:
     KAFKA_BOOTSTRAP_SERVERS: kafka.default.svc.cluster.local:9092
 
@@ -997,14 +1002,15 @@ gateway:
   preview:
     listeners: true
   securityMode: "GATEWAY_MANAGED"
+  kafka:
+    brokerIds:
+      - "0-2"
   listeners:
     internal:
       securityProtocol: SASL_SSL
       routing: sni
       ports:
         - "9092"
-      brokerIds:
-        - "0-2"
     external:
       securityProtocol: SASL_SSL
       routing: sni
@@ -1165,7 +1171,7 @@ gateway:
   securityMode: "GATEWAY_MANAGED"
   kafka:
     brokerIds:
-      - "0-3"                             # match your Kafka broker IDs
+      - "0-2"                             # match your Kafka broker IDs
   listeners:
     internal:
       securityProtocol: SASL_SSL
