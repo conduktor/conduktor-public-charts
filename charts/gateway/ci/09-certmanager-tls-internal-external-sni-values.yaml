@@ -56,9 +56,9 @@ tls:
     issuerRef:
       name: selfsigned-cluster-issuer
       kind: ClusterIssuer
-    extraDnsNames: 
+    extraDnsNames:
       - "extra.kafka.example.com"
-    extraIpAddresses: 
+    extraIpAddresses:
       - "10.0.0.222"
     duration: 24h
     renewBefore: 12h
