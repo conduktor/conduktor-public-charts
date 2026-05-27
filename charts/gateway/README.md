@@ -306,7 +306,11 @@ Shared Kubernetes configuration of the chart.
     * [Sidecar ConfigMap loading](#sidecar-configmap-loading)
     * [Import dashboards manually](#import-dashboards-manually)
 * [Extra resource to deploy](#extra-resource-to-deploy)
-* [Named listener mode (preview)](#named-listener-mode-preview)
+* [Multi-listeners](#multi-listeners)
+  * [Port spec format](#port-spec-format)
+  * [Internal-only listener (port routing)](#internal-only-listener-port-routing)
+  * [Internal + external listener (SNI routing for external access)](#internal--external-listener-sni-routing-for-external-access)
+  * [Internal listener with SNI routing](#internal-listener-with-sni-routing)
   * [cert-manager TLS (automated certificate management)](#cert-manager-tls-automated-certificate-management)
     * [Internal SNI routing with cert-manager](#internal-sni-routing-with-cert-manager)
     * [Internal port routing with cert-manager and secured admin API](#internal-port-routing-with-cert-manager-and-secured-admin-api)
@@ -566,7 +570,7 @@ ingress:
   hostname: conduktor-gateway.mycompany.com
   tls: true
   selfSigned: false
-  ingress.annotations:
+  annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     kubernetes.io/ingress.class: nginx
 ```
@@ -617,7 +621,7 @@ gateway:
   volumeMounts:
     - name: truststore
       mountPath: /etc/gateway/tls/truststore/
-      readonly: true
+      readOnly: true
 ```
 
 Finally, we can configure our truststore location
@@ -780,7 +784,7 @@ gateway:
           mountPath: /mnt/sidecar
 ```
 
-### Multi-listeners mode (preview)
+### Multi-listeners
 
 Multi-listeners mode gives explicit control over listener configuration through dedicated internal and external listeners instead of the single listener port-range approach. Enable with `gateway.preview.listeners: true`.
 
@@ -832,7 +836,7 @@ gateway:
       securityProtocol: PLAINTEXT
       routing: port
       ports:
-        - "9092-9098"
+        - "19092-19098"
     external:
       securityProtocol: SASL_SSL
       routing: sni
@@ -878,7 +882,7 @@ Internal SNI routing multiplexes multiple broker addresses over a single port wi
 > [!NOTE]
 > Broker IDs do not need to start at 0 or be contiguous. Use whatever IDs match your Kafka cluster (e.g. `"100,104,110"`).
 
-The chart auto-generates the advertised and bootstrap host patterns from the release name and namespace. You can override them with `gateway.listeners.internal.advertisedHostPattern` and `gateway.listeners.internal.bootstrapHostPattern` if needed.
+The chart auto-generates the advertised and bootstrap host patterns from the release name and namespace.
 
 ```yaml
 gateway:
@@ -900,13 +904,13 @@ gateway:
 
 This creates three ClusterIP Services:
 
-* `<release>-gateway-broker-0.<namespace>.svc.cluster.local`
-* `<release>-gateway-broker-1.<namespace>.svc.cluster.local`
-* `<release>-gateway-broker-2.<namespace>.svc.cluster.local`
+* `<release>-gateway-broker-0.<namespace>.svc.<clusterDomain>`
+* `<release>-gateway-broker-1.<namespace>.svc.<clusterDomain>`
+* `<release>-gateway-broker-2.<namespace>.svc.<clusterDomain>`
 
 And sets the bootstrap address to the internal service:
 
-* `<release>-gateway-internal.<namespace>.svc.cluster.local`
+* `<release>-gateway-internal.<namespace>.svc.<clusterDomain>`
 
 No additional DNS configuration is required — standard CoreDNS resolves all names automatically.
 
@@ -934,14 +938,15 @@ gateway:
   preview:
     listeners: true
   securityMode: "GATEWAY_MANAGED"
+  kafka:
+    brokerIds:
+      - "0-2"
   listeners:
     internal:
       securityProtocol: SSL
       routing: sni
       ports:
         - "9092"
-      brokerIds:
-        - "0-2"
   env:
     KAFKA_BOOTSTRAP_SERVERS: kafka.default.svc.cluster.local:9092
 
@@ -997,14 +1002,15 @@ gateway:
   preview:
     listeners: true
   securityMode: "GATEWAY_MANAGED"
+  kafka:
+    brokerIds:
+      - "0-2"
   listeners:
     internal:
       securityProtocol: SASL_SSL
       routing: sni
       ports:
         - "9092"
-      brokerIds:
-        - "0-2"
     external:
       securityProtocol: SASL_SSL
       routing: sni
@@ -1165,13 +1171,13 @@ gateway:
   securityMode: "GATEWAY_MANAGED"
   kafka:
     brokerIds:
-      - "0-3"                             # match your Kafka broker IDs
+      - "0-2"                             # match your Kafka broker IDs
   listeners:
     internal:
       securityProtocol: SASL_SSL
       routing: sni
       ports:
-        - "9092"
+        - "19092"
     external:
       securityProtocol: SASL_SSL
       routing: sni
