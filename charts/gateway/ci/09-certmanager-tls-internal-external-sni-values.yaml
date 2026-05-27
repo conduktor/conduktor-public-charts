@@ -5,14 +5,15 @@ gateway:
   preview:
     listeners: true
   securityMode: "GATEWAY_MANAGED"
+  kafka:
+    brokerIds:
+      - "0-2"
   listeners:
     internal:
       securityProtocol: SASL_SSL
       routing: sni
       ports:
         - "9092"
-      brokerIds:
-        - "0-2"
     external:
       securityProtocol: SASL_SSL
       routing: sni

@@ -6,6 +6,9 @@ gateway:
     listeners: true
   securityMode: "GATEWAY_MANAGED"
   aclEnabled: "false"
+  kafka:
+    brokerIds:
+      - "0-2"
   listeners:
     internal:
       securityProtocol: SSL
