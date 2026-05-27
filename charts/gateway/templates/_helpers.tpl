@@ -318,8 +318,10 @@ Returns a JSON array of strings.
 {{- define "conduktor-gateway.certManagerDnsNames" -}}
 {{- $names := list -}}
 
+{{- $names = append $names (include "conduktor-gateway.fullname" .) -}}
+
 {{- if and .Values.gateway.preview.listeners (eq .Values.gateway.listeners.internal.routing "sni") -}}
-  {{- $brokerData := include "conduktor-gateway.expandBrokerIds" .Values.gateway.listeners.internal.brokerIds | fromJson -}}
+  {{- $brokerData := include "conduktor-gateway.expandBrokerIds" .Values.gateway.kafka.brokerIds | fromJson -}}
   {{- range $brokerData.ids -}}
     {{- $svcName := include "conduktor-gateway.brokerSniServiceName" (dict "id" . "context" $) -}}
     {{- $names = append $names (printf "%s.%s.svc.%s" $svcName $.Release.Namespace $.Values.clusterDomain) -}}
