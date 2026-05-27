@@ -3,23 +3,6 @@ entries:
   conduktor-gateway:
   - apiVersion: v2
     appVersion: 3.19.1
-    created: "2026-05-27T13:58:28.914665992Z"
-    dependencies:
-    - name: common
-      repository: https://charts.bitnami.com/bitnami
-      tags:
-      - bitnami-common
-      version: 2.30.2
-    description: Conduktor Gateway chart
-    digest: cd501a5317fcbe0932c8d51123b80443b6d2e4c06e480fa91cbd515e5bf6a23a
-    home: https://www.conduktor.io
-    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
-    name: conduktor-gateway
-    urls:
-    - https://github.com/conduktor/conduktor-public-charts/releases/download/conduktor-gateway-3.20.0/conduktor-gateway-3.20.0.tgz
-    version: 3.20.0
-  - apiVersion: v2
-    appVersion: 3.19.1
     created: "2026-05-26T17:17:55.015264477Z"
     dependencies:
     - name: common
