@@ -6,6 +6,9 @@ k8s_secrets:
   - name: gateway-license
     data:
       GATEWAY_LICENSE_KEY: "${CDK_LICENSE}"
+  - name: gateway-tls-keystore
+    data_files:
+      keystore.jks: "charts/gateway/ci/tls/selfsigned.jks"
 
 # Gateway chart test dependency configuration
 dependencies:
