@@ -26,6 +26,11 @@ helm install my-gateway conduktor/conduktor-gateway
   * [Gateway metrics activation](#gateway-metrics-activation)
   * [Kubernetes common configuration](#kubernetes-common-configuration)
 * [Example](#example)
+  * [Expose the Gateway](#expose-the-gateway)
+    * [Two protocols, two mechanisms](#two-protocols-two-mechanisms)
+    * [Component reference](#component-reference)
+    * [External service types](#external-service-types)
+    * [Decision guide](#decision-guide)
 
 ## Parameters
 
@@ -343,6 +348,46 @@ gateway:
 ```
 See [Gateway Documentation](https://docs.conduktor.io/gateway/configuration/env-variables/) for a list of environment variables that can be used.
 In particular, the [Client to Gateway Authentication page](https://docs.conduktor.io/gateway/configuration/client-authentication/) details the different authentication mechanisms that can be used with Gateway.
+
+### Expose the Gateway
+
+Gateway speaks two different protocols, and each one is exposed through a different Kubernetes mechanism. Understanding this split is the key to picking the right component.
+
+#### Two protocols, two mechanisms
+
+- **Kafka protocol** is raw TCP with per-broker routing. Every broker has to be individually addressable, and the address Gateway advertises has to resolve from the client's location. An HTTP Ingress cannot carry this traffic, so Kafka is always exposed through a Kubernetes **Service**.
+- **Admin REST API** is plain HTTP, served on the `admin-http` port (`8888`). It can be exposed through a Service or through an **Ingress**.
+
+#### Component reference
+
+| Component | Enabled by | Exposes | Protocol |
+| --------- | ---------- | ------- | -------- |
+| Internal service | Always created | Kafka broker ports and `admin-http` | Kafka and HTTP |
+| External service | `service.external.enable: true` | Kafka broker ports, and `admin-http` if `service.external.admin: true` | Kafka and HTTP |
+| Ingress | `ingress.enabled: true` | Admin REST API only, routed to the internal service `admin-http` port | HTTP |
+
+#### External service types
+
+When you need to reach Gateway from outside the cluster over Kafka, set `service.external.enable: true` and choose a `service.external.type`:
+
+- **`LoadBalancer`** (recommended): provisions an external load balancer through your cloud provider, giving Gateway a stable endpoint that is reachable from outside the cluster and that balances traffic across the Gateway pods. The actual load balancer implementation depends on your Kubernetes provider or infrastructure.
+- **`NodePort`**: opens a port on every Kubernetes node, so clients reach Gateway through a node IP and that port.
+- **`ExternalName`**: maps the service to a DNS record.
+
+We recommend `LoadBalancer` because it gives clients a single, stable external endpoint without tying them to node IPs, and it is the standard way to expose a service to external Kafka clients.
+
+> [!NOTE]
+> With multi-listeners mode, enabling SNI routing on the internal listener creates several internal `ClusterIP` services, one per hostname Gateway listens on. See [Multi-listeners](#multi-listeners) for details.
+
+#### Decision guide
+
+| You need to reach Gateway from | Protocol | Use |
+| ------------------------------ | -------- | --- |
+| The same namespace | Kafka | Internal service, short name (`<release>-gateway-internal:9092`) |
+| Another namespace in the same cluster | Kafka | Internal service, FQDN (`<release>-gateway-internal.<namespace>.svc.cluster.local:9092`) |
+| Outside the cluster | Kafka | External service with `type: LoadBalancer`, plus an advertised host and TLS or SNI configuration |
+| Inside the cluster | Admin REST API | Internal service, `admin-http` port (`8888`) |
+| Outside the cluster | Admin REST API | Ingress (or the external service with `service.external.admin: true`) |
 
 ### How to provide secrets
 
