@@ -26,11 +26,6 @@ helm install my-gateway conduktor/conduktor-gateway
   * [Gateway metrics activation](#gateway-metrics-activation)
   * [Kubernetes common configuration](#kubernetes-common-configuration)
 * [Example](#example)
-  * [Expose the Gateway](#expose-the-gateway)
-    * [Two protocols, two mechanisms](#two-protocols-two-mechanisms)
-    * [Component reference](#component-reference)
-    * [External service types](#external-service-types)
-    * [Decision guide](#decision-guide)
 
 ## Parameters
 
@@ -291,6 +286,11 @@ Shared Kubernetes configuration of the chart.
 
 ## Example
 
+* [Expose the Gateway](#expose-the-gateway)
+  * [Two protocols, two mechanisms](#two-protocols-two-mechanisms)
+  * [Component reference](#component-reference)
+  * [External service types](#external-service-types)
+  * [Decision guide](#decision-guide)
 * [How to provide secrets](#how-to-provide-secrets)
   * [Provide you own secret with `gateway.secretRef`](#provide-you-own-secret-with-gatewaysecretref)
   * [Using `gateway.extraSecretEnvVars`](#using-gatewayextrasecretenvvars)
@@ -372,7 +372,6 @@ When you need to reach Gateway from outside the cluster over Kafka, set `service
 
 - **`LoadBalancer`** (recommended): provisions an external load balancer through your cloud provider, giving Gateway a stable endpoint that is reachable from outside the cluster and that balances traffic across the Gateway pods. The actual load balancer implementation depends on your Kubernetes provider or infrastructure.
 - **`NodePort`**: opens a port on every Kubernetes node, so clients reach Gateway through a node IP and that port.
-- **`ExternalName`**: maps the service to a DNS record.
 
 We recommend `LoadBalancer` because it gives clients a single, stable external endpoint without tying them to node IPs, and it is the standard way to expose a service to external Kafka clients.
 
@@ -383,11 +382,10 @@ We recommend `LoadBalancer` because it gives clients a single, stable external e
 
 | You need to reach Gateway from | Protocol | Use |
 | ------------------------------ | -------- | --- |
-| The same namespace | Kafka | Internal service, short name (`<release>-gateway-internal:9092`) |
-| Another namespace in the same cluster | Kafka | Internal service, FQDN (`<release>-gateway-internal.<namespace>.svc.cluster.local:9092`) |
-| Outside the cluster | Kafka | External service with `type: LoadBalancer`, plus an advertised host and TLS or SNI configuration |
-| Inside the cluster | Admin REST API | Internal service, `admin-http` port (`8888`) |
-| Outside the cluster | Admin REST API | Ingress (or the external service with `service.external.admin: true`) |
+| Inside the cluster | Kafka | Internal service |
+| Outside the cluster | Kafka | External service (LoadBalancer) |
+| Inside the cluster | Admin REST API | Internal service |
+| Outside the cluster | Admin REST API | Ingress |
 
 ### How to provide secrets
 
