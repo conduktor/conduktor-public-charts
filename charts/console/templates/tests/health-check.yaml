@@ -23,10 +23,8 @@ spec:
 {{- if .Values.platformCortex.enabled }}
 {{- $serviceName := include "conduktor.platformCortex.fullname" . -}}
 {{- $cortexPort := .Values.platformCortex.service.ports.cortex -}}
-{{- $alertManagerPort := .Values.platformCortex.service.ports.alertmanager -}}
 {{- $prometheusPort := .Values.platformCortex.service.ports.prometheus -}}
 {{- $cortexUrl := printf "http://%v:%v/ready" $serviceName $cortexPort }}
-{{- $alertManagerUrl := printf "http://%v:%v/ready" $serviceName $alertManagerPort }}
 {{- $prometheusUrl := printf "http://%v:%v" $serviceName $prometheusPort }}
 {{- $prometheusTargetsUrl := printf "%v/api/v1/targets" $prometheusUrl }}
 apiVersion: v1
@@ -41,9 +39,6 @@ spec:
     - name: curl-cortex
       image: curlimages/curl:8.1.2
       args: [ '--insecure', "--verbose" ,'{{ $cortexUrl }}']
-    - name: curl-alertmanager
-      image: curlimages/curl:8.1.2
-      args: [ '--insecure', "--verbose" ,'{{ $alertManagerUrl }}']
     - name: curl-prometheus
       image: curlimages/curl:8.1.2
       args: [ '--insecure', "--verbose" ,'{{ $prometheusUrl }}/-/healthy']

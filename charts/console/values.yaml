@@ -797,12 +797,10 @@ platformCortex:
   ##
   replicaCount: 1
   ## @param platformCortex.containerPorts.cortex Conduktor Console Cortex HTTP (or HTTPS if configured) container port
-  ## @param platformCortex.containerPorts.alertmanager Conduktor Console AlertManager HTTP (or HTTPS if configured) container port
   ## @param platformCortex.containerPorts.prometheus Conduktor Console Prometheus HTTP (or HTTPS if configured) container port
   ##
   containerPorts:
     cortex: 9009
-    alertmanager: 9010
     prometheus: 9090
   ## Configure extra options for Conduktor Console Cortex containers' liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
@@ -1028,22 +1026,18 @@ platformCortex:
     # among ClusterIP, NodePort, LoadBalancer
     type: ClusterIP
     ## @param platformCortex.service.ports.cortex Conduktor Console Cortex service HTTP port
-    ## @param platformCortex.service.ports.alertmanager Conduktor Console Cortex AlertManager service HTTP port
     ## @param platformCortex.service.ports.prometheus Conduktor Console Cortex Prometheus service HTTP port
     ##
     ports:
       cortex: 9009
-      alertmanager: 9010
       prometheus: 9090
     ## Node ports to expose
     ## @param platformCortex.service.nodePorts.cortex Node port for Cortex HTTP
-    ## @param platformCortex.service.nodePorts.alertmanager Node port for AlertManager HTTP
     ## @param platformCortex.service.nodePorts.prometheus Node port for Prometheus HTTP
     ## NOTE: choose port between <30000-32767>
     ##
     nodePorts:
       cortex: ""
-      alertmanager: ""
       prometheus: ""
     ## @param platformCortex.service.clusterIP Conduktor Console Cortex service Cluster IP
     ## e.g.:
