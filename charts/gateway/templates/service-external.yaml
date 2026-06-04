@@ -27,19 +27,19 @@ spec:
   {{- include "common.tplvalues.render" (dict "value" .Values.service.external.extraSpecs "context" $) | nindent 2 }}
   {{- end }}
   ports:
-    {{- if .Values.gateway.preview.listeners }}
+    {{- if eq (include "conduktor-gateway.useLegacyPortRange" .) "true" }}
+    {{- range untilStep (int .Values.gateway.portRange.start) (int (add .Values.gateway.portRange.start .Values.gateway.portRange.count)) 1 }}
+    - name: broker-gateway-{{ . }}
+      port: {{ . }}
+      targetPort: {{ . }}
+      protocol: TCP
+    {{- end }}
+    {{- else }}
     {{- $portData := include "conduktor-gateway.portPairsJson" .Values.gateway.listeners.external.ports | fromJson }}
     {{- range $portData.pairs }}
     - name: broker-{{ .advertised }}
       port: {{ .advertised }}
       targetPort: {{ .local }}
-      protocol: TCP
-    {{- end }}
-    {{- else }}
-    {{- range untilStep (int .Values.gateway.portRange.start) (int (add .Values.gateway.portRange.start .Values.gateway.portRange.count)) 1 }}
-    - name: broker-gateway-{{ . }}
-      port: {{ . }}
-      targetPort: {{ . }}
       protocol: TCP
     {{- end }}
     {{- end }}

@@ -1,18 +1,16 @@
-nameOverride: gateway-test-04
+nameOverride: gateway-test-10
 
+# Test the deprecated legacy single listener (portRange) mode that existing users
+# can opt back into via gateway.portRange.enable: true.
 gateway:
   replicas: 1
-  securityMode: "GATEWAY_MANAGED"
-  aclEnabled: "false"
-  listeners:
-    internal:
-      securityProtocol: PLAINTEXT
-      routing: port
-      ports:
-        - "19092-19098"
+  portRange:
+    enable: true
+    start: 9092
+    count: 4
   env:
     KAFKA_BOOTSTRAP_SERVERS: kafka.ct-gateway-deps.svc.cluster.local:9092
-    GATEWAY_CLUSTER_ID: "gw-04"
+    GATEWAY_CLUSTER_ID: "gw-10"
   extraSecretEnvVars:
     - name: GATEWAY_LICENSE_KEY
       valueFrom:

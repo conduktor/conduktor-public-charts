@@ -130,21 +130,6 @@
                     "description": "Deprecated: Json configuration for interceptors to be loaded at startup by Gateway. Use API instead. This will be removed in future versions.",
                     "default": "[]"
                 },
-                "portRange": {
-                    "type": "object",
-                    "properties": {
-                        "start": {
-                            "type": "number",
-                            "description": "start port of the gateway port range (single listener mode)",
-                            "default": 9092
-                        },
-                        "count": {
-                            "type": "number",
-                            "description": "max number of brokers to expose (single listener mode)",
-                            "default": 7
-                        }
-                    }
-                },
                 "admin": {
                     "type": "object",
                     "properties": {
@@ -216,24 +201,44 @@
                         }
                     }
                 },
+                "portRange": {
+                    "type": "object",
+                    "properties": {
+                        "enable": {
+                            "type": "boolean",
+                            "description": "DEPRECATED. Opt back into legacy single listener mode driven by gateway.portRange.start / count. When false (default), multi-listener mode (gateway.listeners) is used. Will be removed alongside gateway.portRange in a future chart release.",
+                            "default": false
+                        },
+                        "start": {
+                            "type": "number",
+                            "description": "DEPRECATED. Start port of the gateway port range (single listener mode). Only used when gateway.portRange.enable is true.",
+                            "default": 9092
+                        },
+                        "count": {
+                            "type": "number",
+                            "description": "DEPRECATED. Max number of brokers to expose (single listener mode). Only used when gateway.portRange.enable is true.",
+                            "default": 7
+                        }
+                    }
+                },
                 "preview": {
                     "type": "object",
                     "properties": {
                         "listeners": {
                             "type": "boolean",
-                            "description": "Enable experimental multi-listeners mode. When true, gateway.listeners.internal/external drive all env var generation; when false (default), single listener portRange config is used.",
-                            "default": false
+                            "description": "DEPRECATED. Backward-compatibility alias from when multi-listeners was a preview feature. Setting this to false is equivalent to gateway.portRange.enable: true (legacy single listener mode). Leave unset on new installs.",
+                            "default": true
                         }
                     }
                 },
                 "securityMode": {
                     "type": "string",
-                    "description": "Gateway security mode: GATEWAY_MANAGED or KAFKA_MANAGED. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).",
+                    "description": "Gateway security mode: GATEWAY_MANAGED or KAFKA_MANAGED. Only used in multi-listener mode. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).",
                     "default": "GATEWAY_MANAGED"
                 },
                 "aclEnabled": {
                     "type": "string",
-                    "description": "Enable ACL for the Gateway virtual cluster. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED).",
+                    "description": "Enable ACL for the Gateway virtual cluster. Only used in multi-listener mode. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED).",
                     "default": ""
                 },
                 "kafka": {
@@ -305,7 +310,7 @@
                                 },
                                 "advertisedHost": {
                                     "type": "string",
-                                    "description": "Externally-reachable hostname. Required when preview.listeners and service.external.enable are both true.",
+                                    "description": "Externally-reachable hostname. Required in multi-listener mode when service.external.enable is true.",
                                     "default": ""
                                 },
                                 "advertisedHostPattern": {

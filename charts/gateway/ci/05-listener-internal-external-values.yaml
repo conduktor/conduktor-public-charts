@@ -2,8 +2,6 @@ nameOverride: gateway-test-05
 
 gateway:
   replicas: 1
-  preview:
-    listeners: true
   securityMode: "GATEWAY_MANAGED"
   listeners:
     internal:

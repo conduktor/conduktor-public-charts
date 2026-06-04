@@ -78,8 +78,6 @@ This section contains configuration of the Conduktor Gateway.
 | `gateway.licenseKey`                         | License key to activate Conduktor Gateway not used if `gateway.secretRef` is set                                                                                                                                                       | `""`                                                                                                                                                                                                                                                                                                                        |
 | `gateway.userPool.secretKey`                 | Secret key (256bits) encoded in base64 to sign service accounts credentials when `SASL_PLAIN` or `SASL_SSL` is used for `GATEWAY_SECURITY_PROTOCOL`. If empty, a random key will be generated. Not used if `gateway.secretRef` is set. | `""`                                                                                                                                                                                                                                                                                                                        |
 | `gateway.interceptors`                       | Deprecated: Json configuration for interceptors to be loaded at startup by Gateway. Use API instead. This will be removed in future versions.                                                                                          | `[]`                                                                                                                                                                                                                                                                                                                        |
-| `gateway.portRange.start`                    | start port of the gateway port range (single listener mode)                                                                                                                                                                            | `9092`                                                                                                                                                                                                                                                                                                                      |
-| `gateway.portRange.count`                    | max number of brokers to expose (single listener mode)                                                                                                                                                                                 | `7`                                                                                                                                                                                                                                                                                                                         |
 | `gateway.admin.port`                         | Admin HTTP server port                                                                                                                                                                                                                 | `8888`                                                                                                                                                                                                                                                                                                                      |
 | `gateway.admin.users[0].username`            | API Admin username. (not used if `gateway.secretRef` is set)                                                                                                                                                                           | `admin`                                                                                                                                                                                                                                                                                                                     |
 | `gateway.admin.users[0].password`            | API Admin password. If empty, a random password will be generated (not used if `gateway.secretRef` is set)                                                                                                                             | `""`                                                                                                                                                                                                                                                                                                                        |
@@ -91,30 +89,43 @@ This section contains configuration of the Conduktor Gateway.
 | `gateway.jmx.port`                           | JMX port to expose by default JVM args                                                                                                                                                                                                 | `9999`                                                                                                                                                                                                                                                                                                                      |
 | `gateway.jmx.jvmArgs`                        | Arguments to pass to the gateway container JVM                                                                                                                                                                                         | `-Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1` |
 
-### Multi-listeners mode (preview)
+### Legacy single listener (portRange) configuration — DEPRECATED
 
-Opt-in multi-listeners API (Gateway >= v3.18). Enable with gateway.preview.listeners: true.
-When active, gateway.listeners.internal and gateway.listeners.external drive all listener
-env var generation instead of the single listener gateway.portRange config. Inactive by
-default — existing installs are unaffected until opt-in.
+Single listener mode driven by gateway.portRange. DEPRECATED since chart 3.20.0 — multi-listener
+mode (gateway.listeners) is now the default. Existing installs upgrading from a previous chart
+version that relied on portRange MUST set gateway.portRange.enable: true to keep the legacy
+behavior, otherwise the chart switches to multi-listener mode and will likely break the
+existing service ports. The entire portRange block will be removed in a future chart release.
 
-| Name                                               | Description                                                                                                                                                                                                              | Value             |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------- |
-| `gateway.preview.listeners`                        | Enable experimental multi-listeners mode. When true, gateway.listeners.internal/external drive all env var generation; when false (default), single listener portRange config is used.                                   | `false`           |
-| `gateway.securityMode`                             | Gateway security mode: GATEWAY_MANAGED or KAFKA_MANAGED. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).                 | `GATEWAY_MANAGED` |
-| `gateway.aclEnabled`                               | Enable ACL for the Gateway virtual cluster. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED). | `""`              |
-| `gateway.kafka.brokerIds`                          | Kafka broker IDs used for SNI routing. Required when any listener uses routing: sni. Supports range syntax e.g. ["0-2"] or ["0-2,10,12-13"].                                                                             | `[]`              |
-| `gateway.listeners.internal.securityProtocol`      | Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL                                                                                                                                                   | `PLAINTEXT`       |
-| `gateway.listeners.internal.routing`               | Listener routing mode: port or sni                                                                                                                                                                                       | `port`            |
-| `gateway.listeners.internal.ports`                 | Port specs. Format: ADVERTISED:LOCAL or range (e.g. "9092-9098", "443:9092")                                                                                                                                             | `["9092-9098"]`   |
-| `gateway.listeners.internal.sslClientAuth`         | TLS client authentication: NONE, OPTIONAL or REQUIRE (only for SSL/SASL_SSL)                                                                                                                                             | `NONE`            |
-| `gateway.listeners.external.securityProtocol`      | Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL                                                                                                                                                   | `SASL_SSL`        |
-| `gateway.listeners.external.routing`               | Listener routing mode: port or sni                                                                                                                                                                                       | `sni`             |
-| `gateway.listeners.external.ports`                 | Port specs. Format: ADVERTISED:LOCAL or range (e.g. "9092", "443:9092")                                                                                                                                                  | `["9092"]`        |
-| `gateway.listeners.external.advertisedHost`        | Externally-reachable hostname. Required when preview.listeners and service.external.enable are both true.                                                                                                                | `""`              |
-| `gateway.listeners.external.advertisedHostPattern` | Per-broker hostname pattern for SNI routing. Must contain {{nodeId}}.                                                                                                                                                    | `""`              |
-| `gateway.listeners.external.bootstrapHostPattern`  | Bootstrap hostname for SNI routing. Derived from advertisedHostPattern if empty.                                                                                                                                         | `""`              |
-| `gateway.listeners.external.sslClientAuth`         | TLS client authentication: NONE, OPTIONAL or REQUIRE (only for SSL/SASL_SSL)                                                                                                                                             | `NONE`            |
+| Name                       | Description                                                                                                                                                                                                                                    | Value   |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `gateway.portRange.enable` | DEPRECATED. Opt back into legacy single listener mode driven by gateway.portRange.start / count. When false (default), multi-listener mode (gateway.listeners) is used. Will be removed alongside gateway.portRange in a future chart release. | `false` |
+| `gateway.portRange.start`  | DEPRECATED. Start port of the gateway port range (single listener mode). Only used when gateway.portRange.enable is true.                                                                                                                      | `9092`  |
+| `gateway.portRange.count`  | DEPRECATED. Max number of brokers to expose (single listener mode). Only used when gateway.portRange.enable is true.                                                                                                                           | `7`     |
+
+### Multi-listeners mode
+
+Multi-listeners API (Gateway >= v3.20). Active by default since chart 3.20.0 — gateway.listeners.internal
+and gateway.listeners.external drive all listener env var generation. To opt back into the legacy
+single listener portRange mode, set gateway.portRange.enable: true (DEPRECATED).
+
+| Name                                               | Description                                                                                                                                                                                                                 | Value             |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| `gateway.preview.listeners`                        | DEPRECATED. Backward-compatibility alias from when multi-listeners was a preview feature. Setting this to false is equivalent to gateway.portRange.enable: true (legacy single listener mode). Leave unset on new installs. | `true`            |
+| `gateway.securityMode`                             | Gateway security mode: GATEWAY_MANAGED or KAFKA_MANAGED. Only used in multi-listener mode. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).                                    | `GATEWAY_MANAGED` |
+| `gateway.aclEnabled`                               | Enable ACL for the Gateway virtual cluster. Only used in multi-listener mode. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED).                    | `""`              |
+| `gateway.kafka.brokerIds`                          | Kafka broker IDs used for SNI routing. Required when any listener uses routing: sni. Supports range syntax e.g. ["0-2"] or ["0-2,10,12-13"].                                                                                | `[]`              |
+| `gateway.listeners.internal.securityProtocol`      | Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL                                                                                                                                                      | `PLAINTEXT`       |
+| `gateway.listeners.internal.routing`               | Listener routing mode: port or sni                                                                                                                                                                                          | `port`            |
+| `gateway.listeners.internal.ports`                 | Port specs. Format: ADVERTISED:LOCAL or range (e.g. "9092-9098", "443:9092")                                                                                                                                                | `["9092-9098"]`   |
+| `gateway.listeners.internal.sslClientAuth`         | TLS client authentication: NONE, OPTIONAL or REQUIRE (only for SSL/SASL_SSL)                                                                                                                                                | `NONE`            |
+| `gateway.listeners.external.securityProtocol`      | Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL                                                                                                                                                      | `SASL_SSL`        |
+| `gateway.listeners.external.routing`               | Listener routing mode: port or sni                                                                                                                                                                                          | `sni`             |
+| `gateway.listeners.external.ports`                 | Port specs. Format: ADVERTISED:LOCAL or range (e.g. "9092", "443:9092")                                                                                                                                                     | `["9092"]`        |
+| `gateway.listeners.external.advertisedHost`        | Externally-reachable hostname. Required in multi-listener mode when service.external.enable is true.                                                                                                                        | `""`              |
+| `gateway.listeners.external.advertisedHostPattern` | Per-broker hostname pattern for SNI routing. Must contain {{nodeId}}.                                                                                                                                                       | `""`              |
+| `gateway.listeners.external.bootstrapHostPattern`  | Bootstrap hostname for SNI routing. Derived from advertisedHostPattern if empty.                                                                                                                                            | `""`              |
+| `gateway.listeners.external.sslClientAuth`         | TLS client authentication: NONE, OPTIONAL or REQUIRE (only for SSL/SASL_SSL)                                                                                                                                                | `NONE`            |
 
 ### Gateway pod/container configuration
 
@@ -342,9 +353,12 @@ gateway:
     # Configure Client -> Gateway
     GATEWAY_SECURITY_PROTOCOL: DELEGATED_SASL_PLAINTEXT
     # clients will be able to authenticate to Gateway with the Confluent Cloud API keys/secrets, no TLS on Gateway
-  portRange:
-    start: 9099
-    count: 100 # to accomodate large shared (Basic or Standard) Confluent Cloud clusters
+  listeners:
+    internal:
+      securityProtocol: SASL_PLAINTEXT
+      routing: port
+      ports:
+        - "9099-9198" # 100 ports to accomodate large shared (Basic or Standard) Confluent Cloud clusters
 ```
 See [Gateway Documentation](https://docs.conduktor.io/gateway/configuration/env-variables/) for a list of environment variables that can be used.
 In particular, the [Client to Gateway Authentication page](https://docs.conduktor.io/gateway/configuration/client-authentication/) details the different authentication mechanisms that can be used with Gateway.
@@ -829,10 +843,14 @@ gateway:
 
 ### Multi-listeners
 
-Multi-listeners mode gives explicit control over listener configuration through dedicated internal and external listeners instead of the single listener port-range approach. Enable with `gateway.preview.listeners: true`.
+Multi-listeners mode gives explicit control over listener configuration through dedicated internal and external listeners instead of the single listener port-range approach. **Multi-listeners is the default since chart 3.20.0** — no opt-in flag is required.
 
-> [!WARNING]
-> This is a preview feature. The API may change in future releases.
+> [!IMPORTANT]
+> **Upgrading from a chart version prior to 3.20.0?**
+> If your previous install relied on `gateway.portRange` (the legacy single listener mode) you MUST set `gateway.portRange.enable: true` before upgrading, otherwise the chart switches to multi-listener mode and the rendered Services / ports will no longer match the configuration your clients expect.
+> The legacy mode is preserved for backward compatibility but is now **deprecated** and will be removed in a future chart release. See [Migrating from single listener portRange to multi-listeners](#migrating-from-single-listener-portrange-to-multi-listeners) below.
+>
+> `gateway.preview.listeners` is kept as a deprecated backward-compatibility alias: setting it to `false` is equivalent to `gateway.portRange.enable: true`. New installs should leave both unset.
 
 #### Port spec format
 
@@ -851,8 +869,6 @@ The simplest configuration exposes a single internal listener using port-based r
 
 ```yaml
 gateway:
-  preview:
-    listeners: true
   securityMode: "GATEWAY_MANAGED"
   aclEnabled: "false"
   listeners:
@@ -871,8 +887,6 @@ This configuration adds an external LoadBalancer listener using SNI routing, whi
 
 ```yaml
 gateway:
-  preview:
-    listeners: true
   securityMode: "GATEWAY_MANAGED"
   listeners:
     internal:
@@ -929,8 +943,6 @@ The chart auto-generates the advertised and bootstrap host patterns from the rel
 
 ```yaml
 gateway:
-  preview:
-    listeners: true
   securityMode: "GATEWAY_MANAGED"
   kafka:
     brokerIds:
@@ -965,7 +977,6 @@ When [cert-manager](https://cert-manager.io/) is installed in your cluster, you 
 
 * cert-manager ≥ 0.15 installed in your cluster
 * An `Issuer` or `ClusterIssuer` configured (self-signed, Let's Encrypt, Vault, etc.)
-* `gateway.preview.listeners: true`
 
 The chart auto-derives certificate SANs from the listener configuration — no manual DNS name list is needed for most setups.
 
@@ -978,8 +989,6 @@ The chart generates per-broker ClusterIP Services and includes their FQDNs as ce
 
 ```yaml
 gateway:
-  preview:
-    listeners: true
   securityMode: "GATEWAY_MANAGED"
   kafka:
     brokerIds:
@@ -1012,8 +1021,6 @@ Port-based routing assigns one port per broker; no per-broker Service is require
 
 ```yaml
 gateway:
-  preview:
-    listeners: true
   securityMode: "GATEWAY_MANAGED"
   listeners:
     internal:
@@ -1042,8 +1049,6 @@ Both listeners can use cert-manager TLS. The chart adds the external advertised 
 
 ```yaml
 gateway:
-  preview:
-    listeners: true
   securityMode: "GATEWAY_MANAGED"
   kafka:
     brokerIds:
@@ -1173,7 +1178,7 @@ If you previously set `GATEWAY_LISTENER_*` environment variables directly via `g
 | `GATEWAY_LISTENER_INTERNAL_*` | `gateway.listeners.internal.*` |
 | `GATEWAY_LISTENER_EXTERNAL_*` | `gateway.listeners.external.*` |
 
-The chart emits a warning in `helm install` output if `GATEWAY_LISTENER_*` keys are found in `gateway.env` while `gateway.preview.listeners` is false — both cannot be mixed safely.
+The chart emits a warning in `helm install` output if `GATEWAY_LISTENER_*` keys are found in `gateway.env` while the chart is in legacy single listener (portRange) mode — both cannot be mixed safely.
 
 #### Migrating from single listener portRange to multi-listeners
 
@@ -1203,14 +1208,14 @@ service:
     type: LoadBalancer
 ```
 
-**Step 2 — Enable multi-listeners mode:**
+**Step 2 — Switch from legacy mode to multi-listeners mode:**
 
-Set `gateway.preview.listeners: true` and translate your single listener config into the listener objects. Keep all existing `gateway.env` vars in place during the initial migration — Gateway ignores single listener port vars in explicit multi-listeners mode, but removing them is a separate clean-up step.
+Disable the legacy opt-in (`gateway.portRange.enable: false` — or simply omit it now that `false` is the default) and translate your single listener config into the listener objects. Keep all existing `gateway.env` vars in place during the initial migration — Gateway ignores single listener port vars in explicit multi-listeners mode, but removing them is a separate clean-up step.
 
 ```yaml
 gateway:
-  preview:
-    listeners: true
+  portRange:
+    enable: false                         # opt out of the legacy single-listener mode (default since 3.20.0)
   securityMode: "GATEWAY_MANAGED"
   kafka:
     brokerIds:

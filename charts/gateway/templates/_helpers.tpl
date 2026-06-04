@@ -320,7 +320,8 @@ Returns a JSON array of strings.
 
 {{- $names = append $names (include "conduktor-gateway.fullname" .) -}}
 
-{{- if and .Values.gateway.preview.listeners (eq .Values.gateway.listeners.internal.routing "sni") -}}
+{{- $useLegacy := eq (include "conduktor-gateway.useLegacyPortRange" .) "true" -}}
+{{- if and (not $useLegacy) (eq .Values.gateway.listeners.internal.routing "sni") -}}
   {{- $brokerData := include "conduktor-gateway.expandBrokerIds" .Values.gateway.kafka.brokerIds | fromJson -}}
   {{- range $brokerData.ids -}}
     {{- $svcName := include "conduktor-gateway.brokerSniServiceName" (dict "id" . "context" $) -}}
@@ -330,7 +331,7 @@ Returns a JSON array of strings.
 
 {{- $names = append $names (include "conduktor-gateway.internalListenerAdvertisedHost" .) -}}
 
-{{- if and .Values.gateway.preview.listeners .Values.service.external.enable -}}
+{{- if and (not $useLegacy) .Values.service.external.enable -}}
   {{- $ext := .Values.gateway.listeners.external -}}
   {{- if $ext.advertisedHost -}}
     {{- $names = append $names $ext.advertisedHost -}}
@@ -380,8 +381,8 @@ Validate TLS configuration. Called unconditionally from NOTES.txt.
     {{- fail "tls.certManager.enabled requires cert-manager >= 0.15 to be installed in the cluster (cert-manager.io/v1 API not found). Install cert-manager first." -}}
   {{- end -}}
 
-  {{- if not .Values.gateway.preview.listeners -}}
-    {{- fail "tls.certManager.enabled requires gateway.preview.listeners to be true. cert-manager integration is not supported in legacy listener mode." -}}
+  {{- if eq (include "conduktor-gateway.useLegacyPortRange" .) "true" -}}
+    {{- fail "tls.certManager.enabled is not supported in legacy single listener (portRange) mode. Migrate to multi-listener mode (gateway.listeners) — set gateway.portRange.enable: false." -}}
   {{- end -}}
 
   {{- $certDns := include "conduktor-gateway.certManagerDnsNames" . | fromJson -}}
@@ -568,6 +569,17 @@ Defaults to the full FQDN of the *-internal service for cross-namespace reachabi
 {{- end -}}
 
 {{/*
+Resolve whether the chart should run in legacy single listener (portRange) mode.
+Returns the string "true" when legacy mode is active, "false" otherwise.
+Legacy is enabled when gateway.portRange.enable is true (the documented opt-in since chart 3.20.0)
+or when gateway.preview.listeners is explicitly false (deprecated backward-compat alias).
+Both inputs are themselves deprecated and will be removed alongside gateway.portRange in a future release.
+*/}}
+{{- define "conduktor-gateway.useLegacyPortRange" -}}
+{{- or .Values.gateway.portRange.enable (not .Values.gateway.preview.listeners) -}}
+{{- end -}}
+
+{{/*
 Resolve the effective security mode.
 Prefers gateway.env.GATEWAY_SECURITY_MODE if set, otherwise falls back to gateway.securityMode.
 */}}
@@ -581,7 +593,10 @@ Prefers gateway.env.GATEWAY_SECURITY_MODE if set, otherwise falls back to gatewa
 
 {{/*
 Resolve the effective ACL enabled setting.
-Priority: gateway.env.GATEWAY_ACL_ENABLED > gateway.aclEnabled > inferred from securityMode.
+Priority: gateway.env.GATEWAY_ACL_ENABLED > gateway.aclEnabled > inferred from securityMode + listener auth capability.
+When inferring: aclEnabled is true only when securityMode is GATEWAY_MANAGED AND at least one
+active listener supports authentication (SASL_* or SSL with non-NONE sslClientAuth). This keeps
+a basic PLAINTEXT install (the chart defaults) free of ACL-without-auth validation errors.
 */}}
 {{- define "conduktor-gateway.resolveAclEnabled" -}}
 {{- if hasKey .Values.gateway.env "GATEWAY_ACL_ENABLED" -}}
@@ -590,12 +605,28 @@ Priority: gateway.env.GATEWAY_ACL_ENABLED > gateway.aclEnabled > inferred from s
   {{- .Values.gateway.aclEnabled | toString -}}
 {{- else -}}
   {{- $securityMode := include "conduktor-gateway.resolveSecurityMode" . -}}
-  {{- ternary "true" "false" (eq $securityMode "GATEWAY_MANAGED") -}}
+  {{- $saslProtocols := list "SASL_PLAINTEXT" "SASL_SSL" -}}
+  {{- $hasAuthListener := false -}}
+  {{- if has .Values.gateway.listeners.internal.securityProtocol $saslProtocols -}}
+    {{- $hasAuthListener = true -}}
+  {{- end -}}
+  {{- if and (eq .Values.gateway.listeners.internal.securityProtocol "SSL") (ne (.Values.gateway.listeners.internal.sslClientAuth | default "NONE") "NONE") -}}
+    {{- $hasAuthListener = true -}}
+  {{- end -}}
+  {{- if .Values.service.external.enable -}}
+    {{- if has .Values.gateway.listeners.external.securityProtocol $saslProtocols -}}
+      {{- $hasAuthListener = true -}}
+    {{- end -}}
+    {{- if and (eq .Values.gateway.listeners.external.securityProtocol "SSL") (ne (.Values.gateway.listeners.external.sslClientAuth | default "NONE") "NONE") -}}
+      {{- $hasAuthListener = true -}}
+    {{- end -}}
+  {{- end -}}
+  {{- ternary "true" "false" (and (eq $securityMode "GATEWAY_MANAGED") $hasAuthListener) -}}
 {{- end -}}
 {{- end -}}
 
 {{/*
-Generate env vars for listener mode (gateway.preview.listeners: true).
+Generate env vars for multi-listener mode (default).
 Returns a JSON object mapping env var names to string values.
 Go template iterates JSON object keys in sorted order — output is deterministic.
 */}}
@@ -637,7 +668,7 @@ Go template iterates JSON object keys in sorted order — output is deterministi
 {{- end -}}
 
 {{/*
-Generate env vars for single listener mode (gateway.preview.listeners: false).
+Generate env vars for legacy single listener (portRange) mode. DEPRECATED.
 Returns a JSON object mapping env var names to string values.
 */}}
 {{- define "conduktor-gateway.singleListenerModeEnvVars" -}}
@@ -652,11 +683,11 @@ Returns a JSON object mapping env var names to string values.
 
 {{/*
 Validate listener mode configuration. Called from NOTES.txt.
-Only runs when gateway.preview.listeners is true.
+Only runs in multi-listener mode (i.e. when legacy portRange mode is NOT active).
 Accumulates all errors and fails once with a combined message.
 */}}
 {{- define "conduktor-gateway.validate.listeners" -}}
-{{- if .Values.gateway.preview.listeners -}}
+{{- if eq (include "conduktor-gateway.useLegacyPortRange" .) "false" -}}
 
 {{- $errors := list -}}
 {{- $securityMode := include "conduktor-gateway.resolveSecurityMode" . -}}
@@ -664,7 +695,7 @@ Accumulates all errors and fails once with a combined message.
 
 {{- /* securityMode required */ -}}
 {{- if empty $securityMode -}}
-  {{- $errors = append $errors "- gateway.securityMode is required when gateway.preview.listeners is true." -}}
+  {{- $errors = append $errors "- gateway.securityMode is required in multi-listener mode." -}}
 {{- end -}}
 
 {{- /* aclEnabled incompatible with KAFKA_MANAGED */ -}}
@@ -695,7 +726,7 @@ Accumulates all errors and fails once with a combined message.
 
 {{- /* External listener requires advertisedHost */ -}}
 {{- if and .Values.service.external.enable (empty .Values.gateway.listeners.external.advertisedHost) -}}
-  {{- $errors = append $errors "- gateway.listeners.external.advertisedHost is required when gateway.preview.listeners and service.external.enable are both true." -}}
+  {{- $errors = append $errors "- gateway.listeners.external.advertisedHost is required in multi-listener mode when service.external.enable is true." -}}
 {{- end -}}
 
 {{- /* Internal SNI requires brokerIds */ -}}
@@ -771,8 +802,18 @@ Accumulates all errors and fails once with a combined message.
 {{- end -}}
 
 {{- if gt (len $errors) 0 -}}
-  {{- fail (printf "gateway.preview.listeners validation errors:\n%s" (join "\n" $errors)) -}}
+  {{- fail (printf "Multi-listener configuration validation errors:\n%s" (join "\n" $errors)) -}}
 {{- end -}}
 
 {{- end -}}
+{{- end -}}
+
+{{/*
+Renders a consistent deprecation notice banner header.
+Usage: {{ include "conduktor-gateway.deprecationBanner" "short title" }}
+*/}}
+{{- define "conduktor-gateway.deprecationBanner" -}}
+##############################################################################
+#  DEPRECATION: {{ . }}
+##############################################################################
 {{- end -}}

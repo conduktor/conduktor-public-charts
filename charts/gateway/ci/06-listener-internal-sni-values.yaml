@@ -2,8 +2,6 @@ nameOverride: gateway-test-06
 
 gateway:
   replicas: 1
-  preview:
-    listeners: true
   securityMode: "GATEWAY_MANAGED"
   aclEnabled: "false"
   kafka:
