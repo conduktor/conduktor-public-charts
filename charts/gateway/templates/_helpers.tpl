@@ -809,11 +809,11 @@ Accumulates all errors and fails once with a combined message.
 {{- end -}}
 
 {{/*
-Renders a consistent deprecation notice banner header.
+Renders a consistent deprecation notice header.
 Usage: {{ include "conduktor-gateway.deprecationBanner" "short title" }}
 */}}
 {{- define "conduktor-gateway.deprecationBanner" -}}
-##############################################################################
-#  DEPRECATION: {{ . }}
-##############################################################################
+----------------------------------------------
+ [DEPRECATION] {{ . }}
+----------------------------------------------
 {{- end -}}
