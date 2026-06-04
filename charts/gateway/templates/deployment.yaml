@@ -77,19 +77,19 @@ spec:
             - name: GATEWAY_FEATURE_FLAGS_INTERNAL_LOAD_BALANCING
               value: "false"
             {{- end }}
-            {{- if .Values.gateway.preview.listeners }}
-            {{- $modeVars := include "conduktor-gateway.listenerModeEnvVars" . | fromJson }}
-            {{- range $name, $value := $modeVars }}
-            - name: {{ $name }}
-              value: {{ $value | quote }}
-            {{- end }}
-            {{- else }}
+            {{- if eq (include "conduktor-gateway.useLegacyPortRange" .) "true" }}
             {{- $modeVars := include "conduktor-gateway.singleListenerModeEnvVars" . | fromJson }}
             {{- range $name, $value := $modeVars }}
             - name: {{ $name }}
               value: {{ $value | quote }}
             {{- end }}
-            {{- end }}{{/* end if/else preview.listeners */}}
+            {{- else }}
+            {{- $modeVars := include "conduktor-gateway.listenerModeEnvVars" . | fromJson }}
+            {{- range $name, $value := $modeVars }}
+            - name: {{ $name }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- end }}{{/* end if/else legacy portRange mode */}}
             {{- if .Values.gateway.extraSecretEnvVars }}
             {{- toYaml .Values.gateway.extraSecretEnvVars | nindent 12 }}
             {{- end }}
@@ -101,7 +101,12 @@ spec:
             - secretRef:
                 name: {{ include "conduktor-gateway.secretName" . }}
           ports:
-            {{- if .Values.gateway.preview.listeners }}
+            {{- if eq (include "conduktor-gateway.useLegacyPortRange" .) "true" }}
+            {{- range untilStep (int .Values.gateway.portRange.start) (int (add .Values.gateway.portRange.start .Values.gateway.portRange.count)) 1 }}
+            - containerPort: {{ . }}
+              protocol: TCP
+            {{- end }}
+            {{- else }}
             {{- $internalPorts := include "conduktor-gateway.portPairsJson" .Values.gateway.listeners.internal.ports | fromJson }}
             {{- range $internalPorts.pairs }}
             - containerPort: {{ .local }}
@@ -113,11 +118,6 @@ spec:
             - containerPort: {{ .local }}
               protocol: TCP
             {{- end }}
-            {{- end }}
-            {{- else }}
-            {{- range untilStep (int .Values.gateway.portRange.start) (int (add .Values.gateway.portRange.start .Values.gateway.portRange.count)) 1 }}
-            - containerPort: {{ . }}
-              protocol: TCP
             {{- end }}
             {{- end }}
             - name: admin-http

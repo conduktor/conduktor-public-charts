@@ -5,6 +5,20 @@ gateway:
   admin:
     port: 8888
 
+  # Multi-listener config covering both internal (in-cluster) and external (LoadBalancer) listeners.
+  listeners:
+    internal:
+      securityProtocol: PLAINTEXT
+      routing: port
+      ports:
+        - "19092-19094"
+    external:
+      securityProtocol: PLAINTEXT
+      routing: port
+      ports:
+        - "9092-9094"
+      advertisedHost: "gateway.private"
+
   env:
     KAFKA_BOOTSTRAP_SERVERS: kafka.ct-gateway-deps.svc.cluster.local:9092
     GATEWAY_CLUSTER_ID: "gw-02"

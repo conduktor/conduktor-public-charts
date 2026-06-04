@@ -192,7 +192,7 @@ jobs:
         run: |
           python -m test.runner run \
             --chart ${{ matrix.chart }} \
-            ${{ contains(github.event.pull_request.labels.*.name, 'breaking') && '--skip-upgrade' || '' }} \
+            ${{ (contains(github.event.pull_request.labels.*.name, 'breaking') || contains(github.event.pull_request.labels.*.name, 'ci-skip-upgrade')) && '--skip-upgrade' || '' }} \
             --verbose
 
       - name: Collect logs on failure

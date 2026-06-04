@@ -14,19 +14,21 @@ To learn more about the release, try:
 {{- include "conduktor-gateway.validate.listeners" . }}
 {{- include "conduktor-gateway.validate.tls" . }}
 
+{{- $useLegacy := eq (include "conduktor-gateway.useLegacyPortRange" .) "true" }}
+
 Gateway Bootstrap server :
 {{- $internalServiceHost := printf "%s.%s.svc.%s" (include "conduktor-gateway.internalServiceName" .) .Release.Namespace .Values.clusterDomain -}}
-{{- if .Values.gateway.preview.listeners }}
-  Multi-listeners mode enabled (gateway.preview.listeners: true).
+{{- if not $useLegacy }}
+  Multi-listeners mode (default since chart 3.21.0).
   INTERNAL listener ({{ .Values.gateway.listeners.internal.routing }} routing):
     Cluster-internal bootstrap: {{ include "conduktor-gateway.internalListenerAdvertisedHost" . }}:{{ include "conduktor-gateway.firstAdvertisedPort" (index .Values.gateway.listeners.internal.ports 0) }}
     {{- if eq .Values.gateway.listeners.internal.routing "sni" }}
 
   SNI listener 'INTERNAL' detected. Per-broker ClusterIP Services created:
-    Bootstrap DNS  : {{ include "conduktor-gateway.internalListenerAdvertisedHost" . }}
-    Broker pattern : {{ include "conduktor-gateway.internalSNIAdvertisedHostPattern" . }}
+    Bootstrap DNS    : {{ include "conduktor-gateway.internalListenerAdvertisedHost" . }}
+    Broker pattern   : {{ include "conduktor-gateway.internalSNIAdvertisedHostPattern" . }}
     {{- $brokerData := include "conduktor-gateway.expandBrokerIds" .Values.gateway.kafka.brokerIds | fromJson }}
-    Services       :
+    Brokers services :
     {{- range $brokerData.ids }}
       {{ include "conduktor-gateway.brokerSniServiceName" (dict "id" . "context" $) }}.{{ $.Release.Namespace }}.svc.{{ $.Values.clusterDomain }}
     {{- end }}
@@ -38,12 +40,16 @@ Gateway Bootstrap server :
 
   SNI listener 'EXTERNAL' detected. DNS requirements:
     Bootstrap hostname : {{ .Values.gateway.listeners.external.bootstrapHostPattern | default (printf "bootstrap.%s" .Values.gateway.listeners.external.advertisedHost) }} → <LoadBalancer IP>
-    Broker pattern    : *.{{ .Values.gateway.listeners.external.advertisedHost }} → <LoadBalancer IP>
+    Broker pattern     : *.{{ .Values.gateway.listeners.external.advertisedHost }} → <LoadBalancer IP>
+
+    Get the LoadBalancer IP/hostname to point the DNS records above:
+      $ kubectl get svc {{ include "conduktor-gateway.externalServiceName" . }} -n {{ .Release.Namespace }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}{.status.loadBalancer.ingress[0].hostname}'
 
   Required certificate SANs: *.{{ .Values.gateway.listeners.external.advertisedHost }}, {{ .Values.gateway.listeners.external.bootstrapHostPattern | default (printf "bootstrap.%s" .Values.gateway.listeners.external.advertisedHost) }}
     {{- end }}
   {{- end }}
 {{- else }}
+  Legacy single listener (portRange) mode — DEPRECATED.
 {{- if not (hasKey .Values.gateway.env "GATEWAY_ADVERTISED_HOST") }}
   Internally with : {{ $internalServiceHost }}:{{ .Values.gateway.portRange.start }}
 {{- else }}
@@ -67,8 +73,8 @@ Admin API :
     ADMIN_PASSWORD="$(kubectl get secret {{ include "conduktor-gateway.secretName" . }} -n {{ .Release.Namespace }} -o jsonpath="{.data.GATEWAY_ADMIN_API_USER_0_PASSWORD}" | base64 --decode)"
 {{- end }}
 
-{{- /* Warn when GATEWAY_LISTENER_* vars are set in single listener mode */ -}}
-{{- if not .Values.gateway.preview.listeners }}
+{{- /* Warn when GATEWAY_LISTENER_* vars are set in legacy mode */ -}}
+{{- if $useLegacy }}
   {{- $listenerEnvFound := false }}
   {{- range $key, $_ := .Values.gateway.env }}
     {{- if hasPrefix "GATEWAY_LISTENER_" $key }}
@@ -77,14 +83,14 @@ Admin API :
   {{- end }}
   {{- if $listenerEnvFound }}
 
-WARNING: One or more GATEWAY_LISTENER_* keys are set in gateway.env while
-  gateway.preview.listeners is false. These vars are passed directly to Gateway
-  and will activate Gateway's explicit multi-listeners mode, but the chart's Service
-  port definitions still use the single listener portRange — causing a mismatch.
+WARNING: One or more GATEWAY_LISTENER_* keys are set in gateway.env while the chart
+  is running in legacy single listener (portRange) mode. These vars are passed
+  directly to Gateway and will activate Gateway's multi-listeners runtime, but the
+  chart's Service port definitions still use the portRange — causing a mismatch.
 
-  To use the multi-listeners API through the chart, set:
-    gateway.preview.listeners: true
-  and configure listeners via gateway.listeners.internal / gateway.listeners.external.
+  To use the chart-managed multi-listeners API, remove gateway.portRange.enable: true
+  (or gateway.preview.listeners: false) and configure listeners via
+  gateway.listeners.internal / gateway.listeners.external.
   {{- end }}
 {{- end }}
 
@@ -102,8 +108,8 @@ NOTE: GATEWAY_ACL_ENABLED is set in gateway.env. It is being used as the effecti
   management and remove it from gateway.env once moved.
 {{- end }}
 
-{{- /* Migration snippet from single listener portRange to multi-listeners mode */ -}}
-{{- if not .Values.gateway.preview.listeners }}
+{{- /* Loud upgrade/deprecation notice + migration snippet when running legacy mode */ -}}
+{{- if $useLegacy }}
   {{- $currentProtocol := "PLAINTEXT" }}
   {{- if hasKey .Values.gateway.env "GATEWAY_SECURITY_PROTOCOL" }}
     {{- $currentProtocol = index .Values.gateway.env "GATEWAY_SECURITY_PROTOCOL" }}
@@ -125,12 +131,24 @@ NOTE: GATEWAY_ACL_ENABLED is set in gateway.env. It is being used as the effecti
     {{- $effectiveSecurityMode = index .Values.gateway.env "GATEWAY_SECURITY_MODE" }}
   {{- end }}
 
-NOTE: You can migrate your single listener gateway.portRange config to multi-listeners mode.
-  Starting-point config derived from your current values:
+{{ include "conduktor-gateway.deprecationBanner" "gateway.portRange / legacy single listener mode" }}
+  You are running the chart in legacy single listener (portRange) mode. This mode
+  is DEPRECATED as of chart 3.20.0 and will be REMOVED in a future release.
+
+  Triggered by:
+{{- if .Values.gateway.portRange.enable }}
+    - gateway.portRange.enable: true
+{{- end }}
+{{- if not .Values.gateway.preview.listeners }}
+    - gateway.preview.listeners: false  (deprecated alias)
+{{- end }}
+
+  Migrate to multi-listener mode. Starting-point config derived from your current
+  values (adjust as needed):
 
   gateway:
-    preview:
-      listeners: true
+    portRange:
+      enable: false                        # remove this block entirely once migrated
     securityMode: "{{ $effectiveSecurityMode }}"
     listeners:
       internal:
@@ -147,22 +165,19 @@ NOTE: You can migrate your single listener gateway.portRange config to multi-lis
         advertisedHost: "{{ index .Values.gateway.env "GATEWAY_ADVERTISED_HOST" | default "<set-externally-reachable-hostname>" }}"
 {{- end }}
 
-  See README.md for the full step-by-step migration guide.
+  See the chart README ("Multi-listeners" + "Migrating from single listener portRange to multi-listeners") for the full step-by-step migration guide.
+{{- end }}
+
+{{- /* Inform user that the deprecated preview alias is in use */ -}}
+{{- if not .Values.gateway.preview.listeners }}
+
+{{ include "conduktor-gateway.deprecationBanner" "gateway.preview.listeners alias" }}
+  gateway.preview.listeners is a backward-compatibility alias from when
+  multi-listeners was a preview feature. It will be removed in a future chart
+  release. Use gateway.portRange.enable to control legacy mode opt-in instead.
 {{- end }}
 
 {{ if .Values.resources -}}
-Depreciation Warning:
-- Root value "resources" is deprecated. We recommend using "gateway.resources" instead.
-{{- end }}
-
-{{- if or .Values.tls.secretRef .Values.tls.keystoreKey .Values.tls.keystoreFile }}
-
-DEPRECATION NOTICE: tls.secretRef, tls.keystoreKey, and tls.keystoreFile are deprecated.
-  Migrate to the new tls.keystore.* structure:
-
-  tls:
-    keystore:
-      secretRef: "{{ .Values.tls.secretRef }}"
-      keystoreKey: "{{ .Values.tls.keystoreKey }}"
-      keystoreFile: "{{ .Values.tls.keystoreFile }}"
+{{ include "conduktor-gateway.deprecationBanner" "root value \"resources\"" }}
+  Root value "resources" is deprecated. Use "gateway.resources" instead.
 {{- end }}

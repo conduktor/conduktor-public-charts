@@ -2,8 +2,6 @@ nameOverride: gw-09
 
 gateway:
   replicas: 1
-  preview:
-    listeners: true
   securityMode: "GATEWAY_MANAGED"
   kafka:
     brokerIds:
