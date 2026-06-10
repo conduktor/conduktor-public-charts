@@ -610,7 +610,7 @@ Go template iterates JSON object keys in sorted order — output is deterministi
 {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_SECURITY_PROTOCOL" .Values.gateway.listeners.internal.securityProtocol -}}
 {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_ROUTING" (.Values.gateway.listeners.internal.routing | upper) -}}
 {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_PORTS" (.Values.gateway.listeners.internal.ports | join ",") -}}
-{{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_HOST" (include "conduktor-gateway.internalListenerAdvertisedHost" .) -}}
+{{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST" (include "conduktor-gateway.internalListenerAdvertisedHost" .) -}}
 {{- if eq .Values.gateway.listeners.internal.routing "sni" -}}
   {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST_PATTERN" (include "conduktor-gateway.internalSNIAdvertisedHostPattern" .) -}}
   {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_BOOTSTRAP_HOST_PATTERN" (include "conduktor-gateway.internalListenerAdvertisedHost" .) -}}
