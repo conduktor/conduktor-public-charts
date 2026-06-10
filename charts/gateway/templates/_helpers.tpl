@@ -622,7 +622,7 @@ Go template iterates JSON object keys in sorted order — output is deterministi
   {{- $_ := set $vars "GATEWAY_LISTENER_EXTERNAL_SECURITY_PROTOCOL" .Values.gateway.listeners.external.securityProtocol -}}
   {{- $_ := set $vars "GATEWAY_LISTENER_EXTERNAL_ROUTING" (.Values.gateway.listeners.external.routing | upper) -}}
   {{- $_ := set $vars "GATEWAY_LISTENER_EXTERNAL_PORTS" (.Values.gateway.listeners.external.ports | join ",") -}}
-  {{- $_ := set $vars "GATEWAY_LISTENER_EXTERNAL_HOST" .Values.gateway.listeners.external.advertisedHost -}}
+  {{- $_ := set $vars "GATEWAY_LISTENER_EXTERNAL_ADVERTISED_HOST" .Values.gateway.listeners.external.advertisedHost -}}
   {{- if .Values.gateway.listeners.external.advertisedHostPattern -}}
     {{- $_ := set $vars "GATEWAY_LISTENER_EXTERNAL_ADVERTISED_HOST_PATTERN" .Values.gateway.listeners.external.advertisedHostPattern -}}
   {{- end -}}
