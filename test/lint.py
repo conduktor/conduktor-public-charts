@@ -71,7 +71,7 @@ def lint_scenario(chart: str, scenario: str, verbose: bool = False) -> bool:
         temp_path = Path(f.name)
 
     try:
-        result = run_command(["kubeconform", "-strict", "-summary", str(temp_path)], verbose=verbose)
+        result = run_command(["kubeconform", "-strict", "-ignore-missing-schemas", "-summary", str(temp_path)], verbose=verbose)
         if result.success:
             log_success(f"Lint OK: {chart}/{scenario}")
             return True

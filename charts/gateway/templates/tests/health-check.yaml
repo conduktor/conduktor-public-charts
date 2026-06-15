@@ -17,7 +17,7 @@ spec:
     - name: curl-gateway-internal
       image: curlimages/curl:8.1.2
       args: [ '--insecure', "--verbose" ,'{{ $internalHealthUrl }}']
-{{- if .Values.service.external.enable }}
+{{- if and .Values.service.external.enable .Values.service.external.admin }}
     - name: curl-gateway-external
       image: curlimages/curl:8.1.2
       args: [ '--insecure', "--verbose" ,'{{ $externalHealthUrl }}']

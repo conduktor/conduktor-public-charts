@@ -24,6 +24,9 @@ bin/*
 # Vscode files
 .vscode
 
+# Claude files
+.claude
+
 # Emacs save files
 *~
 \#*\#

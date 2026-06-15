@@ -94,7 +94,7 @@ def run_scenario(
         if k8s_secrets:
             with timed_step("1a", "Create K8s secrets"):
                 for secret in k8s_secrets:
-                    create_secret(namespace, secret.name, secret.data)
+                    create_secret(namespace, secret.name, secret.data, secret.data_files)
 
         # Initialize isolation resources (database, bucket) for this scenario
         if dep_manager:
@@ -300,7 +300,7 @@ def install_scenario(chart: str, scenario: str, verbose: bool = False, timeout: 
     if config.k8s_secrets:
         with timed_step("2a", "Create K8s secrets"):
             for secret in config.k8s_secrets:
-                create_secret(namespace, secret.name, secret.data)
+                create_secret(namespace, secret.name, secret.data, secret.data_files)
 
     with timed_step("3", "Build chart dependencies"):
         helm_dependency_build(chart, verbose)

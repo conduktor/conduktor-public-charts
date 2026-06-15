@@ -35,6 +35,12 @@ spec:
       {{- if .Values.gateway.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.gateway.terminationGracePeriodSeconds }}
       {{- end }}
+      {{- if .Values.tls.certManager.enabled }}
+      {{/* Set a deterministic pod hostname so Gateway can locate its own SAN entry in the mounted JKS keystore.
+           Without this the pod hostname is a random suffix that doesn't appear in the cert SANs derived at
+           template time, causing Gateway to fail SSL context initialisation. */}}
+      hostname: {{ include "conduktor-gateway.fullname" . }}
+      {{- end }}
       initContainers:
         {{- if .Values.gateway.initContainers }}
           {{- include "common.tplvalues.render" (dict "value" .Values.gateway.initContainers "context" $) | nindent 8 }}
@@ -47,14 +53,6 @@ spec:
             # Static env var to be reconsidered if we offer env way to configure them
             - name: GATEWAY_INTERCEPTOR_CONFIG_LOCATION
               value: /etc/gateway/config/interceptors.json
-            {{- if not (hasKey .Values.gateway.env "GATEWAY_ADVERTISED_HOST") }}
-            - name: GATEWAY_ADVERTISED_HOST
-              value: {{ include "conduktor-gateway.internalServiceName" . }}
-            {{- end }}
-            - name: GATEWAY_PORT_START
-              value: {{ .Values.gateway.portRange.start | quote }}
-            - name: GATEWAY_PORT_COUNT
-              value: {{ .Values.gateway.portRange.count | quote }}
             - name: GATEWAY_HTTP_PORT
               value: {{ .Values.gateway.admin.port | quote }}
             {{- if .Values.gateway.jmx.enable }}
@@ -65,10 +63,33 @@ spec:
             - name: GATEWAY_SECURED_METRICS
               value: {{ .Values.gateway.admin.securedMetrics | quote }}
             {{- end}}
-            {{- if and .Values.tls.enable .Values.tls.secretRef}}
-            - name: GATEWAY_SSL_KEY_STORE_PATH
-              value: /etc/gateway/tls/{{ .Values.tls.keystoreFile }}
+            {{- $tlsVars := include "conduktor-gateway.tlsEnvVars" . | fromJson }}
+            {{- range $name, $value := $tlsVars }}
+            {{- if kindIs "map" $value }}
+            - name: {{ $name }}
+              valueFrom: {{ $value | toYaml | nindent 16 }}
+            {{- else }}
+            - name: {{ $name }}
+              value: {{ $value | quote }}
             {{- end }}
+            {{- end }}
+            {{- if eq (include "conduktor-gateway.envExists" (dict "envkey" "GATEWAY_FEATURE_FLAGS_INTERNAL_LOAD_BALANCING" "context" $)) "false" }}
+            - name: GATEWAY_FEATURE_FLAGS_INTERNAL_LOAD_BALANCING
+              value: "false"
+            {{- end }}
+            {{- if .Values.gateway.preview.listeners }}
+            {{- $modeVars := include "conduktor-gateway.listenerModeEnvVars" . | fromJson }}
+            {{- range $name, $value := $modeVars }}
+            - name: {{ $name }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- else }}
+            {{- $modeVars := include "conduktor-gateway.singleListenerModeEnvVars" . | fromJson }}
+            {{- range $name, $value := $modeVars }}
+            - name: {{ $name }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- end }}{{/* end if/else preview.listeners */}}
             {{- if .Values.gateway.extraSecretEnvVars }}
             {{- toYaml .Values.gateway.extraSecretEnvVars | nindent 12 }}
             {{- end }}
@@ -80,9 +101,24 @@ spec:
             - secretRef:
                 name: {{ include "conduktor-gateway.secretName" . }}
           ports:
+            {{- if .Values.gateway.preview.listeners }}
+            {{- $internalPorts := include "conduktor-gateway.portPairsJson" .Values.gateway.listeners.internal.ports | fromJson }}
+            {{- range $internalPorts.pairs }}
+            - containerPort: {{ .local }}
+              protocol: TCP
+            {{- end }}
+            {{- if .Values.service.external.enable }}
+            {{- $externalPorts := include "conduktor-gateway.portPairsJson" .Values.gateway.listeners.external.ports | fromJson }}
+            {{- range $externalPorts.pairs }}
+            - containerPort: {{ .local }}
+              protocol: TCP
+            {{- end }}
+            {{- end }}
+            {{- else }}
             {{- range untilStep (int .Values.gateway.portRange.start) (int (add .Values.gateway.portRange.start .Values.gateway.portRange.count)) 1 }}
             - containerPort: {{ . }}
               protocol: TCP
+            {{- end }}
             {{- end }}
             - name: admin-http
               containerPort: {{ .Values.gateway.admin.port }}
@@ -96,9 +132,15 @@ spec:
             {{- with .Values.gateway.volumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-            {{- if and .Values.tls.enable .Values.tls.secretRef }}
+            {{- if or (and .Values.tls.enable (include "conduktor-gateway.keystoreSecretRef" .)) .Values.tls.certManager.enabled }}
             - name: keystore
               mountPath: /etc/gateway/tls/
+              readOnly: true
+            {{- end }}
+            {{- if and .Values.tls.truststore.secretRef (not (and .Values.tls.certManager.enabled .Values.tls.certManager.truststore.enabled)) }}
+            - name: truststore
+              mountPath: /etc/gateway/tls/{{ .Values.tls.truststore.keystoreFile }}
+              subPath: {{ .Values.tls.truststore.keystoreKey }}
               readOnly: true
             {{- end }}
             - name: config
@@ -154,13 +196,27 @@ spec:
         {{- with .Values.gateway.volumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- if .Values.tls.enable }}
+        {{- $keystoreFile := include "conduktor-gateway.keystoreFile" . }}
+        {{- if or .Values.tls.enable .Values.tls.certManager.enabled }}
         - name: keystore
           secret:
-            secretName: {{ required "A .tls.secretRef is required when .tls.enable is true" .Values.tls.secretRef }}
+            secretName: {{ if .Values.tls.certManager.enabled -}}
+              {{ include "conduktor-gateway.fullname" . }}-tls
+            {{- else -}}
+              {{ required "tls.keystore.secretRef (or deprecated tls.secretRef) is required when tls.enable is true" (include "conduktor-gateway.keystoreSecretRef" .) }}
+            {{- end }}
             items:
-            - key: {{ .Values.tls.keystoreKey }}
-              path: {{ .Values.tls.keystoreFile }}
+            - key: {{ if .Values.tls.certManager.enabled }}keystore.jks{{ else }}{{ include "conduktor-gateway.keystoreKey" . }}{{ end }}
+              path: {{ $keystoreFile }}
+            {{- if and .Values.tls.certManager.enabled .Values.tls.certManager.truststore.enabled }}
+            - key: truststore.jks
+              path: {{ .Values.tls.truststore.keystoreFile }}
+            {{- end }}
+        {{- end }}
+        {{- if and .Values.tls.truststore.secretRef (not (and .Values.tls.certManager.enabled .Values.tls.certManager.truststore.enabled)) }}
+        - name: truststore
+          secret:
+            secretName: {{ .Values.tls.truststore.secretRef }}
         {{- end }}
         - name: config
           configMap:

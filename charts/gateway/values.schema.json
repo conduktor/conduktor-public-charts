@@ -79,7 +79,7 @@
                         "tag": {
                             "type": "string",
                             "description": "Image tag",
-                            "default": "3.19.0"
+                            "default": "3.19.1"
                         },
                         "pullPolicy": {
                             "type": "string",
@@ -127,7 +127,7 @@
                 },
                 "interceptors": {
                     "type": "string",
-                    "description": "Json configuration for interceptors to be loaded at startup by Gateway",
+                    "description": "Deprecated: Json configuration for interceptors to be loaded at startup by Gateway. Use API instead. This will be removed in future versions.",
                     "default": "[]"
                 },
                 "portRange": {
@@ -135,12 +135,12 @@
                     "properties": {
                         "start": {
                             "type": "number",
-                            "description": "Start port of the gateway port range",
+                            "description": "start port of the gateway port range (single listener mode)",
                             "default": 9092
                         },
                         "count": {
                             "type": "number",
-                            "description": "Max number of broker to expose",
+                            "description": "max number of brokers to expose (single listener mode)",
                             "default": 7
                         }
                     }
@@ -213,6 +213,117 @@
                             "type": "string",
                             "description": "Arguments to pass to the gateway container JVM",
                             "default": "-Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1"
+                        }
+                    }
+                },
+                "preview": {
+                    "type": "object",
+                    "properties": {
+                        "listeners": {
+                            "type": "boolean",
+                            "description": "Enable experimental multi-listeners mode. When true, gateway.listeners.internal/external drive all env var generation; when false (default), single listener portRange config is used.",
+                            "default": false
+                        }
+                    }
+                },
+                "securityMode": {
+                    "type": "string",
+                    "description": "Gateway security mode: GATEWAY_MANAGED or KAFKA_MANAGED. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).",
+                    "default": "GATEWAY_MANAGED"
+                },
+                "aclEnabled": {
+                    "type": "string",
+                    "description": "Enable ACL for the Gateway virtual cluster. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED).",
+                    "default": ""
+                },
+                "kafka": {
+                    "type": "object",
+                    "properties": {
+                        "brokerIds": {
+                            "type": "array",
+                            "description": "Kafka broker IDs used for SNI routing. Required when any listener uses routing: sni. Supports range syntax e.g. [\"0-2\"] or [\"0-2,10,12-13\"].",
+                            "default": [],
+                            "items": {}
+                        }
+                    }
+                },
+                "listeners": {
+                    "type": "object",
+                    "properties": {
+                        "internal": {
+                            "type": "object",
+                            "properties": {
+                                "securityProtocol": {
+                                    "type": "string",
+                                    "description": "Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL",
+                                    "default": "PLAINTEXT"
+                                },
+                                "routing": {
+                                    "type": "string",
+                                    "description": "Listener routing mode: port or sni",
+                                    "default": "port"
+                                },
+                                "ports": {
+                                    "type": "array",
+                                    "description": "Port specs. Format: ADVERTISED:LOCAL or range (e.g. \"9092-9098\", \"443:9092\")",
+                                    "default": [
+                                        "9092-9098"
+                                    ],
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "sslClientAuth": {
+                                    "type": "string",
+                                    "description": "TLS client authentication: NONE, OPTIONAL or REQUIRE (only for SSL/SASL_SSL)",
+                                    "default": "NONE"
+                                }
+                            }
+                        },
+                        "external": {
+                            "type": "object",
+                            "properties": {
+                                "securityProtocol": {
+                                    "type": "string",
+                                    "description": "Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL",
+                                    "default": "SASL_SSL"
+                                },
+                                "routing": {
+                                    "type": "string",
+                                    "description": "Listener routing mode: port or sni",
+                                    "default": "sni"
+                                },
+                                "ports": {
+                                    "type": "array",
+                                    "description": "Port specs. Format: ADVERTISED:LOCAL or range (e.g. \"9092\", \"443:9092\")",
+                                    "default": [
+                                        "9092"
+                                    ],
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "advertisedHost": {
+                                    "type": "string",
+                                    "description": "Externally-reachable hostname. Required when preview.listeners and service.external.enable are both true.",
+                                    "default": ""
+                                },
+                                "advertisedHostPattern": {
+                                    "type": "string",
+                                    "description": "Per-broker hostname pattern for SNI routing. Must contain {{nodeId}}.",
+                                    "default": ""
+                                },
+                                "bootstrapHostPattern": {
+                                    "type": "string",
+                                    "description": "Bootstrap hostname for SNI routing. Derived from advertisedHostPattern if empty.",
+                                    "default": ""
+                                },
+                                "sslClientAuth": {
+                                    "type": "string",
+                                    "description": "TLS client authentication: NONE, OPTIONAL or REQUIRE (only for SSL/SASL_SSL)",
+                                    "default": "NONE"
+                                }
+                            }
                         }
                     }
                 },
@@ -432,18 +543,165 @@
                 },
                 "secretRef": {
                     "type": "string",
-                    "description": "Secret name with keystore to load",
+                    "description": "DEPRECATED: use tls.keystore.secretRef instead. Secret name with keystore to load",
                     "default": ""
                 },
                 "keystoreKey": {
                     "type": "string",
-                    "description": "Key in the secret to load as keystore",
+                    "description": "DEPRECATED: use tls.keystore.keystoreKey instead. Key in the secret to load as keystore",
                     "default": "keystore.jks"
                 },
                 "keystoreFile": {
                     "type": "string",
-                    "description": "File name to mount keystore as",
+                    "description": "DEPRECATED: use tls.keystore.keystoreFile instead. File name to mount keystore as",
                     "default": "keystore.jks"
+                },
+                "keystore": {
+                    "type": "object",
+                    "properties": {
+                        "secretRef": {
+                            "type": "string",
+                            "description": "Secret containing the JKS keystore file",
+                            "default": ""
+                        },
+                        "keystoreKey": {
+                            "type": "string",
+                            "description": "Key in the keystore secret",
+                            "default": "keystore.jks"
+                        },
+                        "keystoreFile": {
+                            "type": "string",
+                            "description": "Filename to mount the keystore as",
+                            "default": "keystore.jks"
+                        },
+                        "passwordSecretRef": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "Secret containing the keystore password (optional; leave empty to set via gateway.env or gateway.extraSecretEnvVars)",
+                                    "default": ""
+                                },
+                                "key": {
+                                    "type": "string",
+                                    "description": "Key in the password secret",
+                                    "default": "password"
+                                }
+                            }
+                        }
+                    }
+                },
+                "truststore": {
+                    "type": "object",
+                    "properties": {
+                        "secretRef": {
+                            "type": "string",
+                            "description": "Secret containing the JKS truststore file (manual path; leave empty to skip)",
+                            "default": ""
+                        },
+                        "keystoreKey": {
+                            "type": "string",
+                            "description": "Key in the truststore secret",
+                            "default": "truststore.jks"
+                        },
+                        "keystoreFile": {
+                            "type": "string",
+                            "description": "Filename to mount the truststore as (also used for cert-manager truststore path)",
+                            "default": "truststore.jks"
+                        },
+                        "passwordSecretRef": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "Secret containing the truststore password (optional)",
+                                    "default": ""
+                                },
+                                "key": {
+                                    "type": "string",
+                                    "description": "Key in the truststore password secret",
+                                    "default": "password"
+                                }
+                            }
+                        }
+                    }
+                },
+                "certManager": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enable cert-manager integration using native JKS keystore generation (requires cert-manager >= 0.15)",
+                            "default": false
+                        },
+                        "issuerRef": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "cert-manager Issuer or ClusterIssuer name",
+                                    "default": ""
+                                },
+                                "kind": {
+                                    "type": "string",
+                                    "description": "Issuer kind — Issuer or ClusterIssuer",
+                                    "default": "ClusterIssuer"
+                                },
+                                "group": {
+                                    "type": "string",
+                                    "description": "Issuer group (leave empty to default to cert-manager.io)",
+                                    "default": ""
+                                }
+                            }
+                        },
+                        "extraDnsNames": {
+                            "type": "array",
+                            "description": "Additional DNS SANs beyond those auto-derived from listener config",
+                            "default": [],
+                            "items": {}
+                        },
+                        "extraIpAddresses": {
+                            "type": "array",
+                            "description": "Additional IP SANs to include in the certificate",
+                            "default": [],
+                            "items": {}
+                        },
+                        "duration": {
+                            "type": "string",
+                            "description": "Certificate validity duration. Defaults to 90 days.",
+                            "default": "2160h"
+                        },
+                        "renewBefore": {
+                            "type": "string",
+                            "description": "How early cert-manager starts renewing before expiry. Must be less than duration.",
+                            "default": "360h"
+                        },
+                        "sslContextRefreshMinutes": {
+                            "type": "number",
+                            "description": "How often Gateway reloads the SSL context from disk (GATEWAY_SSL_UPDATE_CONTEXT_INTERVAL_MINUTES)",
+                            "default": 5
+                        },
+                        "truststore": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "Mount the cert-manager JKS truststore and set GATEWAY_SSL_TRUST_STORE_* env vars. Enable only when the upstream Kafka broker uses SSL or when Gateway listeners require mTLS. Leave false when upstream Kafka is PLAINTEXT — enabling with PLAINTEXT Kafka will cause Gateway to fail at startup.",
+                                    "default": false
+                                }
+                            }
+                        },
+                        "httpsAdminApi": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "Secure the admin API with the same JKS keystore",
+                                    "default": false
+                                }
+                            }
+                        }
+                    }
                 }
             }
         },

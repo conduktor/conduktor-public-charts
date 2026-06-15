@@ -202,6 +202,7 @@ def setup_helm_repos(verbose: bool = False) -> None:
     repos = [
         ("bitnami", "https://charts.bitnami.com/bitnami"),
         ("conduktor", "https://helm.conduktor.io"),
+        ("jetstack", "https://charts.jetstack.io"),
     ]
 
     for name, url in repos:

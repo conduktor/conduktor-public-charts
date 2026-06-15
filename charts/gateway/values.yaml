@@ -48,7 +48,7 @@ gateway:
     ## @param gateway.image.repository Image in repository format (conduktor/conduktor-gateway)
     repository: conduktor/conduktor-gateway
     ## @param gateway.image.tag Image tag
-    tag: 3.19.0
+    tag: 3.19.1
     ## @param gateway.image.pullPolicy Kubernetes image pull policy
     pullPolicy: IfNotPresent
   ## @section Gateway configurations
@@ -83,12 +83,12 @@ gateway:
   userPool:
     ## @param gateway.userPool.secretKey Secret key (256bits) encoded in base64 to sign service accounts credentials when `SASL_PLAIN` or `SASL_SSL` is used for `GATEWAY_SECURITY_PROTOCOL`. If empty, a random key will be generated. Not used if `gateway.secretRef` is set.
     secretKey: ""
-  ## @param gateway.interceptors Json configuration for interceptors to be loaded at startup by Gateway
+  ## @param gateway.interceptors Deprecated: Json configuration for interceptors to be loaded at startup by Gateway. Use API instead. This will be removed in future versions.
   interceptors: "[]"
   portRange:
-    ## @param gateway.portRange.start Start port of the gateway port range
+    ## @param gateway.portRange.start start port of the gateway port range (single listener mode)
     start: 9092
-    ## @param gateway.portRange.count Max number of broker to expose
+    ## @param gateway.portRange.count max number of brokers to expose (single listener mode)
     count: 7
   admin:
     ## @param gateway.admin.port Admin HTTP server port
@@ -114,6 +114,54 @@ gateway:
     port: 9999
     ## @param gateway.jmx.jvmArgs Arguments to pass to the gateway container JVM
     jvmArgs: -Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1
+  ## @section Multi-listeners mode (preview)
+  ## @descriptionStart
+  ## Opt-in multi-listeners API (Gateway >= v3.18). Enable with gateway.preview.listeners: true.
+  ## When active, gateway.listeners.internal and gateway.listeners.external drive all listener
+  ## env var generation instead of the single listener gateway.portRange config. Inactive by
+  ## default — existing installs are unaffected until opt-in.
+  ## @descriptionEnd
+  preview:
+    ## @param gateway.preview.listeners Enable experimental multi-listeners mode. When true, gateway.listeners.internal/external drive all env var generation; when false (default), single listener portRange config is used.
+    listeners: false
+  ## @param gateway.securityMode Gateway security mode: GATEWAY_MANAGED or KAFKA_MANAGED. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).
+  securityMode: "GATEWAY_MANAGED"
+  ## @param gateway.aclEnabled Enable ACL for the Gateway virtual cluster. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED).
+  aclEnabled: ""
+  kafka:
+    ## @param gateway.kafka.brokerIds Kafka broker IDs used for SNI routing. Required when any listener uses routing: sni. Supports range syntax e.g. ["0-2"] or ["0-2,10,12-13"].
+    brokerIds: []
+  listeners:
+    internal:
+      ## @param gateway.listeners.internal.securityProtocol Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL
+      securityProtocol: PLAINTEXT
+      ## @param gateway.listeners.internal.routing Listener routing mode: port or sni
+      routing: port
+      ## @param gateway.listeners.internal.ports Port specs. Format: ADVERTISED:LOCAL or range (e.g. "9092-9098", "443:9092")
+      ports:
+        - "9092-9098"
+      ## @param gateway.listeners.internal.sslClientAuth TLS client authentication: NONE, OPTIONAL or REQUIRE (only for SSL/SASL_SSL)
+      sslClientAuth: "NONE"
+    external:
+      ## @param gateway.listeners.external.securityProtocol Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL
+      securityProtocol: SASL_SSL
+      ## @param gateway.listeners.external.routing Listener routing mode: port or sni
+      routing: sni
+      ## @param gateway.listeners.external.ports Port specs. Format: ADVERTISED:LOCAL or range (e.g. "9092", "443:9092")
+      ports:
+        - "9092"
+      ## @param gateway.listeners.external.advertisedHost Externally-reachable hostname. Required when preview.listeners and service.external.enable are both true.
+      advertisedHost: ""
+      ## @param gateway.listeners.external.advertisedHostPattern Per-broker hostname pattern for SNI routing. Must contain {{nodeId}}.
+      advertisedHostPattern: ""
+      ## @param gateway.listeners.external.bootstrapHostPattern Bootstrap hostname for SNI routing. Derived from advertisedHostPattern if empty.
+      bootstrapHostPattern: ""
+      ## @param gateway.listeners.external.sslClientAuth TLS client authentication: NONE, OPTIONAL or REQUIRE (only for SSL/SASL_SSL)
+      sslClientAuth: "NONE"
+  ## @section Gateway pod/container configuration
+  ## @descriptionStart
+  ## Resource requests/limits, pod labels, security context, volumes, sidecars, init containers and health probes.
+  ## @descriptionEnd
   # Conduktor Gateway resource requests and limits
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ## Gateway system requirements: https://docs.conduktor.io/gateway/get-started/system-requirements/
@@ -234,12 +282,62 @@ gateway:
 tls:
   ## @param tls.enable Enable TLS injection into Gateway
   enable: false
-  ## @param tls.secretRef Secret name with keystore to load
+  ## @param tls.secretRef DEPRECATED: use tls.keystore.secretRef instead. Secret name with keystore to load
   secretRef: ""
-  ## @param tls.keystoreKey Key in the secret to load as keystore
+  ## @param tls.keystoreKey DEPRECATED: use tls.keystore.keystoreKey instead. Key in the secret to load as keystore
   keystoreKey: keystore.jks
-  ## @param tls.keystoreFile File name to mount keystore as
+  ## @param tls.keystoreFile DEPRECATED: use tls.keystore.keystoreFile instead. File name to mount keystore as
   keystoreFile: keystore.jks
+  ## @param tls.keystore.secretRef Secret containing the JKS keystore file
+  ## @param tls.keystore.keystoreKey Key in the keystore secret
+  ## @param tls.keystore.keystoreFile Filename to mount the keystore as
+  ## @param tls.keystore.passwordSecretRef.name Secret containing the keystore password (optional; leave empty to set via gateway.env or gateway.extraSecretEnvVars)
+  ## @param tls.keystore.passwordSecretRef.key Key in the password secret
+  keystore:
+    secretRef: ""
+    keystoreKey: keystore.jks
+    keystoreFile: keystore.jks
+    passwordSecretRef:
+      name: ""
+      key: "password"
+  ## @param tls.truststore.secretRef Secret containing the JKS truststore file (manual path; leave empty to skip)
+  ## @param tls.truststore.keystoreKey Key in the truststore secret
+  ## @param tls.truststore.keystoreFile Filename to mount the truststore as (also used for cert-manager truststore path)
+  ## @param tls.truststore.passwordSecretRef.name Secret containing the truststore password (optional)
+  ## @param tls.truststore.passwordSecretRef.key Key in the truststore password secret
+  truststore:
+    secretRef: ""
+    keystoreKey: truststore.jks
+    keystoreFile: truststore.jks
+    passwordSecretRef:
+      name: ""
+      key: "password"
+  ## @param tls.certManager.enabled Enable cert-manager integration using native JKS keystore generation (requires cert-manager >= 0.15)
+  ## @param tls.certManager.issuerRef.name cert-manager Issuer or ClusterIssuer name
+  ## @param tls.certManager.issuerRef.kind Issuer kind — Issuer or ClusterIssuer
+  ## @param tls.certManager.issuerRef.group Issuer group (leave empty to default to cert-manager.io)
+  ## @param tls.certManager.extraDnsNames Additional DNS SANs beyond those auto-derived from listener config
+  ## @param tls.certManager.extraIpAddresses Additional IP SANs to include in the certificate
+  ## @param tls.certManager.duration Certificate validity duration. Defaults to 90 days.
+  ## @param tls.certManager.renewBefore How early cert-manager starts renewing before expiry. Must be less than duration.
+  ## @param tls.certManager.sslContextRefreshMinutes How often Gateway reloads the SSL context from disk (GATEWAY_SSL_UPDATE_CONTEXT_INTERVAL_MINUTES)
+  ## @param tls.certManager.truststore.enabled Mount the cert-manager JKS truststore and set GATEWAY_SSL_TRUST_STORE_* env vars. Enable only when the upstream Kafka broker uses SSL or when Gateway listeners require mTLS. Leave false when upstream Kafka is PLAINTEXT — enabling with PLAINTEXT Kafka will cause Gateway to fail at startup.
+  ## @param tls.certManager.httpsAdminApi.enabled Secure the admin API with the same JKS keystore
+  certManager:
+    enabled: false
+    issuerRef:
+      name: ""
+      kind: ClusterIssuer
+      group: ""
+    extraDnsNames: []
+    extraIpAddresses: []
+    duration: "2160h"    # 90 days
+    renewBefore: "360h"  # 15 days
+    sslContextRefreshMinutes: 5
+    truststore:
+      enabled: false
+    httpsAdminApi:
+      enabled: false
 ## @section Gateway service configurations
 ## @descriptionStart
 ## This section contains Kubernetes services configuration.

@@ -162,7 +162,7 @@ def helm_test(release_name: str, namespace: str, timeout: str = "600s", verbose:
 
 def helm_template(chart: str, namespace: str, values_files: Optional[list[Path]] = None) -> str:
     """Render Helm templates."""
-    cmd = ["helm", "template", "test", chart, "--namespace", namespace]
+    cmd = ["helm", "template", "test", chart, "--namespace", namespace, "--api-versions", "cert-manager.io/v1"]
 
     for vf in (values_files or []):
         if not vf.exists():

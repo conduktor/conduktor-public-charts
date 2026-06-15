@@ -1,0 +1,56 @@
+nameOverride: gw-07
+
+gateway:
+  replicas: 1
+  preview:
+    listeners: true
+  securityMode: "GATEWAY_MANAGED"
+  aclEnabled: "false"
+  kafka:
+    brokerIds:
+      - "0-2"
+  listeners:
+    internal:
+      securityProtocol: SSL
+      routing: sni
+      ports:
+        - "9092"
+  env:
+    KAFKA_BOOTSTRAP_SERVERS: kafka.ct-gateway-deps.svc.cluster.local:9092
+    GATEWAY_CLUSTER_ID: "gw-07"
+  extraSecretEnvVars:
+    - name: GATEWAY_LICENSE_KEY
+      valueFrom:
+        secretKeyRef:
+          name: gateway-license
+          key: GATEWAY_LICENSE_KEY
+
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+
+  volumes:
+    - name: tmp
+      emptyDir: {}
+  volumeMounts:
+    - name: tmp
+      mountPath: /tmp
+
+podSecurityContext:
+  runAsNonRoot: true
+
+tls:
+  certManager:
+    enabled: true
+    issuerRef:
+      name: selfsigned-cluster-issuer
+      kind: ClusterIssuer
+    sslContextRefreshMinutes: 5
+    truststore:
+      enabled: false  # Kafka in CI is PLAINTEXT; truststore sets GATEWAY_SSL_TRUST_STORE_* which forces SSL upstream
+    httpsAdminApi:
+      enabled: false

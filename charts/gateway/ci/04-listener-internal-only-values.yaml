@@ -1,0 +1,41 @@
+nameOverride: gateway-test-04
+
+gateway:
+  replicas: 1
+  preview:
+    listeners: true
+  securityMode: "GATEWAY_MANAGED"
+  aclEnabled: "false"
+  listeners:
+    internal:
+      securityProtocol: PLAINTEXT
+      routing: port
+      ports:
+        - "19092-19098"
+  env:
+    KAFKA_BOOTSTRAP_SERVERS: kafka.ct-gateway-deps.svc.cluster.local:9092
+    GATEWAY_CLUSTER_ID: "gw-04"
+  extraSecretEnvVars:
+    - name: GATEWAY_LICENSE_KEY
+      valueFrom:
+        secretKeyRef:
+          name: gateway-license
+          key: GATEWAY_LICENSE_KEY
+
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+
+  volumes:
+    - name: tmp
+      emptyDir: {}
+  volumeMounts:
+    - name: tmp
+      mountPath: /tmp
+
+podSecurityContext:
+  runAsNonRoot: true

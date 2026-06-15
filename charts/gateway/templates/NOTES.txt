@@ -11,14 +11,45 @@ To learn more about the release, try:
   $ helm get all {{ .Release.Name }} -n {{ include "common.names.namespace" . | quote }}
 
 {{- include "conduktor-gateway.validate.kafka-bootstrap-server" . }}
+{{- include "conduktor-gateway.validate.listeners" . }}
+{{- include "conduktor-gateway.validate.tls" . }}
 
 Gateway Bootstrap server :
-{{- $internalServiceHost := printf "%s.%s.svc.%s" (include "conduktor-gateway.internalServiceName" .) .Release.Namespace .Values.clusterDomain  -}}
+{{- $internalServiceHost := printf "%s.%s.svc.%s" (include "conduktor-gateway.internalServiceName" .) .Release.Namespace .Values.clusterDomain -}}
+{{- if .Values.gateway.preview.listeners }}
+  Multi-listeners mode enabled (gateway.preview.listeners: true).
+  INTERNAL listener ({{ .Values.gateway.listeners.internal.routing }} routing):
+    Cluster-internal bootstrap: {{ include "conduktor-gateway.internalListenerAdvertisedHost" . }}:{{ include "conduktor-gateway.firstAdvertisedPort" (index .Values.gateway.listeners.internal.ports 0) }}
+    {{- if eq .Values.gateway.listeners.internal.routing "sni" }}
+
+  SNI listener 'INTERNAL' detected. Per-broker ClusterIP Services created:
+    Bootstrap DNS  : {{ include "conduktor-gateway.internalListenerAdvertisedHost" . }}
+    Broker pattern : {{ include "conduktor-gateway.internalSNIAdvertisedHostPattern" . }}
+    {{- $brokerData := include "conduktor-gateway.expandBrokerIds" .Values.gateway.kafka.brokerIds | fromJson }}
+    Services       :
+    {{- range $brokerData.ids }}
+      {{ include "conduktor-gateway.brokerSniServiceName" (dict "id" . "context" $) }}.{{ $.Release.Namespace }}.svc.{{ $.Values.clusterDomain }}
+    {{- end }}
+    {{- end }}
+  {{- if .Values.service.external.enable }}
+  EXTERNAL listener ({{ .Values.gateway.listeners.external.routing }} routing):
+    External bootstrap: {{ .Values.gateway.listeners.external.advertisedHost }}:{{ include "conduktor-gateway.firstAdvertisedPort" (index .Values.gateway.listeners.external.ports 0) }}
+    {{- if eq .Values.gateway.listeners.external.routing "sni" }}
+
+  SNI listener 'EXTERNAL' detected. DNS requirements:
+    Bootstrap hostname : {{ .Values.gateway.listeners.external.bootstrapHostPattern | default (printf "bootstrap.%s" .Values.gateway.listeners.external.advertisedHost) }} → <LoadBalancer IP>
+    Broker pattern    : *.{{ .Values.gateway.listeners.external.advertisedHost }} → <LoadBalancer IP>
+
+  Required certificate SANs: *.{{ .Values.gateway.listeners.external.advertisedHost }}, {{ .Values.gateway.listeners.external.bootstrapHostPattern | default (printf "bootstrap.%s" .Values.gateway.listeners.external.advertisedHost) }}
+    {{- end }}
+  {{- end }}
+{{- else }}
 {{- if not (hasKey .Values.gateway.env "GATEWAY_ADVERTISED_HOST") }}
   Internally with : {{ $internalServiceHost }}:{{ .Values.gateway.portRange.start }}
 {{- else }}
   You defined a specific domain to be advertised : {{ .Values.gateway.env.GATEWAY_ADVERTISED_HOST }}
   You'll need to configure your network connections to gateway with this domain.
+{{- end }}
 {{- end }}
 Check https://docs.conduktor.io/gateway/configuration/client-authentication/ for more information on how to configure your clients.
 
@@ -36,7 +67,102 @@ Admin API :
     ADMIN_PASSWORD="$(kubectl get secret {{ include "conduktor-gateway.secretName" . }} -n {{ .Release.Namespace }} -o jsonpath="{.data.GATEWAY_ADMIN_API_USER_0_PASSWORD}" | base64 --decode)"
 {{- end }}
 
+{{- /* Warn when GATEWAY_LISTENER_* vars are set in single listener mode */ -}}
+{{- if not .Values.gateway.preview.listeners }}
+  {{- $listenerEnvFound := false }}
+  {{- range $key, $_ := .Values.gateway.env }}
+    {{- if hasPrefix "GATEWAY_LISTENER_" $key }}
+      {{- $listenerEnvFound = true }}
+    {{- end }}
+  {{- end }}
+  {{- if $listenerEnvFound }}
+
+WARNING: One or more GATEWAY_LISTENER_* keys are set in gateway.env while
+  gateway.preview.listeners is false. These vars are passed directly to Gateway
+  and will activate Gateway's explicit multi-listeners mode, but the chart's Service
+  port definitions still use the single listener portRange — causing a mismatch.
+
+  To use the multi-listeners API through the chart, set:
+    gateway.preview.listeners: true
+  and configure listeners via gateway.listeners.internal / gateway.listeners.external.
+  {{- end }}
+{{- end }}
+
+{{- /* Warn when GATEWAY_SECURITY_MODE or GATEWAY_ACL_ENABLED bypass chart-level fields */ -}}
+{{- if hasKey .Values.gateway.env "GATEWAY_SECURITY_MODE" }}
+
+NOTE: GATEWAY_SECURITY_MODE is set in gateway.env. It is being used as the effective
+  security mode. Consider moving it to gateway.securityMode for cleaner chart-level
+  management and remove it from gateway.env once moved.
+{{- end }}
+{{- if hasKey .Values.gateway.env "GATEWAY_ACL_ENABLED" }}
+
+NOTE: GATEWAY_ACL_ENABLED is set in gateway.env. It is being used as the effective
+  ACL setting. Consider moving it to gateway.aclEnabled for cleaner chart-level
+  management and remove it from gateway.env once moved.
+{{- end }}
+
+{{- /* Migration snippet from single listener portRange to multi-listeners mode */ -}}
+{{- if not .Values.gateway.preview.listeners }}
+  {{- $currentProtocol := "PLAINTEXT" }}
+  {{- if hasKey .Values.gateway.env "GATEWAY_SECURITY_PROTOCOL" }}
+    {{- $currentProtocol = index .Values.gateway.env "GATEWAY_SECURITY_PROTOCOL" }}
+  {{- end }}
+  {{- $currentRouting := "port" }}
+  {{- if hasKey .Values.gateway.env "GATEWAY_ROUTING_MECHANISM" }}
+    {{- if eq (index .Values.gateway.env "GATEWAY_ROUTING_MECHANISM") "host" }}
+      {{- $currentRouting = "sni" }}
+    {{- end }}
+  {{- end }}
+  {{- $portStart := int .Values.gateway.portRange.start }}
+  {{- $portEnd := sub (add $portStart .Values.gateway.portRange.count) 1 | int }}
+  {{- $portSpec := printf "%d-%d" $portStart $portEnd }}
+  {{- if eq $currentRouting "sni" }}
+    {{- $portSpec = printf "%d" $portStart }}
+  {{- end }}
+  {{- $effectiveSecurityMode := .Values.gateway.securityMode | default "GATEWAY_MANAGED" }}
+  {{- if hasKey .Values.gateway.env "GATEWAY_SECURITY_MODE" }}
+    {{- $effectiveSecurityMode = index .Values.gateway.env "GATEWAY_SECURITY_MODE" }}
+  {{- end }}
+
+NOTE: You can migrate your single listener gateway.portRange config to multi-listeners mode.
+  Starting-point config derived from your current values:
+
+  gateway:
+    preview:
+      listeners: true
+    securityMode: "{{ $effectiveSecurityMode }}"
+    listeners:
+      internal:
+        securityProtocol: {{ $currentProtocol }}
+        routing: {{ $currentRouting }}
+        ports:
+          - "{{ $portSpec }}"
+{{- if .Values.service.external.enable }}
+      external:
+        securityProtocol: {{ $currentProtocol }}
+        routing: {{ $currentRouting }}
+        ports:
+          - "{{ printf "%d" $portStart }}"
+        advertisedHost: "{{ index .Values.gateway.env "GATEWAY_ADVERTISED_HOST" | default "<set-externally-reachable-hostname>" }}"
+{{- end }}
+
+  See README.md for the full step-by-step migration guide.
+{{- end }}
+
 {{ if .Values.resources -}}
 Depreciation Warning:
 - Root value "resources" is deprecated. We recommend using "gateway.resources" instead.
+{{- end }}
+
+{{- if or .Values.tls.secretRef .Values.tls.keystoreKey .Values.tls.keystoreFile }}
+
+DEPRECATION NOTICE: tls.secretRef, tls.keystoreKey, and tls.keystoreFile are deprecated.
+  Migrate to the new tls.keystore.* structure:
+
+  tls:
+    keystore:
+      secretRef: "{{ .Values.tls.secretRef }}"
+      keystoreKey: "{{ .Values.tls.keystoreKey }}"
+      keystoreFile: "{{ .Values.tls.keystoreFile }}"
 {{- end }}

@@ -146,7 +146,7 @@ Refer to our [documentation](https://docs.conduktor.io/platform/configuration/co
 | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------- |
 | `platform.image.registry`                     | Conduktor Console image registry                                                                                                                             | `docker.io`                   |
 | `platform.image.repository`                   | Conduktor Console image repository                                                                                                                           | `conduktor/conduktor-console` |
-| `platform.image.tag`                          | Conduktor Console image tag (immutable tags are recommended)                                                                                                 | `1.45.0`                      |
+| `platform.image.tag`                          | Conduktor Console image tag (immutable tags are recommended)                                                                                                 | `1.45.1`                      |
 | `platform.image.digest`                       | Conduktor Console image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`                          |
 | `platform.image.pullPolicy`                   | Conduktor Console image pull policy                                                                                                                          | `IfNotPresent`                |
 | `platform.image.pullSecrets`                  | Conduktor Console image pull secrets                                                                                                                         | `[]`                          |
@@ -285,7 +285,7 @@ Console expose metrics that could be collected and presented if your environment
 | `platformCortex.enabled`                            | Enable Conduktor Console Cortex                                                                                                                                     | `true`                               |
 | `platformCortex.image.registry`                     | Conduktor Console Cortex image registry                                                                                                                             | `docker.io`                          |
 | `platformCortex.image.repository`                   | Conduktor Console Cortex image repository                                                                                                                           | `conduktor/conduktor-console-cortex` |
-| `platformCortex.image.tag`                          | Conduktor Console Cortex image tag (immutable tags are recommended)                                                                                                 | `1.45.0`                             |
+| `platformCortex.image.tag`                          | Conduktor Console Cortex image tag (immutable tags are recommended)                                                                                                 | `1.45.1`                             |
 | `platformCortex.image.digest`                       | Conduktor Console Cortex image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended) | `""`                                 |
 | `platformCortex.image.pullPolicy`                   | Conduktor Console Cortex image pull policy                                                                                                                          | `IfNotPresent`                       |
 | `platformCortex.image.pullSecrets`                  | Conduktor Console Cortex image pull secrets                                                                                                                         | `[]`                                 |
@@ -379,36 +379,54 @@ console, we recommend you to look at our
 - [Install without Conduktor monitoring](#install-without-conduktor-monitoring)
 
 ### Kubernetes configuration
-- [Install with an enterprise license](#install-with-an-enterprise-license)
-- [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
-- [Install with a Kafka cluster](#install-with-a-kafka-cluster)
-- [Install with a Confluent Cloud cluster](#install-with-a-confluent-cloud-cluster)
-- [Install without Conduktor monitoring](#install-without-conduktor-monitoring)
-- [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
-- [Provide credentials configuration as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
-- [Provide monitoring configuration as a Kubernetes Secret](#provide-monitoring-configuration-as-a-kubernetes-secret)
-- [Pulling from private registry using `global.imagePullSecrets`](#pulling-from-private-registry-using-globalimagepullsecrets)
-- [Store platform data into a Persistent Volume](#store-platform-data-into-a-persistent-volume)
-- [Install with a PodAffinity](#install-with-a-podaffinity)
-- [Provide console configuration as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
-- [Provide additional credentials as a Kubernetes Secret](#provide-additional-credentials-as-a-kubernetes-secret)
-- [Install with a toleration](#install-with-a-toleration)
-- [Ingress configuration](#ingress-configuration)
-  - [Ingress TLS configuration](#ingress-tls-configuration)
-    - [Using cert-manager](#using-cert-manager)
-    - [Using existing TLS secret](#using-existing-tls-secret)
-    - [Using plain PEM certificate and key](#using-plain-pem-certificate-and-key)
-    - [Using Multiple TLS secrets](#using-multiple-tls-secrets)
-    - [Using Helm generated self-signed certificates](#using-helm-generated-self-signed-certificates)
-  - [Ingress with context path](#ingress-with-context-path)
-- [Container TLS configuration](#container-tls-configuration)
-  - [Use an existing secret](#use-an-existing-secret-)
-  - [Install with Self-Signed TLS certificate](#install-with-self-signed-tls-certificate)
-- [Install with a custom service account](#install-with-a-custom-service-account)
-- [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
-- [Install with Console technical monitoring](#install-with-console-technical-monitoring)
-- [Install with custom certificates or keytab](#install-with-custom-certificates-or-keytab)
-- [Install network debugging image as a sidecar](#install-network-debugging-image-as-a-sidecar)
+- [Conduktor Console](#conduktor-console)
+  - [TL;DR](#tldr)
+  - [Introduction](#introduction)
+  - [Prerequisites](#prerequisites)
+  - [Parameters](#parameters)
+    - [Global parameters](#global-parameters)
+    - [Common parameters](#common-parameters)
+    - [Platform product Parameters](#platform-product-parameters)
+    - [Platform Monitoring product Parameters](#platform-monitoring-product-parameters)
+    - [Platform Deployment Parameters](#platform-deployment-parameters)
+    - [Platform Metrics activation](#platform-metrics-activation)
+    - [Traffic Exposure Parameters](#traffic-exposure-parameters)
+    - [Other Parameters](#other-parameters)
+    - [Platform Cortex Parameters](#platform-cortex-parameters)
+  - [Snippets](#snippets)
+    - [Console configuration](#console-configuration)
+    - [Kubernetes configuration](#kubernetes-configuration)
+    - [Install with an enterprise license](#install-with-an-enterprise-license)
+    - [Install with a basic SSO configuration](#install-with-a-basic-sso-configuration)
+    - [Install with a Kafka cluster](#install-with-a-kafka-cluster)
+    - [Install with a Confluent Cloud cluster](#install-with-a-confluent-cloud-cluster)
+    - [Install without Conduktor monitoring](#install-without-conduktor-monitoring)
+    - [Provide the license as a Kubernetes Secret](#provide-the-license-as-a-kubernetes-secret)
+    - [Provide credentials configuration as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
+    - [Provide monitoring configuration as a Kubernetes Secret](#provide-monitoring-configuration-as-a-kubernetes-secret)
+    - [Pulling from private registry using `global.imagePullSecrets`](#pulling-from-private-registry-using-globalimagepullsecrets)
+    - [Store platform data into a Persistent Volume](#store-platform-data-into-a-persistent-volume)
+    - [Install with a PodAffinity](#install-with-a-podaffinity)
+    - [Provide console configuration as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
+    - [Provide additional credentials as a Kubernetes Secret](#provide-additional-credentials-as-a-kubernetes-secret)
+    - [Install with a toleration](#install-with-a-toleration)
+    - [Ingress configuration](#ingress-configuration)
+      - [Ingress TLS configuration](#ingress-tls-configuration)
+        - [Using cert-manager](#using-cert-manager)
+        - [Using existing TLS secret](#using-existing-tls-secret)
+        - [Using plain PEM certificate and key](#using-plain-pem-certificate-and-key)
+        - [Using Multiple TLS secrets](#using-multiple-tls-secrets)
+        - [Using Helm generated self-signed certificates](#using-helm-generated-self-signed-certificates)
+      - [Ingress with context path](#ingress-with-context-path)
+    - [Container TLS configuration](#container-tls-configuration)
+      - [Use an existing secret](#use-an-existing-secret)
+      - [Install with Self-Signed TLS certificate](#install-with-self-signed-tls-certificate)
+    - [Install with a custom service account](#install-with-a-custom-service-account)
+    - [Install with a AWS EKS IAM Role](#install-with-a-aws-eks-iam-role)
+    - [Install with Console technical monitoring](#install-with-console-technical-monitoring)
+    - [Install with custom certificates or keytab](#install-with-custom-certificates-or-keytab)
+  - [Troubleshooting](#troubleshooting)
+    - [Install network debugging image as a sidecar](#install-network-debugging-image-as-a-sidecar)
 
 ### Install with an enterprise license
 
@@ -719,42 +737,172 @@ platformCortex:
       - docker-regsitry-secret-cortex
 ```
 
-### Store platform data into a Persistent Volume
+### Store platform data on a Persistent Volume
+
+By default, both Console and Cortex use `emptyDir` for their `dataVolume` and `tmpVolume`, backed by the node's ephemeral storage. You may want to move them onto a PersistentVolume in two cases:
+
+- To avoid filling node disks on large deployments.
+- For Cortex specifically, to give the compaction cache a dedicated, sized volume.
+
+#### Cortex
+
+Cortex is a single-replica stateful service — running multiple replicas is not supported. It uses its `dataVolume` as a local working area for the monitoring backend:
+
+- Temporary storage for metrics scraped from Prometheus that haven't yet been compacted and offloaded.
+- Periodic compaction work before chunks are pushed to long-term storage.
+- Caching of metadata files downloaded from the external object store at startup.
+
+Long-term metrics data itself lives in your configured object storage (S3, GCS, Azure, Swift) — only the working set and the metadata cache sit on the volume.
+
+When backing Cortex with a `ReadWriteOnce` PVC, you **must** also set `updateStrategy.type: Recreate`. Without this, Helm upgrades will start the new pod before terminating the old one, and the new pod will fail to mount the PVC. On single-node clusters, both pods may even mount it simultaneously and risk corrupting the compaction cache.
+
+Size the `dataVolume` based on your scrape volume and how long data sits before being offloaded to object storage.
+
+#### Console
+
+Console is stateless — its real state lives in PostgreSQL. The Helm chart's volumes are only used for transient files generated by the JVM:
+
+- `dataVolume`: startup-generated configuration files and startup logs. Regenerated on every pod start.
+- `tmpVolume`: JVM heap dumps and other `/tmp` scratch data.
+- `extraVolumes` / `extraVolumeMounts`: optional, typically used to mount JAR plugins or TLS certificates into the container.
+
+You only need a PVC if you specifically want to avoid using the node's ephemeral disk (for example on nodes with very small local disks, or in environments where ephemeral storage is restricted). If you do attach one, the configuration depends on your replica count:
+
+- **Single-replica Console**: use a `ReadWriteOnce` PVC and set `platform.updateStrategy.type: Recreate`, same as Cortex.
+- **Multi-replica Console**: use a `ReadWriteMany` PVC (e.g. NFS, EFS, CephFS, or a GCS/S3-backed CSI driver). With RWO and multiple replicas, only one pod will ever schedule and rolling upgrades will hang.
+
+#### A note on volume access modes
+
+Pick the access mode based on the service and replica count:
+
+| Service          | Replicas | Access mode     | `updateStrategy` |
+|------------------|----------|-----------------|------------------|
+| Cortex           | 1        | `ReadWriteOnce` | `Recreate`       |
+| Console, single  | 1        | `ReadWriteOnce` | `Recreate`       |
+| Console, multi   | 2+       | `ReadWriteMany` | default          |
+
+> **Don't use `ReadWriteMany` for Cortex.** RWX might look like a way to skip the `Recreate` strategy and let the old and new pods overlap during an upgrade — but Cortex is a single-writer process, and two pods writing to the same compaction cache will corrupt it. Stick with RWO + `Recreate`.
+
+#### Example — Console on a pre-provisioned PVC
 
 ```yaml
 # values.yaml
-config:
-  organization:
-    name: "<your_org_name>"
+config: # ... rest of your config
+platform:
+  # For single-replica Console on RWO, also set:
+  # updateStrategy:
+  #   type: Recreate
+  dataVolume:
+    persistentVolumeClaim:
+      claimName: console-data-pv-claim
+  tmpVolume:
+    persistentVolumeClaim:
+      claimName: console-tmp-pv-claim
+```
 
-  admin:
-    email: "<your_admin_email>"
-    password: "<your_admin_password>"
+#### Example — Cortex on a pre-provisioned PVC
 
-  database:
-    host: "<postgres_host>"
-    port: 5432
-    name: "<postgres_database>"
-    username: "<postgres_username>"
-    password: "<postgres_password>"
+```yaml
+# values.yaml
+config: # ... rest of your config
+platformCortex:
+  enabled: true
+  updateStrategy:
+    type: Recreate
+  dataVolume:
+    persistentVolumeClaim:
+      claimName: cortex-data-pv-claim
+  tmpVolume:
+    persistentVolumeClaim:
+      claimName: cortex-tmp-pv-claim
+```
+
+#### Example — Provisioning the PVCs from the chart itself
+
+If you'd rather not manage the PVCs out-of-band, the chart's top-level `extraDeploy` field lets you ship arbitrary manifests alongside the release. This is convenient when you want the storage to be managed by the same Helm lifecycle as Console and Cortex.
+
+```yaml
+# values.yaml
+config: # ... rest of your config
 
 platform:
   dataVolume:
     persistentVolumeClaim:
-      claimName: data-pv-claim
+      claimName: console-data-pv-claim
   tmpVolume:
     persistentVolumeClaim:
-      claimName: tmp-pv-claim
+      claimName: console-tmp-pv-claim
 
 platformCortex:
   enabled: true
+  updateStrategy:
+    type: Recreate
   dataVolume:
     persistentVolumeClaim:
-      claimName: monitoring-data-pv-claim
+      claimName: cortex-data-pv-claim
   tmpVolume:
     persistentVolumeClaim:
-      claimName: monitoring-tmp-pv-claim
+      claimName: cortex-tmp-pv-claim
+
+extraDeploy:
+  # Cortex data volume — keep on `helm uninstall` so the compaction
+  # cache and downloaded metadata survive reinstalls.
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: cortex-data-pv-claim
+      annotations:
+        helm.sh/resource-policy: keep
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 20Gi
+      # storageClassName: <your-storage-class>
+
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: cortex-tmp-pv-claim
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 2Gi
+      # storageClassName: <your-storage-class>
+
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: console-data-pv-claim
+    spec:
+      accessModes:
+        - ReadWriteOnce  # use ReadWriteMany for multi-replica Console
+      resources:
+        requests:
+          storage: 1Gi
+      # storageClassName: <your-storage-class>
+
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: console-tmp-pv-claim
+    spec:
+      accessModes:
+        - ReadWriteOnce  # use ReadWriteMany for multi-replica Console
+      resources:
+        requests:
+          storage: 2Gi
+      # storageClassName: <your-storage-class>
 ```
+
+> **On Helm hooks.** PVCs declared in `extraDeploy` don't need `pre-install` / `pre-upgrade` hooks — Kubernetes binds them on demand when the pod is scheduled, so the normal apply order is enough. The annotation worth setting is `helm.sh/resource-policy: keep` on the Cortex data PVC, so `helm uninstall` doesn't wipe the compaction cache and the metadata files re-downloaded from object storage. The other PVCs (tmp, Console) hold disposable data and don't need it.
+
+#### Sizing the Cortex volume
+
+The Cortex `dataVolume` only needs to hold the working set, not your full metrics history (that lives in object storage). Its size is driven by how much you scrape and how long data sits locally before being compacted and offloaded. As a rough guide, 20Gi is fine for small to medium deployments; large deployments with high scrape volume can need 200Gi or more. Monitor actual usage and grow the volume if compaction starts falling behind.
 
 ### Install with a PodAffinity
 
