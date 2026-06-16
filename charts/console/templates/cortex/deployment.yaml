@@ -142,8 +142,6 @@ spec:
           ports:
             - name: cortex
               containerPort: {{ .Values.platformCortex.containerPorts.cortex }}
-            - name: alertmanager
-              containerPort: {{ .Values.platformCortex.containerPorts.alertmanager }}
             - name: prometheus
               containerPort: {{ .Values.platformCortex.containerPorts.prometheus }}
           {{- if not .Values.diagnosticMode.enabled }}
