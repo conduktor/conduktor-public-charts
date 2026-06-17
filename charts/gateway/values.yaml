@@ -48,7 +48,7 @@ gateway:
     ## @param gateway.image.repository Image in repository format (conduktor/conduktor-gateway)
     repository: conduktor/conduktor-gateway
     ## @param gateway.image.tag Image tag
-    tag: 3.19.1
+    tag: 3.20.0
     ## @param gateway.image.pullPolicy Kubernetes image pull policy
     pullPolicy: IfNotPresent
   ## @section Gateway configurations
@@ -331,7 +331,7 @@ tls:
       group: ""
     extraDnsNames: []
     extraIpAddresses: []
-    duration: "2160h"    # 90 days
+    duration: "2160h"  # 90 days
     renewBefore: "360h"  # 15 days
     sslContextRefreshMinutes: 5
     truststore:

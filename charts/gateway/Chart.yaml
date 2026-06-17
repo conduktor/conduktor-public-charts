@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: "3.19.1"
+appVersion: "3.20.0"
 description: Conduktor Gateway chart
 icon: https://cdn.conduktor.io/brand/symbol_lime.svg
 home: https://www.conduktor.io
