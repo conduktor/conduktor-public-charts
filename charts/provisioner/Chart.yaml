@@ -18,3 +18,22 @@ dependencies:
     tags:
       - bitnami-common
     version: 2.x.x
+annotations:
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/category: streaming-messaging
+  artifacthub.io/images: |
+    - name: conduktor-ctl
+      image: conduktor/conduktor-ctl:v0.7.0
+      platforms:
+        - linux/amd64
+        - linux/arm64
+  artifacthub.io/links: |
+    - name: Changelog
+      url: https://docs.conduktor.io/guide/release-notes
+    - name: Documentation
+      url: https://docs.conduktor.io
+    - name: support
+      url: https://www.conduktor.io/contact/support
+  artifacthub.io/screenshots: |
+    - title: Deployment architecture
+      url: https://docs.conduktor.io/images/deployment-overview.png
