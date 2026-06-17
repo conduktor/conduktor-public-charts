@@ -4,7 +4,7 @@ description: Conduktor Gateway chart
 icon: https://cdn.conduktor.io/brand/symbol_lime.svg
 home: https://www.conduktor.io
 name: conduktor-gateway
-version: 3.20.1
+version: 3.21.0
 dependencies:
   - name: common
     # force version to avoid breaking changes due to remove support for older k8s versions in common chart v2.31.0 and above
