@@ -1,4 +1,4 @@
-{{- if and .Values.gateway.preview.listeners (eq .Values.gateway.listeners.internal.routing "sni") }}
+{{- if and (eq (include "conduktor-gateway.useLegacyPortRange" .) "false") (eq .Values.gateway.listeners.internal.routing "sni") }}
 {{- $brokerData := include "conduktor-gateway.expandBrokerIds" .Values.gateway.kafka.brokerIds | fromJson }}
 {{- $portData := include "conduktor-gateway.portPairsJson" .Values.gateway.listeners.internal.ports | fromJson }}
 {{- range $brokerData.ids }}

@@ -85,11 +85,6 @@ gateway:
     secretKey: ""
   ## @param gateway.interceptors Deprecated: Json configuration for interceptors to be loaded at startup by Gateway. Use API instead. This will be removed in future versions.
   interceptors: "[]"
-  portRange:
-    ## @param gateway.portRange.start start port of the gateway port range (single listener mode)
-    start: 9092
-    ## @param gateway.portRange.count max number of brokers to expose (single listener mode)
-    count: 7
   admin:
     ## @param gateway.admin.port Admin HTTP server port
     port: 8888
@@ -114,19 +109,33 @@ gateway:
     port: 9999
     ## @param gateway.jmx.jvmArgs Arguments to pass to the gateway container JVM
     jvmArgs: -Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1
-  ## @section Multi-listeners mode (preview)
+  ## @section Legacy single listener (portRange) configuration — DEPRECATED
   ## @descriptionStart
-  ## Opt-in multi-listeners API (Gateway >= v3.18). Enable with gateway.preview.listeners: true.
-  ## When active, gateway.listeners.internal and gateway.listeners.external drive all listener
-  ## env var generation instead of the single listener gateway.portRange config. Inactive by
-  ## default — existing installs are unaffected until opt-in.
+  ## Single listener mode driven by gateway.portRange. DEPRECATED since chart 3.20.0 — multi-listener
+  ## mode (gateway.listeners) is now the default. Existing installs upgrading from a previous chart
+  ## version that relied on portRange MUST set gateway.portRange.enable: true to keep the legacy
+  ## behavior, otherwise the chart switches to multi-listener mode and will likely break the
+  ## existing service ports. The entire portRange block will be removed in a future chart release.
+  ## @descriptionEnd
+  portRange:
+    ## @param gateway.portRange.enable DEPRECATED. Opt back into legacy single listener mode driven by gateway.portRange.start / count. When false (default), multi-listener mode (gateway.listeners) is used. Will be removed alongside gateway.portRange in a future chart release.
+    enable: false
+    ## @param gateway.portRange.start DEPRECATED. Start port of the gateway port range (single listener mode). Only used when gateway.portRange.enable is true.
+    start: 9092
+    ## @param gateway.portRange.count DEPRECATED. Max number of brokers to expose (single listener mode). Only used when gateway.portRange.enable is true.
+    count: 7
+  ## @section Multi-listeners mode
+  ## @descriptionStart
+  ## Multi-listeners API (Gateway >= v3.20). Active by default since chart 3.20.0 — gateway.listeners.internal
+  ## and gateway.listeners.external drive all listener env var generation. To opt back into the legacy
+  ## single listener portRange mode, set gateway.portRange.enable: true (DEPRECATED).
   ## @descriptionEnd
   preview:
-    ## @param gateway.preview.listeners Enable experimental multi-listeners mode. When true, gateway.listeners.internal/external drive all env var generation; when false (default), single listener portRange config is used.
-    listeners: false
-  ## @param gateway.securityMode Gateway security mode: GATEWAY_MANAGED or KAFKA_MANAGED. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).
+    ## @param gateway.preview.listeners DEPRECATED. Backward-compatibility alias from when multi-listeners was a preview feature. Setting this to false is equivalent to gateway.portRange.enable: true (legacy single listener mode). Leave unset on new installs.
+    listeners: true
+  ## @param gateway.securityMode Gateway security mode: GATEWAY_MANAGED or KAFKA_MANAGED. Only used in multi-listener mode. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).
   securityMode: "GATEWAY_MANAGED"
-  ## @param gateway.aclEnabled Enable ACL for the Gateway virtual cluster. Only used when gateway.preview.listeners is true. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED).
+  ## @param gateway.aclEnabled Enable ACL for the Gateway virtual cluster. Only used in multi-listener mode. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED).
   aclEnabled: ""
   kafka:
     ## @param gateway.kafka.brokerIds Kafka broker IDs used for SNI routing. Required when any listener uses routing: sni. Supports range syntax e.g. ["0-2"] or ["0-2,10,12-13"].
@@ -150,7 +159,7 @@ gateway:
       ## @param gateway.listeners.external.ports Port specs. Format: ADVERTISED:LOCAL or range (e.g. "9092", "443:9092")
       ports:
         - "9092"
-      ## @param gateway.listeners.external.advertisedHost Externally-reachable hostname. Required when preview.listeners and service.external.enable are both true.
+      ## @param gateway.listeners.external.advertisedHost Externally-reachable hostname. Required in multi-listener mode when service.external.enable is true.
       advertisedHost: ""
       ## @param gateway.listeners.external.advertisedHostPattern Per-broker hostname pattern for SNI routing. Must contain {{nodeId}}.
       advertisedHostPattern: ""

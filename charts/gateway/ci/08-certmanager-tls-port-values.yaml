@@ -2,8 +2,6 @@ nameOverride: gw-08
 
 gateway:
   replicas: 2
-  preview:
-    listeners: true
   securityMode: "GATEWAY_MANAGED"
   aclEnabled: "false"
   kafka:
