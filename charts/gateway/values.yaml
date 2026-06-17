@@ -331,8 +331,8 @@ tls:
       group: ""
     extraDnsNames: []
     extraIpAddresses: []
-    duration: "2160h" # 90 days
-    renewBefore: "360h" # 15 days
+    duration: "2160h"  # 90 days
+    renewBefore: "360h"  # 15 days
     sslContextRefreshMinutes: 5
     truststore:
       enabled: false
