@@ -267,7 +267,7 @@ Returns JSON.
   {{- end -}}
 {{- end -}}
 {{- if .Values.tls.truststore.secretRef -}}
-  {{- $_ := set $vars "GATEWAY_SSL_TRUST_STORE_PATH" (printf "/etc/gateway/tls/%s" .Values.tls.truststore.keystoreFile) -}}
+  {{- $_ := set $vars "GATEWAY_SSL_TRUST_STORE_PATH" (printf "/etc/gateway/truststore/%s" .Values.tls.truststore.keystoreFile) -}}
   {{- $_ := set $vars "GATEWAY_SSL_TRUST_STORE_TYPE" "jks" -}}
   {{- if .Values.tls.truststore.passwordSecretRef.name -}}
     {{- $tsPwKey := .Values.tls.truststore.passwordSecretRef.key | default "password" -}}

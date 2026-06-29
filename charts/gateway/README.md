@@ -677,7 +677,7 @@ gateway:
           path: kafka.truststore.jks
   volumeMounts:
     - name: truststore
-      mountPath: /etc/gateway/tls/truststore/
+      mountPath: /etc/gateway/truststore/
       readOnly: true
 ```
 
@@ -685,7 +685,7 @@ Finally, we can configure our truststore location
 ```yaml
 gateway:
   env:
-    KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/gateway/tls/truststore/kafka.truststore.jks
+    KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/gateway/truststore/kafka.truststore.jks
 ```
 
 ### Set Gateway Container and Pod Security Context

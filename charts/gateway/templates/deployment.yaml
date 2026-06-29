@@ -139,8 +139,7 @@ spec:
             {{- end }}
             {{- if and .Values.tls.truststore.secretRef (not (and .Values.tls.certManager.enabled .Values.tls.certManager.truststore.enabled)) }}
             - name: truststore
-              mountPath: /etc/gateway/tls/{{ .Values.tls.truststore.keystoreFile }}
-              subPath: {{ .Values.tls.truststore.keystoreKey }}
+              mountPath: /etc/gateway/truststore/
               readOnly: true
             {{- end }}
             - name: config
@@ -217,6 +216,9 @@ spec:
         - name: truststore
           secret:
             secretName: {{ .Values.tls.truststore.secretRef }}
+            items:
+            - key: {{ .Values.tls.truststore.keystoreKey }}
+              path: {{ .Values.tls.truststore.keystoreFile }}
         {{- end }}
         - name: config
           configMap:
