@@ -733,7 +733,7 @@ Accumulates all errors and fails once with a combined message.
 
 {{- /* Internal service disabled: user must supply GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST */ -}}
 {{- if not .Values.service.internal.enable -}}
-  {{- if not (hasKey .Values.gateway.env "GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST") -}}
+  {{- if eq (include "conduktor-gateway.envExists" (dict "envkey" "GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST" "context" $)) "false" -}}
     {{- $errors = append $errors "- service.internal.enable is false but GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST is not set in gateway.env. Set it to the hostname Kafka clients should use to reach the internal listener." -}}
   {{- end -}}
 {{- end -}}
