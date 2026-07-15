@@ -1,3 +1,4 @@
+{{- if .Values.service.internal.enable }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -53,3 +54,4 @@ spec:
       protocol: TCP
     {{- end }}
   selector: {{ include "conduktor-gateway.podSelectorLabels" . | nindent 4 }}
+{{- end }}

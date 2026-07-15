@@ -383,6 +383,8 @@ service:
   ## This section specify internal service configuration
   ## @descriptionEnd
   internal:
+    ## @param service.internal.enable Enable the internal ClusterIP service. Set to false to suppress the service (e.g. for security hardening). When false, you must set GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST in gateway.env.
+    enable: true
     ## @param service.internal.annotations
     annotations: {}
     ## @param service.internal.labels Labels to be added to Gateway internal service
