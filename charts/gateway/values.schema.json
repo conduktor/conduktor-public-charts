@@ -761,6 +761,11 @@
                 "internal": {
                     "type": "object",
                     "properties": {
+                        "enable": {
+                            "type": "boolean",
+                            "description": "Enable the internal ClusterIP service. Set to false to suppress the service (e.g. for security hardening). When false, you must set GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST in gateway.env.",
+                            "default": true
+                        },
                         "annotations": {
                             "type": "object",
                             "description": "",
