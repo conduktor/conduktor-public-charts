@@ -1,0 +1,42 @@
+nameOverride: gateway-test-11
+
+gateway:
+  replicas: 1
+  securityMode: "GATEWAY_MANAGED"
+  aclEnabled: "false"
+  listeners:
+    internal:
+      securityProtocol: PLAINTEXT
+      routing: port
+      ports:
+        - "19092-19098"
+  env:
+    KAFKA_BOOTSTRAP_SERVERS: kafka.ct-gateway-deps.svc.cluster.local:9092
+    GATEWAY_CLUSTER_ID: "gw-11"
+    GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST: "my-custom-internal-host.example.com"
+  extraSecretEnvVars:
+    - name: GATEWAY_LICENSE_KEY
+      valueFrom:
+        secretKeyRef:
+          name: gateway-license
+          key: GATEWAY_LICENSE_KEY
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+  volumes:
+    - name: tmp
+      emptyDir: {}
+  volumeMounts:
+    - name: tmp
+      mountPath: /tmp
+
+service:
+  internal:
+    enable: false
+
+podSecurityContext:
+  runAsNonRoot: true
