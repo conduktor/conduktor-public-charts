@@ -224,11 +224,12 @@ This section specifies external service configuration
 
 This section specify internal service configuration
 
-| Name                           | Description                                              | Value |
-| ------------------------------ | -------------------------------------------------------- | ----- |
-| `service.internal.annotations` |                                                          | `{}`  |
-| `service.internal.labels`      | Labels to be added to Gateway internal service           | `{}`  |
-| `service.internal.extraSpecs`  | Extra specs for the service to be added under `spec` key | `{}`  |
+| Name                           | Description                                                                                                                                                                                   | Value  |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| `service.internal.enable`      | Enable the internal ClusterIP service. Set to false to suppress the service (e.g. for security hardening). When false, you must set GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST in gateway.env. | `true` |
+| `service.internal.annotations` |                                                                                                                                                                                               | `{}`   |
+| `service.internal.labels`      | Labels to be added to Gateway internal service                                                                                                                                                | `{}`   |
+| `service.internal.extraSpecs`  | Extra specs for the service to be added under `spec` key                                                                                                                                      | `{}`   |
 
 ### Gateway ingress configurations
 
