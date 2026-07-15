@@ -641,10 +641,12 @@ Go template iterates JSON object keys in sorted order — output is deterministi
 {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_SECURITY_PROTOCOL" .Values.gateway.listeners.internal.securityProtocol -}}
 {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_ROUTING" (.Values.gateway.listeners.internal.routing | upper) -}}
 {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_PORTS" (.Values.gateway.listeners.internal.ports | join ",") -}}
-{{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST" (include "conduktor-gateway.internalListenerAdvertisedHost" .) -}}
-{{- if eq .Values.gateway.listeners.internal.routing "sni" -}}
-  {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST_PATTERN" (include "conduktor-gateway.internalSNIAdvertisedHostPattern" .) -}}
-  {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_BOOTSTRAP_HOST_PATTERN" (include "conduktor-gateway.internalListenerAdvertisedHost" .) -}}
+{{- if .Values.service.internal.enable -}}
+  {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST" (include "conduktor-gateway.internalListenerAdvertisedHost" .) -}}
+  {{- if eq .Values.gateway.listeners.internal.routing "sni" -}}
+    {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST_PATTERN" (include "conduktor-gateway.internalSNIAdvertisedHostPattern" .) -}}
+    {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_BOOTSTRAP_HOST_PATTERN" (include "conduktor-gateway.internalListenerAdvertisedHost" .) -}}
+  {{- end -}}
 {{- end -}}
 {{- if and .Values.gateway.listeners.internal.sslClientAuth (has .Values.gateway.listeners.internal.securityProtocol (list "SSL" "SASL_SSL")) -}}
   {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_SSL_CLIENT_AUTH" .Values.gateway.listeners.internal.sslClientAuth -}}
@@ -727,6 +729,18 @@ Accumulates all errors and fails once with a combined message.
 {{- /* External listener requires advertisedHost */ -}}
 {{- if and .Values.service.external.enable (empty .Values.gateway.listeners.external.advertisedHost) -}}
   {{- $errors = append $errors "- gateway.listeners.external.advertisedHost is required in multi-listener mode when service.external.enable is true." -}}
+{{- end -}}
+
+{{- /* Internal service disabled: user must supply GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST */ -}}
+{{- if not .Values.service.internal.enable -}}
+  {{- if not (hasKey .Values.gateway.env "GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST") -}}
+    {{- $errors = append $errors "- service.internal.enable is false but GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST is not set in gateway.env. Set it to the hostname Kafka clients should use to reach the internal listener." -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Ingress routes to the internal service admin port — incompatible with service.internal.enable: false */ -}}
+{{- if and .Values.ingress.enabled (not .Values.service.internal.enable) -}}
+  {{- $errors = append $errors "- ingress.enabled requires service.internal.enable: true (ingress routes to the internal service admin port)." -}}
 {{- end -}}
 
 {{- /* Internal SNI requires brokerIds */ -}}
