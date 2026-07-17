@@ -1,0 +1,57 @@
+nameOverride: gateway-test-11
+
+gateway:
+  replicas: 1
+  securityMode: "GATEWAY_MANAGED"
+  listeners:
+    internal:
+      enable: false
+    external:
+      enable: true
+      securityProtocol: SASL_SSL
+      routing: port
+      ports:
+        - "9092"
+      advertisedHost: "kafka.example.com"
+  env:
+    KAFKA_BOOTSTRAP_SERVERS: kafka.ct-gateway-deps.svc.cluster.local:9092
+    GATEWAY_CLUSTER_ID: "gw-11"
+    GATEWAY_SSL_KEY_STORE_PASSWORD: "conduktor"
+    GATEWAY_SSL_KEY_PASSWORD: "conduktor"
+  extraSecretEnvVars:
+    - name: GATEWAY_LICENSE_KEY
+      valueFrom:
+        secretKeyRef:
+          name: gateway-license
+          key: GATEWAY_LICENSE_KEY
+
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+
+  volumes:
+    - name: tmp
+      emptyDir: {}
+  volumeMounts:
+    - name: tmp
+      mountPath: /tmp
+
+podSecurityContext:
+  runAsNonRoot: true
+
+tls:
+  enable: true
+  secretRef: gateway-tls-keystore
+  keystoreKey: keystore.jks
+  keystoreFile: keystore.jks
+
+service:
+  external:
+    type: LoadBalancer
+    admin: true
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: "kafka.example.com"

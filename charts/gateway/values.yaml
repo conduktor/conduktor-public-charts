@@ -142,6 +142,8 @@ gateway:
     brokerIds: []
   listeners:
     internal:
+      ## @param gateway.listeners.internal.enable Enable the internal listener. At least one of gateway.listeners.internal.enable or gateway.listeners.external.enable must be true.
+      enable: true
       ## @param gateway.listeners.internal.securityProtocol Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL
       securityProtocol: PLAINTEXT
       ## @param gateway.listeners.internal.routing Listener routing mode: port or sni
@@ -152,6 +154,8 @@ gateway:
       ## @param gateway.listeners.internal.sslClientAuth TLS client authentication: NONE, OPTIONAL or REQUIRE (only for SSL/SASL_SSL)
       sslClientAuth: "NONE"
     external:
+      ## @param gateway.listeners.external.enable Enable the external listener. Supersedes the deprecated service.external.enable flag (effective value is the OR of both). At least one of gateway.listeners.internal.enable or gateway.listeners.external.enable must be true.
+      enable: false
       ## @param gateway.listeners.external.securityProtocol Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL
       securityProtocol: SASL_SSL
       ## @param gateway.listeners.external.routing Listener routing mode: port or sni
@@ -159,7 +163,7 @@ gateway:
       ## @param gateway.listeners.external.ports Port specs. Format: ADVERTISED:LOCAL or range (e.g. "9092", "443:9092")
       ports:
         - "9092"
-      ## @param gateway.listeners.external.advertisedHost Externally-reachable hostname. Required in multi-listener mode when service.external.enable is true.
+      ## @param gateway.listeners.external.advertisedHost Externally-reachable hostname. Required in multi-listener mode when gateway.listeners.external.enable is true.
       advertisedHost: ""
       ## @param gateway.listeners.external.advertisedHostPattern Per-broker hostname pattern for SNI routing. Must contain {{nodeId}}.
       advertisedHostPattern: ""
@@ -357,7 +361,7 @@ service:
   ## This section specifies external service configuration
   ## @descriptionEnd
   external:
-    ## @param service.external.enable Enable a service for external connection to Gateway
+    ## @param service.external.enable DEPRECATED. Enable a service for external connection to Gateway. Use gateway.listeners.external.enable instead — this flag is kept as a backward-compat alias (effective value is the OR of both) and will be removed in a future chart release.
     enable: false
     ## @param service.external.type Type of load balancer
     type: ClusterIP

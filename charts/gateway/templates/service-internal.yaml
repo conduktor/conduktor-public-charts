@@ -34,12 +34,14 @@ spec:
       protocol: TCP
     {{- end }}
     {{- else }}
+    {{- if .Values.gateway.listeners.internal.enable }}
     {{- $portData := include "conduktor-gateway.portPairsJson" .Values.gateway.listeners.internal.ports | fromJson }}
     {{- range $portData.pairs }}
     - name: broker-{{ .advertised }}
       port: {{ .advertised }}
       targetPort: {{ .local }}
       protocol: TCP
+    {{- end }}
     {{- end }}
     {{- end }}
     - name: admin-http
