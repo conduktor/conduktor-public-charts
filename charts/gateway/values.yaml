@@ -127,8 +127,11 @@ gateway:
   ## @section Multi-listeners mode
   ## @descriptionStart
   ## Multi-listeners API (Gateway >= v3.20). Active by default since chart 3.20.0 — gateway.listeners.internal
-  ## and gateway.listeners.external drive all listener env var generation. To opt back into the legacy
-  ## single listener portRange mode, set gateway.portRange.enable: true (DEPRECATED).
+  ## and gateway.listeners.external drive all listener env var generation. Each listener can be fully
+  ## enabled/disabled via its own `enable` flag (internal defaults to `true`, external to `false`); at least
+  ## one listener must stay enabled. The deprecated `service.external.enable` still works as an alias for
+  ## `gateway.listeners.external.enable`. To opt back into the legacy single listener portRange mode, set
+  ## gateway.portRange.enable: true (DEPRECATED).
   ## @descriptionEnd
   preview:
     ## @param gateway.preview.listeners DEPRECATED. Backward-compatibility alias from when multi-listeners was a preview feature. Setting this to false is equivalent to gateway.portRange.enable: true (legacy single listener mode). Leave unset on new installs.
