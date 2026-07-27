@@ -106,8 +106,11 @@ existing service ports. The entire portRange block will be removed in a future c
 ### Multi-listeners mode
 
 Multi-listeners API (Gateway >= v3.20). Active by default since chart 3.20.0 — gateway.listeners.internal
-and gateway.listeners.external drive all listener env var generation. To opt back into the legacy
-single listener portRange mode, set gateway.portRange.enable: true (DEPRECATED).
+and gateway.listeners.external drive all listener env var generation. Each listener can be fully
+enabled/disabled via its own `enable` flag (internal defaults to `true`, external to `false`); at least
+one listener must stay enabled. The deprecated `service.external.enable` still works as an alias for
+`gateway.listeners.external.enable`. To opt back into the legacy single listener portRange mode, set
+gateway.portRange.enable: true (DEPRECATED).
 
 | Name                                               | Description                                                                                                                                                                                                                    | Value             |
 | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------- |
@@ -379,12 +382,12 @@ Gateway speaks two different protocols, and each one is exposed through a differ
 | Component | Enabled by | Exposes | Protocol |
 | --------- | ---------- | ------- | -------- |
 | Internal service | Always created | Kafka broker ports and `admin-http` | Kafka and HTTP |
-| External service | `service.external.enable: true` | Kafka broker ports, and `admin-http` if `service.external.admin: true` | Kafka and HTTP |
+| External service | `gateway.listeners.external.enable: true` | Kafka broker ports, and `admin-http` if `service.external.admin: true` | Kafka and HTTP |
 | Ingress | `ingress.enabled: true` | Admin REST API only, routed to the internal service `admin-http` port | HTTP |
 
 #### External service types
 
-When you need to reach Gateway from outside the cluster over Kafka, set `service.external.enable: true` and choose a `service.external.type`:
+When you need to reach Gateway from outside the cluster over Kafka, set `gateway.listeners.external.enable: true` and choose a `service.external.type`:
 
 - **`LoadBalancer`** (recommended): provisions an external load balancer through your cloud provider, giving Gateway a stable endpoint that is reachable from outside the cluster and that balances traffic across the Gateway pods. The actual load balancer implementation depends on your Kubernetes provider or infrastructure.
 - **`NodePort`**: opens a port on every Kubernetes node, so clients reach Gateway through a node IP and that port.
@@ -897,6 +900,7 @@ gateway:
       ports:
         - "19092-19098"
     external:
+      enable: true
       securityProtocol: SASL_SSL
       routing: sni
       ports:
@@ -915,7 +919,6 @@ tls:
 
 service:
   external:
-    enable: true
     type: LoadBalancer
 ```
 
@@ -924,6 +927,42 @@ DNS records required for external SNI:
 - `*.kafka.example.com` → LoadBalancer IP (wildcard, for per-broker routing)
 
 TLS certificate must include SANs: `*.kafka.example.com`, `bootstrap.kafka.example.com`.
+
+#### External-only listener (disabling the internal listener)
+
+Each listener can be toggled independently with `gateway.listeners.internal.enable` /
+`gateway.listeners.external.enable`. This disables the internal listener entirely and serves all
+traffic — including in-cluster clients — through the external listener.
+
+```yaml
+gateway:
+  securityMode: "GATEWAY_MANAGED"
+  listeners:
+    internal:
+      enable: false
+    external:
+      enable: true
+      securityProtocol: SASL_SSL
+      routing: port
+      ports:
+        - "9092"
+      advertisedHost: "kafka.example.com"
+  env:
+    KAFKA_BOOTSTRAP_SERVERS: kafka.default.svc.cluster.local:9092
+
+tls:
+  enable: true
+  secretRef: gateway-tls-secret
+  keystoreKey: keystore.jks
+  keystoreFile: keystore.jks
+
+service:
+  external:
+    type: LoadBalancer
+```
+
+> [!NOTE]
+> At least one listener must remain enabled — setting both `enable` flags to `false` fails chart validation.
 
 #### Internal listener with SNI routing
 
@@ -1062,6 +1101,7 @@ gateway:
       ports:
         - "9092"
     external:
+      enable: true
       securityProtocol: SASL_SSL
       routing: sni
       ports:
@@ -1090,7 +1130,6 @@ tls:
 
 service:
   external:
-    enable: true
     type: LoadBalancer
     annotations:
       # if external-dns is available in cluster to automate DNS records creation
@@ -1137,14 +1176,14 @@ tls:
 
 #### LoadBalancer chicken-and-egg problem
 
-When using `service.external.enable: true`, you must set `gateway.listeners.external.advertisedHost` to the hostname clients will use. If your cloud provider assigns the LoadBalancer IP dynamically, you face a bootstrapping problem — the IP is unknown until after the Service is created.
+When using `gateway.listeners.external.enable: true`, you must set `gateway.listeners.external.advertisedHost` to the hostname clients will use. If your cloud provider assigns the LoadBalancer IP dynamically, you face a bootstrapping problem — the IP is unknown until after the Service is created.
 
 Common approaches:
 
 1. **Static IP reservation**: Reserve a static IP from your cloud provider and reference it in `service.external.ip` before deploying.
 
 2. **Two-phase deploy**:
-   1. Deploy with `service.external.enable: false` first to get the chart installed.
+   1. Deploy with `gateway.listeners.external.enable: false` first to get the chart installed.
    2. Enable the external service: `kubectl patch ...` or `helm upgrade`.
    3. Retrieve the assigned IP: `kubectl get svc <release>-gateway-external -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`
    4. Update `advertisedHost` and redeploy.
@@ -1155,12 +1194,11 @@ Common approaches:
 
 [external-dns](https://github.com/kubernetes-sigs/external-dns) can automatically create DNS records for LoadBalancer services. It requires installing the external-dns controller in your cluster and configuring it for your DNS provider.
 
-Once external-dns is running, annotate the external service so it creates the required records:
+Once external-dns is running, annotate the external service so it creates the required records (with `gateway.listeners.external.enable: true` already set):
 
 ```yaml
 service:
   external:
-    enable: true
     type: LoadBalancer
     annotations:
       external-dns.alpha.kubernetes.io/hostname: "kafka.example.com"
@@ -1176,7 +1214,7 @@ If you previously set `GATEWAY_LISTENER_*` environment variables directly via `g
 |-----------------------------------|---------------------------------|
 | `GATEWAY_SECURITY_MODE` | `gateway.securityMode` |
 | `GATEWAY_ACL_ENABLED` | `gateway.aclEnabled` |
-| `GATEWAY_LISTENER_NAMES` | derived from `service.external.enable` |
+| `GATEWAY_LISTENER_NAMES` | derived from `gateway.listeners.external.enable` |
 | `GATEWAY_LISTENER_INTERNAL_*` | `gateway.listeners.internal.*` |
 | `GATEWAY_LISTENER_EXTERNAL_*` | `gateway.listeners.external.*` |
 
@@ -1229,6 +1267,7 @@ gateway:
       ports:
         - "19092"
     external:
+      enable: true
       securityProtocol: SASL_SSL
       routing: sni
       ports:
@@ -1247,7 +1286,6 @@ tls:
 
 service:
   external:
-    enable: true
     type: LoadBalancer
 ```
 
