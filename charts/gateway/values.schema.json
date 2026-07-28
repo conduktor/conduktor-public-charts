@@ -258,6 +258,11 @@
                         "internal": {
                             "type": "object",
                             "properties": {
+                                "enable": {
+                                    "type": "boolean",
+                                    "description": "Enable the internal listener. At least one of gateway.listeners.internal.enable or gateway.listeners.external.enable must be true.",
+                                    "default": true
+                                },
                                 "securityProtocol": {
                                     "type": "string",
                                     "description": "Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL",
@@ -288,6 +293,11 @@
                         "external": {
                             "type": "object",
                             "properties": {
+                                "enable": {
+                                    "type": "boolean",
+                                    "description": "Enable the external listener. Supersedes the deprecated service.external.enable flag (effective value is the OR of both). At least one of gateway.listeners.internal.enable or gateway.listeners.external.enable must be true.",
+                                    "default": false
+                                },
                                 "securityProtocol": {
                                     "type": "string",
                                     "description": "Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL",
@@ -310,7 +320,7 @@
                                 },
                                 "advertisedHost": {
                                     "type": "string",
-                                    "description": "Externally-reachable hostname. Required in multi-listener mode when service.external.enable is true.",
+                                    "description": "Externally-reachable hostname. Required in multi-listener mode when gateway.listeners.external.enable is true.",
                                     "default": ""
                                 },
                                 "advertisedHostPattern": {
@@ -718,7 +728,7 @@
                     "properties": {
                         "enable": {
                             "type": "boolean",
-                            "description": "Enable a service for external connection to Gateway",
+                            "description": "DEPRECATED. Enable a service for external connection to Gateway. Use gateway.listeners.external.enable instead — this flag is kept as a backward-compat alias (effective value is the OR of both) and will be removed in a future chart release.",
                             "default": false
                         },
                         "type": {

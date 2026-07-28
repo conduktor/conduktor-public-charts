@@ -107,12 +107,14 @@ spec:
               protocol: TCP
             {{- end }}
             {{- else }}
+            {{- if .Values.gateway.listeners.internal.enable }}
             {{- $internalPorts := include "conduktor-gateway.portPairsJson" .Values.gateway.listeners.internal.ports | fromJson }}
             {{- range $internalPorts.pairs }}
             - containerPort: {{ .local }}
               protocol: TCP
             {{- end }}
-            {{- if .Values.service.external.enable }}
+            {{- end }}
+            {{- if eq (include "conduktor-gateway.externalListenerEnabled" .) "true" }}
             {{- $externalPorts := include "conduktor-gateway.portPairsJson" .Values.gateway.listeners.external.ports | fromJson }}
             {{- range $externalPorts.pairs }}
             - containerPort: {{ .local }}

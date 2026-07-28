@@ -106,26 +106,31 @@ existing service ports. The entire portRange block will be removed in a future c
 ### Multi-listeners mode
 
 Multi-listeners API (Gateway >= v3.20). Active by default since chart 3.20.0 — gateway.listeners.internal
-and gateway.listeners.external drive all listener env var generation. To opt back into the legacy
-single listener portRange mode, set gateway.portRange.enable: true (DEPRECATED).
+and gateway.listeners.external drive all listener env var generation. Each listener can be fully
+enabled/disabled via its own `enable` flag (internal defaults to `true`, external to `false`); at least
+one listener must stay enabled. The deprecated `service.external.enable` still works as an alias for
+`gateway.listeners.external.enable`. To opt back into the legacy single listener portRange mode, set
+gateway.portRange.enable: true (DEPRECATED).
 
-| Name                                               | Description                                                                                                                                                                                                                 | Value             |
-| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
-| `gateway.preview.listeners`                        | DEPRECATED. Backward-compatibility alias from when multi-listeners was a preview feature. Setting this to false is equivalent to gateway.portRange.enable: true (legacy single listener mode). Leave unset on new installs. | `true`            |
-| `gateway.securityMode`                             | Gateway security mode: GATEWAY_MANAGED or KAFKA_MANAGED. Only used in multi-listener mode. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).                                    | `GATEWAY_MANAGED` |
-| `gateway.aclEnabled`                               | Enable ACL for the Gateway virtual cluster. Only used in multi-listener mode. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED).                    | `""`              |
-| `gateway.kafka.brokerIds`                          | Kafka broker IDs used for SNI routing. Required when any listener uses routing: sni. Supports range syntax e.g. ["0-2"] or ["0-2,10,12-13"].                                                                                | `[]`              |
-| `gateway.listeners.internal.securityProtocol`      | Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL                                                                                                                                                      | `PLAINTEXT`       |
-| `gateway.listeners.internal.routing`               | Listener routing mode: port or sni                                                                                                                                                                                          | `port`            |
-| `gateway.listeners.internal.ports`                 | Port specs. Format: ADVERTISED:LOCAL or range (e.g. "9092-9098", "443:9092")                                                                                                                                                | `["9092-9098"]`   |
-| `gateway.listeners.internal.sslClientAuth`         | TLS client authentication: NONE, OPTIONAL or REQUIRE (only for SSL/SASL_SSL)                                                                                                                                                | `NONE`            |
-| `gateway.listeners.external.securityProtocol`      | Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL                                                                                                                                                      | `SASL_SSL`        |
-| `gateway.listeners.external.routing`               | Listener routing mode: port or sni                                                                                                                                                                                          | `sni`             |
-| `gateway.listeners.external.ports`                 | Port specs. Format: ADVERTISED:LOCAL or range (e.g. "9092", "443:9092")                                                                                                                                                     | `["9092"]`        |
-| `gateway.listeners.external.advertisedHost`        | Externally-reachable hostname. Required in multi-listener mode when service.external.enable is true.                                                                                                                        | `""`              |
-| `gateway.listeners.external.advertisedHostPattern` | Per-broker hostname pattern for SNI routing. Must contain {{nodeId}}.                                                                                                                                                       | `""`              |
-| `gateway.listeners.external.bootstrapHostPattern`  | Bootstrap hostname for SNI routing. Derived from advertisedHostPattern if empty.                                                                                                                                            | `""`              |
-| `gateway.listeners.external.sslClientAuth`         | TLS client authentication: NONE, OPTIONAL or REQUIRE (only for SSL/SASL_SSL)                                                                                                                                                | `NONE`            |
+| Name                                               | Description                                                                                                                                                                                                                    | Value             |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------- |
+| `gateway.preview.listeners`                        | DEPRECATED. Backward-compatibility alias from when multi-listeners was a preview feature. Setting this to false is equivalent to gateway.portRange.enable: true (legacy single listener mode). Leave unset on new installs.    | `true`            |
+| `gateway.securityMode`                             | Gateway security mode: GATEWAY_MANAGED or KAFKA_MANAGED. Only used in multi-listener mode. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).                                       | `GATEWAY_MANAGED` |
+| `gateway.aclEnabled`                               | Enable ACL for the Gateway virtual cluster. Only used in multi-listener mode. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED).                       | `""`              |
+| `gateway.kafka.brokerIds`                          | Kafka broker IDs used for SNI routing. Required when any listener uses routing: sni. Supports range syntax e.g. ["0-2"] or ["0-2,10,12-13"].                                                                                   | `[]`              |
+| `gateway.listeners.internal.enable`                | Enable the internal listener. At least one of gateway.listeners.internal.enable or gateway.listeners.external.enable must be true.                                                                                             | `true`            |
+| `gateway.listeners.internal.securityProtocol`      | Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL                                                                                                                                                         | `PLAINTEXT`       |
+| `gateway.listeners.internal.routing`               | Listener routing mode: port or sni                                                                                                                                                                                             | `port`            |
+| `gateway.listeners.internal.ports`                 | Port specs. Format: ADVERTISED:LOCAL or range (e.g. "9092-9098", "443:9092")                                                                                                                                                   | `["9092-9098"]`   |
+| `gateway.listeners.internal.sslClientAuth`         | TLS client authentication: NONE, OPTIONAL or REQUIRE (only for SSL/SASL_SSL)                                                                                                                                                   | `NONE`            |
+| `gateway.listeners.external.enable`                | Enable the external listener. Supersedes the deprecated service.external.enable flag (effective value is the OR of both). At least one of gateway.listeners.internal.enable or gateway.listeners.external.enable must be true. | `false`           |
+| `gateway.listeners.external.securityProtocol`      | Listener security protocol: PLAINTEXT, SSL, SASL_PLAINTEXT or SASL_SSL                                                                                                                                                         | `SASL_SSL`        |
+| `gateway.listeners.external.routing`               | Listener routing mode: port or sni                                                                                                                                                                                             | `sni`             |
+| `gateway.listeners.external.ports`                 | Port specs. Format: ADVERTISED:LOCAL or range (e.g. "9092", "443:9092")                                                                                                                                                        | `["9092"]`        |
+| `gateway.listeners.external.advertisedHost`        | Externally-reachable hostname. Required in multi-listener mode when gateway.listeners.external.enable is true.                                                                                                                 | `""`              |
+| `gateway.listeners.external.advertisedHostPattern` | Per-broker hostname pattern for SNI routing. Must contain {{nodeId}}.                                                                                                                                                          | `""`              |
+| `gateway.listeners.external.bootstrapHostPattern`  | Bootstrap hostname for SNI routing. Derived from advertisedHostPattern if empty.                                                                                                                                               | `""`              |
+| `gateway.listeners.external.sslClientAuth`         | TLS client authentication: NONE, OPTIONAL or REQUIRE (only for SSL/SASL_SSL)                                                                                                                                                   | `NONE`            |
 
 ### Gateway pod/container configuration
 
@@ -209,16 +214,16 @@ This section contains Kubernetes services configuration.
 
 This section specifies external service configuration
 
-| Name                           | Description                                              | Value       |
-| ------------------------------ | -------------------------------------------------------- | ----------- |
-| `service.external.enable`      | Enable a service for external connection to Gateway      | `false`     |
-| `service.external.type`        | Type of load balancer                                    | `ClusterIP` |
-| `service.external.ip`          | IP to configure                                          | `""`        |
-| `service.external.annotations` |                                                          | `{}`        |
-| `service.external.labels`      | Labels to be added to Gateway internal service           | `{}`        |
-| `service.external.admin`       | Enable admin exposition on external service              | `false`     |
-| `service.external.jmx`         | Enable jmx exposition on external service                | `false`     |
-| `service.external.extraSpecs`  | Extra specs for the service to be added under `spec` key | `{}`        |
+| Name                           | Description                                                                                                                                                                                                                                      | Value       |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| `service.external.enable`      | DEPRECATED. Enable a service for external connection to Gateway. Use gateway.listeners.external.enable instead — this flag is kept as a backward-compat alias (effective value is the OR of both) and will be removed in a future chart release. | `false`     |
+| `service.external.type`        | Type of load balancer                                                                                                                                                                                                                            | `ClusterIP` |
+| `service.external.ip`          | IP to configure                                                                                                                                                                                                                                  | `""`        |
+| `service.external.annotations` |                                                                                                                                                                                                                                                  | `{}`        |
+| `service.external.labels`      | Labels to be added to Gateway internal service                                                                                                                                                                                                   | `{}`        |
+| `service.external.admin`       | Enable admin exposition on external service                                                                                                                                                                                                      | `false`     |
+| `service.external.jmx`         | Enable jmx exposition on external service                                                                                                                                                                                                        | `false`     |
+| `service.external.extraSpecs`  | Extra specs for the service to be added under `spec` key                                                                                                                                                                                         | `{}`        |
 
 ### Conduktor-gateway internal service configurations
 
@@ -377,12 +382,12 @@ Gateway speaks two different protocols, and each one is exposed through a differ
 | Component | Enabled by | Exposes | Protocol |
 | --------- | ---------- | ------- | -------- |
 | Internal service | Always created | Kafka broker ports and `admin-http` | Kafka and HTTP |
-| External service | `service.external.enable: true` | Kafka broker ports, and `admin-http` if `service.external.admin: true` | Kafka and HTTP |
+| External service | `gateway.listeners.external.enable: true` | Kafka broker ports, and `admin-http` if `service.external.admin: true` | Kafka and HTTP |
 | Ingress | `ingress.enabled: true` | Admin REST API only, routed to the internal service `admin-http` port | HTTP |
 
 #### External service types
 
-When you need to reach Gateway from outside the cluster over Kafka, set `service.external.enable: true` and choose a `service.external.type`:
+When you need to reach Gateway from outside the cluster over Kafka, set `gateway.listeners.external.enable: true` and choose a `service.external.type`:
 
 - **`LoadBalancer`** (recommended): provisions an external load balancer through your cloud provider, giving Gateway a stable endpoint that is reachable from outside the cluster and that balances traffic across the Gateway pods. The actual load balancer implementation depends on your Kubernetes provider or infrastructure.
 - **`NodePort`**: opens a port on every Kubernetes node, so clients reach Gateway through a node IP and that port.
@@ -895,6 +900,7 @@ gateway:
       ports:
         - "19092-19098"
     external:
+      enable: true
       securityProtocol: SASL_SSL
       routing: sni
       ports:
@@ -913,7 +919,6 @@ tls:
 
 service:
   external:
-    enable: true
     type: LoadBalancer
 ```
 
@@ -922,6 +927,42 @@ DNS records required for external SNI:
 - `*.kafka.example.com` → LoadBalancer IP (wildcard, for per-broker routing)
 
 TLS certificate must include SANs: `*.kafka.example.com`, `bootstrap.kafka.example.com`.
+
+#### External-only listener (disabling the internal listener)
+
+Each listener can be toggled independently with `gateway.listeners.internal.enable` /
+`gateway.listeners.external.enable`. This disables the internal listener entirely and serves all
+traffic — including in-cluster clients — through the external listener.
+
+```yaml
+gateway:
+  securityMode: "GATEWAY_MANAGED"
+  listeners:
+    internal:
+      enable: false
+    external:
+      enable: true
+      securityProtocol: SASL_SSL
+      routing: port
+      ports:
+        - "9092"
+      advertisedHost: "kafka.example.com"
+  env:
+    KAFKA_BOOTSTRAP_SERVERS: kafka.default.svc.cluster.local:9092
+
+tls:
+  enable: true
+  secretRef: gateway-tls-secret
+  keystoreKey: keystore.jks
+  keystoreFile: keystore.jks
+
+service:
+  external:
+    type: LoadBalancer
+```
+
+> [!NOTE]
+> At least one listener must remain enabled — setting both `enable` flags to `false` fails chart validation.
 
 #### Internal listener with SNI routing
 
@@ -1060,6 +1101,7 @@ gateway:
       ports:
         - "9092"
     external:
+      enable: true
       securityProtocol: SASL_SSL
       routing: sni
       ports:
@@ -1088,7 +1130,6 @@ tls:
 
 service:
   external:
-    enable: true
     type: LoadBalancer
     annotations:
       # if external-dns is available in cluster to automate DNS records creation
@@ -1135,14 +1176,14 @@ tls:
 
 #### LoadBalancer chicken-and-egg problem
 
-When using `service.external.enable: true`, you must set `gateway.listeners.external.advertisedHost` to the hostname clients will use. If your cloud provider assigns the LoadBalancer IP dynamically, you face a bootstrapping problem — the IP is unknown until after the Service is created.
+When using `gateway.listeners.external.enable: true`, you must set `gateway.listeners.external.advertisedHost` to the hostname clients will use. If your cloud provider assigns the LoadBalancer IP dynamically, you face a bootstrapping problem — the IP is unknown until after the Service is created.
 
 Common approaches:
 
 1. **Static IP reservation**: Reserve a static IP from your cloud provider and reference it in `service.external.ip` before deploying.
 
 2. **Two-phase deploy**:
-   1. Deploy with `service.external.enable: false` first to get the chart installed.
+   1. Deploy with `gateway.listeners.external.enable: false` first to get the chart installed.
    2. Enable the external service: `kubectl patch ...` or `helm upgrade`.
    3. Retrieve the assigned IP: `kubectl get svc <release>-gateway-external -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`
    4. Update `advertisedHost` and redeploy.
@@ -1153,12 +1194,11 @@ Common approaches:
 
 [external-dns](https://github.com/kubernetes-sigs/external-dns) can automatically create DNS records for LoadBalancer services. It requires installing the external-dns controller in your cluster and configuring it for your DNS provider.
 
-Once external-dns is running, annotate the external service so it creates the required records:
+Once external-dns is running, annotate the external service so it creates the required records (with `gateway.listeners.external.enable: true` already set):
 
 ```yaml
 service:
   external:
-    enable: true
     type: LoadBalancer
     annotations:
       external-dns.alpha.kubernetes.io/hostname: "kafka.example.com"
@@ -1174,7 +1214,7 @@ If you previously set `GATEWAY_LISTENER_*` environment variables directly via `g
 |-----------------------------------|---------------------------------|
 | `GATEWAY_SECURITY_MODE` | `gateway.securityMode` |
 | `GATEWAY_ACL_ENABLED` | `gateway.aclEnabled` |
-| `GATEWAY_LISTENER_NAMES` | derived from `service.external.enable` |
+| `GATEWAY_LISTENER_NAMES` | derived from `gateway.listeners.external.enable` |
 | `GATEWAY_LISTENER_INTERNAL_*` | `gateway.listeners.internal.*` |
 | `GATEWAY_LISTENER_EXTERNAL_*` | `gateway.listeners.external.*` |
 
@@ -1227,6 +1267,7 @@ gateway:
       ports:
         - "19092"
     external:
+      enable: true
       securityProtocol: SASL_SSL
       routing: sni
       ports:
@@ -1245,7 +1286,6 @@ tls:
 
 service:
   external:
-    enable: true
     type: LoadBalancer
 ```
 

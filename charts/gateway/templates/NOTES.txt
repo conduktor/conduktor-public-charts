@@ -20,6 +20,7 @@ Gateway Bootstrap server :
 {{- $internalServiceHost := printf "%s.%s.svc.%s" (include "conduktor-gateway.internalServiceName" .) .Release.Namespace .Values.clusterDomain -}}
 {{- if not $useLegacy }}
   Multi-listeners mode (default since chart 3.21.0).
+  {{- if .Values.gateway.listeners.internal.enable }}
   INTERNAL listener ({{ .Values.gateway.listeners.internal.routing }} routing):
     Cluster-internal bootstrap: {{ include "conduktor-gateway.internalListenerAdvertisedHost" . }}:{{ include "conduktor-gateway.firstAdvertisedPort" (index .Values.gateway.listeners.internal.ports 0) }}
     {{- if eq .Values.gateway.listeners.internal.routing "sni" }}
@@ -33,7 +34,10 @@ Gateway Bootstrap server :
       {{ include "conduktor-gateway.brokerSniServiceName" (dict "id" . "context" $) }}.{{ $.Release.Namespace }}.svc.{{ $.Values.clusterDomain }}
     {{- end }}
     {{- end }}
-  {{- if .Values.service.external.enable }}
+  {{- else }}
+  INTERNAL listener: disabled (gateway.listeners.internal.enable is false).
+  {{- end }}
+  {{- if eq (include "conduktor-gateway.externalListenerEnabled" .) "true" }}
   EXTERNAL listener ({{ .Values.gateway.listeners.external.routing }} routing):
     External bootstrap: {{ .Values.gateway.listeners.external.advertisedHost }}:{{ include "conduktor-gateway.firstAdvertisedPort" (index .Values.gateway.listeners.external.ports 0) }}
     {{- if eq .Values.gateway.listeners.external.routing "sni" }}
@@ -156,8 +160,9 @@ NOTE: GATEWAY_ACL_ENABLED is set in gateway.env. It is being used as the effecti
         routing: {{ $currentRouting }}
         ports:
           - "{{ $portSpec }}"
-{{- if .Values.service.external.enable }}
+{{- if eq (include "conduktor-gateway.externalListenerEnabled" .) "true" }}
       external:
+        enable: true
         securityProtocol: {{ $currentProtocol }}
         routing: {{ $currentRouting }}
         ports:
