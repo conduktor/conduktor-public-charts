@@ -618,6 +618,10 @@ affinity:
     enable: true
     ## @param affinity.podAntiAffinityPreset.topologyKey Topology key to use for pod anti-affinity preset (default: "kubernetes.io/hostname"). If `affinity.podAntiAffinity` is set, this will be ignored.
     topologyKey: "kubernetes.io/hostname"
+## @param topologySpreadConstraints Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template
+## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/#spread-constraints-for-pods
+##
+topologySpreadConstraints: []
 ## @param podSecurityContext Conduktor Gateway Pod Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
 ##
