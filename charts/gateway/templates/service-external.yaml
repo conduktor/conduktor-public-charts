@@ -1,4 +1,4 @@
-{{- if .Values.service.external.enable }}
+{{- if eq (include "conduktor-gateway.externalListenerEnabled" .) "true" }}
 apiVersion: v1
 kind: Service
 metadata:

@@ -321,7 +321,7 @@ Returns a JSON array of strings.
 {{- $names = append $names (include "conduktor-gateway.fullname" .) -}}
 
 {{- $useLegacy := eq (include "conduktor-gateway.useLegacyPortRange" .) "true" -}}
-{{- if and (not $useLegacy) (eq .Values.gateway.listeners.internal.routing "sni") -}}
+{{- if and (not $useLegacy) .Values.gateway.listeners.internal.enable (eq .Values.gateway.listeners.internal.routing "sni") -}}
   {{- $brokerData := include "conduktor-gateway.expandBrokerIds" .Values.gateway.kafka.brokerIds | fromJson -}}
   {{- range $brokerData.ids -}}
     {{- $svcName := include "conduktor-gateway.brokerSniServiceName" (dict "id" . "context" $) -}}
@@ -331,7 +331,7 @@ Returns a JSON array of strings.
 
 {{- $names = append $names (include "conduktor-gateway.internalListenerAdvertisedHost" .) -}}
 
-{{- if and (not $useLegacy) .Values.service.external.enable -}}
+{{- if and (not $useLegacy) (eq (include "conduktor-gateway.externalListenerEnabled" .) "true") -}}
   {{- $ext := .Values.gateway.listeners.external -}}
   {{- if $ext.advertisedHost -}}
     {{- $names = append $names $ext.advertisedHost -}}
@@ -580,6 +580,17 @@ Both inputs are themselves deprecated and will be removed alongside gateway.port
 {{- end -}}
 
 {{/*
+Resolve whether the external listener is active.
+True when either gateway.listeners.external.enable (the current flag) or the deprecated
+service.external.enable alias is true. Both default to false, so existing installs see no
+behavior change; setting either to true fully activates the external listener (env vars,
+container port, and the k8s Service).
+*/}}
+{{- define "conduktor-gateway.externalListenerEnabled" -}}
+{{- or .Values.gateway.listeners.external.enable .Values.service.external.enable -}}
+{{- end -}}
+
+{{/*
 Resolve the effective security mode.
 Prefers gateway.env.GATEWAY_SECURITY_MODE if set, otherwise falls back to gateway.securityMode.
 */}}
@@ -607,13 +618,15 @@ a basic PLAINTEXT install (the chart defaults) free of ACL-without-auth validati
   {{- $securityMode := include "conduktor-gateway.resolveSecurityMode" . -}}
   {{- $saslProtocols := list "SASL_PLAINTEXT" "SASL_SSL" -}}
   {{- $hasAuthListener := false -}}
-  {{- if has .Values.gateway.listeners.internal.securityProtocol $saslProtocols -}}
-    {{- $hasAuthListener = true -}}
+  {{- if .Values.gateway.listeners.internal.enable -}}
+    {{- if has .Values.gateway.listeners.internal.securityProtocol $saslProtocols -}}
+      {{- $hasAuthListener = true -}}
+    {{- end -}}
+    {{- if and (eq .Values.gateway.listeners.internal.securityProtocol "SSL") (ne (.Values.gateway.listeners.internal.sslClientAuth | default "NONE") "NONE") -}}
+      {{- $hasAuthListener = true -}}
+    {{- end -}}
   {{- end -}}
-  {{- if and (eq .Values.gateway.listeners.internal.securityProtocol "SSL") (ne (.Values.gateway.listeners.internal.sslClientAuth | default "NONE") "NONE") -}}
-    {{- $hasAuthListener = true -}}
-  {{- end -}}
-  {{- if .Values.service.external.enable -}}
+  {{- if eq (include "conduktor-gateway.externalListenerEnabled" .) "true" -}}
     {{- if has .Values.gateway.listeners.external.securityProtocol $saslProtocols -}}
       {{- $hasAuthListener = true -}}
     {{- end -}}
@@ -633,23 +646,29 @@ Go template iterates JSON object keys in sorted order — output is deterministi
 {{- define "conduktor-gateway.listenerModeEnvVars" -}}
 {{- $securityMode := include "conduktor-gateway.resolveSecurityMode" . -}}
 {{- $aclEnabled := include "conduktor-gateway.resolveAclEnabled" . -}}
+{{- $internalEnabled := .Values.gateway.listeners.internal.enable -}}
+{{- $externalEnabled := eq (include "conduktor-gateway.externalListenerEnabled" .) "true" -}}
 {{- $vars := dict -}}
-{{- $listenerNames := ternary "INTERNAL,EXTERNAL" "INTERNAL" .Values.service.external.enable -}}
-{{- $_ := set $vars "GATEWAY_LISTENER_NAMES" $listenerNames -}}
+{{- $listenerNames := list -}}
+{{- if $internalEnabled -}}{{- $listenerNames = append $listenerNames "INTERNAL" -}}{{- end -}}
+{{- if $externalEnabled -}}{{- $listenerNames = append $listenerNames "EXTERNAL" -}}{{- end -}}
+{{- $_ := set $vars "GATEWAY_LISTENER_NAMES" ($listenerNames | join ",") -}}
 {{- $_ := set $vars "GATEWAY_SECURITY_MODE" $securityMode -}}
 {{- $_ := set $vars "GATEWAY_ACL_ENABLED" $aclEnabled -}}
-{{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_SECURITY_PROTOCOL" .Values.gateway.listeners.internal.securityProtocol -}}
-{{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_ROUTING" (.Values.gateway.listeners.internal.routing | upper) -}}
-{{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_PORTS" (.Values.gateway.listeners.internal.ports | join ",") -}}
-{{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST" (include "conduktor-gateway.internalListenerAdvertisedHost" .) -}}
-{{- if eq .Values.gateway.listeners.internal.routing "sni" -}}
-  {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST_PATTERN" (include "conduktor-gateway.internalSNIAdvertisedHostPattern" .) -}}
-  {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_BOOTSTRAP_HOST_PATTERN" (include "conduktor-gateway.internalListenerAdvertisedHost" .) -}}
+{{- if $internalEnabled -}}
+  {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_SECURITY_PROTOCOL" .Values.gateway.listeners.internal.securityProtocol -}}
+  {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_ROUTING" (.Values.gateway.listeners.internal.routing | upper) -}}
+  {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_PORTS" (.Values.gateway.listeners.internal.ports | join ",") -}}
+  {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST" (include "conduktor-gateway.internalListenerAdvertisedHost" .) -}}
+  {{- if eq .Values.gateway.listeners.internal.routing "sni" -}}
+    {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_ADVERTISED_HOST_PATTERN" (include "conduktor-gateway.internalSNIAdvertisedHostPattern" .) -}}
+    {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_BOOTSTRAP_HOST_PATTERN" (include "conduktor-gateway.internalListenerAdvertisedHost" .) -}}
+  {{- end -}}
+  {{- if and .Values.gateway.listeners.internal.sslClientAuth (has .Values.gateway.listeners.internal.securityProtocol (list "SSL" "SASL_SSL")) -}}
+    {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_SSL_CLIENT_AUTH" .Values.gateway.listeners.internal.sslClientAuth -}}
+  {{- end -}}
 {{- end -}}
-{{- if and .Values.gateway.listeners.internal.sslClientAuth (has .Values.gateway.listeners.internal.securityProtocol (list "SSL" "SASL_SSL")) -}}
-  {{- $_ := set $vars "GATEWAY_LISTENER_INTERNAL_SSL_CLIENT_AUTH" .Values.gateway.listeners.internal.sslClientAuth -}}
-{{- end -}}
-{{- if .Values.service.external.enable -}}
+{{- if $externalEnabled -}}
   {{- $_ := set $vars "GATEWAY_LISTENER_EXTERNAL_SECURITY_PROTOCOL" .Values.gateway.listeners.external.securityProtocol -}}
   {{- $_ := set $vars "GATEWAY_LISTENER_EXTERNAL_ROUTING" (.Values.gateway.listeners.external.routing | upper) -}}
   {{- $_ := set $vars "GATEWAY_LISTENER_EXTERNAL_PORTS" (.Values.gateway.listeners.external.ports | join ",") -}}
@@ -692,10 +711,17 @@ Accumulates all errors and fails once with a combined message.
 {{- $errors := list -}}
 {{- $securityMode := include "conduktor-gateway.resolveSecurityMode" . -}}
 {{- $aclEnabled := include "conduktor-gateway.resolveAclEnabled" . -}}
+{{- $internalEnabled := .Values.gateway.listeners.internal.enable -}}
+{{- $externalEnabled := eq (include "conduktor-gateway.externalListenerEnabled" .) "true" -}}
 
 {{- /* securityMode required */ -}}
 {{- if empty $securityMode -}}
   {{- $errors = append $errors "- gateway.securityMode is required in multi-listener mode." -}}
+{{- end -}}
+
+{{- /* At least one listener must be enabled */ -}}
+{{- if and (not $internalEnabled) (not $externalEnabled) -}}
+  {{- $errors = append $errors "- At least one listener must be enabled: set gateway.listeners.internal.enable or gateway.listeners.external.enable to true." -}}
 {{- end -}}
 
 {{- /* aclEnabled incompatible with KAFKA_MANAGED */ -}}
@@ -707,16 +733,16 @@ Accumulates all errors and fails once with a combined message.
 {{- if eq $aclEnabled "true" -}}
   {{- $saslProtocols := list "SASL_PLAINTEXT" "SASL_SSL" -}}
   {{- $hasAuthListener := false -}}
-  {{- if has .Values.gateway.listeners.internal.securityProtocol $saslProtocols -}}
+  {{- if and $internalEnabled (has .Values.gateway.listeners.internal.securityProtocol $saslProtocols) -}}
     {{- $hasAuthListener = true -}}
   {{- end -}}
-  {{- if and .Values.service.external.enable (has .Values.gateway.listeners.external.securityProtocol $saslProtocols) -}}
+  {{- if and $externalEnabled (has .Values.gateway.listeners.external.securityProtocol $saslProtocols) -}}
     {{- $hasAuthListener = true -}}
   {{- end -}}
-  {{- if and (eq .Values.gateway.listeners.internal.securityProtocol "SSL") (ne (.Values.gateway.listeners.internal.sslClientAuth | default "NONE") "NONE") -}}
+  {{- if and $internalEnabled (eq .Values.gateway.listeners.internal.securityProtocol "SSL") (ne (.Values.gateway.listeners.internal.sslClientAuth | default "NONE") "NONE") -}}
     {{- $hasAuthListener = true -}}
   {{- end -}}
-  {{- if and .Values.service.external.enable (eq .Values.gateway.listeners.external.securityProtocol "SSL") (ne (.Values.gateway.listeners.external.sslClientAuth | default "NONE") "NONE") -}}
+  {{- if and $externalEnabled (eq .Values.gateway.listeners.external.securityProtocol "SSL") (ne (.Values.gateway.listeners.external.sslClientAuth | default "NONE") "NONE") -}}
     {{- $hasAuthListener = true -}}
   {{- end -}}
   {{- if not $hasAuthListener -}}
@@ -725,26 +751,26 @@ Accumulates all errors and fails once with a combined message.
 {{- end -}}
 
 {{- /* External listener requires advertisedHost */ -}}
-{{- if and .Values.service.external.enable (empty .Values.gateway.listeners.external.advertisedHost) -}}
-  {{- $errors = append $errors "- gateway.listeners.external.advertisedHost is required in multi-listener mode when service.external.enable is true." -}}
+{{- if and $externalEnabled (empty .Values.gateway.listeners.external.advertisedHost) -}}
+  {{- $errors = append $errors "- gateway.listeners.external.advertisedHost is required when gateway.listeners.external.enable is true." -}}
 {{- end -}}
 
 {{- /* Internal SNI requires brokerIds */ -}}
-{{- if and (eq .Values.gateway.listeners.internal.routing "sni") (empty .Values.gateway.kafka.brokerIds) -}}
+{{- if and $internalEnabled (eq .Values.gateway.listeners.internal.routing "sni") (empty .Values.gateway.kafka.brokerIds) -}}
   {{- $errors = append $errors "- gateway.kafka.brokerIds is required when gateway.listeners.internal.routing is sni. Use range syntax e.g. [\"0-2\"] or [\"0-2,10,12-13\"]." -}}
 {{- end -}}
 {{- /* Internal SNI requires TLS (SNI is a TLS feature) */ -}}
-{{- if and (eq .Values.gateway.listeners.internal.routing "sni") (has .Values.gateway.listeners.internal.securityProtocol (list "PLAINTEXT" "SASL_PLAINTEXT")) -}}
+{{- if and $internalEnabled (eq .Values.gateway.listeners.internal.routing "sni") (has .Values.gateway.listeners.internal.securityProtocol (list "PLAINTEXT" "SASL_PLAINTEXT")) -}}
   {{- $errors = append $errors "- gateway.listeners.internal.securityProtocol must be SSL or SASL_SSL when routing is sni (SNI requires TLS)." -}}
 {{- end -}}
 
 {{- /* External SNI requires advertisedHostPattern */ -}}
-{{- if and .Values.service.external.enable (eq .Values.gateway.listeners.external.routing "sni") (empty .Values.gateway.listeners.external.advertisedHostPattern) -}}
+{{- if and $externalEnabled (eq .Values.gateway.listeners.external.routing "sni") (empty .Values.gateway.listeners.external.advertisedHostPattern) -}}
   {{- $errors = append $errors "- gateway.listeners.external.advertisedHostPattern is required when gateway.listeners.external.routing is sni." -}}
 {{- end -}}
 
 {{- /* SNI: external advertisedHostPattern must contain {{nodeId}}; bootstrapHostPattern must not */ -}}
-{{- if .Values.service.external.enable -}}
+{{- if $externalEnabled -}}
   {{- $ext := .Values.gateway.listeners.external -}}
   {{- if and (eq $ext.routing "sni") (not (empty $ext.advertisedHostPattern)) -}}
     {{- if not (contains "{{nodeId}}" $ext.advertisedHostPattern) -}}
@@ -760,7 +786,7 @@ Accumulates all errors and fails once with a combined message.
 {{- range list "internal" "external" -}}
   {{- $listenerName := . -}}
   {{- $listener := index $.Values.gateway.listeners $listenerName -}}
-  {{- $isActive := or (eq $listenerName "internal") (and (eq $listenerName "external") $.Values.service.external.enable) -}}
+  {{- $isActive := ternary $internalEnabled $externalEnabled (eq $listenerName "internal") -}}
   {{- if and $isActive (eq $listener.routing "sni") (gt (len $listener.ports) 1) -}}
     {{- $errors = append $errors (printf "- gateway.listeners.%s.ports must contain exactly one entry when routing is sni." $listenerName) -}}
   {{- end -}}
@@ -768,8 +794,8 @@ Accumulates all errors and fails once with a combined message.
 
 {{- /* TLS required for any SSL/SASL_SSL listener */ -}}
 {{- $sslProtocols := list "SSL" "SASL_SSL" -}}
-{{- if or (has .Values.gateway.listeners.internal.securityProtocol $sslProtocols)
-          (and .Values.service.external.enable (has .Values.gateway.listeners.external.securityProtocol $sslProtocols)) -}}
+{{- if or (and $internalEnabled (has .Values.gateway.listeners.internal.securityProtocol $sslProtocols))
+          (and $externalEnabled (has .Values.gateway.listeners.external.securityProtocol $sslProtocols)) -}}
   {{- if and (not .Values.tls.enable) (not .Values.tls.certManager.enabled) -}}
     {{- $errors = append $errors "- tls.enable or tls.certManager.enabled must be set when any listener uses SSL or SASL_SSL securityProtocol." -}}
   {{- end -}}
@@ -778,16 +804,16 @@ Accumulates all errors and fails once with a combined message.
 {{- /* KAFKA_MANAGED requires SASL on all active listeners */ -}}
 {{- if eq $securityMode "KAFKA_MANAGED" -}}
   {{- $saslProtocols := list "SASL_PLAINTEXT" "SASL_SSL" -}}
-  {{- if not (has .Values.gateway.listeners.internal.securityProtocol $saslProtocols) -}}
+  {{- if and $internalEnabled (not (has .Values.gateway.listeners.internal.securityProtocol $saslProtocols)) -}}
     {{- $errors = append $errors "- KAFKA_MANAGED requires SASL; gateway.listeners.internal.securityProtocol must be SASL_PLAINTEXT or SASL_SSL." -}}
   {{- end -}}
-  {{- if and .Values.service.external.enable (not (has .Values.gateway.listeners.external.securityProtocol $saslProtocols)) -}}
+  {{- if and $externalEnabled (not (has .Values.gateway.listeners.external.securityProtocol $saslProtocols)) -}}
     {{- $errors = append $errors "- KAFKA_MANAGED requires SASL; gateway.listeners.external.securityProtocol must be SASL_PLAINTEXT or SASL_SSL." -}}
   {{- end -}}
 {{- end -}}
 
 {{- /* Local port overlap check between INTERNAL and EXTERNAL */ -}}
-{{- if .Values.service.external.enable -}}
+{{- if and $internalEnabled $externalEnabled -}}
   {{- $internalData := include "conduktor-gateway.portPairsJson" .Values.gateway.listeners.internal.ports | fromJson -}}
   {{- $externalData := include "conduktor-gateway.portPairsJson" .Values.gateway.listeners.external.ports | fromJson -}}
   {{- $seen := dict -}}
