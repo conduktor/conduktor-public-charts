@@ -741,7 +741,12 @@ platformCortex:
 
 ### Install in an air-gapped environment
 
-To deploy Console in an environment without internet access, you need to complete the following steps on an internet-connected machine before deploying to the cluster.
+To deploy Console in an environment without internet access, you can either:
+
+- Use an [OCI registry proxy](https://github.com/container-registry/helm-charts-oci-proxy) that has internet access and can fetch the chart and images on demand.
+- Mirror the chart and images manually, as described below, if you do not have or do not want to use a registry proxy.
+
+The remaining steps assume you are using the manual mirroring approach and complete them on an internet-connected machine before deploying to the cluster.
 
 **1. Get the chart**
 
@@ -760,12 +765,9 @@ Both sources ship with all chart dependencies already bundled — no `helm depen
 Inject your private registry as the default and push the chart to your internal OCI registry:
 
 ```sh
-# Set your private image registry as the default
-yq -i '.global.imageRegistry = "<your-private-registry>"' console/values.yaml
-
 # Repackage and push to your internal OCI registry
-tar czf console-<version>.tgz console/
-helm push console-<version>.tgz oci://<your-chart-registry>
+helm pull conduktor/console
+helm push console-<version>.tgz oci://<your-chart-registry>/console
 ```
 
 **3. Mirror the Console images**
@@ -793,8 +795,13 @@ Configure your cluster to authenticate to your private registry. The recommended
 **5. Install**
 
 ```sh
-helm install my-console oci://<your-chart-registry>/console --version <version>
+helm install my-console oci://<your-chart-registry>/console \
+  --version <version> \
+  --set global.imageRegistry=<your-private-registry> \
+  --set global.imagePullSecrets={registry-creds-secret}
 ```
+
+In practice, you'll usually put these overrides in a values file instead of passing them inline with `--set`.
 
 ### Store platform data on a Persistent Volume
 
