@@ -377,6 +377,7 @@ console, we recommend you to look at our
 - [Install with a Confluent Cloud cluster](#install-with-a-confluent-cloud-cluster)
 - [Install with an enterprise license](#install-with-an-enterprise-license)
 - [Install without Conduktor monitoring](#install-without-conduktor-monitoring)
+- [Install in an air-gapped environment](#install-in-an-air-gapped-environment)
 
 ### Kubernetes configuration
 - [Conduktor Console](#conduktor-console)
@@ -405,6 +406,7 @@ console, we recommend you to look at our
     - [Provide credentials configuration as a Kubernetes Secret](#provide-credentials-configuration-as-a-kubernetes-secret)
     - [Provide monitoring configuration as a Kubernetes Secret](#provide-monitoring-configuration-as-a-kubernetes-secret)
     - [Pulling from private registry using `global.imagePullSecrets`](#pulling-from-private-registry-using-globalimagepullsecrets)
+    - [Install in an air-gapped environment](#install-in-an-air-gapped-environment)
     - [Store platform data into a Persistent Volume](#store-platform-data-into-a-persistent-volume)
     - [Install with a PodAffinity](#install-with-a-podaffinity)
     - [Provide console configuration as a Kubernetes ConfigMap](#provide-console-configuration-as-a-kubernetes-configmap)
@@ -736,6 +738,70 @@ platformCortex:
     pullSecrets:
       - docker-regsitry-secret-cortex
 ```
+
+### Install in an air-gapped environment
+
+To deploy Console in an environment without internet access, you can either:
+
+- Use an [OCI registry proxy](https://github.com/container-registry/helm-charts-oci-proxy) that has internet access and can fetch the chart and images on demand.
+- Mirror the chart and images manually, as described below, if you do not have or do not want to use a registry proxy.
+
+The remaining steps assume you are using the manual mirroring approach and complete them on an internet-connected machine before deploying to the cluster.
+
+**1. Get the chart**
+
+Download the packaged chart from the [GitHub releases page](https://github.com/conduktor/conduktor-public-charts/releases) or pull it from the Helm repository:
+
+```sh
+helm repo add conduktor https://helm.conduktor.io
+helm repo update
+helm pull conduktor/console --version <version>
+```
+
+Both sources ship with all chart dependencies already bundled — no `helm dependency build` needed.
+
+**2. Repackage the chart for your private registry**
+
+Inject your private registry as the default and push the chart to your internal OCI registry:
+
+```sh
+# Repackage and push to your internal OCI registry
+helm pull conduktor/console
+helm push console-<version>.tgz oci://<your-chart-registry>/console
+```
+
+**3. Mirror the Console images**
+
+Console uses two images. Pull each one from Docker Hub and push it to your private registry:
+
+```sh
+# Console
+docker pull conduktor/conduktor-console:<version>
+docker tag conduktor/conduktor-console:<version> <your-private-registry>/conduktor/conduktor-console:<version>
+docker push <your-private-registry>/conduktor/conduktor-console:<version>
+
+# Console Cortex (monitoring)
+docker pull conduktor/conduktor-console-cortex:<version>
+docker tag conduktor/conduktor-console-cortex:<version> <your-private-registry>/conduktor/conduktor-console-cortex:<version>
+docker push <your-private-registry>/conduktor/conduktor-console-cortex:<version>
+```
+
+The image tags follow the chart `appVersion`. If you disable the Cortex monitoring component, you can skip mirroring `conduktor-console-cortex`.
+
+**4. Set up registry authentication**
+
+Configure your cluster to authenticate to your private registry. The recommended approach is to use your cloud provider's native registry authentication (for example, IRSA on EKS) to avoid managing short-lived credentials. Alternatively, use `global.imagePullSecrets` — see [Pulling from private registry using `global.imagePullSecrets`](#pulling-from-private-registry-using-globalimagepullsecrets).
+
+**5. Install**
+
+```sh
+helm install my-console oci://<your-chart-registry>/console \
+  --version <version> \
+  --set global.imageRegistry=<your-private-registry> \
+  --set global.imagePullSecrets={registry-creds-secret}
+```
+
+In practice, you'll usually put these overrides in a values file instead of passing them inline with `--set`.
 
 ### Store platform data on a Persistent Volume
 
