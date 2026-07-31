@@ -1051,6 +1051,12 @@
                 }
             }
         },
+        "topologySpreadConstraints": {
+            "type": "array",
+            "description": "Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template",
+            "default": [],
+            "items": {}
+        },
         "podSecurityContext": {
             "type": "object",
             "description": "Conduktor Gateway Pod Security Context",

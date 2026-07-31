@@ -297,6 +297,7 @@ Shared Kubernetes configuration of the chart.
 | `affinity.podAntiAffinity`                    | Gateway pods anti-affinity configuration                                                                                                                                                                                                                                         | `{}`                     |
 | `affinity.podAntiAffinityPreset.enable`       | Enable predefined pod anti-affinity presets that spread pods across nodes. If `affinity.podAntiAffinity` is set, this will be ignored. If both `affinity.podAntiAffinityPreset.enable` is `false` and `affinity.podAntiAffinity` is empty, no pod anti-affinity will be applied. | `true`                   |
 | `affinity.podAntiAffinityPreset.topologyKey`  | Topology key to use for pod anti-affinity preset (default: "kubernetes.io/hostname"). If `affinity.podAntiAffinity` is set, this will be ignored.                                                                                                                                | `kubernetes.io/hostname` |
+| `topologySpreadConstraints`                   | Topology Spread Constraints for pod assignment spread across your cluster among failure-domains. Evaluated as a template                                                                                                                                                         | `[]`                     |
 | `podSecurityContext`                          | Conduktor Gateway Pod Security Context                                                                                                                                                                                                                                           | `{}`                     |
 
 
@@ -724,6 +725,25 @@ affinity:
     enable: false
     topologyKey: "kubernetes.io/hostname"
 ```
+
+### Topology spread constraints
+
+Pod anti-affinity keeps pods apart, but it cannot enforce a balanced number of pods per failure domain. To spread Gateway pods evenly across availability zones (for example two pods per zone across three zones), use `topologySpreadConstraints` instead. It is not set by default.
+
+```yaml
+gateway:
+  replicas: 6
+
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: topology.kubernetes.io/zone
+    whenUnsatisfiable: DoNotSchedule # or ScheduleAnyway for best-effort
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: conduktor-gateway
+```
+
+`maxSkew: 1` keeps the pod count per zone within one of every other zone. `whenUnsatisfiable: DoNotSchedule` enforces the spread strictly (a pod stays Pending until it can balance), while `ScheduleAnyway` treats it as a preference. The `topology.kubernetes.io/zone` label is standard on managed Kubernetes such as EKS, AKS, and GKE.
 
 ### Monitoring
 
