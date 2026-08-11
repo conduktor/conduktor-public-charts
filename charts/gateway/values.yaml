@@ -309,11 +309,16 @@ tls:
   ## @param tls.keystore.keystoreFile Filename to mount the keystore as
   ## @param tls.keystore.passwordSecretRef.name Secret containing the keystore password (optional; leave empty to set via gateway.env or gateway.extraSecretEnvVars)
   ## @param tls.keystore.passwordSecretRef.key Key in the password secret
+  ## @param tls.keystore.keyPasswordSecretRef.name Secret containing the private key password inside the JKS, when it differs from the keystore password. Leave empty to reuse tls.keystore.passwordSecretRef. Not supported with tls.certManager.enabled, which issues keystores whose key password always matches the store password
+  ## @param tls.keystore.keyPasswordSecretRef.key Key in the private key password secret
   keystore:
     secretRef: ""
     keystoreKey: keystore.jks
     keystoreFile: keystore.jks
     passwordSecretRef:
+      name: ""
+      key: "password"
+    keyPasswordSecretRef:
       name: ""
       key: "password"
   ## @param tls.truststore.secretRef Secret containing the JKS truststore file (manual path; leave empty to skip)

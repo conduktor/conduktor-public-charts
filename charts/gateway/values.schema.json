@@ -603,6 +603,21 @@
                                     "default": "password"
                                 }
                             }
+                        },
+                        "keyPasswordSecretRef": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "Secret containing the private key password inside the JKS, when it differs from the keystore password. Leave empty to reuse tls.keystore.passwordSecretRef. Not supported with tls.certManager.enabled, which issues keystores whose key password always matches the store password",
+                                    "default": ""
+                                },
+                                "key": {
+                                    "type": "string",
+                                    "description": "Key in the private key password secret",
+                                    "default": "password"
+                                }
+                            }
                         }
                     }
                 },
