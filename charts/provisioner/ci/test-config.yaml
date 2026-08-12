@@ -69,6 +69,7 @@ dependencies:
           GATEWAY_SECURITY_PROTOCOL: "SASL_PLAINTEXT"
           GATEWAY_ACL_ENABLED: "true"
           GATEWAY_SUPER_USERS: "admin"
+          GATEWAY_LICENSE_KEY: "${CDK_LICENSE}"
         admin:
           users:
             - username: admin
