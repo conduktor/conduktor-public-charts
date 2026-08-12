@@ -252,6 +252,9 @@ so that the caller can dispatch on kind (see deployment.yaml tlsEnvVars range bl
 Two code paths:
   - tls.enable        : user-supplied JKS keystore secret
   - tls.certManager.* : cert-manager-issued JKS (password always from the auto/user-supplied secret)
+Values already set through gateway.env or gateway.extraSecretEnvVars are left alone: gateway.env
+lands in a ConfigMap consumed via envFrom, which an entry in the container's env list would silently
+override.
 Returns JSON.
 */}}
 {{- define "conduktor-gateway.tlsEnvVars" -}}
@@ -261,9 +264,21 @@ Returns JSON.
 {{- if and .Values.tls.enable (include "conduktor-gateway.keystoreSecretRef" .) -}}
   {{- $_ := set $vars "GATEWAY_SSL_KEY_STORE_PATH" (printf "/etc/gateway/tls/%s" $ksFile) -}}
   {{- $_ := set $vars "GATEWAY_SSL_KEY_TYPE"       "jks" -}}
-  {{- if .Values.tls.keystore.passwordSecretRef.name -}}
-    {{- $ref := dict "secretKeyRef" (dict "name" .Values.tls.keystore.passwordSecretRef.name "key" $pwKey) -}}
-    {{- $_ := set $vars "GATEWAY_SSL_KEY_STORE_PASSWORD" $ref -}}
+  {{- if and .Values.tls.keystore.passwordSecretRef.name (eq (include "conduktor-gateway.envExists" (dict "envkey" "GATEWAY_SSL_KEY_STORE_PASSWORD" "context" .)) "false") -}}
+    {{- $_ := set $vars "GATEWAY_SSL_KEY_STORE_PASSWORD" (dict "secretKeyRef" (dict "name" .Values.tls.keystore.passwordSecretRef.name "key" $pwKey)) -}}
+  {{- end -}}
+  {{/* A JKS holds two passwords: the store password and the private key password. Gateway requires
+       both (KeyStoreConfig.isIncomplete) and has no fallback between them, so the key password
+       defaults to the store password — the common case, and what cert-manager always produces.
+       keyPasswordSecretRef overrides it for keystores built with a distinct key password. */}}
+  {{- $keyPwName := .Values.tls.keystore.keyPasswordSecretRef.name -}}
+  {{- $keyPwKey  := .Values.tls.keystore.keyPasswordSecretRef.key | default "password" -}}
+  {{- if not $keyPwName -}}
+    {{- $keyPwName = .Values.tls.keystore.passwordSecretRef.name -}}
+    {{- $keyPwKey  = $pwKey -}}
+  {{- end -}}
+  {{- if and $keyPwName (eq (include "conduktor-gateway.envExists" (dict "envkey" "GATEWAY_SSL_KEY_PASSWORD" "context" .)) "false") -}}
+    {{- $_ := set $vars "GATEWAY_SSL_KEY_PASSWORD" (dict "secretKeyRef" (dict "name" $keyPwName "key" $keyPwKey)) -}}
   {{- end -}}
 {{- end -}}
 {{- if .Values.tls.truststore.secretRef -}}
@@ -392,6 +407,10 @@ Validate TLS configuration. Called unconditionally from NOTES.txt.
 
   {{- if and .Values.tls.truststore.secretRef .Values.tls.certManager.truststore.enabled -}}
     {{- fail "tls.truststore.secretRef and tls.certManager.truststore.enabled cannot both be set. Use one or the other." -}}
+  {{- end -}}
+
+  {{- if .Values.tls.keystore.keyPasswordSecretRef.name -}}
+    {{- fail "tls.keystore.keyPasswordSecretRef is not supported with tls.certManager.enabled: the cert-manager JKSKeystore API exposes a single passwordSecretRef, so the private key password always matches the keystore password. Remove tls.keystore.keyPasswordSecretRef, or bring your own keystore with tls.enable." -}}
   {{- end -}}
 
   {{- $dur := .Values.tls.certManager.duration -}}
