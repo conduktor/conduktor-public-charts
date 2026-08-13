@@ -136,42 +136,54 @@ gateway.portRange.enable: true (DEPRECATED).
 
 Resource requests/limits, pod labels, security context, volumes, sidecars, init containers and health probes.
 
-| Name                                         | Description                                                                                                                              | Value   |
-| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| `gateway.resources.limits.cpu`               | CPU limit for the platform container                                                                                                     | `2000m` |
-| `gateway.resources.limits.memory`            | Memory limit for the container                                                                                                           | `4Gi`   |
-| `gateway.resources.requests.cpu`             | CPU resource requests                                                                                                                    | `500m`  |
-| `gateway.resources.requests.memory`          | Memory resource requests                                                                                                                 | `500Mi` |
-| `gateway.podLabels`                          | Specific labels to be added to Gateway pod by deployment                                                                                 | `{}`    |
-| `gateway.podAnnotations`                     | Gateway pod annotations                                                                                                                  | `{}`    |
-| `gateway.securityContext`                    | Conduktor Gateway container Security Context                                                                                             | `{}`    |
-| `gateway.volumes`                            | Define user specific volumes for Gateway deployment                                                                                      | `[]`    |
-| `gateway.volumeMounts`                       | Define user specific volumeMounts for Gateway container in deployment                                                                    | `[]`    |
-| `gateway.sidecars`                           | Add additional sidecar containers to run into the Conduktor Gateway pod(s)                                                               | `[]`    |
-| `gateway.initContainers`                     | Add additional init containers to the Conduktor Gateway pod(s). ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/ | `[]`    |
-| `gateway.terminationGracePeriodSeconds`      | Duration in seconds the pod needs to terminate gracefully.                                                                               | `30`    |
-| `gateway.priorityClassName`                  | Define Gateway pods' priority based on an existing ClassName                                                                             | `""`    |
-| `gateway.customStartupProbe`                 | Custom startup probe configuration                                                                                                       | `{}`    |
-| `gateway.startupProbe.enabled`               | Enable startupProbe on Conduktor Gaterway containers                                                                                     | `true`  |
-| `gateway.startupProbe.initialDelaySeconds`   | Initial delay seconds for startupProbe                                                                                                   | `10`    |
-| `gateway.startupProbe.periodSeconds`         | Period seconds for startupProbe                                                                                                          | `10`    |
-| `gateway.startupProbe.timeoutSeconds`        | Timeout seconds for startupProbe                                                                                                         | `1`     |
-| `gateway.startupProbe.failureThreshold`      | Failure threshold for startupProbe                                                                                                       | `5`     |
-| `gateway.startupProbe.successThreshold`      | Success threshold for startupProbe                                                                                                       | `1`     |
-| `gateway.customLivenessProbe`                | Custom liveness probe configuration                                                                                                      | `{}`    |
-| `gateway.livenessProbe.enabled`              | Enable livenessProbe on Conduktor Gaterway containers                                                                                    | `true`  |
-| `gateway.livenessProbe.initialDelaySeconds`  | Initial delay seconds for livenessProbe                                                                                                  | `0`     |
-| `gateway.livenessProbe.periodSeconds`        | Period seconds for livenessProbe                                                                                                         | `5`     |
-| `gateway.livenessProbe.timeoutSeconds`       | Timeout seconds for livenessProbe                                                                                                        | `1`     |
-| `gateway.livenessProbe.failureThreshold`     | Failure threshold for livenessProbe                                                                                                      | `3`     |
-| `gateway.livenessProbe.successThreshold`     | Success threshold for livenessProbe                                                                                                      | `1`     |
-| `gateway.customReadinessProbe`               | Custom readiness probe configuration                                                                                                     | `{}`    |
-| `gateway.readinessProbe.enabled`             | Enable readinessProbe on Conduktor Gaterway containers                                                                                   | `true`  |
-| `gateway.readinessProbe.initialDelaySeconds` | Initial delay seconds for readinessProbe                                                                                                 | `0`     |
-| `gateway.readinessProbe.periodSeconds`       | Period seconds for readinessProbe                                                                                                        | `5`     |
-| `gateway.readinessProbe.timeoutSeconds`      | Timeout seconds for readinessProbe                                                                                                       | `1`     |
-| `gateway.readinessProbe.failureThreshold`    | Failure threshold for readinessProbe                                                                                                     | `3`     |
-| `gateway.readinessProbe.successThreshold`    | Success threshold for readinessProbe                                                                                                     | `1`     |
+| Name                                         | Description                                                                                                                                                                                                                     | Value                       |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| `gateway.resources.limits.cpu`               | CPU limit for the platform container                                                                                                                                                                                            | `2000m`                     |
+| `gateway.resources.limits.memory`            | Memory limit for the container                                                                                                                                                                                                  | `4Gi`                       |
+| `gateway.resources.requests.cpu`             | CPU resource requests                                                                                                                                                                                                           | `500m`                      |
+| `gateway.resources.requests.memory`          | Memory resource requests                                                                                                                                                                                                        | `500Mi`                     |
+| `gateway.podLabels`                          | Specific labels to be added to Gateway pod by deployment                                                                                                                                                                        | `{}`                        |
+| `gateway.podAnnotations`                     | Gateway pod annotations                                                                                                                                                                                                         | `{}`                        |
+| `gateway.securityContext`                    | Conduktor Gateway container Security Context                                                                                                                                                                                    | `{}`                        |
+| `gateway.volumes`                            | Define user specific volumes for Gateway deployment                                                                                                                                                                             | `[]`                        |
+| `gateway.volumeMounts`                       | Define user specific volumeMounts for Gateway container in deployment                                                                                                                                                           | `[]`                        |
+| `gateway.sidecars`                           | Add additional sidecar containers to run into the Conduktor Gateway pod(s)                                                                                                                                                      | `[]`                        |
+| `gateway.initContainers`                     | Add additional init containers to the Conduktor Gateway pod(s). ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/                                                                                        | `[]`                        |
+| `gateway.debugSidecar.enabled`               | Deploy the Conduktor debug image as a sidecar of the Conduktor Gateway container                                                                                                                                                | `false`                     |
+| `gateway.debugSidecar.shareProcessNamespace` | Share the pod process namespace so the JVM tools (`jcmd`, `jstack`, `jmap`, `jfr`) can attach to the Gateway process                                                                                                            | `true`                      |
+| `gateway.debugSidecar.image.registry`        | Conduktor debug image registry                                                                                                                                                                                                  | `docker.io`                 |
+| `gateway.debugSidecar.image.repository`      | Conduktor debug image repository                                                                                                                                                                                                | `conduktor/conduktor-debug` |
+| `gateway.debugSidecar.image.tag`             | Conduktor debug image tag (immutable date tags such as `2026.08.12` are recommended)                                                                                                                                            | `latest`                    |
+| `gateway.debugSidecar.image.pullPolicy`      | Conduktor debug image pull policy                                                                                                                                                                                               | `IfNotPresent`              |
+| `gateway.debugSidecar.command`               | Command to keep the debug sidecar alive                                                                                                                                                                                         | `["sleep","infinity"]`      |
+| `gateway.debugSidecar.args`                  | Args for the debug sidecar container                                                                                                                                                                                            | `[]`                        |
+| `gateway.debugSidecar.securityContext`       | Conduktor debug sidecar container Security Context. Defaults to the Gateway UID/GID (`1001`), which is what the JVM attach mechanism requires. Add the `NET_RAW` capability for `tcpdump`, or `SYS_PTRACE` for `strace`/`jhsdb` | `{}`                        |
+| `gateway.debugSidecar.resources`             | Conduktor debug sidecar container resource requests and limits                                                                                                                                                                  | `{}`                        |
+| `gateway.debugSidecar.env`                   | Array with extra environment variables to add to the debug sidecar container                                                                                                                                                    | `[]`                        |
+| `gateway.debugSidecar.volumeMounts`          | Define user specific volumeMounts for the debug sidecar container. Volumes are declared in `gateway.volumes`                                                                                                                    | `[]`                        |
+| `gateway.terminationGracePeriodSeconds`      | Duration in seconds the pod needs to terminate gracefully.                                                                                                                                                                      | `30`                        |
+| `gateway.priorityClassName`                  | Define Gateway pods' priority based on an existing ClassName                                                                                                                                                                    | `""`                        |
+| `gateway.customStartupProbe`                 | Custom startup probe configuration                                                                                                                                                                                              | `{}`                        |
+| `gateway.startupProbe.enabled`               | Enable startupProbe on Conduktor Gaterway containers                                                                                                                                                                            | `true`                      |
+| `gateway.startupProbe.initialDelaySeconds`   | Initial delay seconds for startupProbe                                                                                                                                                                                          | `10`                        |
+| `gateway.startupProbe.periodSeconds`         | Period seconds for startupProbe                                                                                                                                                                                                 | `10`                        |
+| `gateway.startupProbe.timeoutSeconds`        | Timeout seconds for startupProbe                                                                                                                                                                                                | `1`                         |
+| `gateway.startupProbe.failureThreshold`      | Failure threshold for startupProbe                                                                                                                                                                                              | `5`                         |
+| `gateway.startupProbe.successThreshold`      | Success threshold for startupProbe                                                                                                                                                                                              | `1`                         |
+| `gateway.customLivenessProbe`                | Custom liveness probe configuration                                                                                                                                                                                             | `{}`                        |
+| `gateway.livenessProbe.enabled`              | Enable livenessProbe on Conduktor Gaterway containers                                                                                                                                                                           | `true`                      |
+| `gateway.livenessProbe.initialDelaySeconds`  | Initial delay seconds for livenessProbe                                                                                                                                                                                         | `0`                         |
+| `gateway.livenessProbe.periodSeconds`        | Period seconds for livenessProbe                                                                                                                                                                                                | `5`                         |
+| `gateway.livenessProbe.timeoutSeconds`       | Timeout seconds for livenessProbe                                                                                                                                                                                               | `1`                         |
+| `gateway.livenessProbe.failureThreshold`     | Failure threshold for livenessProbe                                                                                                                                                                                             | `3`                         |
+| `gateway.livenessProbe.successThreshold`     | Success threshold for livenessProbe                                                                                                                                                                                             | `1`                         |
+| `gateway.customReadinessProbe`               | Custom readiness probe configuration                                                                                                                                                                                            | `{}`                        |
+| `gateway.readinessProbe.enabled`             | Enable readinessProbe on Conduktor Gaterway containers                                                                                                                                                                          | `true`                      |
+| `gateway.readinessProbe.initialDelaySeconds` | Initial delay seconds for readinessProbe                                                                                                                                                                                        | `0`                         |
+| `gateway.readinessProbe.periodSeconds`       | Period seconds for readinessProbe                                                                                                                                                                                               | `5`                         |
+| `gateway.readinessProbe.timeoutSeconds`      | Timeout seconds for readinessProbe                                                                                                                                                                                              | `1`                         |
+| `gateway.readinessProbe.failureThreshold`    | Failure threshold for readinessProbe                                                                                                                                                                                            | `3`                         |
+| `gateway.readinessProbe.successThreshold`    | Success threshold for readinessProbe                                                                                                                                                                                            | `1`                         |
 
 ### TLS configuration
 
@@ -866,6 +878,69 @@ gateway:
       volumeMounts:
         - name: sidecar-volume
           mountPath: /mnt/sidecar
+```
+
+### With the Conduktor debug sidecar
+
+[`conduktor/conduktor-debug`](https://hub.docker.com/r/conduktor/conduktor-debug) is our support toolbox image: JVM diagnostics (`jcmd`, `jstack`, `jmap`, `jfr`, `async-profiler`), network (`tcpdump`, `ss`, `dig`, `mtr`, `nc`), TLS (`openssl`, `certutil`), LDAP (`ldapsearch`), Kafka (`kcat`, the Apache `kafka-*.sh` tools), plus `cdk-*` helpers that read everything from the Gateway process itself and redact secrets by default.
+
+Enable it as a sidecar of the Gateway container:
+
+```yaml
+gateway:
+  debugSidecar:
+    enabled: true
+    image:
+      # Pin an immutable tag rather than `latest` for reproducible deployments
+      tag: 2026.08.12
+```
+
+This adds a `debug` container to the Gateway pod and sets `shareProcessNamespace: true` so the JVM tools can attach to the Gateway process. The sidecar runs as UID/GID `1001` — the same as the Gateway container — which is what the JVM attach mechanism requires; `SYS_PTRACE` is *not* needed for it. If you override the Gateway UID through `gateway.securityContext` or `podSecurityContext`, set the same UID/GID on `gateway.debugSidecar.securityContext` or the attach will fail with `Permission denied`.
+
+Then get a shell and run the triage helpers:
+
+```bash
+kubectl exec -it $GATEWAY_POD_NAME -n conduktor -c debug -- bash
+
+cdk-doctor                                          # one-shot triage, exit code = number of failures
+cdk-target                                          # visible JVMs, their UID and derived config paths
+cdk-jvm threads                                     # thread dump over the attach mechanism
+cdk-tls my-kafka:9093                               # chain, expiry and SANs against the JVM's own truststore
+kafka-topics.sh --bootstrap-server my-kafka:9092 --list
+tcpdump -i any -n port 9092                         # needs the NET_RAW capability, see below
+```
+
+Some tools need extra privileges. Restate the container security context to grant them — `gateway.debugSidecar.securityContext` replaces the chart default, so repeat the UID/GID:
+
+```yaml
+gateway:
+  debugSidecar:
+    enabled: true
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1001     # must match the Gateway container UID
+      runAsGroup: 1001
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+        add:
+          - NET_RAW       # tcpdump
+          # - SYS_PTRACE  # strace, jhsdb, jstack -F
+```
+
+> [!NOTE]
+> The image is ~330 MB compressed (it ships a full JDK). If your cluster is air-gapped, mirror it alongside the Gateway image and set `gateway.debugSidecar.image.registry` / `repository` accordingly.
+
+> [!IMPORTANT]
+> A shared process namespace lets both containers of the pod see each other's processes and `/proc`, so keep the sidecar enabled only while you need it. Set `gateway.debugSidecar.shareProcessNamespace: false` to keep the network, TLS and Kafka tooling while giving up JVM attach.
+
+For one-off investigations you can skip the chart entirely and use an ephemeral container instead, which requires no redeploy:
+
+```bash
+kubectl debug -n conduktor $GATEWAY_POD_NAME \
+  --image=conduktor/conduktor-debug:latest \
+  --target=gateway --profile=general -it -- bash
 ```
 
 ### Multi-listeners
