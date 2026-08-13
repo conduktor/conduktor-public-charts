@@ -13,10 +13,57 @@ Return the proper platform cortex image name
 {{- end -}}
 
 {{/*
+Render the Conduktor debug sidecar container.
+{{ include "conduktor.debugSidecar" (dict "debugSidecar" .Values.platform.debugSidecar "context" $) }}
+*/}}
+{{- define "conduktor.debugSidecar" -}}
+{{- $debugSidecar := .debugSidecar -}}
+{{- $context := .context -}}
+- name: debug
+  image: {{ include "common.images.image" (dict "imageRoot" $debugSidecar.image "global" $context.Values.global) }}
+  imagePullPolicy: {{ $debugSidecar.image.pullPolicy }}
+  {{- if $debugSidecar.containerSecurityContext }}
+  securityContext: {{- include "common.tplvalues.render" (dict "value" $debugSidecar.containerSecurityContext "context" $context) | nindent 4 }}
+  {{- else }}
+  {{- /* The debug image defaults to root: the UID/GID must match the target container's for the JVM attach mechanism to reach it */}}
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 10001
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+  {{- end }}
+  {{- if $debugSidecar.command }}
+  command: {{- include "common.tplvalues.render" (dict "value" $debugSidecar.command "context" $context) | nindent 4 }}
+  {{- end }}
+  {{- if $debugSidecar.args }}
+  args: {{- include "common.tplvalues.render" (dict "value" $debugSidecar.args "context" $context) | nindent 4 }}
+  {{- end }}
+  {{- if $debugSidecar.extraEnvVars }}
+  env: {{- include "common.tplvalues.render" (dict "value" $debugSidecar.extraEnvVars "context" $context) | nindent 4 }}
+  {{- end }}
+  {{- if $debugSidecar.resources }}
+  resources: {{- toYaml $debugSidecar.resources | nindent 4 }}
+  {{- end }}
+  {{- if $debugSidecar.extraVolumeMounts }}
+  volumeMounts: {{- include "common.tplvalues.render" (dict "value" $debugSidecar.extraVolumeMounts "context" $context) | nindent 4 }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Return the proper Docker Image Registry Secret Names
 */}}
 {{- define "conduktor.imagePullSecrets" -}}
-{{- include "common.images.renderPullSecrets" (dict "images" (list .Values.platform.image .Values.platformCortex.image) "global" .Values.global "context" $) -}}
+{{- $images := list .Values.platform.image .Values.platformCortex.image -}}
+{{- if .Values.platform.debugSidecar.enabled -}}
+{{- $images = append $images .Values.platform.debugSidecar.image -}}
+{{- end -}}
+{{- if .Values.platformCortex.debugSidecar.enabled -}}
+{{- $images = append $images .Values.platformCortex.debugSidecar.image -}}
+{{- end -}}
+{{- include "common.images.renderPullSecrets" (dict "images" $images "global" .Values.global "context" $) -}}
 {{- end -}}
 
 {{/*

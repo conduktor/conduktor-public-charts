@@ -477,6 +477,60 @@ platform:
   ##    command: ['sh', '-c', 'echo "hello world"']
   ##
   initContainers: []
+  ## Conduktor debug sidecar
+  ## Opt-in `conduktor/conduktor-debug` container running next to Console to inspect network, TLS, LDAP,
+  ## Kafka, PostgreSQL and JVM state without shelling into the Console container.
+  ## ref: https://hub.docker.com/r/conduktor/conduktor-debug
+  ## @param platform.debugSidecar.enabled Deploy the Conduktor debug image as a sidecar of the Conduktor Console container
+  ## @param platform.debugSidecar.shareProcessNamespace Share the pod process namespace so the JVM tools (`jcmd`, `jstack`, `jmap`, `jfr`) can attach to the Console process
+  ## @param platform.debugSidecar.image.registry Conduktor debug image registry
+  ## @param platform.debugSidecar.image.repository Conduktor debug image repository
+  ## @param platform.debugSidecar.image.tag Conduktor debug image tag (immutable date tags such as `2026.08.12` are recommended)
+  ## @param platform.debugSidecar.image.digest Conduktor debug image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag
+  ## @param platform.debugSidecar.image.pullPolicy Conduktor debug image pull policy
+  ## @param platform.debugSidecar.image.pullSecrets Conduktor debug image pull secrets
+  ## @param platform.debugSidecar.command Command to keep the debug sidecar alive
+  ## @param platform.debugSidecar.args Args for the debug sidecar container
+  ## @param platform.debugSidecar.containerSecurityContext Conduktor debug sidecar container Security Context. Defaults to the Console UID/GID (`10001`), which is what the JVM attach mechanism requires. Add the `NET_RAW` capability for `tcpdump`, or `SYS_PTRACE` for `strace`/`jhsdb`
+  ## @param platform.debugSidecar.resources Conduktor debug sidecar container resource requests and limits
+  ## @param platform.debugSidecar.extraEnvVars Array with extra environment variables to add to the debug sidecar container
+  ## @param platform.debugSidecar.extraVolumeMounts Extra list of additional volumeMounts for the debug sidecar container. Volumes are declared in `platform.extraVolumes`
+  ##
+  debugSidecar:
+    enabled: false
+    shareProcessNamespace: true
+    image:
+      registry: docker.io
+      repository: conduktor/conduktor-debug
+      tag: latest
+      digest: ""
+      pullPolicy: IfNotPresent
+      ## Optionally specify an array of imagePullSecrets.
+      ## Secrets must be manually created in the namespace.
+      ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+      ## e.g:
+      ## pullSecrets:
+      ##   - myRegistryKeySecretName
+      ##
+      pullSecrets: []
+    command:
+      - sleep
+      - infinity
+    args: []
+    ## E.g.
+    ## containerSecurityContext:
+    ##   runAsNonRoot: true
+    ##   runAsUser: 10001
+    ##   runAsGroup: 10001
+    ##   allowPrivilegeEscalation: false
+    ##   capabilities:
+    ##     add:
+    ##       - NET_RAW
+    ##
+    containerSecurityContext: {}
+    resources: {}
+    extraEnvVars: []
+    extraVolumeMounts: []
   ## @section Platform Metrics activation
   ## @descriptionStart
   ## Console expose metrics that could be collected and presented if your environment have the necessary components (Prometheus and Grafana operators)
@@ -1018,6 +1072,60 @@ platformCortex:
   ##    command: ['sh', '-c', 'echo "hello world"']
   ##
   initContainers: []
+  ## Conduktor debug sidecar
+  ## Opt-in `conduktor/conduktor-debug` container running next to Cortex to inspect network, TLS,
+  ## monitoring object storage and PostgreSQL reachability without shelling into the Cortex container.
+  ## ref: https://hub.docker.com/r/conduktor/conduktor-debug
+  ## @param platformCortex.debugSidecar.enabled Deploy the Conduktor debug image as a sidecar of the Conduktor Console Cortex container
+  ## @param platformCortex.debugSidecar.shareProcessNamespace Share the pod process namespace. Disabled by default: unlike Console, Cortex is not a JVM, so there is no process to attach to. Enable it to let `strace` and `ss -p` see the Cortex processes
+  ## @param platformCortex.debugSidecar.image.registry Conduktor debug image registry
+  ## @param platformCortex.debugSidecar.image.repository Conduktor debug image repository
+  ## @param platformCortex.debugSidecar.image.tag Conduktor debug image tag (immutable date tags such as `2026.08.12` are recommended)
+  ## @param platformCortex.debugSidecar.image.digest Conduktor debug image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag
+  ## @param platformCortex.debugSidecar.image.pullPolicy Conduktor debug image pull policy
+  ## @param platformCortex.debugSidecar.image.pullSecrets Conduktor debug image pull secrets
+  ## @param platformCortex.debugSidecar.command Command to keep the debug sidecar alive
+  ## @param platformCortex.debugSidecar.args Args for the debug sidecar container
+  ## @param platformCortex.debugSidecar.containerSecurityContext Conduktor debug sidecar container Security Context. Defaults to the Cortex UID/GID (`10001`). Add the `NET_RAW` capability for `tcpdump`, or `SYS_PTRACE` for `strace`
+  ## @param platformCortex.debugSidecar.resources Conduktor debug sidecar container resource requests and limits
+  ## @param platformCortex.debugSidecar.extraEnvVars Array with extra environment variables to add to the debug sidecar container
+  ## @param platformCortex.debugSidecar.extraVolumeMounts Extra list of additional volumeMounts for the debug sidecar container. Volumes are declared in `platformCortex.extraVolumes`
+  ##
+  debugSidecar:
+    enabled: false
+    shareProcessNamespace: false
+    image:
+      registry: docker.io
+      repository: conduktor/conduktor-debug
+      tag: latest
+      digest: ""
+      pullPolicy: IfNotPresent
+      ## Optionally specify an array of imagePullSecrets.
+      ## Secrets must be manually created in the namespace.
+      ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+      ## e.g:
+      ## pullSecrets:
+      ##   - myRegistryKeySecretName
+      ##
+      pullSecrets: []
+    command:
+      - sleep
+      - infinity
+    args: []
+    ## E.g.
+    ## containerSecurityContext:
+    ##   runAsNonRoot: true
+    ##   runAsUser: 10001
+    ##   runAsGroup: 10001
+    ##   allowPrivilegeEscalation: false
+    ##   capabilities:
+    ##     add:
+    ##       - NET_RAW
+    ##
+    containerSecurityContext: {}
+    resources: {}
+    extraEnvVars: []
+    extraVolumeMounts: []
   ## Conduktor Console Cortex service parameters
   ##
   service:
