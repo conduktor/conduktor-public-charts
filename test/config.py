@@ -83,14 +83,17 @@ def get_scenarios(chart: str) -> list[str]:
 def get_old_values_content(chart: str, scenario: str, ref: str = "main") -> Optional[str]:
     """Get old CI values content from git ref.
 
-    Tries origin/{ref} first (for CI environments), then {ref} (for local).
+    A branch ref is resolved via origin/{ref} first (for CI environments) then {ref}
+    (for local). Tag refs (which have no origin/ prefix) are tried as-is.
     """
     import subprocess
 
     path = f"charts/{chart}/ci/{scenario}-values.yaml"
 
-    # Try origin/ref first (CI typically has origin/main but not local main)
-    for git_ref in [f"origin/{ref}", ref]:
+    # Tags live at the top level of refs/tags; only branches sit under origin/.
+    candidates = [ref] if _is_tag(ref) else [f"origin/{ref}", ref]
+
+    for git_ref in candidates:
         result = subprocess.run(
             ["git", "show", f"{git_ref}:{path}"],
             capture_output=True,
@@ -100,3 +103,15 @@ def get_old_values_content(chart: str, scenario: str, ref: str = "main") -> Opti
             return result.stdout
 
     return None
+
+
+def _is_tag(ref: str) -> bool:
+    """Return True if ref exists as a local git tag."""
+    import subprocess
+
+    result = subprocess.run(
+        ["git", "rev-parse", "--verify", "--quiet", f"refs/tags/{ref}"],
+        capture_output=True,
+        text=True,
+    )
+    return result.returncode == 0
