@@ -110,7 +110,20 @@ def run_scenario(
 
         if upgrade:
             old_version = get_released_version(chart_name, verbose)
-            old_values = get_old_values_content(chart, scenario, "main")
+            # Values file must match the old chart's template contract. Fetching from main
+            # would install the released chart with the current PR's values, which fails
+            # whenever the values schema changed in the PR (e.g. a new field the template
+            # only starts consuming in the upgrade).
+            old_values = None
+            if old_version:
+                tag_ref = f"{chart_name}-{old_version}"
+                old_values = get_old_values_content(chart, scenario, tag_ref)
+                if not old_values:
+                    log_warning(
+                        f"No values file at tag {tag_ref}; falling back to main. "
+                        f"Upgrade may fail if the values schema changed."
+                    )
+                    old_values = get_old_values_content(chart, scenario, "main")
 
             if old_version and old_values:
                 with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
