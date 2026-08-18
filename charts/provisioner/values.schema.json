@@ -135,7 +135,7 @@
                 "tag": {
                     "type": "string",
                     "description": "conduktor-ctl image tag (immutable tags are recommended)",
-                    "default": "v0.7.0"
+                    "default": "v0.9.2"
                 },
                 "digest": {
                     "type": "string",
