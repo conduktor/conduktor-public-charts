@@ -635,6 +635,96 @@
                     "default": [],
                     "items": {}
                 },
+                "debugSidecar": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Deploy the Conduktor debug image as a sidecar of the Conduktor Console container",
+                            "default": false
+                        },
+                        "shareProcessNamespace": {
+                            "type": "boolean",
+                            "description": "Share the pod process namespace so the JVM tools (`jcmd`, `jstack`, `jmap`, `jfr`) can attach to the Console process",
+                            "default": true
+                        },
+                        "image": {
+                            "type": "object",
+                            "properties": {
+                                "registry": {
+                                    "type": "string",
+                                    "description": "Conduktor debug image registry",
+                                    "default": "docker.io"
+                                },
+                                "repository": {
+                                    "type": "string",
+                                    "description": "Conduktor debug image repository",
+                                    "default": "conduktor/conduktor-debug"
+                                },
+                                "tag": {
+                                    "type": "string",
+                                    "description": "Conduktor debug image tag (immutable date tags such as `2026.08.12` are recommended)",
+                                    "default": "latest"
+                                },
+                                "digest": {
+                                    "type": "string",
+                                    "description": "Conduktor debug image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag",
+                                    "default": ""
+                                },
+                                "pullPolicy": {
+                                    "type": "string",
+                                    "description": "Conduktor debug image pull policy",
+                                    "default": "IfNotPresent"
+                                },
+                                "pullSecrets": {
+                                    "type": "array",
+                                    "description": "Conduktor debug image pull secrets",
+                                    "default": [],
+                                    "items": {}
+                                }
+                            }
+                        },
+                        "command": {
+                            "type": "array",
+                            "description": "Command to keep the debug sidecar alive",
+                            "default": [
+                                "sleep",
+                                "infinity"
+                            ],
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "args": {
+                            "type": "array",
+                            "description": "Args for the debug sidecar container",
+                            "default": [],
+                            "items": {}
+                        },
+                        "containerSecurityContext": {
+                            "type": "object",
+                            "description": "Conduktor debug sidecar container Security Context. Defaults to the Console UID/GID (`10001`), which is what the JVM attach mechanism requires. Add the `NET_RAW` capability for `tcpdump`, or `SYS_PTRACE` for `strace`/`jhsdb`",
+                            "default": {}
+                        },
+                        "resources": {
+                            "type": "object",
+                            "description": "Conduktor debug sidecar container resource requests and limits",
+                            "default": {}
+                        },
+                        "extraEnvVars": {
+                            "type": "array",
+                            "description": "Array with extra environment variables to add to the debug sidecar container",
+                            "default": [],
+                            "items": {}
+                        },
+                        "extraVolumeMounts": {
+                            "type": "array",
+                            "description": "Extra list of additional volumeMounts for the debug sidecar container. Volumes are declared in `platform.extraVolumes`",
+                            "default": [],
+                            "items": {}
+                        }
+                    }
+                },
                 "metrics": {
                     "type": "object",
                     "properties": {
@@ -1345,6 +1435,96 @@
                     "description": "Add additional init containers to the Conduktor Console Cortex pod(s)",
                     "default": [],
                     "items": {}
+                },
+                "debugSidecar": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Deploy the Conduktor debug image as a sidecar of the Conduktor Console Cortex container",
+                            "default": false
+                        },
+                        "shareProcessNamespace": {
+                            "type": "boolean",
+                            "description": "Share the pod process namespace. Disabled by default: unlike Console, Cortex is not a JVM, so there is no process to attach to. Enable it to let `strace` and `ss -p` see the Cortex processes",
+                            "default": false
+                        },
+                        "image": {
+                            "type": "object",
+                            "properties": {
+                                "registry": {
+                                    "type": "string",
+                                    "description": "Conduktor debug image registry",
+                                    "default": "docker.io"
+                                },
+                                "repository": {
+                                    "type": "string",
+                                    "description": "Conduktor debug image repository",
+                                    "default": "conduktor/conduktor-debug"
+                                },
+                                "tag": {
+                                    "type": "string",
+                                    "description": "Conduktor debug image tag (immutable date tags such as `2026.08.12` are recommended)",
+                                    "default": "latest"
+                                },
+                                "digest": {
+                                    "type": "string",
+                                    "description": "Conduktor debug image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag",
+                                    "default": ""
+                                },
+                                "pullPolicy": {
+                                    "type": "string",
+                                    "description": "Conduktor debug image pull policy",
+                                    "default": "IfNotPresent"
+                                },
+                                "pullSecrets": {
+                                    "type": "array",
+                                    "description": "Conduktor debug image pull secrets",
+                                    "default": [],
+                                    "items": {}
+                                }
+                            }
+                        },
+                        "command": {
+                            "type": "array",
+                            "description": "Command to keep the debug sidecar alive",
+                            "default": [
+                                "sleep",
+                                "infinity"
+                            ],
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "args": {
+                            "type": "array",
+                            "description": "Args for the debug sidecar container",
+                            "default": [],
+                            "items": {}
+                        },
+                        "containerSecurityContext": {
+                            "type": "object",
+                            "description": "Conduktor debug sidecar container Security Context. Defaults to the Cortex UID/GID (`10001`). Add the `NET_RAW` capability for `tcpdump`, or `SYS_PTRACE` for `strace`",
+                            "default": {}
+                        },
+                        "resources": {
+                            "type": "object",
+                            "description": "Conduktor debug sidecar container resource requests and limits",
+                            "default": {}
+                        },
+                        "extraEnvVars": {
+                            "type": "array",
+                            "description": "Array with extra environment variables to add to the debug sidecar container",
+                            "default": [],
+                            "items": {}
+                        },
+                        "extraVolumeMounts": {
+                            "type": "array",
+                            "description": "Extra list of additional volumeMounts for the debug sidecar container. Volumes are declared in `platformCortex.extraVolumes`",
+                            "default": [],
+                            "items": {}
+                        }
+                    }
                 },
                 "service": {
                     "type": "object",
