@@ -231,6 +231,48 @@ gateway:
   ##    command: ['sh', '-c', 'echo "hello world"']
   ##
   initContainers: []
+  ## Conduktor debug sidecar
+  ## Opt-in `conduktor/conduktor-debug` container running next to Gateway to inspect network, TLS, LDAP,
+  ## Kafka and JVM state without shelling into the Gateway container.
+  ## ref: https://hub.docker.com/r/conduktor/conduktor-debug
+  debugSidecar:
+    ## @param gateway.debugSidecar.enabled Deploy the Conduktor debug image as a sidecar of the Conduktor Gateway container
+    enabled: false
+    ## @param gateway.debugSidecar.shareProcessNamespace Share the pod process namespace so the JVM tools (`jcmd`, `jstack`, `jmap`, `jfr`) can attach to the Gateway process
+    shareProcessNamespace: true
+    image:
+      ## @param gateway.debugSidecar.image.registry Conduktor debug image registry
+      registry: docker.io
+      ## @param gateway.debugSidecar.image.repository Conduktor debug image repository
+      repository: conduktor/conduktor-debug
+      ## @param gateway.debugSidecar.image.tag Conduktor debug image tag (immutable date tags such as `2026.08.12` are recommended)
+      tag: latest
+      ## @param gateway.debugSidecar.image.pullPolicy Conduktor debug image pull policy
+      pullPolicy: IfNotPresent
+    ## @param gateway.debugSidecar.command Command to keep the debug sidecar alive
+    command:
+      - sleep
+      - infinity
+    ## @param gateway.debugSidecar.args Args for the debug sidecar container
+    args: []
+    ## @param gateway.debugSidecar.securityContext Conduktor debug sidecar container Security Context. Defaults to the Gateway UID/GID (`1001`), which is what the JVM attach mechanism requires. Add the `NET_RAW` capability for `tcpdump`, or `SYS_PTRACE` for `strace`/`jhsdb`
+    ## E.g.
+    ## securityContext:
+    ##   runAsNonRoot: true
+    ##   runAsUser: 1001
+    ##   runAsGroup: 1001
+    ##   allowPrivilegeEscalation: false
+    ##   capabilities:
+    ##     add:
+    ##       - NET_RAW
+    ##
+    securityContext: {}
+    ## @param gateway.debugSidecar.resources Conduktor debug sidecar container resource requests and limits
+    resources: {}
+    ## @param gateway.debugSidecar.env Array with extra environment variables to add to the debug sidecar container
+    env: []
+    ## @param gateway.debugSidecar.volumeMounts Define user specific volumeMounts for the debug sidecar container. Volumes are declared in `gateway.volumes`
+    volumeMounts: []
   ## @param gateway.terminationGracePeriodSeconds Duration in seconds the pod needs to terminate gracefully.
   ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination
   ##
