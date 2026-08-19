@@ -225,6 +225,9 @@ def run_chart(chart: str, scenarios: Optional[list[str]] = None, upgrade: bool =
     if has_deps:
         log_info(f"Setting up shared dependencies in {deps_namespace}")
         create_namespace(deps_namespace, verbose)
+        if effective_k8s_secrets:
+            for secret in effective_k8s_secrets:
+                create_secret(deps_namespace, secret.name, secret.data, secret.data_files)
         dep_manager = DependencyManager(chart, deps_namespace, verbose)
         dep_manager.setup_all()
 
@@ -299,6 +302,9 @@ def install_scenario(chart: str, scenario: str, verbose: bool = False, timeout: 
     if has_deps:
         log_info(f"Setting up dependencies in {deps_namespace}")
         create_namespace(deps_namespace, verbose)
+        if config.k8s_secrets:
+            for secret in config.k8s_secrets:
+                create_secret(deps_namespace, secret.name, secret.data, secret.data_files)
         dep_manager = DependencyManager(chart, deps_namespace, verbose)
         dep_manager.setup_all()
 

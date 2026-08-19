@@ -2,7 +2,7 @@ apiVersion: v2
 name: provisioner
 type: application
 version: 0.2.0
-appVersion: "v0.7.0"
+appVersion: "v0.9.2"
 description: Helm chart to run Conduktor CLI provisioning on Conduktor Plaform
 icon: https://cdn.conduktor.io/brand/symbol_lime.svg
 home: https://www.conduktor.io

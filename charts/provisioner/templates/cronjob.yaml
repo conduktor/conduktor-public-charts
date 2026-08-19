@@ -92,7 +92,7 @@ spec:
                 - "/bin/sh"
                 - "/wait-for.sh"
               args:
-                - "{{ .Values.gateway.url }}/health"
+                - "{{ .Values.gateway.url }}/health/ready"
               volumeMounts:
                 - name: init-script
                   mountPath: /wait-for.sh
