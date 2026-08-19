@@ -3718,6 +3718,30 @@ entries:
     version: 0.2.1
   provisioner:
   - apiVersion: v2
+    appVersion: v0.9.2
+    created: "2026-08-19T08:21:27.826930773Z"
+    dependencies:
+    - name: common
+      repository: oci://registry-1.docker.io/bitnamicharts
+      tags:
+      - bitnami-common
+      version: 2.x.x
+    description: Helm chart to run Conduktor CLI provisioning on Conduktor Plaform
+    digest: 26353da1da93f9e90a59015b29adc4be17eb2a42d4ed208b621bae08427414a2
+    home: https://www.conduktor.io
+    icon: https://cdn.conduktor.io/brand/symbol_lime.svg
+    maintainers:
+    - email: support@conduktor.io
+      name: Conduktor
+      url: https://docs.conduktor.io/platform
+    name: provisioner
+    sources:
+    - https://github.com/conduktor/conduktor-public-charts/tree/main/charts/provisioner
+    type: application
+    urls:
+    - https://github.com/conduktor/conduktor-public-charts/releases/download/provisioner-0.3.0/provisioner-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
     appVersion: v0.7.0
     created: "2026-01-22T16:34:37.493521052Z"
     dependencies:
@@ -3765,4 +3789,4 @@ entries:
     urls:
     - https://github.com/conduktor/conduktor-public-charts/releases/download/provisioner-0.1.0/provisioner-0.1.0.tgz
     version: 0.1.0
-generated: "2026-08-18T10:34:20.831634884Z"
+generated: "2026-08-19T08:21:27.827228334Z"
