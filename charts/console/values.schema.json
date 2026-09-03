@@ -264,7 +264,7 @@
                         "tag": {
                             "type": "string",
                             "description": "Conduktor Console image tag (immutable tags are recommended)",
-                            "default": "1.47.0"
+                            "default": "1.47.1"
                         },
                         "digest": {
                             "type": "string",
@@ -1060,7 +1060,7 @@
                         "tag": {
                             "type": "string",
                             "description": "Conduktor Console Cortex image tag (immutable tags are recommended)",
-                            "default": "1.47.0"
+                            "default": "1.47.1"
                         },
                         "digest": {
                             "type": "string",
