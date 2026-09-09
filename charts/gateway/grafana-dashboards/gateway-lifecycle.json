@@ -170,7 +170,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": ">1s rhs"
+              "options": ">1s"
             },
             "properties": [
               {
@@ -249,7 +249,7 @@
           },
           "editorMode": "code",
           "expr": "1 - (sum(rate(gateway_request_total_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_total_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
-          "legendFormat": ">1s rhs",
+          "legendFormat": ">1s",
           "range": true,
           "refId": "C"
         }
@@ -1095,7 +1095,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": ">500ms rhs"
+              "options": ">500ms"
             },
             "properties": [
               {
@@ -1174,7 +1174,7 @@
           },
           "editorMode": "code",
           "expr": "1 - (sum(rate(gateway_request_preprocess_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_preprocess_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
-          "legendFormat": ">500ms rhs",
+          "legendFormat": ">500ms",
           "range": true,
           "refId": "C"
         }
@@ -1325,7 +1325,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": ">500ms rhs"
+              "options": ">500ms"
             },
             "properties": [
               {
@@ -1404,7 +1404,7 @@
           },
           "editorMode": "code",
           "expr": "1 - (sum(rate(gateway_request_authorization_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
-          "legendFormat": ">500ms rhs",
+          "legendFormat": ">500ms",
           "range": true,
           "refId": "C"
         }
@@ -1555,7 +1555,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": ">500ms rhs"
+              "options": ">500ms"
             },
             "properties": [
               {
@@ -1634,7 +1634,7 @@
           },
           "editorMode": "code",
           "expr": "1 - (sum(rate(gateway_request_rebuilder_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
-          "legendFormat": ">500ms rhs",
+          "legendFormat": ">500ms",
           "range": true,
           "refId": "C"
         }
@@ -1785,7 +1785,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": ">500ms rhs"
+              "options": ">500ms"
             },
             "properties": [
               {
@@ -1864,7 +1864,7 @@
           },
           "editorMode": "code",
           "expr": "1 - (sum(rate(gateway_request_upstreamqueue_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_upstreamqueue_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
-          "legendFormat": ">500ms rhs",
+          "legendFormat": ">500ms",
           "range": true,
           "refId": "C"
         }
@@ -2015,7 +2015,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": ">500ms rhs"
+              "options": ">500ms"
             },
             "properties": [
               {
@@ -2094,7 +2094,7 @@
           },
           "editorMode": "code",
           "expr": "1 - (sum(rate(gateway_request_upstreamwait_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_upstreamwait_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
-          "legendFormat": ">500ms rhs",
+          "legendFormat": ">500ms",
           "range": true,
           "refId": "C"
         }
@@ -2258,7 +2258,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": ">500ms rhs"
+              "options": ">500ms"
             },
             "properties": [
               {
@@ -2337,7 +2337,7 @@
           },
           "editorMode": "code",
           "expr": "1 - (sum(rate(gateway_response_rebuilder_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_response_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
-          "legendFormat": ">500ms rhs",
+          "legendFormat": ">500ms",
           "range": true,
           "refId": "C"
         }
@@ -2488,7 +2488,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": ">500ms rhs"
+              "options": ">500ms"
             },
             "properties": [
               {
@@ -2567,7 +2567,7 @@
           },
           "editorMode": "code",
           "expr": "1 - (sum(rate(gateway_response_authorization_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_response_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
-          "legendFormat": ">500ms rhs",
+          "legendFormat": ">500ms",
           "range": true,
           "refId": "C"
         }
@@ -2718,7 +2718,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": ">500ms rhs"
+              "options": ">500ms"
             },
             "properties": [
               {
@@ -2797,7 +2797,7 @@
           },
           "editorMode": "code",
           "expr": "1 - (sum(rate(gateway_response_send_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_response_send_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
-          "legendFormat": ">500ms rhs",
+          "legendFormat": ">500ms",
           "range": true,
           "refId": "C"
         }
