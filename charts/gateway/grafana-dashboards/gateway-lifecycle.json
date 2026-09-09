@@ -116,7 +116,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Full-pipeline latency (gateway.request.total.duration). Mean and max are exact at any magnitude; P99 is meaningful once the pipeline crosses ~1ms. A ~30s spike with no upstreamwait count is an upstream timeout (ADR \u00a77 #6).",
+      "description": "Full-pipeline latency (gateway.request.total.duration). Left axis (seconds): mean and max, both exact. Right axis: '% over 1s', the exact fraction of requests slower than 1s (a real ladder bound) \u2014 an honest end-to-end tail signal replacing the interpolated p99 (ADR \u00a74). A ~30s spike with no upstreamwait count is an upstream timeout (ADR \u00a77 #6).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -166,7 +166,39 @@
           },
           "unit": "s"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "% over 1s"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "fraction over 1s"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -205,8 +237,8 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by(le) (rate(gateway_request_total_duration_seconds_bucket{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
-          "legendFormat": "p99",
+          "expr": "max(gateway_request_total_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
+          "legendFormat": "max",
           "range": true,
           "refId": "B"
         },
@@ -216,8 +248,8 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "max(gateway_request_total_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
-          "legendFormat": "max",
+          "expr": "1 - (sum(rate(gateway_request_total_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_total_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "% over 1s",
           "range": true,
           "refId": "C"
         }
