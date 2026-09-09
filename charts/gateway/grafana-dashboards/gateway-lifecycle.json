@@ -91,6 +91,515 @@
         "content": "**Request lifecycle latency** \u2014 one panel per T0\u2192T10 stage from ADR-0015. Requires the gateway feature flag `GATEWAY_FEATURE_FLAGS_LIFECYCLE_METRICS=true`; with it off, panels are empty.\n\n**Reading gaps (ADR \u00a77):** a missing/zero series means traffic didn't reach that stage, not that instrumentation is broken. Cache hits skip `upstreamwait`/rebuilder (healthy); `acks=0` produce skips `total`; a ~30s `total` spike with no `upstreamwait` is an upstream timeout.\n\n**Percentiles (ADR \u00a74):** buckets start at 1ms, so P99 reads flat for the sub-ms stages until they degrade; use mean and max for those, P99 for `upstreamwait`."
       },
       "datasource": null
+    },
+    {
+      "type": "row",
+      "title": "Overview",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
+      "id": 100,
+      "panels": []
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Full-pipeline latency (gateway.request.total.duration). Mean and max are exact at any magnitude; P99 is meaningful once the pipeline crosses ~1ms. A ~30s spike with no upstreamwait count is an upstream timeout (ADR \u00a77 #6).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 5
+      },
+      "id": 101,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_request_total_duration_seconds_sum{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_total_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "mean",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.99, sum by(le) (rate(gateway_request_total_duration_seconds_bucket{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "p99",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max(gateway_request_total_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
+          "legendFormat": "max",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "Total request latency (T0\u2192T10)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Stacked mean latency per lifecycle stage \u2014 the dominant band is the bottleneck. Interceptor stages are per-invocation means (their _count is interceptors run, not requests, ADR \u00a71); use the Interceptors section for per-interceptor attribution.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 60,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 5
+      },
+      "id": 102,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_request_preprocess_duration_seconds_sum{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_preprocess_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "preprocess",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_request_authorization_duration_seconds_sum{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "authorization",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_request_interceptor_duration_seconds_sum{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "request.interceptor",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_request_rebuilder_duration_seconds_sum{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "request.rebuilder",
+          "range": true,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_request_upstreamqueue_duration_seconds_sum{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_upstreamqueue_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "upstreamqueue",
+          "range": true,
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_request_upstreamwait_duration_seconds_sum{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_upstreamwait_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "upstreamwait",
+          "range": true,
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_response_rebuilder_duration_seconds_sum{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_response_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "response.rebuilder",
+          "range": true,
+          "refId": "G"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_response_interceptor_duration_seconds_sum{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "response.interceptor",
+          "range": true,
+          "refId": "H"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_response_authorization_duration_seconds_sum{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_response_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "response.authorization",
+          "range": true,
+          "refId": "I"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_response_send_duration_seconds_sum{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_response_send_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "response.send",
+          "range": true,
+          "refId": "J"
+        }
+      ],
+      "title": "Where the time goes (mean per stage)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Recording rate per stage. A missing/zero series means traffic didn't reach that stage (ADR \u00a77), e.g. cache hits skip upstreamwait; interceptor rates count invocations, not requests.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
+      "id": 103,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_request_preprocess_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "preprocess",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_request_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "authorization",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "request.interceptor",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_request_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "request.rebuilder",
+          "range": true,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_request_upstreamqueue_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "upstreamqueue",
+          "range": true,
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_request_upstreamwait_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "upstreamwait",
+          "range": true,
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_response_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "response.rebuilder",
+          "range": true,
+          "refId": "G"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "response.interceptor",
+          "range": true,
+          "refId": "H"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_response_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "response.authorization",
+          "range": true,
+          "refId": "I"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_response_send_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "response.send",
+          "range": true,
+          "refId": "J"
+        }
+      ],
+      "title": "Per-stage throughput (samples/s)",
+      "type": "timeseries"
     }
   ],
   "refresh": "30s",
