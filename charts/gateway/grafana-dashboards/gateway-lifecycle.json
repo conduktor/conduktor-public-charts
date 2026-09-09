@@ -1742,6 +1742,225 @@
       ],
       "title": "Fraction over 100ms per stage",
       "type": "timeseries"
+    },
+    {
+      "type": "row",
+      "title": "Interceptors",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 72
+      },
+      "id": 500,
+      "panels": []
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Per-interceptor latency (legend = interceptor name). _count is interceptors run, not requests (ADR \u00a71). Isolates a slow request-side interceptor deployment.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 73
+      },
+      "id": 501,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(interceptor) (rate(gateway_request_interceptor_duration_seconds_sum{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) / sum by(interceptor) (rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))",
+          "legendFormat": "{{interceptor}} mean",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.99, sum by(le, interceptor) (rate(gateway_request_interceptor_duration_seconds_bucket{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])))",
+          "legendFormat": "{{interceptor}} p99",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "T2\u2192T3 request.interceptor per interceptor",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Per-interceptor latency (legend = interceptor name). _count is interceptors run, not requests (ADR \u00a71). Isolates a slow response-side interceptor deployment.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 73
+      },
+      "id": 502,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by(interceptor) (rate(gateway_response_interceptor_duration_seconds_sum{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) / sum by(interceptor) (rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))",
+          "legendFormat": "{{interceptor}} mean",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.99, sum by(le, interceptor) (rate(gateway_response_interceptor_duration_seconds_bucket{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])))",
+          "legendFormat": "{{interceptor}} p99",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "T7\u2192T8 response.interceptor per interceptor",
+      "type": "timeseries"
     }
   ],
   "refresh": "30s",
