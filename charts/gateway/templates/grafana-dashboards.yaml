@@ -163,7 +163,7 @@ spec:
 apiVersion: integreatly.org/v1alpha1
 kind: GrafanaDashboard
 metadata:
-  name: {{ include "conduktor-gateway.fullname" . | trunc 44 }}-lifecycle-dashboard
+  name: {{ include "conduktor-gateway.fullname" . | trunc 42 }}-lifecycle-dashboard
   namespace: {{ include "conduktor-gateway.dashboard.namespace" . | quote }}
   labels: {{ include "conduktor-gateway.labels" . | nindent 4 }}
     conduktor.io/dashboard: "true"
