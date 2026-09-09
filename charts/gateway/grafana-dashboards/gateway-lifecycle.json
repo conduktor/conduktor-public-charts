@@ -1,0 +1,214 @@
+{
+  "__inputs": [
+    {
+      "name": "INPUT_DS_PROMETHEUS",
+      "label": "prometheus",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus",
+      "value": "prometheus"
+    },
+    {
+      "name": "INPUT_GATEWAY_JOB_NAME",
+      "label": "Gateway job name (app.kubernetes.io/instance by default)",
+      "description": "The name of the gateway to monitor",
+      "type": "constant",
+      "value": "conduktor-gateway"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "9.3.2"
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "text",
+      "name": "Text",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "limit": 100,
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Per-stage request lifecycle latency for Conduktor Gateway (ADR-0015).",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "gnetId": null,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "type": "text",
+      "title": "About this dashboard",
+      "id": 1,
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "**Request lifecycle latency** \u2014 one panel per T0\u2192T10 stage from ADR-0015. Requires the gateway feature flag `GATEWAY_FEATURE_FLAGS_LIFECYCLE_METRICS=true`; with it off, panels are empty.\n\n**Reading gaps (ADR \u00a77):** a missing/zero series means traffic didn't reach that stage, not that instrumentation is broken. Cache hits skip `upstreamwait`/rebuilder (healthy); `acks=0` produce skips `total`; a ~30s `total` spike with no `upstreamwait` is an upstream timeout.\n\n**Percentiles (ADR \u00a74):** buckets start at 1ms, so P99 reads flat for the sub-ms stages until they degrade; use mean and max for those, P99 for `upstreamwait`."
+      },
+      "datasource": null
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 37,
+  "style": "dark",
+  "tags": [
+    "Conduktor",
+    "conduktor-gateway",
+    "lifecycle",
+    "latency"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "Prometheus",
+          "value": "default"
+        },
+        "hide": 2,
+        "includeAll": false,
+        "label": "Datasource",
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "${INPUT_DS_PROMETHEUS}",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
+        "hide": 2,
+        "label": "job",
+        "name": "job",
+        "query": "${INPUT_GATEWAY_JOB_NAME}",
+        "skipUrlSync": false,
+        "type": "constant"
+      },
+      {
+        "allFormat": "glob",
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values(up{job=\"$job\"}, pod)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Pod",
+        "multi": true,
+        "multiFormat": "glob",
+        "name": "pod",
+        "options": [],
+        "query": {
+          "query": "label_values(up{job=\"$job\"}, pod)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values(gateway_request_total_duration_seconds_count{job=\"$job\"}, api_key)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "API key",
+        "multi": true,
+        "name": "api_key",
+        "options": [],
+        "query": {
+          "query": "label_values(gateway_request_total_duration_seconds_count{job=\"$job\"}, api_key)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values(gateway_request_interceptor_duration_seconds_count{job=\"$job\"}, interceptor)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Interceptor",
+        "multi": true,
+        "name": "interceptor",
+        "options": [],
+        "query": {
+          "query": "label_values(gateway_request_interceptor_duration_seconds_count{job=\"$job\"}, interceptor)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Conduktor Gateway Lifecycle",
+  "version": 1,
+  "weekStart": ""
+}
