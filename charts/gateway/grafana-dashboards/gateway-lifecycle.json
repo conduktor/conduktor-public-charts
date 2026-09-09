@@ -799,6 +799,199 @@
       "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Apdex latency-satisfaction score per stage (1.0 = all fast, 0 = all frustrated). T=100ms: satisfied \u2264100ms, tolerating \u2264500ms, frustrated above \u2014 computed from exact bucket counts (no interpolation). Fast self-performed stages sit at ~1.0; a dip flags a degrading stage (upstreamwait is the usual mover).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none",
+          "min": 0,
+          "max": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 29
+      },
+      "id": 105,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(rate(gateway_request_preprocess_duration_seconds_bucket{le=\"0.1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) + sum(rate(gateway_request_preprocess_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / (2 * sum(rate(gateway_request_preprocess_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "preprocess",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(rate(gateway_request_authorization_duration_seconds_bucket{le=\"0.1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) + sum(rate(gateway_request_authorization_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / (2 * sum(rate(gateway_request_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "authorization",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) + sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / (2 * sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "request.interceptor",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(rate(gateway_request_rebuilder_duration_seconds_bucket{le=\"0.1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) + sum(rate(gateway_request_rebuilder_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / (2 * sum(rate(gateway_request_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "request.rebuilder",
+          "range": true,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(rate(gateway_request_upstreamqueue_duration_seconds_bucket{le=\"0.1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) + sum(rate(gateway_request_upstreamqueue_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / (2 * sum(rate(gateway_request_upstreamqueue_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "upstreamqueue",
+          "range": true,
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(rate(gateway_request_upstreamwait_duration_seconds_bucket{le=\"0.1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) + sum(rate(gateway_request_upstreamwait_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / (2 * sum(rate(gateway_request_upstreamwait_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "upstreamwait",
+          "range": true,
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(rate(gateway_response_rebuilder_duration_seconds_bucket{le=\"0.1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) + sum(rate(gateway_response_rebuilder_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / (2 * sum(rate(gateway_response_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "response.rebuilder",
+          "range": true,
+          "refId": "G"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) + sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / (2 * sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "response.interceptor",
+          "range": true,
+          "refId": "H"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(rate(gateway_response_authorization_duration_seconds_bucket{le=\"0.1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) + sum(rate(gateway_response_authorization_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / (2 * sum(rate(gateway_response_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "response.authorization",
+          "range": true,
+          "refId": "I"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(rate(gateway_response_send_duration_seconds_bucket{le=\"0.1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) + sum(rate(gateway_response_send_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / (2 * sum(rate(gateway_response_send_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "response.send",
+          "range": true,
+          "refId": "J"
+        }
+      ],
+      "title": "Apdex@100ms per stage",
+      "type": "timeseries"
+    },
+    {
       "type": "row",
       "title": "Request path",
       "collapsed": false,
@@ -806,7 +999,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 29
+        "y": 37
       },
       "id": 200,
       "panels": []
@@ -816,7 +1009,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Mean and max are exact; P99 reads flat inside the first bucket (1ms) until this stage degrades (ADR \u00a74). channelRead to just before ACL. Records even on ACL denial (ADR \u00a77 #1).",
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). channelRead to just before ACL. Records even on ACL denial (ADR \u00a77 #1).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -866,13 +1059,45 @@
           },
           "unit": "s"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "% over 500ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "fraction over 500ms"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 30
+        "y": 38
       },
       "id": 201,
       "options": {
@@ -905,8 +1130,8 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by(le) (rate(gateway_request_preprocess_duration_seconds_bucket{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
-          "legendFormat": "p99",
+          "expr": "max(gateway_request_preprocess_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
+          "legendFormat": "max",
           "range": true,
           "refId": "B"
         },
@@ -916,8 +1141,8 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "max(gateway_request_preprocess_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
-          "legendFormat": "max",
+          "expr": "1 - (sum(rate(gateway_request_preprocess_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_preprocess_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "% over 500ms",
           "range": true,
           "refId": "C"
         }
@@ -930,7 +1155,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Mean and max are exact; P99 reads flat inside the first bucket (1ms) until this stage degrades (ADR \u00a74). ACL lookup. Zero is normal for superuser/ACL-disabled requests (ADR \u00a77 #1).",
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). ACL lookup. Zero is normal for superuser/ACL-disabled requests (ADR \u00a77 #1).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -980,13 +1205,45 @@
           },
           "unit": "s"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "% over 500ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "fraction over 500ms"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 30
+        "y": 38
       },
       "id": 202,
       "options": {
@@ -1019,8 +1276,8 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by(le) (rate(gateway_request_authorization_duration_seconds_bucket{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
-          "legendFormat": "p99",
+          "expr": "max(gateway_request_authorization_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
+          "legendFormat": "max",
           "range": true,
           "refId": "B"
         },
@@ -1030,8 +1287,8 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "max(gateway_request_authorization_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
-          "legendFormat": "max",
+          "expr": "1 - (sum(rate(gateway_request_authorization_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "% over 500ms",
           "range": true,
           "refId": "C"
         }
@@ -1044,7 +1301,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Mean and max are exact; P99 reads flat inside the first bucket (1ms) until this stage degrades (ADR \u00a74). API-specific request rebuild. Skipped on cache hit and on all-topics-blocked produce (ADR \u00a77 #2, #9).",
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). API-specific request rebuild. Skipped on cache hit and on all-topics-blocked produce (ADR \u00a77 #2, #9).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1094,13 +1351,45 @@
           },
           "unit": "s"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "% over 500ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "fraction over 500ms"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 38
+        "y": 46
       },
       "id": 203,
       "options": {
@@ -1133,8 +1422,8 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by(le) (rate(gateway_request_rebuilder_duration_seconds_bucket{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
-          "legendFormat": "p99",
+          "expr": "max(gateway_request_rebuilder_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
+          "legendFormat": "max",
           "range": true,
           "refId": "B"
         },
@@ -1144,8 +1433,8 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "max(gateway_request_rebuilder_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
-          "legendFormat": "max",
+          "expr": "1 - (sum(rate(gateway_request_rebuilder_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "% over 500ms",
           "range": true,
           "refId": "C"
         }
@@ -1158,7 +1447,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Mean and max are exact; P99 reads flat inside the first bucket (1ms) until this stage degrades (ADR \u00a74). Rebuilt request waiting for broker/channel then sent to Kafka wire.",
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). Rebuilt request waiting for broker/channel then sent to Kafka wire.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1208,13 +1497,45 @@
           },
           "unit": "s"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "% over 500ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "fraction over 500ms"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 38
+        "y": 46
       },
       "id": 204,
       "options": {
@@ -1247,8 +1568,8 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by(le) (rate(gateway_request_upstreamqueue_duration_seconds_bucket{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
-          "legendFormat": "p99",
+          "expr": "max(gateway_request_upstreamqueue_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
+          "legendFormat": "max",
           "range": true,
           "refId": "B"
         },
@@ -1258,8 +1579,8 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "max(gateway_request_upstreamqueue_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
-          "legendFormat": "max",
+          "expr": "1 - (sum(rate(gateway_request_upstreamqueue_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_upstreamqueue_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "% over 500ms",
           "range": true,
           "refId": "C"
         }
@@ -1272,7 +1593,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Mean and max are exact; P99 reads flat inside the first bucket (1ms) until this stage degrades (ADR \u00a74). Kafka round-trip \u2014 the one stage where P99 is directly meaningful. Skipped on acks=0 and on upstream timeout (ADR \u00a77 #5, #6).",
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). Kafka round-trip \u2014 the stage most likely to breach 500ms. Skipped on acks=0 and on upstream timeout (ADR \u00a77 #5, #6).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1322,13 +1643,45 @@
           },
           "unit": "s"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "% over 500ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "fraction over 500ms"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 46
+        "y": 54
       },
       "id": 205,
       "options": {
@@ -1361,8 +1714,8 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by(le) (rate(gateway_request_upstreamwait_duration_seconds_bucket{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
-          "legendFormat": "p99",
+          "expr": "max(gateway_request_upstreamwait_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
+          "legendFormat": "max",
           "range": true,
           "refId": "B"
         },
@@ -1372,8 +1725,8 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "max(gateway_request_upstreamwait_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
-          "legendFormat": "max",
+          "expr": "1 - (sum(rate(gateway_request_upstreamwait_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_upstreamwait_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "% over 500ms",
           "range": true,
           "refId": "C"
         }
@@ -1389,7 +1742,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 54
+        "y": 62
       },
       "id": 300,
       "panels": []
@@ -1399,7 +1752,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Mean and max are exact; P99 reads flat inside the first bucket (1ms) until this stage degrades (ADR \u00a74). API-specific response rebuild. Skipped on cache hit (ADR \u00a77 #9).",
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). API-specific response rebuild. Skipped on cache hit (ADR \u00a77 #9).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1449,13 +1802,45 @@
           },
           "unit": "s"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "% over 500ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "fraction over 500ms"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 55
+        "y": 63
       },
       "id": 301,
       "options": {
@@ -1488,8 +1873,8 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by(le) (rate(gateway_response_rebuilder_duration_seconds_bucket{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
-          "legendFormat": "p99",
+          "expr": "max(gateway_response_rebuilder_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
+          "legendFormat": "max",
           "range": true,
           "refId": "B"
         },
@@ -1499,8 +1884,8 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "max(gateway_response_rebuilder_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
-          "legendFormat": "max",
+          "expr": "1 - (sum(rate(gateway_response_rebuilder_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_response_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "% over 500ms",
           "range": true,
           "refId": "C"
         }
@@ -1513,7 +1898,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Mean and max are exact; P99 reads flat inside the first bucket (1ms) until this stage degrades (ADR \u00a74). Response ACL lookup.",
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). Response ACL lookup.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1563,13 +1948,45 @@
           },
           "unit": "s"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "% over 500ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "fraction over 500ms"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 55
+        "y": 63
       },
       "id": 302,
       "options": {
@@ -1602,8 +2019,8 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by(le) (rate(gateway_response_authorization_duration_seconds_bucket{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
-          "legendFormat": "p99",
+          "expr": "max(gateway_response_authorization_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
+          "legendFormat": "max",
           "range": true,
           "refId": "B"
         },
@@ -1613,8 +2030,8 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "max(gateway_response_authorization_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
-          "legendFormat": "max",
+          "expr": "1 - (sum(rate(gateway_response_authorization_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_response_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "% over 500ms",
           "range": true,
           "refId": "C"
         }
@@ -1627,7 +2044,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Mean and max are exact; P99 reads flat inside the first bucket (1ms) until this stage degrades (ADR \u00a74). Serialize + hop to event loop + head-of-line wait + socket write. A spike usually means head-of-line blocking behind a slow earlier request on the same connection, not a slow client (ADR \u00a71). Not a delivery signal.",
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). Serialize + hop to event loop + head-of-line wait + socket write. A spike usually means head-of-line blocking behind a slow earlier request on the same connection, not a slow client (ADR \u00a71). Not a delivery signal.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1677,13 +2094,45 @@
           },
           "unit": "s"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "% over 500ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "fraction over 500ms"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 63
+        "y": 71
       },
       "id": 303,
       "options": {
@@ -1716,8 +2165,8 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by(le) (rate(gateway_response_send_duration_seconds_bucket{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
-          "legendFormat": "p99",
+          "expr": "max(gateway_response_send_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
+          "legendFormat": "max",
           "range": true,
           "refId": "B"
         },
@@ -1727,8 +2176,8 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "max(gateway_response_send_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
-          "legendFormat": "max",
+          "expr": "1 - (sum(rate(gateway_response_send_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_response_send_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": "% over 500ms",
           "range": true,
           "refId": "C"
         }
@@ -1744,7 +2193,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 71
+        "y": 79
       },
       "id": 500,
       "panels": []
@@ -1810,7 +2259,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 72
+        "y": 80
       },
       "id": 501,
       "options": {
@@ -1913,7 +2362,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 72
+        "y": 80
       },
       "id": 502,
       "options": {
@@ -1963,7 +2412,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 80
+        "y": 88
       },
       "id": 600,
       "panels": []
@@ -1981,7 +2430,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 81
+        "y": 89
       },
       "pluginVersion": "9.3.2",
       "targets": [
@@ -2065,7 +2514,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 81
+        "y": 89
       },
       "pluginVersion": "9.3.2",
       "targets": [
@@ -2149,7 +2598,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 89
+        "y": 97
       },
       "pluginVersion": "9.3.2",
       "targets": [
@@ -2233,7 +2682,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 89
+        "y": 97
       },
       "pluginVersion": "9.3.2",
       "targets": [
@@ -2317,7 +2766,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 97
+        "y": 105
       },
       "pluginVersion": "9.3.2",
       "targets": [
@@ -2401,7 +2850,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 97
+        "y": 105
       },
       "pluginVersion": "9.3.2",
       "targets": [
@@ -2485,7 +2934,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 105
+        "y": 113
       },
       "pluginVersion": "9.3.2",
       "targets": [
@@ -2569,7 +3018,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 105
+        "y": 113
       },
       "pluginVersion": "9.3.2",
       "targets": [
@@ -2653,7 +3102,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 113
+        "y": 121
       },
       "pluginVersion": "9.3.2",
       "targets": [
@@ -2737,7 +3186,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 113
+        "y": 121
       },
       "pluginVersion": "9.3.2",
       "targets": [
@@ -2821,7 +3270,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 121
+        "y": 129
       },
       "pluginVersion": "9.3.2",
       "targets": [
