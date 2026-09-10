@@ -38,9 +38,9 @@ data:
   gateway-lifecycle-by-interceptor.json: >
 {{ toPrettyJson $interceptorDashboard | indent 4 }}
 {{- end }}
----
 {{/* Support for v5 of Grafana operator */}}
 {{- if .Capabilities.APIVersions.Has "grafana.integreatly.org/v1beta1/GrafanaDashboard" }}
+---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
@@ -175,9 +175,9 @@ spec:
       datasourceName: {{ .Release.Name | quote }}
 {{- end }}
 {{- end }}
----
 {{/* Support for v4 of Grafana operator */}}
 {{- if .Capabilities.APIVersions.Has "integreatly.org/v1alpha1/GrafanaDashboard" }}
+---
 apiVersion: integreatly.org/v1alpha1
 kind: GrafanaDashboard
 metadata:
