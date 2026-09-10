@@ -81,6 +81,10 @@ spec:
             - name: GATEWAY_FEATURE_FLAGS_INTERNAL_LOAD_BALANCING
               value: "false"
             {{- end }}
+            {{- if .Values.gateway.preview.lifecycle }}
+            - name: GATEWAY_FEATURE_FLAGS_LIFECYCLE_METRICS
+              value: "true"
+            {{- end }}
             {{- if eq (include "conduktor-gateway.useLegacyPortRange" .) "true" }}
             {{- $modeVars := include "conduktor-gateway.singleListenerModeEnvVars" . | fromJson }}
             {{- range $name, $value := $modeVars }}
