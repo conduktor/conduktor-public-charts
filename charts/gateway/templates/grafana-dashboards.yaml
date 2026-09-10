@@ -13,10 +13,10 @@
 */}}
 {{- $dashboards := list
   (dict "file" "gateway.json"                          "suffix" "gateway-dashboard"     "title" (printf "Conduktor Gateway [%s]" $gatewayNsRelease))
-  (dict "file" "gateway-logs.json"                     "suffix" "log-dashboard"         "title" (printf "Conduktor Gateway logs [%s]" $gatewayNsRelease) "loki" true)
-  (dict "file" "gateway-lifecycle.json"                "suffix" "lifecycle-dashboard"   "title" (printf "Conduktor Gateway Lifecycle - Overview [%s]" $gatewayNsRelease) "lifecycleMetrics" true)
-  (dict "file" "gateway-lifecycle-by-apikey.json"      "suffix" "apikey-dashboard"      "title" (printf "Conduktor Gateway Lifecycle - by API key [%s]" $gatewayNsRelease) "lifecycleMetrics" true)
-  (dict "file" "gateway-lifecycle-by-interceptor.json" "suffix" "interceptor-dashboard" "title" (printf "Conduktor Gateway Lifecycle - by Interceptor [%s]" $gatewayNsRelease) "lifecycleMetrics" true)
+  (dict "file" "gateway-logs.json"                     "suffix" "log-dashboard"         "title" (printf "Conduktor Gateway [%s] - logs" $gatewayNsRelease) "loki" true)
+  (dict "file" "gateway-lifecycle.json"                "suffix" "lifecycle-dashboard"   "title" (printf "Conduktor Gateway [%s] - Lifecycle Overview" $gatewayNsRelease) "lifecycleMetrics" true)
+  (dict "file" "gateway-lifecycle-by-apikey.json"      "suffix" "apikey-dashboard"      "title" (printf "Conduktor Gateway [%s] - Lifecycle by API key" $gatewayNsRelease) "lifecycleMetrics" true)
+  (dict "file" "gateway-lifecycle-by-interceptor.json" "suffix" "interceptor-dashboard" "title" (printf "Conduktor Gateway [%s] - Lifecycle by Interceptor" $gatewayNsRelease) "lifecycleMetrics" true)
 -}}
 apiVersion: v1
 kind: ConfigMap
