@@ -115,7 +115,7 @@ gateway.portRange.enable: true (DEPRECATED).
 | Name                                               | Description                                                                                                                                                                                                                    | Value             |
 | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------- |
 | `gateway.preview.listeners`                        | DEPRECATED. Backward-compatibility alias from when multi-listeners was a preview feature. Setting this to false is equivalent to gateway.portRange.enable: true (legacy single listener mode). Leave unset on new installs.    | `true`            |
-| `gateway.preview.lifecycle`                        | Enable the lifecycle metrics preview feature. When true, emits GATEWAY_FEATURE_FLAGS_LIFECYCLE_METRICS=true and deploys the gateway-lifecycle Grafana dashboards when metrics.grafana.enable is also true.                     | `false`           |
+| `gateway.preview.lifecycle`                        | Enable the request lifecycle metrics preview feature. When true, emits GATEWAY_FEATURE_FLAGS_LIFECYCLE_METRICS=true and deploys the request lifecycle Grafana dashboards when metrics.grafana.enable is also true.                     | `false`           |
 | `gateway.securityMode`                             | Gateway security mode: GATEWAY_MANAGED or KAFKA_MANAGED. Only used in multi-listener mode. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).                                       | `GATEWAY_MANAGED` |
 | `gateway.aclEnabled`                               | Enable ACL for the Gateway virtual cluster. Only used in multi-listener mode. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED).                       | `""`              |
 | `gateway.kafka.brokerIds`                          | Kafka broker IDs used for SNI routing. Required when any listener uses routing: sni. Supports range syntax e.g. ["0-2"] or ["0-2,10,12-13"].                                                                                   | `[]`              |
@@ -812,18 +812,18 @@ metrics:
 The chart then installs the Grafana dashboards as ConfigMap in the configured namespace. And init CRD if they are installed in Kubernetes Cluster.
 
 ##### Request lifecycle dashboards (preview)
-The chart ships additional **request lifecycle** dashboards that break a request's end-to-end latency into its per-stage lifecycle segments (queue, authorization, interceptors, the Kafka round-trip, response send, …). These are a preview feature and are gated behind `gateway.preview.lifecycle` in addition to `metrics.grafana.enable`:
+The chart ships additional **request lifecycle** Grafana dashboards that break a request's end-to-end latency into its per-stage lifecycle segments (preprocessing, authorization, interceptors, the Kafka round-trip, response send, etc).
 
 ```yaml
 gateway:
   preview:
-    lifecycle: true # emits GATEWAY_FEATURE_FLAGS_LIFECYCLE_METRICS=true and enables the lifecycle dashboards
+    lifecycle: true
 metrics:
   grafana:
     enable: true
 ```
 
-When both `gateway.preview.lifecycle` and `metrics.grafana.enable` are `true`, the chart deploys the `gateway-lifecycle`, `gateway-lifecycle-by-apikey`, and `gateway-lifecycle-by-interceptor` dashboards alongside the main dashboard. With `gateway.preview.lifecycle: false` (the default) these dashboards are not deployed.
+When both `gateway.preview.lifecycle` and `metrics.grafana.enable` are `true`, the chart deploys 3 additional request lifecycle Grafana dashboards alongside the main dashboard.
 
 ##### Sidecar ConfigMap loading
 If you are not using the Grafana Operator but an official [Grafana Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/grafana), you can use the Sidecar provisioning to load dashboards from ConfigMap.
