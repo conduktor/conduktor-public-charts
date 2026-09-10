@@ -30,12 +30,14 @@ data:
 {{ toPrettyJson $gatewayDashboard | indent 4 }}
   gateway-logs.json: >
 {{ toPrettyJson $gatewayLogsDashboard | indent 4 }}
+{{- if .Values.gateway.preview.lifecycle }}
   gateway-lifecycle.json: >
 {{ toPrettyJson $lifecycleDashboard | indent 4 }}
   gateway-lifecycle-by-apikey.json: >
 {{ toPrettyJson $apikeyDashboard | indent 4 }}
   gateway-lifecycle-by-interceptor.json: >
 {{ toPrettyJson $interceptorDashboard | indent 4 }}
+{{- end }}
 ---
 {{/* Support for v5 of Grafana operator */}}
 {{- if .Capabilities.APIVersions.Has "grafana.integreatly.org/v1beta1/GrafanaDashboard" }}
@@ -92,6 +94,7 @@ spec:
       datasourceName: {{ .Values.metrics.grafana.datasources.prometheus | quote }}
     - inputName: "GATEWAY_NAME"
       datasourceName: {{ .Release.Name | quote }}
+{{- if .Values.gateway.preview.lifecycle }}
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -171,6 +174,7 @@ spec:
     - inputName: "GATEWAY_NAME"
       datasourceName: {{ .Release.Name | quote }}
 {{- end }}
+{{- end }}
 ---
 {{/* Support for v4 of Grafana operator */}}
 {{- if .Capabilities.APIVersions.Has "integreatly.org/v1alpha1/GrafanaDashboard" }}
@@ -221,6 +225,7 @@ spec:
       datasourceName: {{ .Values.metrics.grafana.datasources.prometheus | quote }}
     - inputName: "INPUT_GATEWAY_JOB_NAME"
       datasourceName: {{ .Release.Name | quote }}
+{{- if .Values.gateway.preview.lifecycle }}
 ---
 apiVersion: integreatly.org/v1alpha1
 kind: GrafanaDashboard
@@ -290,5 +295,6 @@ spec:
       datasourceName: {{ .Values.metrics.grafana.datasources.prometheus | quote }}
     - inputName: "INPUT_GATEWAY_JOB_NAME"
       datasourceName: {{ .Release.Name | quote }}
+{{- end }}
 {{- end }}
 {{- end }}
