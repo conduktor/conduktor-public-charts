@@ -78,7 +78,7 @@
   "panels": [
     {
       "type": "text",
-      "title": "Latency by Interceptor",
+      "title": "Conduktor Gateway Lifecycle \u2014 by Interceptor",
       "id": 1,
       "gridPos": {
         "h": 3,
@@ -88,7 +88,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "Per interceptor span: **mean / max / rate**, one line per interceptor (aggregated across API keys). Use the **Interceptor** dropdown above to filter. See [Gateway request lifecycle metrics](https://docs.conduktor.io)."
+        "content": "This dashboard shows the breakdown of request and response latency inside Conduktor Gateway for each interceptor. Read about this in more details in [Gateway request lifecycle metrics](https://docs.conduktor.io/guide/conduktor-in-production/monitor/gateway_lifecycle_metrics).\n\nEach line shows the **mean** and **max** latency and **rate** for each lifecycle span. Use the **Interceptor** dropdown above to filter which interceptors are shown."
       },
       "datasource": null
     },

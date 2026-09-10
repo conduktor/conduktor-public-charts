@@ -78,7 +78,7 @@
   "panels": [
     {
       "type": "text",
-      "title": "About this dashboard",
+      "title": "Conduktor Gateway Lifecycle - Overview",
       "id": 1,
       "gridPos": {
         "h": 4,
@@ -88,7 +88,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "Request lifecycle latency, as explained in [Gateway request lifecycle metrics](https://docs.conduktor.io).\n\nNote: a missing or zero series means traffic did not reach that stage \u2014 for example, `acks=0` produce skips `total` and all response spans."
+        "content": "This dashboard shows the breakdown of request and response latency inside Conduktor Gateway, allowing you to analyze the performance of Conduktor Gateway internals. Read about this in more details in [Gateway request lifecycle metrics](https://docs.conduktor.io/guide/conduktor-in-production/monitor/gateway_lifecycle_metrics).\n\nNote: a missing or zero series means traffic did not reach that stage, for example: produce requests with `acks=0` skips all response spans and `total` span."
       },
       "datasource": null
     },
