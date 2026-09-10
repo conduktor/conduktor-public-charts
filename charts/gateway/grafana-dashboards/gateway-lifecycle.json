@@ -1924,7 +1924,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). API-specific request rebuild. Skipped on cache hit and on all-topics-blocked produce (ADR \u00a77 #2, #9).",
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). All request interceptors aggregated. For the per-interceptor breakdown, open the 'by Interceptor' dashboard.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2013,6 +2013,334 @@
         "w": 12,
         "x": 0,
         "y": 55
+      },
+      "id": 206,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_request_interceptor_duration_seconds_sum{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "mean",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max(gateway_request_interceptor_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
+          "legendFormat": "max",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "1 - (sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": ">500ms",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "T2\u2192T3 request.interceptor",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Share of requests whose latency fell in each ladder bucket (exact, from bucket counts); the bands sum to 100%. Buckets with no traffic stay in the legend at 0 (via `or vector(0)`), so every bucket up to >30s is always labelled.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 55
+      },
+      "id": 609,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.001\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "<1ms",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.01\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.001\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "1-10ms",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.05\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.01\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "10-50ms",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.05\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "50-100ms",
+          "range": true,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "100-500ms",
+          "range": true,
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "500ms-1s",
+          "range": true,
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "1-5s",
+          "range": true,
+          "refId": "G"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "5-30s",
+          "range": true,
+          "refId": "H"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": ">30s",
+          "range": true,
+          "refId": "I"
+        }
+      ],
+      "title": "T2\u2192T3 request.interceptor \u2014 % in bucket",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). API-specific request rebuild. Skipped on cache hit and on all-topics-blocked produce (ADR \u00a77 #2, #9).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": ">500ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "% over 500ms"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 63
       },
       "id": 203,
       "options": {
@@ -2128,7 +2456,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 55
+        "y": 63
       },
       "id": 603,
       "options": {
@@ -2340,7 +2668,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 63
+        "y": 71
       },
       "id": 204,
       "options": {
@@ -2456,7 +2784,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 63
+        "y": 71
       },
       "id": 604,
       "options": {
@@ -2668,7 +2996,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 71
+        "y": 79
       },
       "id": 205,
       "options": {
@@ -2784,7 +3112,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 71
+        "y": 79
       },
       "id": 605,
       "options": {
@@ -2911,7 +3239,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 79
+        "y": 87
       },
       "id": 300,
       "panels": []
@@ -3009,7 +3337,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 80
+        "y": 88
       },
       "id": 301,
       "options": {
@@ -3125,7 +3453,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 80
+        "y": 88
       },
       "id": 606,
       "options": {
@@ -3249,6 +3577,334 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). All response interceptors aggregated. For the per-interceptor breakdown, open the 'by Interceptor' dashboard.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": ">500ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "% over 500ms"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 96
+      },
+      "id": 306,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(gateway_response_interceptor_duration_seconds_sum{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))",
+          "legendFormat": "mean",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max(gateway_response_interceptor_duration_seconds_max{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"})",
+          "legendFormat": "max",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "1 - (sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "legendFormat": ">500ms",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "T7\u2192T8 response.interceptor",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Share of requests whose latency fell in each ladder bucket (exact, from bucket counts); the bands sum to 100%. Buckets with no traffic stay in the legend at 0 (via `or vector(0)`), so every bucket up to >30s is always labelled.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 96
+      },
+      "id": 610,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.001\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "<1ms",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.01\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.001\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "1-10ms",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.05\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.01\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "10-50ms",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.05\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "50-100ms",
+          "range": true,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "100-500ms",
+          "range": true,
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "500ms-1s",
+          "range": true,
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "1-5s",
+          "range": true,
+          "refId": "G"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "5-30s",
+          "range": true,
+          "refId": "H"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": ">30s",
+          "range": true,
+          "refId": "I"
+        }
+      ],
+      "title": "T7\u2192T8 response.interceptor \u2014 % in bucket",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
       "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). Response ACL lookup.",
       "fieldConfig": {
         "defaults": {
@@ -3337,7 +3993,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 88
+        "y": 104
       },
       "id": 302,
       "options": {
@@ -3453,7 +4109,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 88
+        "y": 104
       },
       "id": 607,
       "options": {
@@ -3665,7 +4321,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 96
+        "y": 112
       },
       "id": 303,
       "options": {
@@ -3781,7 +4437,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 96
+        "y": 112
       },
       "id": 608,
       "options": {
@@ -3899,589 +4555,6 @@
       ],
       "title": "T9\u2192T10 response.send \u2014 % in bucket",
       "type": "timeseries"
-    },
-    {
-      "type": "row",
-      "title": "Interceptors",
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 104
-      },
-      "id": 500,
-      "panels": []
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "description": "Per-interceptor latency (legend = interceptor name). _count is interceptors run, not requests (ADR \u00a71). Isolates a slow request-side interceptor deployment.",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 105
-      },
-      "id": 501,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "sum by(interceptor) (rate(gateway_request_interceptor_duration_seconds_sum{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) / sum by(interceptor) (rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))",
-          "legendFormat": "{{interceptor}} mean",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by(le, interceptor) (rate(gateway_request_interceptor_duration_seconds_bucket{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])))",
-          "legendFormat": "{{interceptor}} p99",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "T2\u2192T3 request.interceptor per interceptor",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "description": "Share of requests whose latency fell in each ladder bucket (exact, from bucket counts); the bands sum to 100%. Buckets with no traffic stay in the legend at 0 (via `or vector(0)`), so every bucket up to >30s is always labelled.",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "percentunit",
-          "min": 0,
-          "max": 1
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 105
-      },
-      "id": 609,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "(sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.001\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
-          "legendFormat": "<1ms",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.01\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.001\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
-          "legendFormat": "1-10ms",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.05\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.01\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
-          "legendFormat": "10-50ms",
-          "range": true,
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.05\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
-          "legendFormat": "50-100ms",
-          "range": true,
-          "refId": "D"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
-          "legendFormat": "100-500ms",
-          "range": true,
-          "refId": "E"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
-          "legendFormat": "500ms-1s",
-          "range": true,
-          "refId": "F"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
-          "legendFormat": "1-5s",
-          "range": true,
-          "refId": "G"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
-          "legendFormat": "5-30s",
-          "range": true,
-          "refId": "H"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
-          "legendFormat": ">30s",
-          "range": true,
-          "refId": "I"
-        }
-      ],
-      "title": "request.interceptor \u2014 % in bucket (all interceptors)",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "description": "Per-interceptor latency (legend = interceptor name). _count is interceptors run, not requests (ADR \u00a71). Isolates a slow response-side interceptor deployment.",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 113
-      },
-      "id": 502,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "sum by(interceptor) (rate(gateway_response_interceptor_duration_seconds_sum{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) / sum by(interceptor) (rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))",
-          "legendFormat": "{{interceptor}} mean",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by(le, interceptor) (rate(gateway_response_interceptor_duration_seconds_bucket{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])))",
-          "legendFormat": "{{interceptor}} p99",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "T7\u2192T8 response.interceptor per interceptor",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "description": "Share of requests whose latency fell in each ladder bucket (exact, from bucket counts); the bands sum to 100%. Buckets with no traffic stay in the legend at 0 (via `or vector(0)`), so every bucket up to >30s is always labelled.",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "percentunit",
-          "min": 0,
-          "max": 1
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 113
-      },
-      "id": 610,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "(sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.001\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
-          "legendFormat": "<1ms",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.01\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.001\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
-          "legendFormat": "1-10ms",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.05\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.01\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
-          "legendFormat": "10-50ms",
-          "range": true,
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.05\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
-          "legendFormat": "50-100ms",
-          "range": true,
-          "refId": "D"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
-          "legendFormat": "100-500ms",
-          "range": true,
-          "refId": "E"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
-          "legendFormat": "500ms-1s",
-          "range": true,
-          "refId": "F"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
-          "legendFormat": "1-5s",
-          "range": true,
-          "refId": "G"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
-          "legendFormat": "5-30s",
-          "range": true,
-          "refId": "H"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
-          "legendFormat": ">30s",
-          "range": true,
-          "refId": "I"
-        }
-      ],
-      "title": "response.interceptor \u2014 % in bucket (all interceptors)",
-      "type": "timeseries"
     }
   ],
   "refresh": "30s",
@@ -4560,29 +4633,6 @@
         "options": [],
         "query": {
           "query": "label_values(gateway_request_total_duration_seconds_count{job=\"$job\"}, api_key)",
-          "refId": "StandardVariableQuery"
-        },
-        "refresh": 2,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 1,
-        "type": "query"
-      },
-      {
-        "current": {},
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${datasource}"
-        },
-        "definition": "label_values(gateway_request_interceptor_duration_seconds_count{job=\"$job\"}, interceptor)",
-        "hide": 0,
-        "includeAll": true,
-        "label": "Interceptor",
-        "multi": true,
-        "name": "interceptor",
-        "options": [],
-        "query": {
-          "query": "label_values(gateway_request_interceptor_duration_seconds_count{job=\"$job\"}, interceptor)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 2,
