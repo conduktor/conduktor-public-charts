@@ -1,6 +1,11 @@
 # Helm install/upgrade/test timeout
 timeout: "900s"
 
+k8s_secrets:
+  - name: gateway-license
+    data:
+      GATEWAY_LICENSE_KEY: "${CDK_LICENSE}"
+
 # Provisioner chart test configuration
 # Requires full stack: Kafka, PostgreSQL, Console, Gateway
 dependencies:
@@ -60,15 +65,23 @@ dependencies:
     values:
       gateway:
         replicas: 1
+        securityMode: "GATEWAY_MANAGED"
+        aclEnabled: "true"
+        listeners:
+          internal:
+            securityProtocol: SASL_PLAINTEXT
         env:
           KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
           KAFKA_SECURITY_PROTOCOL: "SASL_PLAINTEXT"
           KAFKA_SASL_MECHANISM: "PLAIN"
           KAFKA_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required username='kafka-admin' password='kafka-admin-password';" # checkov:skip=CKV_SECRET_6: test credentials
-          GATEWAY_SECURITY_MODE: "GATEWAY_MANAGED"
-          GATEWAY_SECURITY_PROTOCOL: "SASL_PLAINTEXT"
-          GATEWAY_ACL_ENABLED: "true"
           GATEWAY_SUPER_USERS: "admin"
+        extraSecretEnvVars:
+          - name: GATEWAY_LICENSE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: gateway-license
+                key: GATEWAY_LICENSE_KEY
         admin:
           users:
             - username: admin

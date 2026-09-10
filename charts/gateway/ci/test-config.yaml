@@ -9,6 +9,10 @@ k8s_secrets:
   - name: gateway-tls-keystore
     data_files:
       keystore.jks: "charts/gateway/ci/tls/selfsigned.jks"
+  # Store and key password of selfsigned.jks, see charts/gateway/ci/tls/generate.sh
+  - name: gateway-tls-keystore-password
+    data:
+      password: "conduktor"
 
 # Gateway chart test dependency configuration
 dependencies:

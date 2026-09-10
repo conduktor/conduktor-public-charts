@@ -35,6 +35,10 @@ spec:
       {{- if .Values.gateway.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.gateway.terminationGracePeriodSeconds }}
       {{- end }}
+      {{- if and .Values.gateway.debugSidecar.enabled .Values.gateway.debugSidecar.shareProcessNamespace }}
+      {{- /* The JVM attach mechanism used by jcmd/jstack/jmap/jfr needs the debug sidecar to see the Gateway process */}}
+      shareProcessNamespace: true
+      {{- end }}
       {{- if .Values.tls.certManager.enabled }}
       {{/* Set a deterministic pod hostname so Gateway can locate its own SAN entry in the mounted JKS keystore.
            Without this the pod hostname is a random suffix that doesn't appear in the cert SANs derived at
@@ -190,6 +194,39 @@ spec:
           {{- with .Values.gateway.securityContext }}
           securityContext: {{- toYaml . | nindent 12 }}
           {{- end }}
+        {{- if .Values.gateway.debugSidecar.enabled }}
+        - name: debug
+          image: {{ include "common.images.image" (dict "imageRoot" .Values.gateway.debugSidecar.image "global" .Values.global "chart" .Chart) }}
+          imagePullPolicy: {{ .Values.gateway.debugSidecar.image.pullPolicy }}
+          {{- with .Values.gateway.debugSidecar.securityContext }}
+          securityContext: {{- toYaml . | nindent 12 }}
+          {{- else }}
+          {{- /* The debug image defaults to root: the UID/GID must match the Gateway container's for the JVM attach mechanism to reach it */}}
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          {{- end }}
+          {{- with .Values.gateway.debugSidecar.command }}
+          command: {{- include "common.tplvalues.render" (dict "value" . "context" $) | nindent 12 }}
+          {{- end }}
+          {{- with .Values.gateway.debugSidecar.args }}
+          args: {{- include "common.tplvalues.render" (dict "value" . "context" $) | nindent 12 }}
+          {{- end }}
+          {{- with .Values.gateway.debugSidecar.env }}
+          env: {{- include "common.tplvalues.render" (dict "value" . "context" $) | nindent 12 }}
+          {{- end }}
+          {{- with .Values.gateway.debugSidecar.resources }}
+          resources: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.gateway.debugSidecar.volumeMounts }}
+          volumeMounts: {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- end }}
         {{- if .Values.gateway.sidecars }}
         {{- include "common.tplvalues.render" ( dict "value" .Values.gateway.sidecars "context" $) | nindent 8 }}
         {{- end }}

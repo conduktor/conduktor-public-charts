@@ -1,10 +1,10 @@
 {{- $apiScheme := include "conduktor-gateway.adminAPIScheme" . -}}
 {{- $internalServiceName := include "conduktor-gateway.internalServiceName" . -}}
 {{- $internalServicePort := .Values.gateway.admin.port -}}
-{{- $internalHealthUrl := printf "%s://%v:%v/health" $apiScheme $internalServiceName $internalServicePort -}}
+{{- $internalHealthUrl := printf "%s://%v:%v/health/ready" $apiScheme $internalServiceName $internalServicePort -}}
 {{- $externalServiceName := include "conduktor-gateway.externalServiceName" . -}}
 {{- $externalServicePort := .Values.gateway.admin.port -}}
-{{- $externalHealthUrl := printf "%s://%v:%v/health" $apiScheme $externalServiceName $externalServicePort -}}
+{{- $externalHealthUrl := printf "%s://%v:%v/health/ready" $apiScheme $externalServiceName $externalServicePort -}}
 apiVersion: v1
 kind: Pod
 metadata:

@@ -16,8 +16,6 @@ gateway:
   env:
     KAFKA_BOOTSTRAP_SERVERS: kafka.ct-gateway-deps.svc.cluster.local:9092
     GATEWAY_CLUSTER_ID: "gw-06"
-    GATEWAY_SSL_KEY_STORE_PASSWORD: "conduktor"
-    GATEWAY_SSL_KEY_PASSWORD: "conduktor"
   extraSecretEnvVars:
     - name: GATEWAY_LICENSE_KEY
       valueFrom:
@@ -43,8 +41,15 @@ gateway:
 podSecurityContext:
   runAsNonRoot: true
 
+# Covers the bring-your-own-keystore path with both JKS passwords sourced from secrets:
+# the chart derives GATEWAY_SSL_KEY_STORE_PASSWORD and GATEWAY_SSL_KEY_PASSWORD on its own.
+# Scenarios 05 and 11 still cover passing those passwords through gateway.env.
 tls:
   enable: true
-  secretRef: gateway-tls-keystore
-  keystoreKey: keystore.jks
-  keystoreFile: keystore.jks
+  keystore:
+    secretRef: gateway-tls-keystore
+    keystoreKey: keystore.jks
+    keystoreFile: keystore.jks
+    passwordSecretRef:
+      name: gateway-tls-keystore-password
+      key: password
