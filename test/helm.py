@@ -162,7 +162,13 @@ def helm_test(release_name: str, namespace: str, timeout: str = "600s", verbose:
 
 def helm_template(chart: str, namespace: str, values_files: Optional[list[Path]] = None) -> str:
     """Render Helm templates."""
-    cmd = ["helm", "template", "test", chart, "--namespace", namespace, "--api-versions", "cert-manager.io/v1"]
+    cmd = [
+        "helm", "template", "test", chart, "--namespace", namespace,
+        "--api-versions", "cert-manager.io/v1",
+        # Grafana operator CRDs so the GrafanaDashboard resources (v5 and v4) render and get linted
+        "--api-versions", "grafana.integreatly.org/v1beta1/GrafanaDashboard",
+        "--api-versions", "integreatly.org/v1alpha1/GrafanaDashboard",
+    ]
 
     for vf in (values_files or []):
         if not vf.exists():
