@@ -78,7 +78,7 @@
   "panels": [
     {
       "type": "text",
-      "title": "Latency by API key",
+      "title": "Conduktor Gateway Lifecycle \u2014 by API key",
       "id": 1,
       "gridPos": {
         "h": 3,
@@ -88,7 +88,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "Per lifecycle span: **mean / max / rate**, one line per API key. Use the **API key** dropdown above to filter which keys are shown. See [Gateway request lifecycle metrics](https://docs.conduktor.io)."
+        "content": "This dashboard shows the breakdown of request and response latency inside Conduktor Gateway for each API key. Read about this in more details in [Gateway request lifecycle metrics](https://docs.conduktor.io/guide/conduktor-in-production/monitor/gateway_lifecycle_metrics).\n\nEach line shows the **mean** and **max** latency and **rate** for each lifecycle span. Use the **API key** dropdown above to filter which API keys are shown."
       },
       "datasource": null
     },

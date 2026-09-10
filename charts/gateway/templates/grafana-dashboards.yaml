@@ -8,7 +8,7 @@
 {{- $logDashboardTitle := printf "Conduktor Gateway logs [%s]" $gatewayNsRelease -}}
 {{- $_3 := (include "conduktor-gateway.patchGrafanaDashboardInputs" (dict "dashboard" $gatewayLogsDashboard "title" $logDashboardTitle "context" $)) -}}
 {{- $lifecycleDashboard :=  .Files.Get "grafana-dashboards/gateway-lifecycle.json" | fromJson }}
-{{- $lifecycleDashboardTitle := printf "Conduktor Gateway Lifecycle [%s]" $gatewayNsRelease -}}
+{{- $lifecycleDashboardTitle := printf "Conduktor Gateway Lifecycle - Overview [%s]" $gatewayNsRelease -}}
 {{- $_5 := (include "conduktor-gateway.patchGrafanaDashboardInputs" (dict "dashboard" $lifecycleDashboard "title" $lifecycleDashboardTitle "context" $)) -}}
 {{- $apikeyDashboard :=  .Files.Get "grafana-dashboards/gateway-lifecycle-by-apikey.json" | fromJson }}
 {{- $apikeyDashboardTitle := printf "Conduktor Gateway Lifecycle - by API key [%s]" $gatewayNsRelease -}}
