@@ -7,16 +7,16 @@
     suffix  - GrafanaDashboard resource name suffix (appended as "<fullname>-<suffix>")
     title   - dashboard title patched into the JSON
     loki    - (optional) also wire the Loki datasource input
-    preview - (optional) only render when metrics.grafana.lifecycleMetrics is true
+    lifecycleMetrics - (optional) only render when metrics.grafana.lifecycleMetrics is true
   The fullname prefix is truncated to (62 - len suffix) so "<fullname>-<suffix>"
   always fits within the 63-char Kubernetes name limit.
 */}}
 {{- $dashboards := list
   (dict "file" "gateway.json"                          "suffix" "gateway-dashboard"     "title" (printf "Conduktor Gateway [%s]" $gatewayNsRelease))
   (dict "file" "gateway-logs.json"                     "suffix" "log-dashboard"         "title" (printf "Conduktor Gateway logs [%s]" $gatewayNsRelease) "loki" true)
-  (dict "file" "gateway-lifecycle.json"                "suffix" "lifecycle-dashboard"   "title" (printf "Conduktor Gateway Lifecycle - Overview [%s]" $gatewayNsRelease) "preview" true)
-  (dict "file" "gateway-lifecycle-by-apikey.json"      "suffix" "apikey-dashboard"      "title" (printf "Conduktor Gateway Lifecycle - by API key [%s]" $gatewayNsRelease) "preview" true)
-  (dict "file" "gateway-lifecycle-by-interceptor.json" "suffix" "interceptor-dashboard" "title" (printf "Conduktor Gateway Lifecycle - by Interceptor [%s]" $gatewayNsRelease) "preview" true)
+  (dict "file" "gateway-lifecycle.json"                "suffix" "lifecycle-dashboard"   "title" (printf "Conduktor Gateway Lifecycle - Overview [%s]" $gatewayNsRelease) "lifecycleMetrics" true)
+  (dict "file" "gateway-lifecycle-by-apikey.json"      "suffix" "apikey-dashboard"      "title" (printf "Conduktor Gateway Lifecycle - by API key [%s]" $gatewayNsRelease) "lifecycleMetrics" true)
+  (dict "file" "gateway-lifecycle-by-interceptor.json" "suffix" "interceptor-dashboard" "title" (printf "Conduktor Gateway Lifecycle - by Interceptor [%s]" $gatewayNsRelease) "lifecycleMetrics" true)
 -}}
 apiVersion: v1
 kind: ConfigMap
@@ -29,7 +29,7 @@ metadata:
     {{- end }}
 data:
 {{- range $d := $dashboards }}
-{{- if or (not $d.preview) $.Values.metrics.grafana.lifecycleMetrics }}
+{{- if or (not $d.lifecycleMetrics) $.Values.metrics.grafana.lifecycleMetrics }}
 {{- $dashboard := $.Files.Get (printf "grafana-dashboards/%s" $d.file) | fromJson }}
 {{- $_ := include "conduktor-gateway.patchGrafanaDashboardInputs" (dict "dashboard" $dashboard "title" $d.title "context" $) }}
   {{ $d.file }}: >
@@ -39,7 +39,7 @@ data:
 {{/* Support for v5 of Grafana operator */}}
 {{- if .Capabilities.APIVersions.Has "grafana.integreatly.org/v1beta1/GrafanaDashboard" }}
 {{- range $d := $dashboards }}
-{{- if or (not $d.preview) $.Values.metrics.grafana.lifecycleMetrics }}
+{{- if or (not $d.lifecycleMetrics) $.Values.metrics.grafana.lifecycleMetrics }}
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -76,7 +76,7 @@ spec:
 {{/* Support for v4 of Grafana operator */}}
 {{- if .Capabilities.APIVersions.Has "integreatly.org/v1alpha1/GrafanaDashboard" }}
 {{- range $d := $dashboards }}
-{{- if or (not $d.preview) $.Values.metrics.grafana.lifecycleMetrics }}
+{{- if or (not $d.lifecycleMetrics) $.Values.metrics.grafana.lifecycleMetrics }}
 ---
 apiVersion: integreatly.org/v1alpha1
 kind: GrafanaDashboard
