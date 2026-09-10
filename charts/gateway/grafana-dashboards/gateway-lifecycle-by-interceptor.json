@@ -88,7 +88,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "Per interceptor span: **mean / max / rate**, one line per interceptor (aggregated across API keys). Use the **Interceptor** dropdown above to filter. `_count` counts interceptor invocations, not requests (ADR \u00a71). Requires `GATEWAY_FEATURE_FLAGS_LIFECYCLE_METRICS=true`."
+        "content": "Per interceptor span: **mean / max / rate**, one line per interceptor (aggregated across API keys). Use the **Interceptor** dropdown above to filter. See [Gateway request lifecycle metrics](https://docs.conduktor.io)."
       },
       "datasource": null
     },

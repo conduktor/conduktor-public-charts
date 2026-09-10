@@ -88,7 +88,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "**Request lifecycle latency** \u2014 one panel per T0\u2192T10 stage from ADR-0015. Requires the gateway feature flag `GATEWAY_FEATURE_FLAGS_LIFECYCLE_METRICS=true`; with it off, panels are empty.\n\n**Reading gaps (ADR \u00a77):** a missing/zero series means traffic didn't reach that stage, not that instrumentation is broken. Cache hits skip `upstreamwait`/rebuilder (healthy); `acks=0` produce skips `total`; a ~30s `total` spike with no `upstreamwait` is an upstream timeout.\n\n**Percentiles (ADR \u00a74):** buckets start at 1ms, so P99 reads flat for the sub-ms stages until they degrade; use mean and max for those, P99 for `upstreamwait`."
+        "content": "Request lifecycle latency, as explained in [Gateway request lifecycle metrics](https://docs.conduktor.io).\n\nNote: a missing or zero series means traffic did not reach that stage \u2014 for example, `acks=0` produce skips `total` and all response spans."
       },
       "datasource": null
     },
