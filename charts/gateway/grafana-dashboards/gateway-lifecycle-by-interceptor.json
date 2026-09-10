@@ -67,18 +67,31 @@
       }
     ]
   },
-  "description": "Interceptor request/response latency broken down by interceptor (ADR-0015).",
+  "description": "Interceptor request/response latency broken down by interceptor.",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "gnetId": null,
   "graphTooltip": 1,
   "id": null,
-  "links": [],
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "doc",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "Gateway Lifecycle Metrics documentation",
+      "tooltip": "",
+      "type": "link",
+      "url": "https://docs.conduktor.io/guide/conduktor-in-production/monitor/gateway_lifecycle_metrics"
+    }
+  ],
   "liveNow": false,
   "panels": [
     {
       "type": "text",
-      "title": "Conduktor Gateway Lifecycle \u2014 by Interceptor",
+      "title": "Conduktor Gateway Lifecycle - by Interceptor",
       "id": 1,
       "gridPos": {
         "h": 3,
@@ -88,13 +101,13 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "This dashboard shows the breakdown of request and response latency inside Conduktor Gateway for each interceptor. Read about this in more details in [Gateway request lifecycle metrics](https://docs.conduktor.io/guide/conduktor-in-production/monitor/gateway_lifecycle_metrics).\n\nEach line shows the **mean** and **max** latency and **rate** for each lifecycle span. Use the **Interceptor** dropdown above to filter which interceptors are shown."
+        "content": "This dashboard breaks down Conduktor Gateway **interceptor** latency **per interceptor**, so you can see which interceptors add the most processing time on the request and response paths. Read more in [Gateway request lifecycle metrics](https://docs.conduktor.io/guide/conduktor-in-production/monitor/gateway_lifecycle_metrics).\n\nGateway runs interceptors at two points in the request lifecycle, and this dashboard has one row for each:\n\n- `request.interceptor` (T2 -> T3) - interceptors applied to the incoming request, before it is sent to the Kafka broker\n- `response.interceptor` (T7 -> T8) - interceptors applied to the broker response, before it is returned to the client\n\nWithin each row, the three panels show **mean** latency, **max** latency and **rate** (samples/s), with one line per interceptor. Use the **pod** and **Interceptor** dropdowns above to filter which pods and interceptors are shown.\n\nNote: a missing or zero series means no traffic passed through that interceptor for the selected filters. For the full end-to-end stage breakdown, see the **Lifecycle - Overview** dashboard."
       },
       "datasource": null
     },
     {
       "type": "row",
-      "title": "request.interceptor (T2\u2192T3)",
+      "title": "request.interceptor (T2 -> T3)",
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -110,7 +123,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Mean latency by interceptor for request.interceptor (T2\u2192T3).",
+      "description": "Mean latency by interceptor for request.interceptor (T2 -> T3).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -202,7 +215,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Max latency by interceptor for request.interceptor (T2\u2192T3).",
+      "description": "Max latency by interceptor for request.interceptor (T2 -> T3).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -294,7 +307,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Recording rate by interceptor for request.interceptor (T2\u2192T3).",
+      "description": "Recording rate by interceptor for request.interceptor (T2 -> T3).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -383,7 +396,7 @@
     },
     {
       "type": "row",
-      "title": "response.interceptor (T7\u2192T8)",
+      "title": "response.interceptor (T7 -> T8)",
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -399,7 +412,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Mean latency by interceptor for response.interceptor (T7\u2192T8).",
+      "description": "Mean latency by interceptor for response.interceptor (T7 -> T8).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -491,7 +504,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Max latency by interceptor for response.interceptor (T7\u2192T8).",
+      "description": "Max latency by interceptor for response.interceptor (T7 -> T8).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -583,7 +596,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Recording rate by interceptor for response.interceptor (T7\u2192T8).",
+      "description": "Recording rate by interceptor for response.interceptor (T7 -> T8).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -764,7 +777,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Conduktor Gateway Lifecycle \u2014 by Interceptor",
+  "title": "Conduktor Gateway Lifecycle - by Interceptor",
   "version": 1,
   "weekStart": ""
 }
