@@ -464,7 +464,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "1 - (sum by(api_key) (rate(gateway_request_total_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum by(api_key) (rate(gateway_request_total_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
+          "expr": "1 - (sum by(api_key) (rate(gateway_request_total_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) / sum by(api_key) (rate(gateway_request_total_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])))",
           "legendFormat": "{{api_key}}",
           "range": true,
           "refId": "A"
@@ -1549,7 +1549,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_preprocess_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_preprocess_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_preprocess_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_preprocess_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_preprocess_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_preprocess_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "500ms-1s",
           "range": true,
           "refId": "F"
@@ -1560,7 +1560,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_preprocess_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_preprocess_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_preprocess_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_preprocess_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_preprocess_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_preprocess_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "1-5s",
           "range": true,
           "refId": "G"
@@ -1571,7 +1571,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_preprocess_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_preprocess_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_preprocess_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_preprocess_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_preprocess_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_preprocess_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "5-30s",
           "range": true,
           "refId": "H"
@@ -1582,7 +1582,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_preprocess_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_preprocess_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_preprocess_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_preprocess_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_preprocess_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_preprocess_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": ">30s",
           "range": true,
           "refId": "I"
@@ -1877,7 +1877,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_authorization_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_authorization_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_authorization_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_authorization_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "500ms-1s",
           "range": true,
           "refId": "F"
@@ -1888,7 +1888,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_authorization_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_authorization_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_authorization_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_authorization_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "1-5s",
           "range": true,
           "refId": "G"
@@ -1899,7 +1899,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_authorization_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_authorization_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_authorization_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_authorization_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "5-30s",
           "range": true,
           "refId": "H"
@@ -1910,7 +1910,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_authorization_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_authorization_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": ">30s",
           "range": true,
           "refId": "I"
@@ -2205,7 +2205,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_rebuilder_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_rebuilder_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_rebuilder_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_rebuilder_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "500ms-1s",
           "range": true,
           "refId": "F"
@@ -2216,7 +2216,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_rebuilder_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_rebuilder_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_rebuilder_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_rebuilder_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "1-5s",
           "range": true,
           "refId": "G"
@@ -2227,7 +2227,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_rebuilder_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_rebuilder_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_rebuilder_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_rebuilder_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "5-30s",
           "range": true,
           "refId": "H"
@@ -2238,7 +2238,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_rebuilder_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_rebuilder_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": ">30s",
           "range": true,
           "refId": "I"
@@ -2533,7 +2533,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_upstreamqueue_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_upstreamqueue_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_upstreamqueue_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_upstreamqueue_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_upstreamqueue_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_upstreamqueue_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "500ms-1s",
           "range": true,
           "refId": "F"
@@ -2544,7 +2544,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_upstreamqueue_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_upstreamqueue_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_upstreamqueue_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_upstreamqueue_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_upstreamqueue_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_upstreamqueue_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "1-5s",
           "range": true,
           "refId": "G"
@@ -2555,7 +2555,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_upstreamqueue_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_upstreamqueue_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_upstreamqueue_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_upstreamqueue_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_upstreamqueue_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_upstreamqueue_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "5-30s",
           "range": true,
           "refId": "H"
@@ -2566,7 +2566,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_upstreamqueue_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_upstreamqueue_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_upstreamqueue_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_upstreamqueue_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_upstreamqueue_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_upstreamqueue_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": ">30s",
           "range": true,
           "refId": "I"
@@ -2861,7 +2861,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_upstreamwait_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_upstreamwait_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_upstreamwait_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_upstreamwait_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_upstreamwait_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_upstreamwait_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "500ms-1s",
           "range": true,
           "refId": "F"
@@ -2872,7 +2872,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_upstreamwait_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_upstreamwait_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_upstreamwait_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_upstreamwait_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_upstreamwait_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_upstreamwait_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "1-5s",
           "range": true,
           "refId": "G"
@@ -2883,7 +2883,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_upstreamwait_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_upstreamwait_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_upstreamwait_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_upstreamwait_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_upstreamwait_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_upstreamwait_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "5-30s",
           "range": true,
           "refId": "H"
@@ -2894,7 +2894,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_upstreamwait_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_upstreamwait_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_upstreamwait_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_upstreamwait_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_request_upstreamwait_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_request_upstreamwait_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": ">30s",
           "range": true,
           "refId": "I"
@@ -3202,7 +3202,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_rebuilder_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_rebuilder_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_response_rebuilder_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_rebuilder_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "500ms-1s",
           "range": true,
           "refId": "F"
@@ -3213,7 +3213,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_rebuilder_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_rebuilder_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_response_rebuilder_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_rebuilder_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "1-5s",
           "range": true,
           "refId": "G"
@@ -3224,7 +3224,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_rebuilder_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_rebuilder_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_response_rebuilder_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_rebuilder_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "5-30s",
           "range": true,
           "refId": "H"
@@ -3235,7 +3235,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_rebuilder_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_response_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_rebuilder_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_rebuilder_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": ">30s",
           "range": true,
           "refId": "I"
@@ -3530,7 +3530,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_authorization_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_authorization_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_response_authorization_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_authorization_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "500ms-1s",
           "range": true,
           "refId": "F"
@@ -3541,7 +3541,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_authorization_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_authorization_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_response_authorization_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_authorization_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "1-5s",
           "range": true,
           "refId": "G"
@@ -3552,7 +3552,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_authorization_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_authorization_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_response_authorization_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_authorization_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "5-30s",
           "range": true,
           "refId": "H"
@@ -3563,7 +3563,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_authorization_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_response_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_authorization_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_authorization_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": ">30s",
           "range": true,
           "refId": "I"
@@ -3858,7 +3858,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_send_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_send_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_send_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_response_send_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_send_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_send_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "500ms-1s",
           "range": true,
           "refId": "F"
@@ -3869,7 +3869,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_send_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_send_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_send_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_response_send_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_send_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_send_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "1-5s",
           "range": true,
           "refId": "G"
@@ -3880,7 +3880,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_send_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_send_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_send_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_response_send_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_send_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_send_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "5-30s",
           "range": true,
           "refId": "H"
@@ -3891,7 +3891,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_send_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_send_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_send_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_response_send_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval])) - sum(rate(gateway_response_send_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) / sum(rate(gateway_response_send_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": ">30s",
           "range": true,
           "refId": "I"
@@ -4156,7 +4156,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "500ms-1s",
           "range": true,
           "refId": "F"
@@ -4167,7 +4167,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "1-5s",
           "range": true,
           "refId": "G"
@@ -4178,7 +4178,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "5-30s",
           "range": true,
           "refId": "H"
@@ -4189,7 +4189,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_request_interceptor_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_request_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": ">30s",
           "range": true,
           "refId": "I"
@@ -4441,7 +4441,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"0.5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "500ms-1s",
           "range": true,
           "refId": "F"
@@ -4452,7 +4452,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"1\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"1.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "1-5s",
           "range": true,
           "refId": "G"
@@ -4463,7 +4463,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"5\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"5.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "5-30s",
           "range": true,
           "refId": "H"
@@ -4474,7 +4474,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"30\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
+          "expr": "((sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval])) - sum(rate(gateway_response_interceptor_duration_seconds_bucket{le=\"30.0\", job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) / sum(rate(gateway_response_interceptor_duration_seconds_count{job=\"$job\", pod=~\"$pod\", api_key=~\"$api_key\", interceptor=~\"$interceptor\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": ">30s",
           "range": true,
           "refId": "I"
