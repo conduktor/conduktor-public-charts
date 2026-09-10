@@ -67,13 +67,26 @@
       }
     ]
   },
-  "description": "Per-stage request lifecycle latency for Conduktor Gateway (ADR-0015).",
+  "description": "Per-stage request lifecycle latency for Conduktor Gateway.",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "gnetId": null,
   "graphTooltip": 1,
   "id": null,
-  "links": [],
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "doc",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "Gateway Lifecycle Metrics documentation",
+      "tooltip": "",
+      "type": "link",
+      "url": "https://docs.conduktor.io/guide/conduktor-in-production/monitor/gateway_lifecycle_metrics"
+    }
+  ],
   "liveNow": false,
   "panels": [
     {
@@ -88,7 +101,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "This dashboard shows the breakdown of request and response latency inside Conduktor Gateway, allowing you to analyze the performance of Conduktor Gateway internals. Read about this in more details in [Gateway request lifecycle metrics](https://docs.conduktor.io/guide/conduktor-in-production/monitor/gateway_lifecycle_metrics).\n\nNote: a missing or zero series means traffic did not reach that stage, for example: produce requests with `acks=0` skips all response spans and `total` span."
+        "content": "This dashboard breaks down request and response latency **inside** Conduktor Gateway, stage by stage, so you can see where time is spent as a request travels through the proxy and pinpoint internal bottlenecks. Read more in [Gateway request lifecycle metrics](https://docs.conduktor.io/guide/conduktor-in-production/monitor/gateway_lifecycle_metrics).\n\nEach request is timestamped at eleven checkpoints (T0 to T10). The gap between two consecutive checkpoints is a **span** that measures one processing stage:\n\n**Request path**\n- T0 -> T1 `request.preprocess` - decode, authenticate and prepare the incoming request\n- T1 -> T2 `request.authorization` - ACL authorization check\n- T2 -> T3 `request.interceptor` - run request interceptors\n- T3 -> T4 `request.rebuilder` - rebuild the request for the upstream broker\n- T4 -> T5 `request.upstreamqueue` - time queued before being sent upstream\n- T5 -> T6 `request.upstreamwait` - waiting for the Kafka broker to respond\n\n**Response path**\n- T6 -> T7 `response.rebuilder` - rebuild the broker response for the client\n- T7 -> T8 `response.interceptor` - run response interceptors\n- T8 -> T9 `response.authorization` - response-side ACL authorization check\n- T9 -> T10 `response.send` - encode and send the response back to the client\n\n**How to read the rows**\n- **Overview per API key** and **Overview per stage** summarise total (T0 -> T10) and per-stage latency, throughput and the fraction of slow samples.\n- **Request path** and **Response path** drill into each individual span, each paired with a `% in bucket` panel showing how that stage's latency is distributed.\n\nUse the **pod** and **API key** dropdowns to filter. For a per-client or per-interceptor view, see the companion **Lifecycle - by API key** and **Lifecycle - by Interceptor** dashboards.\n\nNote: a missing or zero series means traffic did not reach that stage - for example, produce requests with `acks=0` skip all response spans and the `total` span."
       },
       "datasource": null
     },
@@ -110,7 +123,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Mean end-to-end latency (T0\u2192T10) per API key \u2014 one line per key. Use the API key dropdown to filter. For the full per-stage breakdown by API key, open the 'by API key' dashboard.",
+      "description": "Mean end-to-end latency (T0 -> T10) per API key - one line per key. Use the API key dropdown to filter. For the full per-stage breakdown by API key, open the 'by API key' dashboard.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -202,7 +215,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Max end-to-end latency (T0\u2192T10) per API key (exact rolling max) \u2014 one line per key.",
+      "description": "Max end-to-end latency (T0 -> T10) per API key (exact rolling max) - one line per key.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -294,7 +307,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Full-pipeline request rate (T0\u2192T10) per API key \u2014 one line per key.",
+      "description": "Full-pipeline request rate (T0 -> T10) per API key - one line per key.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -386,7 +399,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Share of total requests slower than 1s per API key \u2014 one line per key. 1s is a real bucket bound so this is exact (no interpolation).",
+      "description": "Share of total requests slower than 1s per API key - one line per key. 1s is a real bucket bound so this is exact (no interpolation).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -491,7 +504,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Mean latency per lifecycle stage \u2014 one line per span. Interceptor stages are per-invocation means (their _count is interceptors run, not requests).",
+      "description": "Mean latency per lifecycle stage - one line per span. Interceptor stages are per-invocation means (their _count is interceptors run, not requests).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -682,7 +695,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Max latency per lifecycle stage \u2014 one line per span (exact rolling max).",
+      "description": "Max latency per lifecycle stage - one line per span (exact rolling max).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -873,7 +886,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Recording rate per stage \u2014 one line per span. A missing/zero series means traffic didn't reach that stage (ADR \u00a77), e.g. cache hits skip upstreamwait.",
+      "description": "Recording rate per stage - one line per span. A missing/zero series means traffic didn't reach that stage, e.g. cache hits skip upstreamwait.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1064,7 +1077,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Share of samples slower than 100ms per stage \u2014 one line per span. 100ms is a real bucket bound so this is exact (no interpolation, ADR \u00a74).",
+      "description": "Share of samples slower than 100ms per stage - one line per span. 100ms is a real bucket bound so this is exact (no interpolation).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1268,7 +1281,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). channelRead to just before ACL. Records even on ACL denial (ADR \u00a77 #1).",
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms - an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder. channelRead to just before ACL. Records even on ACL denial.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1406,7 +1419,7 @@
           "refId": "C"
         }
       ],
-      "title": "T0\u2192T1 request.preprocess",
+      "title": "T0 -> T1 request.preprocess",
       "type": "timeseries"
     },
     {
@@ -1588,7 +1601,7 @@
           "refId": "I"
         }
       ],
-      "title": "T0\u2192T1 request.preprocess \u2014 % in bucket",
+      "title": "T0 -> T1 request.preprocess - % in bucket",
       "type": "timeseries"
     },
     {
@@ -1596,7 +1609,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). ACL lookup. Zero is normal for superuser/ACL-disabled requests (ADR \u00a77 #1).",
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms - an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder. ACL lookup. Zero is normal for superuser/ACL-disabled requests.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1734,7 +1747,7 @@
           "refId": "C"
         }
       ],
-      "title": "T1\u2192T2 request.authorization",
+      "title": "T1 -> T2 request.authorization",
       "type": "timeseries"
     },
     {
@@ -1916,7 +1929,7 @@
           "refId": "I"
         }
       ],
-      "title": "T1\u2192T2 request.authorization \u2014 % in bucket",
+      "title": "T1 -> T2 request.authorization - % in bucket",
       "type": "timeseries"
     },
     {
@@ -1924,7 +1937,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). All request interceptors aggregated. For the per-interceptor breakdown, open the 'by Interceptor' dashboard.",
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms - an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder. All request interceptors aggregated. For the per-interceptor breakdown, open the 'by Interceptor' dashboard.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2062,7 +2075,7 @@
           "refId": "C"
         }
       ],
-      "title": "T2\u2192T3 request.interceptor",
+      "title": "T2 -> T3 request.interceptor",
       "type": "timeseries"
     },
     {
@@ -2244,7 +2257,7 @@
           "refId": "I"
         }
       ],
-      "title": "T2\u2192T3 request.interceptor \u2014 % in bucket",
+      "title": "T2 -> T3 request.interceptor - % in bucket",
       "type": "timeseries"
     },
     {
@@ -2252,7 +2265,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). API-specific request rebuild. Skipped on cache hit and on all-topics-blocked produce (ADR \u00a77 #2, #9).",
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms - an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder. API-specific request rebuild. Skipped on cache hit and on all-topics-blocked produce.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2390,7 +2403,7 @@
           "refId": "C"
         }
       ],
-      "title": "T3\u2192T4 request.rebuilder",
+      "title": "T3 -> T4 request.rebuilder",
       "type": "timeseries"
     },
     {
@@ -2572,7 +2585,7 @@
           "refId": "I"
         }
       ],
-      "title": "T3\u2192T4 request.rebuilder \u2014 % in bucket",
+      "title": "T3 -> T4 request.rebuilder - % in bucket",
       "type": "timeseries"
     },
     {
@@ -2580,7 +2593,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). Rebuilt request waiting for broker/channel then sent to Kafka wire.",
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms - an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder. Rebuilt request waiting for broker/channel then sent to Kafka wire.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2718,7 +2731,7 @@
           "refId": "C"
         }
       ],
-      "title": "T4\u2192T5 request.upstreamqueue",
+      "title": "T4 -> T5 request.upstreamqueue",
       "type": "timeseries"
     },
     {
@@ -2900,7 +2913,7 @@
           "refId": "I"
         }
       ],
-      "title": "T4\u2192T5 request.upstreamqueue \u2014 % in bucket",
+      "title": "T4 -> T5 request.upstreamqueue - % in bucket",
       "type": "timeseries"
     },
     {
@@ -2908,7 +2921,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). Kafka round-trip \u2014 the stage most likely to breach 500ms. Skipped on acks=0 and on upstream timeout (ADR \u00a77 #5, #6).",
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms - an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder. Kafka round-trip - the stage most likely to breach 500ms. Skipped on acks=0 and on upstream timeout.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -3046,7 +3059,7 @@
           "refId": "C"
         }
       ],
-      "title": "T5\u2192T6 request.upstreamwait",
+      "title": "T5 -> T6 request.upstreamwait",
       "type": "timeseries"
     },
     {
@@ -3228,7 +3241,7 @@
           "refId": "I"
         }
       ],
-      "title": "T5\u2192T6 request.upstreamwait \u2014 % in bucket",
+      "title": "T5 -> T6 request.upstreamwait - % in bucket",
       "type": "timeseries"
     },
     {
@@ -3249,7 +3262,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). API-specific response rebuild. Skipped on cache hit (ADR \u00a77 #9).",
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms - an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder. API-specific response rebuild. Skipped on cache hit.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -3387,7 +3400,7 @@
           "refId": "C"
         }
       ],
-      "title": "T6\u2192T7 response.rebuilder",
+      "title": "T6 -> T7 response.rebuilder",
       "type": "timeseries"
     },
     {
@@ -3569,7 +3582,7 @@
           "refId": "I"
         }
       ],
-      "title": "T6\u2192T7 response.rebuilder \u2014 % in bucket",
+      "title": "T6 -> T7 response.rebuilder - % in bucket",
       "type": "timeseries"
     },
     {
@@ -3577,7 +3590,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). All response interceptors aggregated. For the per-interceptor breakdown, open the 'by Interceptor' dashboard.",
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms - an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder. All response interceptors aggregated. For the per-interceptor breakdown, open the 'by Interceptor' dashboard.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -3715,7 +3728,7 @@
           "refId": "C"
         }
       ],
-      "title": "T7\u2192T8 response.interceptor",
+      "title": "T7 -> T8 response.interceptor",
       "type": "timeseries"
     },
     {
@@ -3897,7 +3910,7 @@
           "refId": "I"
         }
       ],
-      "title": "T7\u2192T8 response.interceptor \u2014 % in bucket",
+      "title": "T7 -> T8 response.interceptor - % in bucket",
       "type": "timeseries"
     },
     {
@@ -3905,7 +3918,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). Response ACL lookup.",
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms - an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder. Response ACL lookup.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -4043,7 +4056,7 @@
           "refId": "C"
         }
       ],
-      "title": "T8\u2192T9 response.authorization",
+      "title": "T8 -> T9 response.authorization",
       "type": "timeseries"
     },
     {
@@ -4225,7 +4238,7 @@
           "refId": "I"
         }
       ],
-      "title": "T8\u2192T9 response.authorization \u2014 % in bucket",
+      "title": "T8 -> T9 response.authorization - % in bucket",
       "type": "timeseries"
     },
     {
@@ -4233,7 +4246,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms \u2014 an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder (ADR \u00a74). Serialize + hop to event loop + head-of-line wait + socket write. A spike usually means head-of-line blocking behind a slow earlier request on the same connection, not a slow client (ADR \u00a71). Not a delivery signal.",
+      "description": "Left axis (seconds): mean and max, both exact at any magnitude. Right axis: '% over 500ms', the exact fraction of requests slower than 500ms - an honest tail signal that replaces the interpolated p99, which can overshoot on the coarse ladder. Serialize + hop to event loop + head-of-line wait + socket write. A spike usually means head-of-line blocking behind a slow earlier request on the same connection, not a slow client. Not a delivery signal.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -4371,7 +4384,7 @@
           "refId": "C"
         }
       ],
-      "title": "T9\u2192T10 response.send",
+      "title": "T9 -> T10 response.send",
       "type": "timeseries"
     },
     {
@@ -4553,7 +4566,7 @@
           "refId": "I"
         }
       ],
-      "title": "T9\u2192T10 response.send \u2014 % in bucket",
+      "title": "T9 -> T10 response.send - % in bucket",
       "type": "timeseries"
     }
   ],
