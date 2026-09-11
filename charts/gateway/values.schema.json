@@ -1035,6 +1035,11 @@
                             "description": "Enable Grafana dashboards to installation. Dashboards can be installed as Sidecar ConfigMap or using Grafana operator CRDs (v4 or v5)",
                             "default": false
                         },
+                        "lifecycleMetrics": {
+                            "type": "boolean",
+                            "description": "Enable the request lifecycle metrics preview feature. When true (and metrics.grafana.enable is also true), emits GATEWAY_FEATURE_FLAGS_LIFECYCLE_METRICS=true and deploys the request lifecycle Grafana dashboards.",
+                            "default": false
+                        },
                         "namespace": {
                             "type": "string",
                             "description": "Namespace used to deploy Grafana dashboards by default use the same namespace as Conduktor Gateway",

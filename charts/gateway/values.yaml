@@ -136,8 +136,6 @@ gateway:
   preview:
     ## @param gateway.preview.listeners DEPRECATED. Backward-compatibility alias from when multi-listeners was a preview feature. Setting this to false is equivalent to gateway.portRange.enable: true (legacy single listener mode). Leave unset on new installs.
     listeners: true
-    ## @param gateway.preview.lifecycle Enable the request lifecycle metrics preview feature. When true, emits GATEWAY_FEATURE_FLAGS_LIFECYCLE_METRICS=true and deploys the request lifecycle Grafana dashboards when metrics.grafana.enable is also true.
-    lifecycle: false
   ## @param gateway.securityMode Gateway security mode: GATEWAY_MANAGED or KAFKA_MANAGED. Only used in multi-listener mode. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).
   securityMode: "GATEWAY_MANAGED"
   ## @param gateway.aclEnabled Enable ACL for the Gateway virtual cluster. Only used in multi-listener mode. Emitted as GATEWAY_ACL_ENABLED. Inferred from securityMode when empty (true for GATEWAY_MANAGED, false for KAFKA_MANAGED).
@@ -590,6 +588,8 @@ metrics:
   grafana:
     ## @param metrics.grafana.enable Enable Grafana dashboards to installation. Dashboards can be installed as Sidecar ConfigMap or using Grafana operator CRDs (v4 or v5)
     enable: false
+    ## @param metrics.grafana.lifecycleMetrics Enable the request lifecycle metrics preview feature. When true (and metrics.grafana.enable is also true), emits GATEWAY_FEATURE_FLAGS_LIFECYCLE_METRICS=true and deploys the request lifecycle Grafana dashboards.
+    lifecycleMetrics: false
     ## @param metrics.grafana.namespace Namespace used to deploy Grafana dashboards by default use the same namespace as Conduktor Gateway
     ##
     namespace: ""
