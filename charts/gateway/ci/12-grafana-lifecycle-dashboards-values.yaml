@@ -1,0 +1,49 @@
+nameOverride: gateway-test-12
+
+gateway:
+  replicas: 1
+  env:
+    KAFKA_BOOTSTRAP_SERVERS: kafka.ct-gateway-deps.svc.cluster.local:9092
+    GATEWAY_CLUSTER_ID: "gw-12"
+  extraSecretEnvVars:
+    - name: GATEWAY_LICENSE_KEY
+      valueFrom:
+        secretKeyRef:
+          name: gateway-license
+          key: GATEWAY_LICENSE_KEY
+
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+
+  # Add volume on /tmp because of readOnlyRootFilesystem=true security constraint
+  volumes:
+    - name: tmp
+      emptyDir: {}
+  volumeMounts:
+    - name: tmp
+      mountPath: /tmp
+
+podSecurityContext:
+  runAsNonRoot: true
+
+# Exercise the Grafana dashboards template: ConfigMap + GrafanaDashboard resources
+# (v4/v5 operator variants) for every dashboard, including the lifecycle ones.
+# folder, labels and matchLabels are set to also cover their conditional branches.
+# lifecycleMetrics enables the request lifecycle dashboards so they render.
+metrics:
+  grafana:
+    enable: true
+    lifecycleMetrics: true
+    folder: Conduktor
+    matchLabels:
+      dashboards: grafana
+    labels:
+      grafana_dashboard: "1"
+    datasources:
+      prometheus: prometheus
+      loki: loki
