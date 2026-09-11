@@ -81,7 +81,7 @@ spec:
             - name: GATEWAY_FEATURE_FLAGS_INTERNAL_LOAD_BALANCING
               value: "false"
             {{- end }}
-            {{- if .Values.gateway.preview.lifecycle }}
+            {{- if and .Values.metrics.grafana.enable .Values.metrics.grafana.lifecycleMetrics }}
             - name: GATEWAY_FEATURE_FLAGS_LIFECYCLE_METRICS
               value: "true"
             {{- end }}
