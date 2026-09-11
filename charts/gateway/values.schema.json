@@ -1037,7 +1037,7 @@
                         },
                         "lifecycleMetrics": {
                             "type": "boolean",
-                            "description": "Enable the request lifecycle metrics preview feature. When true (and metrics.grafana.enable is also true), emits GATEWAY_FEATURE_FLAGS_LIFECYCLE_METRICS=true and deploys the request lifecycle Grafana dashboards.",
+                            "description": "Enable the request lifecycle metrics feature. When true (and metrics.grafana.enable is also true), emits GATEWAY_FEATURE_FLAGS_LIFECYCLE_METRICS=true and deploys the request lifecycle Grafana dashboards.",
                             "default": false
                         },
                         "namespace": {
