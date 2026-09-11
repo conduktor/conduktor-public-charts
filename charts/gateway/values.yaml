@@ -588,6 +588,8 @@ metrics:
   grafana:
     ## @param metrics.grafana.enable Enable Grafana dashboards to installation. Dashboards can be installed as Sidecar ConfigMap or using Grafana operator CRDs (v4 or v5)
     enable: false
+    ## @param metrics.grafana.lifecycleMetrics Enable the request lifecycle metrics feature. When true (and metrics.grafana.enable is also true), emits GATEWAY_FEATURE_FLAGS_LIFECYCLE_METRICS=true and deploys the request lifecycle Grafana dashboards.
+    lifecycleMetrics: false
     ## @param metrics.grafana.namespace Namespace used to deploy Grafana dashboards by default use the same namespace as Conduktor Gateway
     ##
     namespace: ""
