@@ -1035,11 +1035,6 @@
                             "description": "Enable Grafana dashboards to installation. Dashboards can be installed as Sidecar ConfigMap or using Grafana operator CRDs (v4 or v5)",
                             "default": false
                         },
-                        "lifecycleMetrics": {
-                            "type": "boolean",
-                            "description": "Enable the request lifecycle metrics feature. When true (and metrics.grafana.enable is also true), emits GATEWAY_FEATURE_FLAGS_LIFECYCLE_METRICS=true and deploys the request lifecycle Grafana dashboards.",
-                            "default": false
-                        },
                         "namespace": {
                             "type": "string",
                             "description": "Namespace used to deploy Grafana dashboards by default use the same namespace as Conduktor Gateway",
@@ -1074,6 +1069,26 @@
                                     "default": "loki"
                                 }
                             }
+                        }
+                    }
+                },
+                "lifecycle": {
+                    "type": "object",
+                    "properties": {
+                        "enable": {
+                            "type": "boolean",
+                            "description": "Enable the request lifecycle metrics feature. Emits GATEWAY_FEATURE_FLAGS_LIFECYCLE_METRICS=true so Gateway records the per-stage request lifecycle histograms (high cardinality, off by default). Independent of metrics.grafana.enable; when metrics.grafana.enable is also true, the request lifecycle Grafana dashboards are deployed as well.",
+                            "default": false
+                        },
+                        "apiKeys": {
+                            "type": "string",
+                            "description": "Scope the lifecycle metrics to a comma-separated list of Kafka ApiKeys names (e.g. \"PRODUCE,FETCH\"), or \"ALL\" (default) for every ApiKey. Emitted as GATEWAY_LIFECYCLE_METRICS_API_KEYS only when set to a value other than \"ALL\". Only used when metrics.lifecycle.enable is true.",
+                            "default": "ALL"
+                        },
+                        "interceptors": {
+                            "type": "string",
+                            "description": "Scope the per-interceptor lifecycle metrics to a comma-separated list of interceptor logical names, or \"ALL\" (default) for every interceptor. Emitted as GATEWAY_LIFECYCLE_METRICS_INTERCEPTORS only when set to a value other than \"ALL\". Only used when metrics.lifecycle.enable is true.",
+                            "default": "ALL"
                         }
                     }
                 }
