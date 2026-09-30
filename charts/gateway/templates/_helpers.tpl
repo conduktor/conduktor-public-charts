@@ -228,6 +228,22 @@ Resolve the effective keystore mount filename (tls.keystore.keystoreFile takes p
 {{- end -}}
 
 {{/*
+Resolve a keystore/truststore type: the explicit type wins, otherwise it is derived from the secret key extension.
+Params:
+  - type - String - Required - Explicit store type, may be empty.
+  - key  - String - Required - Key of the store in its secret.
+*/}}
+{{- define "conduktor-gateway.storeType" -}}
+{{- if .type -}}
+  {{- .type -}}
+{{- else if has (.key | lower | ext) (list ".p12" ".pfx") -}}
+  pkcs12
+{{- else -}}
+  jks
+{{- end -}}
+{{- end -}}
+
+{{/*
 Name of the auto-generated TLS keystore password secret.
 */}}
 {{- define "conduktor-gateway.tlsPasswordSecretName" -}}
@@ -250,7 +266,7 @@ Plain-string values are stored as strings; secretKeyRef values are stored as a m
   {"secretKeyRef": {"name": "...", "key": "..."}}
 so that the caller can dispatch on kind (see deployment.yaml tlsEnvVars range block).
 Two code paths:
-  - tls.enable        : user-supplied JKS keystore secret
+  - tls.enable        : user-supplied JKS or PKCS12 keystore secret
   - tls.certManager.* : cert-manager-issued JKS (password always from the auto/user-supplied secret)
 Values already set through gateway.env or gateway.extraSecretEnvVars are left alone: gateway.env
 lands in a ConfigMap consumed via envFrom, which an entry in the container's env list would silently
@@ -263,8 +279,8 @@ Returns JSON.
 {{- $pwKey   := .Values.tls.keystore.passwordSecretRef.key | default "password" -}}
 {{- if and .Values.tls.enable (include "conduktor-gateway.keystoreSecretRef" .) -}}
   {{- $_ := set $vars "GATEWAY_SSL_KEY_STORE_PATH" (printf "/etc/gateway/tls/%s" $ksFile) -}}
-  {{- $_ := set $vars "GATEWAY_SSL_KEY_TYPE"       "jks" -}}
-  {{- if and .Values.tls.keystore.passwordSecretRef.name (eq (include "conduktor-gateway.envExists" (dict "envkey" "GATEWAY_SSL_KEY_STORE_PASSWORD" "context" .)) "false") -}}
+  {{- $_ := set $vars "GATEWAY_SSL_KEY_TYPE"       (include "conduktor-gateway.storeType" (dict "type" .Values.tls.keystore.type "key" (include "conduktor-gateway.keystoreKey" .))) -}}
+  {{- if .Values.tls.keystore.passwordSecretRef.name -}}
     {{- $_ := set $vars "GATEWAY_SSL_KEY_STORE_PASSWORD" (dict "secretKeyRef" (dict "name" .Values.tls.keystore.passwordSecretRef.name "key" $pwKey)) -}}
   {{- end -}}
   {{/* A JKS holds two passwords: the store password and the private key password. Gateway requires
@@ -277,13 +293,13 @@ Returns JSON.
     {{- $keyPwName = .Values.tls.keystore.passwordSecretRef.name -}}
     {{- $keyPwKey  = $pwKey -}}
   {{- end -}}
-  {{- if and $keyPwName (eq (include "conduktor-gateway.envExists" (dict "envkey" "GATEWAY_SSL_KEY_PASSWORD" "context" .)) "false") -}}
+  {{- if $keyPwName -}}
     {{- $_ := set $vars "GATEWAY_SSL_KEY_PASSWORD" (dict "secretKeyRef" (dict "name" $keyPwName "key" $keyPwKey)) -}}
   {{- end -}}
 {{- end -}}
 {{- if .Values.tls.truststore.secretRef -}}
   {{- $_ := set $vars "GATEWAY_SSL_TRUST_STORE_PATH" (printf "/etc/gateway/truststore/%s" .Values.tls.truststore.keystoreFile) -}}
-  {{- $_ := set $vars "GATEWAY_SSL_TRUST_STORE_TYPE" "jks" -}}
+  {{- $_ := set $vars "GATEWAY_SSL_TRUST_STORE_TYPE" (include "conduktor-gateway.storeType" (dict "type" .Values.tls.truststore.type "key" .Values.tls.truststore.keystoreKey)) -}}
   {{- if .Values.tls.truststore.passwordSecretRef.name -}}
     {{- $tsPwKey := .Values.tls.truststore.passwordSecretRef.key | default "password" -}}
     {{- $ref := dict "secretKeyRef" (dict "name" .Values.tls.truststore.passwordSecretRef.name "key" $tsPwKey) -}}
@@ -312,7 +328,13 @@ Returns JSON.
     {{- end -}}
   {{- end -}}
 {{- end -}}
-{{- toJson $vars -}}
+{{- $notUserSet := dict -}}
+{{- range $name, $value := $vars -}}
+  {{- if eq (include "conduktor-gateway.envExists" (dict "envkey" $name "context" $)) "false" -}}
+    {{- $_ := set $notUserSet $name $value -}}
+  {{- end -}}
+{{- end -}}
+{{- toJson $notUserSet -}}
 {{- end -}}
 
 {{/*
