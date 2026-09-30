@@ -19,7 +19,7 @@ gateway:
         - "19092"
       advertisedHost: "kafka.example.com"
       advertisedHostPattern: "broker{{physicalCluster}}{{nodeId}}.{{advertisedHost}}"
-      bootstrapHostPattern: "bootstrap.kafka.example.com"
+      bootstrapHostPattern: "bootstrap.{{advertisedHost}}"
       sslClientAuth: "NONE"
   env:
     KAFKA_BOOTSTRAP_SERVERS: kafka.ct-gateway-deps.svc.cluster.local:9092
