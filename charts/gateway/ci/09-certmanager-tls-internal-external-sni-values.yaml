@@ -18,7 +18,7 @@ gateway:
       ports:
         - "19092"
       advertisedHost: "kafka.example.com"
-      advertisedHostPattern: "broker-{{nodeId}}.kafka.example.com"
+      advertisedHostPattern: "broker{{physicalCluster}}{{nodeId}}.{{advertisedHost}}"
       bootstrapHostPattern: "bootstrap.kafka.example.com"
       sslClientAuth: "NONE"
   env:

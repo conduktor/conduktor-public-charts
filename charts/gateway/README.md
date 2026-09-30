@@ -1264,8 +1264,10 @@ The chart automatically adds these SANs to the certificate:
 
 * Per-broker services: `<release>-gateway-broker-<N>.<namespace>.svc.cluster.local` (internal SNI)
 * Internal service FQDN: `<release>-gateway-internal.<namespace>.svc.cluster.local`
-* External bootstrap: value of `bootstrapHostPattern` (wildcard-expanded for `{{nodeId}}` patterns)
-* External per-broker wildcard from `advertisedHostPattern`
+* External bootstrap: value of `bootstrapHostPattern`
+* External per-broker wildcard from `advertisedHostPattern` (e.g. `broker-{{nodeId}}.{{advertisedHost}}` → `*.kafka.example.com`)
+
+In both patterns `{{advertisedHost}}` is substituted, and the label holding the other placeholders (`{{nodeId}}`, `{{physicalCluster}}`) becomes `*`. Placeholders must stay in the leftmost DNS label, since a certificate wildcard only covers one label.
 
 ##### Using a custom Issuer namespace or group
 
