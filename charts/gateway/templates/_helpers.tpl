@@ -326,6 +326,26 @@ Params:
 {{- end -}}
 
 {{/*
+Turn an external listener host pattern into a DNS SAN: {{advertisedHost}} is substituted,
+any label still holding a placeholder (e.g. {{nodeId}}, {{physicalCluster}}) becomes "*".
+A wildcard is only valid as the leftmost label (RFC 6125), so anything else fails.
+*/}}
+{{- define "conduktor-gateway.hostPatternToDnsName" -}}
+{{- $pattern := .pattern -}}
+{{- if .advertisedHost -}}
+  {{- $pattern = replace "{{advertisedHost}}" .advertisedHost $pattern -}}
+{{- end -}}
+{{- $labels := list -}}
+{{- range splitList "." $pattern -}}
+  {{- $labels = append $labels (ternary "*" . (contains "{{" .)) -}}
+{{- end -}}
+{{- if has "*" (rest $labels) -}}
+  {{- fail (printf "tls.certManager: cannot derive a valid certificate SAN from gateway.listeners.external.%s %q (resolved to %q): placeholders are only supported in the leftmost DNS label, and {{advertisedHost}} requires gateway.listeners.external.advertisedHost to be set. Use a pattern like \"broker{{physicalCluster}}{{nodeId}}.example.com\", or bring your own certificate with tls.enable." .key .pattern (join "." $labels)) -}}
+{{- end -}}
+{{- join "." $labels -}}
+{{- end -}}
+
+{{/*
 Derive the list of DNS SANs for the cert-manager Certificate resource.
 Auto-derives from listener config; user can append extras via tls.certManager.extraDnsNames.
 Returns a JSON array of strings.
@@ -351,22 +371,11 @@ Returns a JSON array of strings.
   {{- if $ext.advertisedHost -}}
     {{- $names = append $names $ext.advertisedHost -}}
   {{- end -}}
-  {{- if $ext.bootstrapHostPattern -}}
-    {{- $names = append $names $ext.bootstrapHostPattern -}}
-  {{- end -}}
-  {{- if and $ext.advertisedHostPattern (contains "{{nodeId}}" $ext.advertisedHostPattern) -}}
-    {{- $parts := splitList "." $ext.advertisedHostPattern -}}
-    {{- $wildcardParts := list -}}
-    {{- range $parts -}}
-      {{- if contains "{{nodeId}}" . -}}
-        {{- $wildcardParts = append $wildcardParts "*" -}}
-      {{- else -}}
-        {{- $wildcardParts = append $wildcardParts . -}}
-      {{- end -}}
+  {{- range $key := list "bootstrapHostPattern" "advertisedHostPattern" -}}
+    {{- $pattern := get $ext $key -}}
+    {{- if $pattern -}}
+      {{- $names = append $names (include "conduktor-gateway.hostPatternToDnsName" (dict "key" $key "pattern" $pattern "advertisedHost" $ext.advertisedHost)) -}}
     {{- end -}}
-    {{- $names = append $names (join "." $wildcardParts) -}}
-  {{- else if $ext.advertisedHostPattern -}}
-    {{- $names = append $names $ext.advertisedHostPattern -}}
   {{- end -}}
 {{- end -}}
 
