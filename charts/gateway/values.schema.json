@@ -655,7 +655,7 @@
                     "properties": {
                         "secretRef": {
                             "type": "string",
-                            "description": "Secret containing the JKS keystore file",
+                            "description": "Secret containing the JKS or PKCS12 keystore file",
                             "default": ""
                         },
                         "keystoreKey": {
@@ -667,6 +667,11 @@
                             "type": "string",
                             "description": "Filename to mount the keystore as",
                             "default": "keystore.jks"
+                        },
+                        "type": {
+                            "type": "string",
+                            "description": "Keystore type (`jks` or `pkcs12`). Leave empty to derive it from the tls.keystore.keystoreKey extension: `.p12`/`.pfx` is `pkcs12`, anything else `jks`. Ignored with tls.certManager.enabled, which always issues JKS",
+                            "default": ""
                         },
                         "passwordSecretRef": {
                             "type": "object",
@@ -705,7 +710,7 @@
                     "properties": {
                         "secretRef": {
                             "type": "string",
-                            "description": "Secret containing the JKS truststore file (manual path; leave empty to skip)",
+                            "description": "Secret containing the JKS or PKCS12 truststore file (manual path; leave empty to skip)",
                             "default": ""
                         },
                         "keystoreKey": {
@@ -717,6 +722,11 @@
                             "type": "string",
                             "description": "Filename to mount the truststore as (also used for cert-manager truststore path)",
                             "default": "truststore.jks"
+                        },
+                        "type": {
+                            "type": "string",
+                            "description": "Truststore type (`jks` or `pkcs12`). Leave empty to derive it from the tls.truststore.keystoreKey extension: `.p12`/`.pfx` is `pkcs12`, anything else `jks`. Ignored with tls.certManager.truststore.enabled, which always issues JKS",
+                            "default": ""
                         },
                         "passwordSecretRef": {
                             "type": "object",
