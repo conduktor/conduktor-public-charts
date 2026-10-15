@@ -269,9 +269,9 @@ platform:
   livenessProbe:
     enabled: true
     initialDelaySeconds: 60
-    periodSeconds: 10
+    periodSeconds: 30
     timeoutSeconds: 5
-    failureThreshold: 3
+    failureThreshold: 10
     successThreshold: 1
   ## @param platform.readinessProbe.enabled Enable readinessProbe on Conduktor Console containers
   ## @param platform.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
@@ -283,9 +283,9 @@ platform:
   readinessProbe:
     enabled: true
     initialDelaySeconds: 60
-    periodSeconds: 10
+    periodSeconds: 30
     timeoutSeconds: 5
-    failureThreshold: 3
+    failureThreshold: 10
     successThreshold: 1
   ## @param platform.startupProbe.enabled Enable startupProbe on Conduktor Console containers
   ## @param platform.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
@@ -296,8 +296,8 @@ platform:
   ##
   startupProbe:
     enabled: true
-    initialDelaySeconds: 10
-    periodSeconds: 10
+    initialDelaySeconds: 60
+    periodSeconds: 30
     timeoutSeconds: 5
     failureThreshold: 10
     successThreshold: 1

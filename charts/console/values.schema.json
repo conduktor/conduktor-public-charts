@@ -320,7 +320,7 @@
                         "periodSeconds": {
                             "type": "number",
                             "description": "Period seconds for livenessProbe",
-                            "default": 10
+                            "default": 30
                         },
                         "timeoutSeconds": {
                             "type": "number",
@@ -330,7 +330,7 @@
                         "failureThreshold": {
                             "type": "number",
                             "description": "Failure threshold for livenessProbe",
-                            "default": 3
+                            "default": 10
                         },
                         "successThreshold": {
                             "type": "number",
@@ -355,7 +355,7 @@
                         "periodSeconds": {
                             "type": "number",
                             "description": "Period seconds for readinessProbe",
-                            "default": 10
+                            "default": 30
                         },
                         "timeoutSeconds": {
                             "type": "number",
@@ -365,7 +365,7 @@
                         "failureThreshold": {
                             "type": "number",
                             "description": "Failure threshold for readinessProbe",
-                            "default": 3
+                            "default": 10
                         },
                         "successThreshold": {
                             "type": "number",
@@ -385,12 +385,12 @@
                         "initialDelaySeconds": {
                             "type": "number",
                             "description": "Initial delay seconds for startupProbe",
-                            "default": 10
+                            "default": 60
                         },
                         "periodSeconds": {
                             "type": "number",
                             "description": "Period seconds for startupProbe",
-                            "default": 10
+                            "default": 30
                         },
                         "timeoutSeconds": {
                             "type": "number",
