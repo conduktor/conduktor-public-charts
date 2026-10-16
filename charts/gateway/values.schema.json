@@ -745,6 +745,16 @@
                         }
                     }
                 },
+                "httpsAdminApi": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Also secure the HTTP Admin API with HTTPS using the same BYO keystore configured via tls.keystore. Only used when tls.enable is true. When true, GATEWAY_HTTPS_KEY_STORE_PATH and GATEWAY_HTTPS_KEY_STORE_PASSWORD are injected automatically. Has no effect when tls.certManager.enabled is true (use tls.certManager.httpsAdminApi.enabled instead).",
+                            "default": false
+                        }
+                    }
+                },
                 "certManager": {
                     "type": "object",
                     "properties": {
