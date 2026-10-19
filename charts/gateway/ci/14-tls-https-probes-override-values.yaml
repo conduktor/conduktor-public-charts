@@ -1,9 +1,5 @@
 nameOverride: gw-14
 
-# CUS-567: Customer uses external TLS termination (e.g. Istio) for the admin API
-# and needs Kafka-side SSL, but probes must stay HTTP because Gateway itself is
-# not serving HTTPS. httpsProbes: "false" forces HTTP probes regardless of the
-# GATEWAY_HTTPS_KEY_STORE_PATH env var that auto-detection would otherwise pick up.
 gateway:
   replicas: 1
   securityMode: "GATEWAY_MANAGED"
