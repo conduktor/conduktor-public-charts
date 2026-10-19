@@ -1,0 +1,56 @@
+nameOverride: gw-14
+
+# CUS-567: Customer uses external TLS termination (e.g. Istio) for the admin API
+# and needs Kafka-side SSL, but probes must stay HTTP because Gateway itself is
+# not serving HTTPS. httpsProbes: "false" forces HTTP probes regardless of the
+# GATEWAY_HTTPS_KEY_STORE_PATH env var that auto-detection would otherwise pick up.
+gateway:
+  replicas: 1
+  securityMode: "GATEWAY_MANAGED"
+  aclEnabled: "false"
+  listeners:
+    internal:
+      securityProtocol: SSL
+      routing: port
+      ports:
+        - "29092-29098"
+  env:
+    KAFKA_BOOTSTRAP_SERVERS: kafka.ct-gateway-deps.svc.cluster.local:9092
+    GATEWAY_CLUSTER_ID: "gw-14"
+  extraSecretEnvVars:
+    - name: GATEWAY_LICENSE_KEY
+      valueFrom:
+        secretKeyRef:
+          name: gateway-license
+          key: GATEWAY_LICENSE_KEY
+
+  admin:
+    httpsProbes: "false"
+
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+
+  volumes:
+    - name: tmp
+      emptyDir: {}
+  volumeMounts:
+    - name: tmp
+      mountPath: /tmp
+
+podSecurityContext:
+  runAsNonRoot: true
+
+tls:
+  enable: true
+  keystore:
+    secretRef: gateway-tls-keystore
+    keystoreKey: keystore.jks
+    keystoreFile: keystore.jks
+    passwordSecretRef:
+      name: gateway-tls-keystore-password
+      key: password
