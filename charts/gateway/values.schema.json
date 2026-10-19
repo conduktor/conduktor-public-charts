@@ -178,6 +178,11 @@
                             "type": "boolean",
                             "description": "Enable secured metrics using api users credentials. If `gateway.secretRef` is set, this can't be used by `metrics.prometheus` to automatically configure basic auth on scrapping.",
                             "default": true
+                        },
+                        "httpsProbes": {
+                            "type": "string",
+                            "description": "Override the health probe scheme. When empty (default), the scheme is inferred automatically: HTTPS if GATEWAY_HTTPS_KEY_STORE_PATH is configured, HTTP otherwise. Set to \"true\" to force HTTPS probes, or \"false\" to force HTTP probes regardless of TLS configuration (useful when TLS termination is handled externally by a proxy).",
+                            "default": ""
                         }
                     }
                 },
@@ -742,6 +747,16 @@
                                     "default": "password"
                                 }
                             }
+                        }
+                    }
+                },
+                "httpsAdminApi": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Also secure the HTTP Admin API with HTTPS using the same BYO keystore configured via tls.keystore. Only used when tls.enable is true. When true, GATEWAY_HTTPS_KEY_STORE_PATH and GATEWAY_HTTPS_KEY_STORE_PASSWORD are injected automatically. Has no effect when tls.certManager.enabled is true (use tls.certManager.httpsAdminApi.enabled instead).",
+                            "default": false
                         }
                     }
                 },

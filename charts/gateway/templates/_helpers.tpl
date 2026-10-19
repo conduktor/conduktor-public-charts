@@ -197,13 +197,22 @@ Params:
 Return admin api scheme http or https
 */}}
 {{- define "conduktor-gateway.adminAPIScheme" -}}
-  {{- $scheme := "http" -}}
-  {{- if eq (include "conduktor-gateway.envExists" (dict "envkey" "GATEWAY_HTTPS_KEY_STORE_PATH" "context" $)) "true"  -}}
-    {{- $scheme = "https" -}}
-  {{- else if and .Values.tls.certManager.enabled .Values.tls.certManager.httpsAdminApi.enabled -}}
-    {{- $scheme = "https" -}}
+  {{- $override := .Values.gateway.admin.httpsProbes | toString -}}
+  {{- if eq $override "true" -}}
+    {{- "https" -}}
+  {{- else if eq $override "false" -}}
+    {{- "http" -}}
+  {{- else -}}
+    {{- $scheme := "http" -}}
+    {{- if eq (include "conduktor-gateway.envExists" (dict "envkey" "GATEWAY_HTTPS_KEY_STORE_PATH" "context" $)) "true"  -}}
+      {{- $scheme = "https" -}}
+    {{- else if and .Values.tls.certManager.enabled .Values.tls.certManager.httpsAdminApi.enabled -}}
+      {{- $scheme = "https" -}}
+    {{- else if and .Values.tls.enable .Values.tls.httpsAdminApi.enabled (include "conduktor-gateway.keystoreSecretRef" .) -}}
+      {{- $scheme = "https" -}}
+    {{- end -}}
+    {{- $scheme -}}
   {{- end -}}
-  {{- $scheme -}}
 {{- end -}}
 
 {{/*
@@ -295,6 +304,20 @@ Returns JSON.
   {{- end -}}
   {{- if $keyPwName -}}
     {{- $_ := set $vars "GATEWAY_SSL_KEY_PASSWORD" (dict "secretKeyRef" (dict "name" $keyPwName "key" $keyPwKey)) -}}
+  {{- end -}}
+{{- end -}}
+{{- if and .Values.tls.enable .Values.tls.httpsAdminApi.enabled (include "conduktor-gateway.keystoreSecretRef" .) -}}
+  {{- $_ := set $vars "GATEWAY_HTTPS_KEY_STORE_PATH" (printf "/etc/gateway/tls/%s" $ksFile) -}}
+  {{- if .Values.tls.keystore.passwordSecretRef.name -}}
+    {{- $_ := set $vars "GATEWAY_HTTPS_KEY_STORE_PASSWORD" (dict "secretKeyRef" (dict "name" .Values.tls.keystore.passwordSecretRef.name "key" $pwKey)) -}}
+  {{- end -}}
+{{- end -}}
+{{- if and .Values.tls.truststore.secretRef .Values.tls.httpsAdminApi.enabled -}}
+  {{- $_ := set $vars "GATEWAY_HTTPS_TRUST_STORE_PATH" (printf "/etc/gateway/truststore/%s" .Values.tls.truststore.keystoreFile) -}}
+  {{- if .Values.tls.truststore.passwordSecretRef.name -}}
+    {{- $tsPwKey := .Values.tls.truststore.passwordSecretRef.key | default "password" -}}
+    {{- $ref := dict "secretKeyRef" (dict "name" .Values.tls.truststore.passwordSecretRef.name "key" $tsPwKey) -}}
+    {{- $_ := set $vars "GATEWAY_HTTPS_TRUST_STORE_PASSWORD" $ref -}}
   {{- end -}}
 {{- end -}}
 {{- if .Values.tls.truststore.secretRef -}}
@@ -415,6 +438,10 @@ Validate TLS configuration. Called unconditionally from NOTES.txt.
 
 {{- if and .Values.tls.enable .Values.tls.certManager.enabled -}}
   {{- fail "tls.enable and tls.certManager.enabled cannot both be true." -}}
+{{- end -}}
+
+{{- if and .Values.tls.httpsAdminApi.enabled .Values.tls.certManager.enabled -}}
+  {{- fail "tls.httpsAdminApi.enabled cannot be used with tls.certManager.enabled. Use tls.certManager.httpsAdminApi.enabled instead." -}}
 {{- end -}}
 
 {{- if and .Values.tls.certManager.httpsAdminApi.enabled (not .Values.tls.certManager.enabled) -}}
