@@ -102,6 +102,8 @@ gateway:
       password: "GATEWAY_ADMIN_PASSWORD"
     ## @param gateway.admin.securedMetrics Enable secured metrics using api users credentials. If `gateway.secretRef` is set, this can't be used by `metrics.prometheus` to automatically configure basic auth on scrapping.
     securedMetrics: true
+    ## @param gateway.admin.httpsProbes Override the health probe scheme. When empty (default), the scheme is inferred automatically: HTTPS if GATEWAY_HTTPS_KEY_STORE_PATH is configured, HTTP otherwise. Set to "true" to force HTTPS probes, or "false" to force HTTP probes regardless of TLS configuration (useful when TLS termination is handled externally by a proxy).
+    httpsProbes: ""
   jmx:
     ## @param gateway.jmx.enable Enable JMX JVM options
     enable: false

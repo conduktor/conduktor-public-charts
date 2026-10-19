@@ -178,6 +178,11 @@
                             "type": "boolean",
                             "description": "Enable secured metrics using api users credentials. If `gateway.secretRef` is set, this can't be used by `metrics.prometheus` to automatically configure basic auth on scrapping.",
                             "default": true
+                        },
+                        "httpsProbes": {
+                            "type": "string",
+                            "description": "Override the health probe scheme. When empty (default), the scheme is inferred automatically: HTTPS if GATEWAY_HTTPS_KEY_STORE_PATH is configured, HTTP otherwise. Set to \"true\" to force HTTPS probes, or \"false\" to force HTTP probes regardless of TLS configuration (useful when TLS termination is handled externally by a proxy).",
+                            "default": ""
                         }
                     }
                 },

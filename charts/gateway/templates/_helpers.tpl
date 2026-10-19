@@ -197,15 +197,22 @@ Params:
 Return admin api scheme http or https
 */}}
 {{- define "conduktor-gateway.adminAPIScheme" -}}
-  {{- $scheme := "http" -}}
-  {{- if eq (include "conduktor-gateway.envExists" (dict "envkey" "GATEWAY_HTTPS_KEY_STORE_PATH" "context" $)) "true"  -}}
-    {{- $scheme = "https" -}}
-  {{- else if and .Values.tls.certManager.enabled .Values.tls.certManager.httpsAdminApi.enabled -}}
-    {{- $scheme = "https" -}}
-  {{- else if and .Values.tls.enable .Values.tls.httpsAdminApi.enabled (include "conduktor-gateway.keystoreSecretRef" .) -}}
-    {{- $scheme = "https" -}}
+  {{- $override := .Values.gateway.admin.httpsProbes | toString -}}
+  {{- if eq $override "true" -}}
+    {{- "https" -}}
+  {{- else if eq $override "false" -}}
+    {{- "http" -}}
+  {{- else -}}
+    {{- $scheme := "http" -}}
+    {{- if eq (include "conduktor-gateway.envExists" (dict "envkey" "GATEWAY_HTTPS_KEY_STORE_PATH" "context" $)) "true"  -}}
+      {{- $scheme = "https" -}}
+    {{- else if and .Values.tls.certManager.enabled .Values.tls.certManager.httpsAdminApi.enabled -}}
+      {{- $scheme = "https" -}}
+    {{- else if and .Values.tls.enable .Values.tls.httpsAdminApi.enabled (include "conduktor-gateway.keystoreSecretRef" .) -}}
+      {{- $scheme = "https" -}}
+    {{- end -}}
+    {{- $scheme -}}
   {{- end -}}
-  {{- $scheme -}}
 {{- end -}}
 
 {{/*
