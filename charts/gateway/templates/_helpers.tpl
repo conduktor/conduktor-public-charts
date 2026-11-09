@@ -197,22 +197,15 @@ Params:
 Return admin api scheme http or https
 */}}
 {{- define "conduktor-gateway.adminAPIScheme" -}}
-  {{- $override := .Values.gateway.admin.httpsProbes | toString -}}
-  {{- if eq $override "true" -}}
-    {{- "https" -}}
-  {{- else if eq $override "false" -}}
-    {{- "http" -}}
-  {{- else -}}
-    {{- $scheme := "http" -}}
-    {{- if eq (include "conduktor-gateway.envExists" (dict "envkey" "GATEWAY_HTTPS_KEY_STORE_PATH" "context" $)) "true"  -}}
-      {{- $scheme = "https" -}}
-    {{- else if and .Values.tls.certManager.enabled .Values.tls.certManager.httpsAdminApi.enabled -}}
-      {{- $scheme = "https" -}}
-    {{- else if and .Values.tls.enable .Values.tls.httpsAdminApi.enabled (include "conduktor-gateway.keystoreSecretRef" .) -}}
-      {{- $scheme = "https" -}}
-    {{- end -}}
-    {{- $scheme -}}
+  {{- $scheme := "http" -}}
+  {{- if eq (include "conduktor-gateway.envExists" (dict "envkey" "GATEWAY_HTTPS_KEY_STORE_PATH" "context" $)) "true"  -}}
+    {{- $scheme = "https" -}}
+  {{- else if and .Values.tls.certManager.enabled .Values.tls.certManager.httpsAdminApi.enabled -}}
+    {{- $scheme = "https" -}}
+  {{- else if and .Values.tls.api.enabled .Values.tls.api.keystore.secretRef -}}
+    {{- $scheme = "https" -}}
   {{- end -}}
+  {{- $scheme -}}
 {{- end -}}
 
 {{/*
@@ -306,17 +299,22 @@ Returns JSON.
     {{- $_ := set $vars "GATEWAY_SSL_KEY_PASSWORD" (dict "secretKeyRef" (dict "name" $keyPwName "key" $keyPwKey)) -}}
   {{- end -}}
 {{- end -}}
-{{- if and .Values.tls.enable .Values.tls.httpsAdminApi.enabled (include "conduktor-gateway.keystoreSecretRef" .) -}}
-  {{- $_ := set $vars "GATEWAY_HTTPS_KEY_STORE_PATH" (printf "/etc/gateway/tls/%s" $ksFile) -}}
-  {{- if .Values.tls.keystore.passwordSecretRef.name -}}
-    {{- $_ := set $vars "GATEWAY_HTTPS_KEY_STORE_PASSWORD" (dict "secretKeyRef" (dict "name" .Values.tls.keystore.passwordSecretRef.name "key" $pwKey)) -}}
+{{- if and .Values.tls.api.enabled .Values.tls.api.keystore.secretRef -}}
+  {{- $apiKsFile := .Values.tls.api.keystore.keystoreFile | default "keystore.jks" -}}
+  {{- $apiPwKey  := .Values.tls.api.keystore.passwordSecretRef.key | default "password" -}}
+  {{- $_ := set $vars "GATEWAY_HTTPS_KEY_STORE_PATH" (printf "/etc/gateway/tls-api/%s" $apiKsFile) -}}
+  {{- $_ := set $vars "GATEWAY_HTTPS_KEY_TYPE" (include "conduktor-gateway.storeType" (dict "type" .Values.tls.api.keystore.type "key" .Values.tls.api.keystore.keystoreKey)) -}}
+  {{- if .Values.tls.api.keystore.passwordSecretRef.name -}}
+    {{- $_ := set $vars "GATEWAY_HTTPS_KEY_STORE_PASSWORD" (dict "secretKeyRef" (dict "name" .Values.tls.api.keystore.passwordSecretRef.name "key" $apiPwKey)) -}}
   {{- end -}}
 {{- end -}}
-{{- if and .Values.tls.truststore.secretRef .Values.tls.httpsAdminApi.enabled -}}
-  {{- $_ := set $vars "GATEWAY_HTTPS_TRUST_STORE_PATH" (printf "/etc/gateway/truststore/%s" .Values.tls.truststore.keystoreFile) -}}
-  {{- if .Values.tls.truststore.passwordSecretRef.name -}}
-    {{- $tsPwKey := .Values.tls.truststore.passwordSecretRef.key | default "password" -}}
-    {{- $ref := dict "secretKeyRef" (dict "name" .Values.tls.truststore.passwordSecretRef.name "key" $tsPwKey) -}}
+{{- if and .Values.tls.api.enabled .Values.tls.api.truststore.secretRef -}}
+  {{- $apiTsFile  := .Values.tls.api.truststore.keystoreFile | default "truststore.jks" -}}
+  {{- $apiTsPwKey := .Values.tls.api.truststore.passwordSecretRef.key | default "password" -}}
+  {{- $_ := set $vars "GATEWAY_HTTPS_TRUST_STORE_PATH" (printf "/etc/gateway/tls-api-truststore/%s" $apiTsFile) -}}
+  {{- $_ := set $vars "GATEWAY_HTTPS_TRUST_STORE_TYPE" (include "conduktor-gateway.storeType" (dict "type" .Values.tls.api.truststore.type "key" .Values.tls.api.truststore.keystoreKey)) -}}
+  {{- if .Values.tls.api.truststore.passwordSecretRef.name -}}
+    {{- $ref := dict "secretKeyRef" (dict "name" .Values.tls.api.truststore.passwordSecretRef.name "key" $apiTsPwKey) -}}
     {{- $_ := set $vars "GATEWAY_HTTPS_TRUST_STORE_PASSWORD" $ref -}}
   {{- end -}}
 {{- end -}}
@@ -440,8 +438,8 @@ Validate TLS configuration. Called unconditionally from NOTES.txt.
   {{- fail "tls.enable and tls.certManager.enabled cannot both be true." -}}
 {{- end -}}
 
-{{- if and .Values.tls.httpsAdminApi.enabled .Values.tls.certManager.enabled -}}
-  {{- fail "tls.httpsAdminApi.enabled cannot be used with tls.certManager.enabled. Use tls.certManager.httpsAdminApi.enabled instead." -}}
+{{- if and .Values.tls.api.enabled .Values.tls.certManager.enabled -}}
+  {{- fail "tls.api.enabled cannot be used with tls.certManager.enabled. Use tls.certManager.httpsAdminApi.enabled instead." -}}
 {{- end -}}
 
 {{- if and .Values.tls.certManager.httpsAdminApi.enabled (not .Values.tls.certManager.enabled) -}}

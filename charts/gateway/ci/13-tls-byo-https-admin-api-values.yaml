@@ -47,5 +47,12 @@ tls:
     passwordSecretRef:
       name: gateway-tls-keystore-password
       key: password
-  httpsAdminApi:
+  api:
     enabled: true
+    keystore:
+      secretRef: gateway-api-tls-keystore
+      keystoreKey: keystore.jks
+      keystoreFile: keystore.jks
+      passwordSecretRef:
+        name: gateway-api-tls-keystore-password
+        key: password
