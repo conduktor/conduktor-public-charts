@@ -160,6 +160,16 @@ spec:
               mountPath: /etc/gateway/truststore/
               readOnly: true
             {{- end }}
+            {{- if and .Values.tls.api.enabled .Values.tls.api.keystore.secretRef }}
+            - name: tls-api-keystore
+              mountPath: /etc/gateway/tls-api/
+              readOnly: true
+            {{- end }}
+            {{- if and .Values.tls.api.enabled .Values.tls.api.truststore.secretRef }}
+            - name: tls-api-truststore
+              mountPath: /etc/gateway/tls-api-truststore/
+              readOnly: true
+            {{- end }}
             - name: config
               mountPath: /etc/gateway/config
           {{- if .Values.gateway.customStartupProbe }}
@@ -270,6 +280,22 @@ spec:
             items:
             - key: {{ .Values.tls.truststore.keystoreKey }}
               path: {{ .Values.tls.truststore.keystoreFile }}
+        {{- end }}
+        {{- if and .Values.tls.api.enabled .Values.tls.api.keystore.secretRef }}
+        - name: tls-api-keystore
+          secret:
+            secretName: {{ .Values.tls.api.keystore.secretRef }}
+            items:
+            - key: {{ .Values.tls.api.keystore.keystoreKey }}
+              path: {{ .Values.tls.api.keystore.keystoreFile }}
+        {{- end }}
+        {{- if and .Values.tls.api.enabled .Values.tls.api.truststore.secretRef }}
+        - name: tls-api-truststore
+          secret:
+            secretName: {{ .Values.tls.api.truststore.secretRef }}
+            items:
+            - key: {{ .Values.tls.api.truststore.keystoreKey }}
+              path: {{ .Values.tls.api.truststore.keystoreFile }}
         {{- end }}
         - name: config
           configMap:

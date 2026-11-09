@@ -379,6 +379,37 @@ tls:
     passwordSecretRef:
       name: ""
       key: "password"
+  ## @param tls.api.enabled Enable HTTPS on the Gateway Admin API using a dedicated BYO keystore. Independent from tls.enable (Kafka TCP TLS). When true, GATEWAY_HTTPS_KEY_STORE_PATH and GATEWAY_HTTPS_KEY_STORE_PASSWORD are injected from tls.api.keystore. Has no effect when tls.certManager.enabled is true (use tls.certManager.httpsAdminApi.enabled instead).
+  ## @param tls.api.keystore.secretRef Secret containing the JKS or PKCS12 keystore file for the Admin API
+  ## @param tls.api.keystore.keystoreKey Key in the keystore secret
+  ## @param tls.api.keystore.keystoreFile Filename to mount the keystore as
+  ## @param tls.api.keystore.type Keystore type (`jks` or `pkcs12`). Leave empty to derive from the keystoreKey extension.
+  ## @param tls.api.keystore.passwordSecretRef.name Secret containing the keystore password
+  ## @param tls.api.keystore.passwordSecretRef.key Key in the password secret
+  ## @param tls.api.truststore.secretRef Secret containing the JKS or PKCS12 truststore file for the Admin API (optional)
+  ## @param tls.api.truststore.keystoreKey Key in the truststore secret
+  ## @param tls.api.truststore.keystoreFile Filename to mount the truststore as
+  ## @param tls.api.truststore.type Truststore type (`jks` or `pkcs12`). Leave empty to derive from the keystoreKey extension.
+  ## @param tls.api.truststore.passwordSecretRef.name Secret containing the truststore password (optional)
+  ## @param tls.api.truststore.passwordSecretRef.key Key in the truststore password secret
+  api:
+    enabled: false
+    keystore:
+      secretRef: ""
+      keystoreKey: keystore.jks
+      keystoreFile: keystore.jks
+      type: ""
+      passwordSecretRef:
+        name: ""
+        key: "password"
+    truststore:
+      secretRef: ""
+      keystoreKey: truststore.jks
+      keystoreFile: truststore.jks
+      type: ""
+      passwordSecretRef:
+        name: ""
+        key: "password"
   ## @param tls.certManager.enabled Enable cert-manager integration using native JKS keystore generation (requires cert-manager >= 0.15)
   ## @param tls.certManager.issuerRef.name cert-manager Issuer or ClusterIssuer name
   ## @param tls.certManager.issuerRef.kind Issuer kind — Issuer or ClusterIssuer
