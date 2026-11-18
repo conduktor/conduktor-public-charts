@@ -112,13 +112,14 @@ gateway:
   ## @section Legacy single listener (portRange) configuration — DEPRECATED
   ## @descriptionStart
   ## Single listener mode driven by gateway.portRange. DEPRECATED since chart 3.21.0 — multi-listener
-  ## mode (gateway.listeners) is now the default. Existing installs upgrading from a previous chart
-  ## version that relied on portRange MUST set gateway.portRange.enable: true to keep the legacy
-  ## behavior, otherwise the chart switches to multi-listener mode and will likely break the
-  ## existing service ports. The entire portRange block will be removed in a future chart release.
+  ## mode (gateway.listeners) is the default. Gateway 3.23.0 and later refuse to start in this mode,
+  ## and the chart fails at install / upgrade when it is enabled with such an image. Existing installs
+  ## that relied on portRange must migrate to gateway.listeners, see
+  ## https://docs.conduktor.io/guide/tutorials/migrate-to-listener-configuration#kubernetes-helm-chart.
+  ## The entire portRange block will be removed in a future chart release.
   ## @descriptionEnd
   portRange:
-    ## @param gateway.portRange.enable DEPRECATED. Opt back into legacy single listener mode driven by gateway.portRange.start / count. When false (default), multi-listener mode (gateway.listeners) is used. Will be removed alongside gateway.portRange in a future chart release.
+    ## @param gateway.portRange.enable DEPRECATED. Legacy single listener mode driven by gateway.portRange.start / count, not supported by Gateway 3.23.0 and later. When false (default), multi-listener mode (gateway.listeners) is used. Will be removed alongside gateway.portRange in a future chart release.
     enable: false
     ## @param gateway.portRange.start DEPRECATED. Start port of the gateway port range (single listener mode). Only used when gateway.portRange.enable is true.
     start: 9092
@@ -130,11 +131,10 @@ gateway:
   ## and gateway.listeners.external drive all listener env var generation. Each listener can be fully
   ## enabled/disabled via its own `enable` flag (internal defaults to `true`, external to `false`); at least
   ## one listener must stay enabled. The deprecated `service.external.enable` still works as an alias for
-  ## `gateway.listeners.external.enable`. To opt back into the legacy single listener portRange mode, set
-  ## gateway.portRange.enable: true (DEPRECATED).
+  ## `gateway.listeners.external.enable`.
   ## @descriptionEnd
   preview:
-    ## @param gateway.preview.listeners DEPRECATED. Backward-compatibility alias from when multi-listeners was a preview feature. Setting this to false is equivalent to gateway.portRange.enable: true (legacy single listener mode). Leave unset on new installs.
+    ## @param gateway.preview.listeners DEPRECATED. Backward-compatibility alias from when multi-listeners was a preview feature. Setting this to false enables legacy single listener mode, like gateway.portRange.enable: true, and is not supported by Gateway 3.23.0 and later. Leave unset.
     listeners: true
   ## @param gateway.securityMode Gateway security mode: GATEWAY_MANAGED or KAFKA_MANAGED. Only used in multi-listener mode. Emitted as GATEWAY_SECURITY_MODE (gateway.env.GATEWAY_SECURITY_MODE takes precedence if set).
   securityMode: "GATEWAY_MANAGED"

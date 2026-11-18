@@ -206,7 +206,7 @@
                     "properties": {
                         "enable": {
                             "type": "boolean",
-                            "description": "DEPRECATED. Opt back into legacy single listener mode driven by gateway.portRange.start / count. When false (default), multi-listener mode (gateway.listeners) is used. Will be removed alongside gateway.portRange in a future chart release.",
+                            "description": "DEPRECATED. Legacy single listener mode driven by gateway.portRange.start / count, not supported by Gateway 3.23.0 and later. When false (default), multi-listener mode (gateway.listeners) is used. Will be removed alongside gateway.portRange in a future chart release.",
                             "default": false
                         },
                         "start": {
@@ -226,7 +226,7 @@
                     "properties": {
                         "listeners": {
                             "type": "boolean",
-                            "description": "DEPRECATED. Backward-compatibility alias from when multi-listeners was a preview feature. Setting this to false is equivalent to gateway.portRange.enable: true (legacy single listener mode). Leave unset on new installs.",
+                            "description": "DEPRECATED. Backward-compatibility alias from when multi-listeners was a preview feature. Setting this to false enables legacy single listener mode, like gateway.portRange.enable: true, and is not supported by Gateway 3.23.0 and later. Leave unset.",
                             "default": true
                         }
                     }
