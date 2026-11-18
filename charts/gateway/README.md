@@ -91,7 +91,7 @@ This section contains configuration of the Conduktor Gateway.
 
 ### Legacy single listener (portRange) configuration — DEPRECATED
 
-Single listener mode driven by gateway.portRange. DEPRECATED since chart 3.20.0 — multi-listener
+Single listener mode driven by gateway.portRange. DEPRECATED since chart 3.21.0 — multi-listener
 mode (gateway.listeners) is now the default. Existing installs upgrading from a previous chart
 version that relied on portRange MUST set gateway.portRange.enable: true to keep the legacy
 behavior, otherwise the chart switches to multi-listener mode and will likely break the
@@ -105,7 +105,7 @@ existing service ports. The entire portRange block will be removed in a future c
 
 ### Multi-listeners mode
 
-Multi-listeners API (Gateway >= v3.20). Active by default since chart 3.20.0 — gateway.listeners.internal
+Multi-listeners API (Gateway >= v3.20). Active by default since chart 3.21.0 — gateway.listeners.internal
 and gateway.listeners.external drive all listener env var generation. Each listener can be fully
 enabled/disabled via its own `enable` flag (internal defaults to `true`, external to `false`); at least
 one listener must stay enabled. The deprecated `service.external.enable` still works as an alias for
@@ -974,10 +974,10 @@ kubectl debug -n conduktor $GATEWAY_POD_NAME \
 
 ### Multi-listeners
 
-Multi-listeners mode gives explicit control over listener configuration through dedicated internal and external listeners instead of the single listener port-range approach. **Multi-listeners is the default since chart 3.20.0** — no opt-in flag is required.
+Multi-listeners mode gives explicit control over listener configuration through dedicated internal and external listeners instead of the single listener port-range approach. **Multi-listeners is the default since chart 3.21.0** — no opt-in flag is required.
 
 > [!IMPORTANT]
-> **Upgrading from a chart version prior to 3.20.0?**
+> **Upgrading from a chart version prior to 3.21.0?**
 > If your previous install relied on `gateway.portRange` (the legacy single listener mode) you MUST set `gateway.portRange.enable: true` before upgrading, otherwise the chart switches to multi-listener mode and the rendered Services / ports will no longer match the configuration your clients expect.
 > The legacy mode is preserved for backward compatibility but is now **deprecated** and will be removed in a future chart release. See [Migrating from single listener portRange to multi-listeners](#migrating-from-single-listener-portrange-to-multi-listeners) below.
 >
@@ -1383,7 +1383,7 @@ Disable the legacy opt-in (`gateway.portRange.enable: false` — or simply omit 
 ```yaml
 gateway:
   portRange:
-    enable: false                         # opt out of the legacy single-listener mode (default since 3.20.0)
+    enable: false                         # opt out of the legacy single-listener mode (default since 3.21.0)
   securityMode: "GATEWAY_MANAGED"
   kafka:
     brokerIds:

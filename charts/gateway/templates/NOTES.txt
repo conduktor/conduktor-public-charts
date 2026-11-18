@@ -137,7 +137,7 @@ NOTE: GATEWAY_ACL_ENABLED is set in gateway.env. It is being used as the effecti
 
 {{ include "conduktor-gateway.deprecationBanner" "gateway.portRange / legacy single listener mode" }}
   You are running the chart in legacy single listener (portRange) mode. This mode
-  is DEPRECATED as of chart 3.20.0 and will be REMOVED in a future release.
+  is DEPRECATED as of chart 3.21.0 and will be REMOVED in a future release.
 
   Triggered by:
 {{- if .Values.gateway.portRange.enable }}

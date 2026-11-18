@@ -111,7 +111,7 @@ gateway:
     jvmArgs: -Dcom.sun.management.jmxremote.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.rmi.port={{ .Values.gateway.jmx.port }} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1
   ## @section Legacy single listener (portRange) configuration — DEPRECATED
   ## @descriptionStart
-  ## Single listener mode driven by gateway.portRange. DEPRECATED since chart 3.20.0 — multi-listener
+  ## Single listener mode driven by gateway.portRange. DEPRECATED since chart 3.21.0 — multi-listener
   ## mode (gateway.listeners) is now the default. Existing installs upgrading from a previous chart
   ## version that relied on portRange MUST set gateway.portRange.enable: true to keep the legacy
   ## behavior, otherwise the chart switches to multi-listener mode and will likely break the
@@ -126,7 +126,7 @@ gateway:
     count: 7
   ## @section Multi-listeners mode
   ## @descriptionStart
-  ## Multi-listeners API (Gateway >= v3.20). Active by default since chart 3.20.0 — gateway.listeners.internal
+  ## Multi-listeners API (Gateway >= v3.20). Active by default since chart 3.21.0 — gateway.listeners.internal
   ## and gateway.listeners.external drive all listener env var generation. Each listener can be fully
   ## enabled/disabled via its own `enable` flag (internal defaults to `true`, external to `false`); at least
   ## one listener must stay enabled. The deprecated `service.external.enable` still works as an alias for
