@@ -47,12 +47,10 @@ tls:
     passwordSecretRef:
       name: gateway-tls-keystore-password
       key: password
-  api:
+  # Dedicated admin API keystore. It reuses the CI keystore secret: test-config.yaml has no second one.
+  adminApi:
     enabled: true
     keystore:
-      secretRef: gateway-api-tls-keystore
-      keystoreKey: keystore.jks
-      keystoreFile: keystore.jks
+      secretRef: gateway-tls-keystore
       passwordSecretRef:
-        name: gateway-api-tls-keystore-password
-        key: password
+        name: gateway-tls-keystore-password

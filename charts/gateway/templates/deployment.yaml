@@ -155,20 +155,21 @@ spec:
               mountPath: /etc/gateway/tls/
               readOnly: true
             {{- end }}
-            {{- if and .Values.tls.truststore.secretRef (not (and .Values.tls.certManager.enabled .Values.tls.certManager.truststore.enabled)) }}
+            {{- if eq (include "conduktor-gateway.mountsTruststore" .) "true" }}
             - name: truststore
               mountPath: /etc/gateway/truststore/
               readOnly: true
             {{- end }}
-            {{- if and .Values.tls.api.enabled .Values.tls.api.keystore.secretRef }}
-            - name: tls-api-keystore
-              mountPath: /etc/gateway/tls-api/
+            {{- range $api, $_ := include "conduktor-gateway.httpsApis" . | fromJson }}
+            {{- if (index $.Values.tls $api).enabled }}
+            {{- range $kind := list "keystore" "truststore" }}
+            {{- if (index $.Values.tls $api $kind).secretRef }}
+            - name: {{ include "conduktor-gateway.httpsStoreVolume" (dict "api" $api "kind" $kind) }}
+              mountPath: /etc/gateway/{{ include "conduktor-gateway.httpsStoreVolume" (dict "api" $api "kind" $kind) }}/
               readOnly: true
             {{- end }}
-            {{- if and .Values.tls.api.enabled .Values.tls.api.truststore.secretRef }}
-            - name: tls-api-truststore
-              mountPath: /etc/gateway/tls-api-truststore/
-              readOnly: true
+            {{- end }}
+            {{- end }}
             {{- end }}
             - name: config
               mountPath: /etc/gateway/config
@@ -273,7 +274,7 @@ spec:
               path: {{ .Values.tls.truststore.keystoreFile }}
             {{- end }}
         {{- end }}
-        {{- if and .Values.tls.truststore.secretRef (not (and .Values.tls.certManager.enabled .Values.tls.certManager.truststore.enabled)) }}
+        {{- if eq (include "conduktor-gateway.mountsTruststore" .) "true" }}
         - name: truststore
           secret:
             secretName: {{ .Values.tls.truststore.secretRef }}
@@ -281,21 +282,20 @@ spec:
             - key: {{ .Values.tls.truststore.keystoreKey }}
               path: {{ .Values.tls.truststore.keystoreFile }}
         {{- end }}
-        {{- if and .Values.tls.api.enabled .Values.tls.api.keystore.secretRef }}
-        - name: tls-api-keystore
+        {{- range $api, $_ := include "conduktor-gateway.httpsApis" . | fromJson }}
+        {{- if (index $.Values.tls $api).enabled }}
+        {{- range $kind := list "keystore" "truststore" }}
+        {{- $store := index $.Values.tls $api $kind }}
+        {{- if $store.secretRef }}
+        - name: {{ include "conduktor-gateway.httpsStoreVolume" (dict "api" $api "kind" $kind) }}
           secret:
-            secretName: {{ .Values.tls.api.keystore.secretRef }}
+            secretName: {{ $store.secretRef }}
             items:
-            - key: {{ .Values.tls.api.keystore.keystoreKey }}
-              path: {{ .Values.tls.api.keystore.keystoreFile }}
+            - key: {{ $store.keystoreKey }}
+              path: {{ $store.keystoreFile }}
         {{- end }}
-        {{- if and .Values.tls.api.enabled .Values.tls.api.truststore.secretRef }}
-        - name: tls-api-truststore
-          secret:
-            secretName: {{ .Values.tls.api.truststore.secretRef }}
-            items:
-            - key: {{ .Values.tls.api.truststore.keystoreKey }}
-              path: {{ .Values.tls.api.truststore.keystoreFile }}
+        {{- end }}
+        {{- end }}
         {{- end }}
         - name: config
           configMap:

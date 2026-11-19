@@ -202,10 +202,57 @@ Return admin api scheme http or https
     {{- $scheme = "https" -}}
   {{- else if and .Values.tls.certManager.enabled .Values.tls.certManager.httpsAdminApi.enabled -}}
     {{- $scheme = "https" -}}
-  {{- else if and .Values.tls.api.enabled .Values.tls.api.keystore.secretRef -}}
+  {{- else if .Values.tls.adminApi.enabled -}}
     {{- $scheme = "https" -}}
   {{- end -}}
   {{- $scheme -}}
+{{- end -}}
+
+{{/*
+HTTPS APIs with their own bring-your-own TLS settings under tls.<api>, mapped to their Gateway env var prefix.
+Returns JSON.
+*/}}
+{{- define "conduktor-gateway.httpsApis" -}}
+{{- dict "adminApi" "GATEWAY_HTTPS" | toJson -}}
+{{- end -}}
+
+{{/*
+Name of the volume holding an HTTPS API's own keystore or truststore, also its directory under /etc/gateway/.
+Params: api (e.g. "adminApi"), kind ("keystore" or "truststore").
+*/}}
+{{- define "conduktor-gateway.httpsStoreVolume" -}}
+{{- printf "%s-%s" (kebabcase .api) .kind -}}
+{{- end -}}
+
+{{/*
+Whether the bring-your-own tls.truststore is mounted at /etc/gateway/truststore/ (the cert-manager truststore replaces it).
+*/}}
+{{- define "conduktor-gateway.mountsTruststore" -}}
+{{- and .Values.tls.truststore.secretRef (not (and .Values.tls.certManager.enabled .Values.tls.certManager.truststore.enabled)) | toString -}}
+{{- end -}}
+
+{{/*
+Resolve the keystore or truststore an HTTPS API serves with: its own tls.<api>.<kind> when secretRef is set,
+otherwise the Kafka listeners' one (tls.keystore with tls.enable, or the mounted tls.truststore).
+Params: api, kind ("keystore" or "truststore"), context.
+Returns JSON {"path": ..., "passwordSecretRef": {...}}, or {} when there is none.
+*/}}
+{{- define "conduktor-gateway.httpsStore" -}}
+{{- $ctx := .context -}}
+{{- $own := index $ctx.Values.tls .api .kind -}}
+{{- if $own.secretRef -}}
+  {{- dict "path" (printf "/etc/gateway/%s/%s" (include "conduktor-gateway.httpsStoreVolume" .) $own.keystoreFile) "passwordSecretRef" $own.passwordSecretRef | toJson -}}
+{{- else if eq .kind "keystore" -}}
+  {{- if and $ctx.Values.tls.enable (include "conduktor-gateway.keystoreSecretRef" $ctx) -}}
+    {{- dict "path" (printf "/etc/gateway/tls/%s" (include "conduktor-gateway.keystoreFile" $ctx)) "passwordSecretRef" $ctx.Values.tls.keystore.passwordSecretRef | toJson -}}
+  {{- else -}}
+    {{- dict | toJson -}}
+  {{- end -}}
+{{- else if eq (include "conduktor-gateway.mountsTruststore" $ctx) "true" -}}
+  {{- dict "path" (printf "/etc/gateway/truststore/%s" $ctx.Values.tls.truststore.keystoreFile) "passwordSecretRef" $ctx.Values.tls.truststore.passwordSecretRef | toJson -}}
+{{- else -}}
+  {{- dict | toJson -}}
+{{- end -}}
 {{- end -}}
 
 {{/*
@@ -267,9 +314,10 @@ Build a dict of GATEWAY_SSL_* / GATEWAY_HTTPS_* env vars to inject into the cont
 Plain-string values are stored as strings; secretKeyRef values are stored as a map
   {"secretKeyRef": {"name": "...", "key": "..."}}
 so that the caller can dispatch on kind (see deployment.yaml tlsEnvVars range block).
-Two code paths:
+Code paths:
   - tls.enable        : user-supplied JKS or PKCS12 keystore secret
   - tls.certManager.* : cert-manager-issued JKS (password always from the auto/user-supplied secret)
+  - tls.<httpsApi>.*  : HTTPS API stores (see httpsApis), each falling back to the tls.enable one
 Values already set through gateway.env or gateway.extraSecretEnvVars are left alone: gateway.env
 lands in a ConfigMap consumed via envFrom, which an entry in the container's env list would silently
 override.
@@ -299,23 +347,17 @@ Returns JSON.
     {{- $_ := set $vars "GATEWAY_SSL_KEY_PASSWORD" (dict "secretKeyRef" (dict "name" $keyPwName "key" $keyPwKey)) -}}
   {{- end -}}
 {{- end -}}
-{{- if and .Values.tls.api.enabled .Values.tls.api.keystore.secretRef -}}
-  {{- $apiKsFile := .Values.tls.api.keystore.keystoreFile | default "keystore.jks" -}}
-  {{- $apiPwKey  := .Values.tls.api.keystore.passwordSecretRef.key | default "password" -}}
-  {{- $_ := set $vars "GATEWAY_HTTPS_KEY_STORE_PATH" (printf "/etc/gateway/tls-api/%s" $apiKsFile) -}}
-  {{- $_ := set $vars "GATEWAY_HTTPS_KEY_TYPE" (include "conduktor-gateway.storeType" (dict "type" .Values.tls.api.keystore.type "key" .Values.tls.api.keystore.keystoreKey)) -}}
-  {{- if .Values.tls.api.keystore.passwordSecretRef.name -}}
-    {{- $_ := set $vars "GATEWAY_HTTPS_KEY_STORE_PASSWORD" (dict "secretKeyRef" (dict "name" .Values.tls.api.keystore.passwordSecretRef.name "key" $apiPwKey)) -}}
-  {{- end -}}
-{{- end -}}
-{{- if and .Values.tls.api.enabled .Values.tls.api.truststore.secretRef -}}
-  {{- $apiTsFile  := .Values.tls.api.truststore.keystoreFile | default "truststore.jks" -}}
-  {{- $apiTsPwKey := .Values.tls.api.truststore.passwordSecretRef.key | default "password" -}}
-  {{- $_ := set $vars "GATEWAY_HTTPS_TRUST_STORE_PATH" (printf "/etc/gateway/tls-api-truststore/%s" $apiTsFile) -}}
-  {{- $_ := set $vars "GATEWAY_HTTPS_TRUST_STORE_TYPE" (include "conduktor-gateway.storeType" (dict "type" .Values.tls.api.truststore.type "key" .Values.tls.api.truststore.keystoreKey)) -}}
-  {{- if .Values.tls.api.truststore.passwordSecretRef.name -}}
-    {{- $ref := dict "secretKeyRef" (dict "name" .Values.tls.api.truststore.passwordSecretRef.name "key" $apiTsPwKey) -}}
-    {{- $_ := set $vars "GATEWAY_HTTPS_TRUST_STORE_PASSWORD" $ref -}}
+{{- range $api, $prefix := include "conduktor-gateway.httpsApis" . | fromJson -}}
+  {{- if (index $.Values.tls $api).enabled -}}
+    {{- range $kind, $storeVar := dict "keystore" "KEY_STORE" "truststore" "TRUST_STORE" -}}
+      {{- $store := include "conduktor-gateway.httpsStore" (dict "api" $api "kind" $kind "context" $) | fromJson -}}
+      {{- if $store.path -}}
+        {{- $_ := set $vars (printf "%s_%s_PATH" $prefix $storeVar) $store.path -}}
+        {{- if $store.passwordSecretRef.name -}}
+          {{- $_ := set $vars (printf "%s_%s_PASSWORD" $prefix $storeVar) (dict "secretKeyRef" (dict "name" $store.passwordSecretRef.name "key" ($store.passwordSecretRef.key | default "password"))) -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
   {{- end -}}
 {{- end -}}
 {{- if .Values.tls.truststore.secretRef -}}
@@ -438,8 +480,12 @@ Validate TLS configuration. Called unconditionally from NOTES.txt.
   {{- fail "tls.enable and tls.certManager.enabled cannot both be true." -}}
 {{- end -}}
 
-{{- if and .Values.tls.api.enabled .Values.tls.certManager.enabled -}}
-  {{- fail "tls.api.enabled cannot be used with tls.certManager.enabled. Use tls.certManager.httpsAdminApi.enabled instead." -}}
+{{- if .Values.tls.adminApi.enabled -}}
+  {{- if .Values.tls.certManager.enabled -}}
+    {{- fail "tls.adminApi.enabled cannot be used with tls.certManager.enabled. Use tls.certManager.httpsAdminApi.enabled instead." -}}
+  {{- else if not (include "conduktor-gateway.httpsStore" (dict "api" "adminApi" "kind" "keystore" "context" .) | fromJson).path -}}
+    {{- fail "tls.adminApi.enabled requires tls.adminApi.keystore.secretRef, or tls.enable with tls.keystore.secretRef to reuse the Kafka keystore." -}}
+  {{- end -}}
 {{- end -}}
 
 {{- if and .Values.tls.certManager.httpsAdminApi.enabled (not .Values.tls.certManager.enabled) -}}

@@ -745,12 +745,12 @@
                         }
                     }
                 },
-                "api": {
+                "adminApi": {
                     "type": "object",
                     "properties": {
                         "enabled": {
                             "type": "boolean",
-                            "description": "Enable HTTPS on the Gateway Admin API using a dedicated BYO keystore. Independent from tls.enable (Kafka TCP TLS). When true, GATEWAY_HTTPS_KEY_STORE_PATH and GATEWAY_HTTPS_KEY_STORE_PASSWORD are injected from tls.api.keystore. Has no effect when tls.certManager.enabled is true (use tls.certManager.httpsAdminApi.enabled instead).",
+                            "description": "Serve the admin API over HTTPS with a bring-your-own keystore, independently from the Kafka listeners. Not supported with tls.certManager.enabled: use tls.certManager.httpsAdminApi.enabled instead",
                             "default": false
                         },
                         "keystore": {
@@ -758,7 +758,7 @@
                             "properties": {
                                 "secretRef": {
                                     "type": "string",
-                                    "description": "Secret containing the JKS or PKCS12 keystore file for the Admin API",
+                                    "description": "Secret containing the admin API JKS or PKCS12 keystore. Leave empty to reuse tls.keystore (requires tls.enable)",
                                     "default": ""
                                 },
                                 "keystoreKey": {
@@ -771,17 +771,12 @@
                                     "description": "Filename to mount the keystore as",
                                     "default": "keystore.jks"
                                 },
-                                "type": {
-                                    "type": "string",
-                                    "description": "Keystore type (`jks` or `pkcs12`). Leave empty to derive from the keystoreKey extension.",
-                                    "default": ""
-                                },
                                 "passwordSecretRef": {
                                     "type": "object",
                                     "properties": {
                                         "name": {
                                             "type": "string",
-                                            "description": "Secret containing the keystore password",
+                                            "description": "Secret containing the keystore password (optional; leave empty to set GATEWAY_HTTPS_KEY_STORE_PASSWORD via gateway.env or gateway.extraSecretEnvVars). The private key password must match it",
                                             "default": ""
                                         },
                                         "key": {
@@ -798,7 +793,7 @@
                             "properties": {
                                 "secretRef": {
                                     "type": "string",
-                                    "description": "Secret containing the JKS or PKCS12 truststore file for the Admin API (optional)",
+                                    "description": "Secret containing the admin API JKS or PKCS12 truststore. Leave empty to reuse tls.truststore when set. Only used with GATEWAY_HTTPS_CLIENT_AUTH (set in gateway.env)",
                                     "default": ""
                                 },
                                 "keystoreKey": {
@@ -810,11 +805,6 @@
                                     "type": "string",
                                     "description": "Filename to mount the truststore as",
                                     "default": "truststore.jks"
-                                },
-                                "type": {
-                                    "type": "string",
-                                    "description": "Truststore type (`jks` or `pkcs12`). Leave empty to derive from the keystoreKey extension.",
-                                    "default": ""
                                 },
                                 "passwordSecretRef": {
                                     "type": "object",
