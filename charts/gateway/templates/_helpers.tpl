@@ -630,6 +630,39 @@ Both inputs are themselves deprecated and will be removed alongside gateway.port
 {{- end -}}
 
 {{/*
+Fail when the legacy network configuration is used with a Gateway image that no longer supports it.
+Gateway 3.23.0 refuses to start when any of these variables is set (conduktor/conduktor-proxy#4770).
+Non-semver image tags (e.g. "latest") cannot be compared and are left to Gateway's own startup check.
+*/}}
+{{- define "conduktor-gateway.validate.legacyNetworkConfig" -}}
+{{- $removedVars := list "GATEWAY_PORT_START" "GATEWAY_PORT_COUNT" "GATEWAY_BIND_HOST" "GATEWAY_ADVERTISED_HOST" "GATEWAY_HOST" "GATEWAY_ADVERTISED_SNI_PORT" "GATEWAY_ROUTING_MECHANISM" "GATEWAY_SECURITY_PROTOCOL" "GATEWAY_SSL_CLIENT_AUTH" "GATEWAY_ADVERTISED_HOST_PREFIX" "GATEWAY_SNI_HOST_SEPARATOR" "GATEWAY_TENANT_IN_HOSTNAME" -}}
+{{- $imageTag := .Values.gateway.image.tag | default .Chart.AppVersion | toString -}}
+{{- $imageVersion := regexFind "^v?[0-9]+\\.[0-9]+\\.[0-9]+" $imageTag -}}
+{{- if and $imageVersion (semverCompare ">=3.23.0" $imageVersion) -}}
+  {{- $errors := list -}}
+  {{- if .Values.gateway.portRange.enable -}}
+    {{- $errors = append $errors "- gateway.portRange.enable: true" -}}
+  {{- end -}}
+  {{- if not .Values.gateway.preview.listeners -}}
+    {{- $errors = append $errors "- gateway.preview.listeners: false" -}}
+  {{- end -}}
+  {{- range $removedVars -}}
+    {{- if not (empty (index $.Values.gateway.env .)) -}}
+      {{- $errors = append $errors (printf "- gateway.env.%s" .) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- range .Values.gateway.extraSecretEnvVars -}}
+    {{- if has .name $removedVars -}}
+      {{- $errors = append $errors (printf "- gateway.extraSecretEnvVars[].name: %s" .name) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if $errors -}}
+    {{- fail (printf "\n\nGateway %s no longer supports the legacy network configuration and refuses to start when it is set. Found:\n%s\n\nConfigure networking with gateway.listeners instead, then remove gateway.portRange, gateway.preview.listeners and the variables above: https://docs.conduktor.io/guide/tutorials/migrate-to-listener-configuration#kubernetes-helm-chart" $imageTag (join "\n" $errors)) -}}
+  {{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Resolve whether the external listener is active.
 True when either gateway.listeners.external.enable (the current flag) or the deprecated
 service.external.enable alias is true. Both default to false, so existing installs see no
