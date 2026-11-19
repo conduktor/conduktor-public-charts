@@ -646,7 +646,7 @@ Defaults to the full FQDN of the *-internal service for cross-namespace reachabi
 {{/*
 Resolve whether the chart should run in legacy single listener (portRange) mode.
 Returns the string "true" when legacy mode is active, "false" otherwise.
-Legacy is enabled when gateway.portRange.enable is true (the documented opt-in since chart 3.20.0)
+Legacy is enabled when gateway.portRange.enable is true (the documented opt-in since chart 3.21.0)
 or when gateway.preview.listeners is explicitly false (deprecated backward-compat alias).
 Both inputs are themselves deprecated and will be removed alongside gateway.portRange in a future release.
 */}}
