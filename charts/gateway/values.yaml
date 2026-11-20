@@ -379,33 +379,6 @@ tls:
     passwordSecretRef:
       name: ""
       key: "password"
-  ## @param tls.adminApi.enabled Serve the admin API over HTTPS with a bring-your-own keystore, independently from the Kafka listeners. Not supported with tls.certManager.enabled: use tls.certManager.httpsAdminApi.enabled instead
-  ## @param tls.adminApi.keystore.secretRef Secret containing the admin API JKS or PKCS12 keystore. Leave empty to reuse tls.keystore (requires tls.enable)
-  ## @param tls.adminApi.keystore.keystoreKey Key in the keystore secret
-  ## @param tls.adminApi.keystore.keystoreFile Filename to mount the keystore as
-  ## @param tls.adminApi.keystore.passwordSecretRef.name Secret containing the keystore password (optional; leave empty to set GATEWAY_HTTPS_KEY_STORE_PASSWORD via gateway.env or gateway.extraSecretEnvVars). The private key password must match it
-  ## @param tls.adminApi.keystore.passwordSecretRef.key Key in the password secret
-  ## @param tls.adminApi.truststore.secretRef Secret containing the admin API JKS or PKCS12 truststore. Leave empty to reuse tls.truststore when set. Only used with GATEWAY_HTTPS_CLIENT_AUTH (set in gateway.env)
-  ## @param tls.adminApi.truststore.keystoreKey Key in the truststore secret
-  ## @param tls.adminApi.truststore.keystoreFile Filename to mount the truststore as
-  ## @param tls.adminApi.truststore.passwordSecretRef.name Secret containing the truststore password (optional)
-  ## @param tls.adminApi.truststore.passwordSecretRef.key Key in the truststore password secret
-  adminApi:
-    enabled: false
-    keystore:
-      secretRef: ""
-      keystoreKey: keystore.jks
-      keystoreFile: keystore.jks
-      passwordSecretRef:
-        name: ""
-        key: "password"
-    truststore:
-      secretRef: ""
-      keystoreKey: truststore.jks
-      keystoreFile: truststore.jks
-      passwordSecretRef:
-        name: ""
-        key: "password"
   ## @param tls.certManager.enabled Enable cert-manager integration using native JKS keystore generation (requires cert-manager >= 0.15)
   ## @param tls.certManager.issuerRef.name cert-manager Issuer or ClusterIssuer name
   ## @param tls.certManager.issuerRef.kind Issuer kind — Issuer or ClusterIssuer
