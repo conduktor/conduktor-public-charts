@@ -213,7 +213,7 @@ HTTPS APIs with their own bring-your-own TLS settings under tls.<api>, mapped to
 Returns JSON.
 */}}
 {{- define "conduktor-gateway.httpsApis" -}}
-{{- dict "adminApi" "GATEWAY_HTTPS" | toJson -}}
+{{- dict "adminApi" "GATEWAY_HTTPS" "recordsApi" "GATEWAY_RECORDS_API_HTTPS" | toJson -}}
 {{- end -}}
 
 {{/*
@@ -233,7 +233,8 @@ Whether the bring-your-own tls.truststore is mounted at /etc/gateway/truststore/
 
 {{/*
 Resolve the keystore or truststore an HTTPS API serves with: its own tls.<api>.<kind> when secretRef is set,
-otherwise the Kafka listeners' one (tls.keystore with tls.enable, or the mounted tls.truststore).
+otherwise the admin API's for the Records API when tls.adminApi.enabled (both are HTTP APIs reached through the
+same services), otherwise the Kafka listeners' one (tls.keystore with tls.enable, or the mounted tls.truststore).
 Params: api, kind ("keystore" or "truststore"), context.
 Returns JSON {"path": ..., "passwordSecretRef": {...}}, or {} when there is none.
 */}}
@@ -242,6 +243,8 @@ Returns JSON {"path": ..., "passwordSecretRef": {...}}, or {} when there is none
 {{- $own := index $ctx.Values.tls .api .kind -}}
 {{- if $own.secretRef -}}
   {{- dict "path" (printf "/etc/gateway/%s/%s" (include "conduktor-gateway.httpsStoreVolume" .) $own.keystoreFile) "passwordSecretRef" $own.passwordSecretRef | toJson -}}
+{{- else if and (eq .api "recordsApi") $ctx.Values.tls.adminApi.enabled -}}
+  {{- include "conduktor-gateway.httpsStore" (dict "api" "adminApi" "kind" .kind "context" $ctx) -}}
 {{- else if eq .kind "keystore" -}}
   {{- if and $ctx.Values.tls.enable (include "conduktor-gateway.keystoreSecretRef" $ctx) -}}
     {{- dict "path" (printf "/etc/gateway/tls/%s" (include "conduktor-gateway.keystoreFile" $ctx)) "passwordSecretRef" $ctx.Values.tls.keystore.passwordSecretRef | toJson -}}
@@ -252,6 +255,20 @@ Returns JSON {"path": ..., "passwordSecretRef": {...}}, or {} when there is none
   {{- dict "path" (printf "/etc/gateway/truststore/%s" $ctx.Values.tls.truststore.keystoreFile) "passwordSecretRef" $ctx.Values.tls.truststore.passwordSecretRef | toJson -}}
 {{- else -}}
   {{- dict | toJson -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Admin API URL each node publishes to the fleet and to Console (GATEWAY_HTTP_ADVERTISED_URL).
+Gateway's default, the system hostname, does not resolve in Kubernetes. Over HTTP each pod advertises
+its own IP (POD_IP, from the downward API). Over HTTPS the certificate has no pod IP SAN, so all pods
+advertise the internal service FQDN instead, which is in the cert-manager certificate.
+*/}}
+{{- define "conduktor-gateway.adminAdvertisedUrl" -}}
+{{- if eq (include "conduktor-gateway.adminAPIScheme" .) "https" -}}
+  {{- printf "https://%s:%v" (include "conduktor-gateway.internalListenerAdvertisedHost" .) .Values.gateway.admin.port -}}
+{{- else -}}
+  {{- printf "http://$(POD_IP):%v" .Values.gateway.admin.port -}}
 {{- end -}}
 {{- end -}}
 
@@ -310,7 +327,7 @@ secret only exists when tls.certManager.enabled is true.
 {{- end -}}
 
 {{/*
-Build a dict of GATEWAY_SSL_* / GATEWAY_HTTPS_* env vars to inject into the container spec.
+Build a dict of GATEWAY_SSL_* / GATEWAY_HTTPS_* / GATEWAY_RECORDS_API_HTTPS_* env vars to inject into the container spec.
 Plain-string values are stored as strings; secretKeyRef values are stored as a map
   {"secretKeyRef": {"name": "...", "key": "..."}}
 so that the caller can dispatch on kind (see deployment.yaml tlsEnvVars range block).
@@ -382,12 +399,14 @@ Returns JSON.
     {{- $_ := set $vars "GATEWAY_SSL_TRUST_STORE_TYPE"     "jks" -}}
     {{- $_ := set $vars "GATEWAY_SSL_TRUST_STORE_PASSWORD" $ref -}}
   {{- end -}}
-  {{- if .Values.tls.certManager.httpsAdminApi.enabled -}}
-    {{- $_ := set $vars "GATEWAY_HTTPS_KEY_STORE_PATH"     (printf "/etc/gateway/tls/%s" $ksFile) -}}
-    {{- $_ := set $vars "GATEWAY_HTTPS_KEY_STORE_PASSWORD" $ref -}}
-    {{- if .Values.tls.certManager.truststore.enabled -}}
-      {{- $_ := set $vars "GATEWAY_HTTPS_TRUST_STORE_PATH"     (printf "/etc/gateway/tls/%s" .Values.tls.truststore.keystoreFile) -}}
-      {{- $_ := set $vars "GATEWAY_HTTPS_TRUST_STORE_PASSWORD" $ref -}}
+  {{- range $prefix, $enabled := dict "GATEWAY_HTTPS" .Values.tls.certManager.httpsAdminApi.enabled "GATEWAY_RECORDS_API_HTTPS" .Values.tls.certManager.httpsRecordsApi.enabled -}}
+    {{- if $enabled -}}
+      {{- $_ := set $vars (printf "%s_KEY_STORE_PATH" $prefix)     (printf "/etc/gateway/tls/%s" $ksFile) -}}
+      {{- $_ := set $vars (printf "%s_KEY_STORE_PASSWORD" $prefix) $ref -}}
+      {{- if $.Values.tls.certManager.truststore.enabled -}}
+        {{- $_ := set $vars (printf "%s_TRUST_STORE_PATH" $prefix)     (printf "/etc/gateway/tls/%s" $.Values.tls.truststore.keystoreFile) -}}
+        {{- $_ := set $vars (printf "%s_TRUST_STORE_PASSWORD" $prefix) $ref -}}
+      {{- end -}}
     {{- end -}}
   {{- end -}}
 {{- end -}}
@@ -490,6 +509,26 @@ Validate TLS configuration. Called unconditionally from NOTES.txt.
 
 {{- if and .Values.tls.certManager.httpsAdminApi.enabled (not .Values.tls.certManager.enabled) -}}
   {{- fail "tls.certManager.httpsAdminApi.enabled requires tls.certManager.enabled to be true." -}}
+{{- end -}}
+
+{{- if and .Values.tls.recordsApi.enabled .Values.tls.certManager.httpsRecordsApi.enabled -}}
+  {{- fail "tls.recordsApi.enabled and tls.certManager.httpsRecordsApi.enabled cannot both be true." -}}
+{{- end -}}
+
+{{- if and (or .Values.tls.recordsApi.enabled .Values.tls.certManager.httpsRecordsApi.enabled) (not .Values.gateway.recordsApi.enable) -}}
+  {{- fail "tls.recordsApi.enabled and tls.certManager.httpsRecordsApi.enabled require gateway.recordsApi.enable to be true." -}}
+{{- end -}}
+
+{{- if and .Values.tls.certManager.httpsRecordsApi.enabled (not .Values.tls.certManager.enabled) -}}
+  {{- fail "tls.certManager.httpsRecordsApi.enabled requires tls.certManager.enabled to be true." -}}
+{{- end -}}
+
+{{- if .Values.tls.recordsApi.enabled -}}
+  {{- if and .Values.tls.certManager.enabled (not .Values.tls.recordsApi.keystore.secretRef) -}}
+    {{- fail "tls.recordsApi.enabled with tls.certManager.enabled requires tls.recordsApi.keystore.secretRef. To reuse the cert-manager certificate, use tls.certManager.httpsRecordsApi.enabled instead." -}}
+  {{- else if not (include "conduktor-gateway.httpsStore" (dict "api" "recordsApi" "kind" "keystore" "context" .) | fromJson).path -}}
+    {{- fail "tls.recordsApi.enabled requires tls.recordsApi.keystore.secretRef, tls.adminApi.enabled, or tls.enable with tls.keystore.secretRef to reuse their keystore." -}}
+  {{- end -}}
 {{- end -}}
 
 {{- if .Values.tls.certManager.enabled -}}

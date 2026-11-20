@@ -102,6 +102,11 @@ gateway:
       password: "GATEWAY_ADMIN_PASSWORD"
     ## @param gateway.admin.securedMetrics Enable secured metrics using api users credentials. If `gateway.secretRef` is set, this can't be used by `metrics.prometheus` to automatically configure basic auth on scrapping.
     securedMetrics: true
+  recordsApi:
+    ## @param gateway.recordsApi.enable (Preview, Gateway >= 3.23.0) Enable the Records API (`POST /gateway/v2/topics/{topic}/records`) on its own listener, apart from the admin API. Sets GATEWAY_FEATURE_FLAGS_RECORDS_API and exposes the port on the internal service. Use tls.recordsApi.enabled or tls.certManager.httpsRecordsApi.enabled to serve it over HTTPS
+    enable: false
+    ## @param gateway.recordsApi.port Records API port (GATEWAY_RECORDS_API_PORT). Must differ from gateway.admin.port and every listener port
+    port: 8889
   jmx:
     ## @param gateway.jmx.enable Enable JMX JVM options
     enable: false
@@ -417,6 +422,7 @@ tls:
   ## @param tls.certManager.sslContextRefreshMinutes How often Gateway reloads the SSL context from disk (GATEWAY_SSL_UPDATE_CONTEXT_INTERVAL_MINUTES)
   ## @param tls.certManager.truststore.enabled Mount the cert-manager JKS truststore and set GATEWAY_SSL_TRUST_STORE_* env vars. Enable only when the upstream Kafka broker uses SSL or when Gateway listeners require mTLS. Leave false when upstream Kafka is PLAINTEXT — enabling with PLAINTEXT Kafka will cause Gateway to fail at startup.
   ## @param tls.certManager.httpsAdminApi.enabled Secure the admin API with the same JKS keystore
+  ## @param tls.certManager.httpsRecordsApi.enabled Secure the Records API with the same JKS keystore (and truststore when tls.certManager.truststore.enabled). Requires gateway.recordsApi.enable
   certManager:
     enabled: false
     issuerRef:
@@ -432,6 +438,35 @@ tls:
       enabled: false
     httpsAdminApi:
       enabled: false
+    httpsRecordsApi:
+      enabled: false
+  ## @param tls.recordsApi.enabled Serve the Records API over HTTPS with a bring-your-own keystore, independently from the admin API and the Kafka listeners. Requires gateway.recordsApi.enable. With tls.certManager.enabled, set tls.recordsApi.keystore.secretRef or use tls.certManager.httpsRecordsApi.enabled instead
+  ## @param tls.recordsApi.keystore.secretRef Secret containing the Records API JKS or PKCS12 keystore. Leave empty to reuse the admin API keystore when tls.adminApi.enabled, otherwise tls.keystore (requires tls.enable)
+  ## @param tls.recordsApi.keystore.keystoreKey Key in the keystore secret
+  ## @param tls.recordsApi.keystore.keystoreFile Filename to mount the keystore as
+  ## @param tls.recordsApi.keystore.passwordSecretRef.name Secret containing the keystore password (optional; leave empty to set GATEWAY_RECORDS_API_HTTPS_KEY_STORE_PASSWORD via gateway.env or gateway.extraSecretEnvVars). The private key password must match it
+  ## @param tls.recordsApi.keystore.passwordSecretRef.key Key in the password secret
+  ## @param tls.recordsApi.truststore.secretRef Secret containing the Records API JKS or PKCS12 truststore. Leave empty to reuse the admin API truststore when tls.adminApi.enabled, otherwise tls.truststore when set. Only used with GATEWAY_RECORDS_API_HTTPS_CLIENT_AUTH (set in gateway.env)
+  ## @param tls.recordsApi.truststore.keystoreKey Key in the truststore secret
+  ## @param tls.recordsApi.truststore.keystoreFile Filename to mount the truststore as
+  ## @param tls.recordsApi.truststore.passwordSecretRef.name Secret containing the truststore password (optional)
+  ## @param tls.recordsApi.truststore.passwordSecretRef.key Key in the truststore password secret
+  recordsApi:
+    enabled: false
+    keystore:
+      secretRef: ""
+      keystoreKey: keystore.jks
+      keystoreFile: keystore.jks
+      passwordSecretRef:
+        name: ""
+        key: "password"
+    truststore:
+      secretRef: ""
+      keystoreKey: truststore.jks
+      keystoreFile: truststore.jks
+      passwordSecretRef:
+        name: ""
+        key: "password"
 ## @section Gateway service configurations
 ## @descriptionStart
 ## This section contains Kubernetes services configuration.
@@ -456,6 +491,8 @@ service:
     # external-dns.alpha.kubernetes.io/hostname: "{{ required "A valid .Values.gateway.domain is required!" .Values.gateway.domain }}"
     ## @param service.external.admin Enable admin exposition on external service
     admin: false
+    ## @param service.external.recordsApi Enable Records API exposition on external service (requires gateway.recordsApi.enable)
+    recordsApi: false
     ## @param service.external.jmx Enable jmx exposition on external service
     jmx: false
     ## @param service.external.extraSpecs Extra specs for the service to be added under `spec` key

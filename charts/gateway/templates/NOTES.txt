@@ -77,6 +77,11 @@ Admin API :
     ADMIN_LOGIN="$(kubectl get secret {{ include "conduktor-gateway.secretName" . }} -n {{ .Release.Namespace }} -o jsonpath="{.data.GATEWAY_ADMIN_API_USER_0_USERNAME}" | base64 --decode)"
     ADMIN_PASSWORD="$(kubectl get secret {{ include "conduktor-gateway.secretName" . }} -n {{ .Release.Namespace }} -o jsonpath="{.data.GATEWAY_ADMIN_API_USER_0_PASSWORD}" | base64 --decode)"
 {{- end }}
+{{- if .Values.gateway.recordsApi.enable }}
+
+Records API (preview, Gateway >= 3.23.0) :
+  Internal access : {{ ternary "https" "http" (or .Values.tls.recordsApi.enabled .Values.tls.certManager.httpsRecordsApi.enabled) }}://{{ $internalServiceHost }}:{{ .Values.gateway.recordsApi.port }}/gateway/v2/topics/<topic>/records
+{{- end }}
 
 {{- /* Warn when GATEWAY_LISTENER_* vars are set in legacy mode */ -}}
 {{- if $useLegacy }}
