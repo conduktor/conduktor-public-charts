@@ -155,10 +155,21 @@ spec:
               mountPath: /etc/gateway/tls/
               readOnly: true
             {{- end }}
-            {{- if and .Values.tls.truststore.secretRef (not (and .Values.tls.certManager.enabled .Values.tls.certManager.truststore.enabled)) }}
+            {{- if eq (include "conduktor-gateway.mountsTruststore" .) "true" }}
             - name: truststore
               mountPath: /etc/gateway/truststore/
               readOnly: true
+            {{- end }}
+            {{- range $api, $_ := include "conduktor-gateway.httpsApis" . | fromJson }}
+            {{- if (index $.Values.tls $api).enabled }}
+            {{- range $kind := list "keystore" "truststore" }}
+            {{- if (index $.Values.tls $api $kind).secretRef }}
+            - name: {{ include "conduktor-gateway.httpsStoreVolume" (dict "api" $api "kind" $kind) }}
+              mountPath: /etc/gateway/{{ include "conduktor-gateway.httpsStoreVolume" (dict "api" $api "kind" $kind) }}/
+              readOnly: true
+            {{- end }}
+            {{- end }}
+            {{- end }}
             {{- end }}
             - name: config
               mountPath: /etc/gateway/config
@@ -263,13 +274,28 @@ spec:
               path: {{ .Values.tls.truststore.keystoreFile }}
             {{- end }}
         {{- end }}
-        {{- if and .Values.tls.truststore.secretRef (not (and .Values.tls.certManager.enabled .Values.tls.certManager.truststore.enabled)) }}
+        {{- if eq (include "conduktor-gateway.mountsTruststore" .) "true" }}
         - name: truststore
           secret:
             secretName: {{ .Values.tls.truststore.secretRef }}
             items:
             - key: {{ .Values.tls.truststore.keystoreKey }}
               path: {{ .Values.tls.truststore.keystoreFile }}
+        {{- end }}
+        {{- range $api, $_ := include "conduktor-gateway.httpsApis" . | fromJson }}
+        {{- if (index $.Values.tls $api).enabled }}
+        {{- range $kind := list "keystore" "truststore" }}
+        {{- $store := index $.Values.tls $api $kind }}
+        {{- if $store.secretRef }}
+        - name: {{ include "conduktor-gateway.httpsStoreVolume" (dict "api" $api "kind" $kind) }}
+          secret:
+            secretName: {{ $store.secretRef }}
+            items:
+            - key: {{ $store.keystoreKey }}
+              path: {{ $store.keystoreFile }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
         {{- end }}
         - name: config
           configMap:
