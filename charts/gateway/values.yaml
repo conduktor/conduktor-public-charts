@@ -48,7 +48,7 @@ gateway:
     ## @param gateway.image.repository Image in repository format (conduktor/conduktor-gateway)
     repository: conduktor/conduktor-gateway
     ## @param gateway.image.tag Image tag
-    tag: 3.22.3
+    tag: 3.23.0
     ## @param gateway.image.pullPolicy Kubernetes image pull policy
     pullPolicy: IfNotPresent
   ## @section Gateway configurations
@@ -648,10 +648,10 @@ metrics:
     extraParams: {}
     # basicAuth:
     #   password:
-    #     name: conduktor-admin-user # secret name
+    #     name: conduktor-admin-user  # secret name
     #     key: password
     #   username:
-    #     name: conduktor-admin-user # secret name
+    #     name: conduktor-admin-user  # secret name
     #     key: username
   grafana:
     ## @param metrics.grafana.enable Enable Grafana dashboards to installation. Dashboards can be installed as Sidecar ConfigMap or using Grafana operator CRDs (v4 or v5)
@@ -665,7 +665,7 @@ metrics:
     ## @param metrics.grafana.labels Additional custom labels for Grafana dashboard ConfigMap. Used by Sidecar ConfigMap loading https://github.com/grafana/helm-charts/tree/main/charts/grafana#sidecar-for-dashboards
     ##
     labels: {}
-    #  grafana_dashboard: '1' #Default label of Grafana Sidecar (sidecar.dashboards.label)
+    #  grafana_dashboard: '1'  #Default label of Grafana Sidecar (sidecar.dashboards.label)
     ## @param metrics.grafana.folder Grafana dashboard folder name
     ##
     folder: ""
@@ -715,10 +715,10 @@ affinity:
   # requiredDuringSchedulingIgnoredDuringExecution:
   #   nodeSelectorTerms:
   #     - matchExpressions:
-  #         - key: node-role.kubernetes.io/worker # node label key
+  #         - key: node-role.kubernetes.io/worker  # node label key
   #           operator: In
   #           values:
-  #             - "data" # node label values
+  #             - "data"  # node label values
 
   ## @param affinity.podAffinity Gateway pods affinity configuration
   ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
@@ -726,10 +726,10 @@ affinity:
   # requiredDuringSchedulingIgnoredDuringExecution:
   #      - labelSelector:
   #          matchExpressions:
-  #          - key: app.kubernetes.io/name # pod label key to colocate with
+  #          - key: app.kubernetes.io/name  # pod label key to colocate with
   #            operator: In
   #            values:
-  #            - kafka # label values of the pods to colocate with
+  #            - kafka  # label values of the pods to colocate with
   #        topologyKey: topology.kubernetes.io/zone
 
   ## @param affinity.podAntiAffinity Gateway pods anti-affinity configuration
