@@ -10,6 +10,7 @@ To learn more about the release, try:
   $ helm status {{ .Release.Name }} -n {{ include "common.names.namespace" . | quote }}
   $ helm get all {{ .Release.Name }} -n {{ include "common.names.namespace" . | quote }}
 
+{{- include "conduktor-gateway.validate.legacyNetworkConfig" . }}
 {{- include "conduktor-gateway.validate.kafka-bootstrap-server" . }}
 {{- include "conduktor-gateway.validate.listeners" . }}
 {{- include "conduktor-gateway.validate.tls" . }}
@@ -76,6 +77,11 @@ Admin API :
     ADMIN_LOGIN="$(kubectl get secret {{ include "conduktor-gateway.secretName" . }} -n {{ .Release.Namespace }} -o jsonpath="{.data.GATEWAY_ADMIN_API_USER_0_USERNAME}" | base64 --decode)"
     ADMIN_PASSWORD="$(kubectl get secret {{ include "conduktor-gateway.secretName" . }} -n {{ .Release.Namespace }} -o jsonpath="{.data.GATEWAY_ADMIN_API_USER_0_PASSWORD}" | base64 --decode)"
 {{- end }}
+{{- if .Values.gateway.recordsApi.enable }}
+
+Records API (preview, Gateway >= 3.23.0) :
+  Internal access : {{ ternary "https" "http" (or .Values.tls.recordsApi.enabled .Values.tls.certManager.httpsRecordsApi.enabled) }}://{{ $internalServiceHost }}:{{ .Values.gateway.recordsApi.port }}/gateway/v2/topics/<topic>/records
+{{- end }}
 
 {{- /* Warn when GATEWAY_LISTENER_* vars are set in legacy mode */ -}}
 {{- if $useLegacy }}
@@ -138,6 +144,8 @@ NOTE: GATEWAY_ACL_ENABLED is set in gateway.env. It is being used as the effecti
 {{ include "conduktor-gateway.deprecationBanner" "gateway.portRange / legacy single listener mode" }}
   You are running the chart in legacy single listener (portRange) mode. This mode
   is DEPRECATED as of chart 3.21.0 and will be REMOVED in a future release.
+  Gateway 3.23.0 and later refuse to start in this mode: migrate before upgrading
+  the Gateway image.
 
   Triggered by:
 {{- if .Values.gateway.portRange.enable }}
@@ -170,7 +178,7 @@ NOTE: GATEWAY_ACL_ENABLED is set in gateway.env. It is being used as the effecti
         advertisedHost: "{{ index .Values.gateway.env "GATEWAY_ADVERTISED_HOST" | default "<set-externally-reachable-hostname>" }}"
 {{- end }}
 
-  See the chart README ("Multi-listeners" + "Migrating from single listener portRange to multi-listeners") for the full step-by-step migration guide.
+  Full migration guide: https://docs.conduktor.io/guide/tutorials/migrate-to-listener-configuration#kubernetes-helm-chart
 {{- end }}
 
 {{- /* Inform user that the deprecated preview alias is in use */ -}}
@@ -179,7 +187,7 @@ NOTE: GATEWAY_ACL_ENABLED is set in gateway.env. It is being used as the effecti
 {{ include "conduktor-gateway.deprecationBanner" "gateway.preview.listeners alias" }}
   gateway.preview.listeners is a backward-compatibility alias from when
   multi-listeners was a preview feature. It will be removed in a future chart
-  release. Use gateway.portRange.enable to control legacy mode opt-in instead.
+  release. Migrate to gateway.listeners and remove it.
 {{- end }}
 
 {{ if .Values.resources -}}

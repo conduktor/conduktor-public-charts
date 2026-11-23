@@ -39,12 +39,6 @@ spec:
       {{- /* The JVM attach mechanism used by jcmd/jstack/jmap/jfr needs the debug sidecar to see the Gateway process */}}
       shareProcessNamespace: true
       {{- end }}
-      {{- if .Values.tls.certManager.enabled }}
-      {{/* Set a deterministic pod hostname so Gateway can locate its own SAN entry in the mounted JKS keystore.
-           Without this the pod hostname is a random suffix that doesn't appear in the cert SANs derived at
-           template time, causing Gateway to fail SSL context initialisation. */}}
-      hostname: {{ include "conduktor-gateway.fullname" . }}
-      {{- end }}
       initContainers:
         {{- if .Values.gateway.initContainers }}
           {{- include "common.tplvalues.render" (dict "value" .Values.gateway.initContainers "context" $) | nindent 8 }}
@@ -59,6 +53,22 @@ spec:
               value: /etc/gateway/config/interceptors.json
             - name: GATEWAY_HTTP_PORT
               value: {{ .Values.gateway.admin.port | quote }}
+            {{- if eq (include "conduktor-gateway.envExists" (dict "envkey" "GATEWAY_HTTP_ADVERTISED_URL" "context" $)) "false" }}
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: GATEWAY_HTTP_ADVERTISED_URL
+              value: {{ include "conduktor-gateway.adminAdvertisedUrl" . | quote }}
+            {{- end }}
+            {{- if .Values.gateway.recordsApi.enable }}
+            {{- if eq (include "conduktor-gateway.envExists" (dict "envkey" "GATEWAY_FEATURE_FLAGS_RECORDS_API" "context" $)) "false" }}
+            - name: GATEWAY_FEATURE_FLAGS_RECORDS_API
+              value: "true"
+            {{- end }}
+            - name: GATEWAY_RECORDS_API_PORT
+              value: {{ .Values.gateway.recordsApi.port | quote }}
+            {{- end }}
             {{- if .Values.gateway.jmx.enable }}
             - name: JAVA_TOOL_OPTIONS
               value: {{ tpl .Values.gateway.jmx.jvmArgs . | quote }}
@@ -141,6 +151,11 @@ spec:
             - name: admin-http
               containerPort: {{ .Values.gateway.admin.port }}
               protocol: TCP
+            {{- if .Values.gateway.recordsApi.enable }}
+            - name: records-api
+              containerPort: {{ .Values.gateway.recordsApi.port }}
+              protocol: TCP
+            {{- end }}
             {{- if .Values.gateway.jmx.enable }}
             - name: jmx
               containerPort: {{ .Values.gateway.jmx.port }}
@@ -155,10 +170,21 @@ spec:
               mountPath: /etc/gateway/tls/
               readOnly: true
             {{- end }}
-            {{- if and .Values.tls.truststore.secretRef (not (and .Values.tls.certManager.enabled .Values.tls.certManager.truststore.enabled)) }}
+            {{- if eq (include "conduktor-gateway.mountsTruststore" .) "true" }}
             - name: truststore
               mountPath: /etc/gateway/truststore/
               readOnly: true
+            {{- end }}
+            {{- range $api, $_ := include "conduktor-gateway.httpsApis" . | fromJson }}
+            {{- if (index $.Values.tls $api).enabled }}
+            {{- range $kind := list "keystore" "truststore" }}
+            {{- if (index $.Values.tls $api $kind).secretRef }}
+            - name: {{ include "conduktor-gateway.httpsStoreVolume" (dict "api" $api "kind" $kind) }}
+              mountPath: /etc/gateway/{{ include "conduktor-gateway.httpsStoreVolume" (dict "api" $api "kind" $kind) }}/
+              readOnly: true
+            {{- end }}
+            {{- end }}
+            {{- end }}
             {{- end }}
             - name: config
               mountPath: /etc/gateway/config
@@ -263,13 +289,28 @@ spec:
               path: {{ .Values.tls.truststore.keystoreFile }}
             {{- end }}
         {{- end }}
-        {{- if and .Values.tls.truststore.secretRef (not (and .Values.tls.certManager.enabled .Values.tls.certManager.truststore.enabled)) }}
+        {{- if eq (include "conduktor-gateway.mountsTruststore" .) "true" }}
         - name: truststore
           secret:
             secretName: {{ .Values.tls.truststore.secretRef }}
             items:
             - key: {{ .Values.tls.truststore.keystoreKey }}
               path: {{ .Values.tls.truststore.keystoreFile }}
+        {{- end }}
+        {{- range $api, $_ := include "conduktor-gateway.httpsApis" . | fromJson }}
+        {{- if (index $.Values.tls $api).enabled }}
+        {{- range $kind := list "keystore" "truststore" }}
+        {{- $store := index $.Values.tls $api $kind }}
+        {{- if $store.secretRef }}
+        - name: {{ include "conduktor-gateway.httpsStoreVolume" (dict "api" $api "kind" $kind) }}
+          secret:
+            secretName: {{ $store.secretRef }}
+            items:
+            - key: {{ $store.keystoreKey }}
+              path: {{ $store.keystoreFile }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
         {{- end }}
         - name: config
           configMap:

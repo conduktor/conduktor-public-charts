@@ -232,7 +232,7 @@ platform:
   image:
     registry: docker.io
     repository: conduktor/conduktor-console
-    tag: 1.48.1
+    tag: 1.49.0
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -592,10 +592,10 @@ platform:
       ##  extraParams:
       ##    basicAuth:
       ##      password:
-      ##        name: conduktor-admin-user # secret name
+      ##        name: conduktor-admin-user  # secret name
       ##        key: password
       ##      username:
-      ##        name: conduktor-admin-user # secret name
+      ##        name: conduktor-admin-user  # secret name
       ##        key: username
       ##
       extraParams: {}
@@ -761,7 +761,7 @@ ingress:
   ## It is also possible to create and manage the certificates outside of this helm chart by just set existing secret name in secrets[].name without key and certificate values.
   ## e.g:
   ## secrets:
-  ##   - name: existing-secret-tls # existing TLS secret
+  ##   - name: existing-secret-tls  # existing TLS secret
   ##   - name: platform.local-tls  # new TLS secret with key and certificate values for tls.cert and tls.key keys
   ##     key: |-
   ##       -----BEGIN RSA PRIVATE KEY-----
@@ -827,7 +827,7 @@ platformCortex:
   image:
     registry: docker.io
     repository: conduktor/conduktor-console-cortex
-    tag: 1.48.1
+    tag: 1.49.0
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'

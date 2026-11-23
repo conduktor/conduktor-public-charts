@@ -2,7 +2,10 @@ nameOverride: gateway-test-10
 
 # Test the deprecated legacy single listener (portRange) mode that existing users
 # can opt back into via gateway.portRange.enable: true.
+# Pinned below 3.23.0: later Gateway images reject the legacy configuration.
 gateway:
+  image:
+    tag: 3.22.3
   replicas: 1
   portRange:
     enable: true

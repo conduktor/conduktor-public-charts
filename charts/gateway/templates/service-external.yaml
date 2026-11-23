@@ -49,6 +49,12 @@ spec:
       targetPort: {{ .Values.gateway.admin.port }}
       protocol: TCP
     {{- end }}
+    {{- if and .Values.gateway.recordsApi.enable .Values.service.external.recordsApi }}
+    - name: records-api
+      port: {{ .Values.gateway.recordsApi.port }}
+      targetPort: {{ .Values.gateway.recordsApi.port }}
+      protocol: TCP
+    {{- end }}
     {{- if and .Values.gateway.jmx.enable .Values.service.external.jmx }}
     - name: jmx
       port: {{ .Values.gateway.jmx.port }}
