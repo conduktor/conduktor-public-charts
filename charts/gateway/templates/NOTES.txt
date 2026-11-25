@@ -39,18 +39,26 @@ Gateway Bootstrap server :
   INTERNAL listener: disabled (gateway.listeners.internal.enable is false).
   {{- end }}
   {{- if eq (include "conduktor-gateway.externalListenerEnabled" .) "true" }}
-  EXTERNAL listener ({{ .Values.gateway.listeners.external.routing }} routing):
-    External bootstrap: {{ .Values.gateway.listeners.external.advertisedHost }}:{{ include "conduktor-gateway.firstAdvertisedPort" (index .Values.gateway.listeners.external.ports 0) }}
-    {{- if eq .Values.gateway.listeners.external.routing "sni" }}
+  {{- $ext := .Values.gateway.listeners.external }}
+  {{- $externalPort := include "conduktor-gateway.firstAdvertisedPort" (index $ext.ports 0) }}
+  EXTERNAL listener ({{ $ext.routing }} routing):
+    {{- if eq $ext.routing "sni" }}
+    {{- $brokerHost := include "conduktor-gateway.resolveHostPattern" (dict "pattern" $ext.advertisedHostPattern "advertisedHost" $ext.advertisedHost) }}
+    {{- /* Gateway derives a missing bootstrapHostPattern by removing {{nodeId}} from advertisedHostPattern */}}
+    {{- $bootstrapPattern := $ext.bootstrapHostPattern | default (replace "{{nodeId}}" "" $ext.advertisedHostPattern) }}
+    {{- $bootstrapHost := include "conduktor-gateway.resolveHostPattern" (dict "pattern" $bootstrapPattern "advertisedHost" $ext.advertisedHost) }}
+    External bootstrap: {{ $bootstrapHost }}:{{ $externalPort }}
 
   SNI listener 'EXTERNAL' detected. DNS requirements:
-    Bootstrap hostname : {{ .Values.gateway.listeners.external.bootstrapHostPattern | default (printf "bootstrap.%s" .Values.gateway.listeners.external.advertisedHost) }} → <LoadBalancer IP>
-    Broker pattern     : *.{{ .Values.gateway.listeners.external.advertisedHost }} → <LoadBalancer IP>
+    Bootstrap hostname : {{ $bootstrapHost }} → <LoadBalancer IP>
+    Broker pattern     : {{ $brokerHost }} → <LoadBalancer IP>
 
     Get the LoadBalancer IP/hostname to point the DNS records above:
       $ kubectl get svc {{ include "conduktor-gateway.externalServiceName" . }} -n {{ .Release.Namespace }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}{.status.loadBalancer.ingress[0].hostname}'
 
-  Required certificate SANs: *.{{ .Values.gateway.listeners.external.advertisedHost }}, {{ .Values.gateway.listeners.external.bootstrapHostPattern | default (printf "bootstrap.%s" .Values.gateway.listeners.external.advertisedHost) }}
+  Required certificate SANs: {{ $brokerHost }}, {{ $bootstrapHost }}
+    {{- else }}
+    External bootstrap: {{ $ext.advertisedHost }}:{{ $externalPort }}
     {{- end }}
   {{- end }}
 {{- else }}

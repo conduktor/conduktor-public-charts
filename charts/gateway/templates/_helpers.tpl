@@ -430,11 +430,13 @@ Params:
 {{- end -}}
 
 {{/*
-Turn an external listener host pattern into a DNS SAN: {{advertisedHost}} is substituted,
+Resolve an external listener host pattern into a hostname: {{advertisedHost}} is substituted,
 any label still holding a placeholder (e.g. {{nodeId}}, {{physicalCluster}}) becomes "*".
-A wildcard is only valid as the leftmost label (RFC 6125), so anything else fails.
+Parameters:
+  - pattern        - string - Required - Host pattern.
+  - advertisedHost - string - Optional - Value substituted for {{advertisedHost}}.
 */}}
-{{- define "conduktor-gateway.hostPatternToDnsName" -}}
+{{- define "conduktor-gateway.resolveHostPattern" -}}
 {{- $pattern := .pattern -}}
 {{- if .advertisedHost -}}
   {{- $pattern = replace "{{advertisedHost}}" .advertisedHost $pattern -}}
@@ -443,10 +445,20 @@ A wildcard is only valid as the leftmost label (RFC 6125), so anything else fail
 {{- range splitList "." $pattern -}}
   {{- $labels = append $labels (ternary "*" . (contains "{{" .)) -}}
 {{- end -}}
-{{- if has "*" (rest $labels) -}}
-  {{- fail (printf "tls.certManager: cannot derive a valid certificate SAN from gateway.listeners.external.%s %q (resolved to %q): placeholders are only supported in the leftmost DNS label, and {{advertisedHost}} requires gateway.listeners.external.advertisedHost to be set. Use a pattern like \"broker{{physicalCluster}}{{nodeId}}.example.com\", or bring your own certificate with tls.enable." .key .pattern (join "." $labels)) -}}
-{{- end -}}
 {{- join "." $labels -}}
+{{- end -}}
+
+{{/*
+Turn an external listener host pattern into a DNS SAN (see conduktor-gateway.resolveHostPattern).
+A wildcard is only valid as the leftmost label (RFC 6125), so anything else fails.
+Parameters: key (values key, for the error message), pattern, advertisedHost.
+*/}}
+{{- define "conduktor-gateway.hostPatternToDnsName" -}}
+{{- $dnsName := include "conduktor-gateway.resolveHostPattern" . -}}
+{{- if has "*" (rest (splitList "." $dnsName)) -}}
+  {{- fail (printf "tls.certManager: cannot derive a valid certificate SAN from gateway.listeners.external.%s %q (resolved to %q): placeholders are only supported in the leftmost DNS label, and {{advertisedHost}} requires gateway.listeners.external.advertisedHost to be set. Use a pattern like \"broker{{physicalCluster}}{{nodeId}}.example.com\", or bring your own certificate with tls.enable." .key .pattern $dnsName) -}}
+{{- end -}}
+{{- $dnsName -}}
 {{- end -}}
 
 {{/*
